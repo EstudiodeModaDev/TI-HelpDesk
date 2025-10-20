@@ -117,7 +117,7 @@ export default function TicketsAsociados({title = "Tickets Asociados", ticket, e
 
             {/* Hijos */}
             <section className="ta-column">
-              <p className="ta-label">Hijo de {hijos.length}:</p>
+              <p className="ta-label">Padre de {hijos.length}:</p>
               {hijos.length === 0 ? (
                 <p className="ta-empty">{emptyChildrenText}</p>
               ) : (
