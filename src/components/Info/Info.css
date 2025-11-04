@@ -12,14 +12,14 @@
 
 @media (prefers-color-scheme: dark){
   :root{
-    color-scheme: light dark;
-    --bg:#ffffff;
-    --bg-elev:#ffffff;
-    --text:#0f172a;
-    --border:#e2e8f0;
-    --shadow:0 1px 2px rgba(2,6,23,.05);
-    --focus:#4f46e5;
-    --focus-ring:rgba(79,70,229,.35);
+  color-scheme: light dark;
+  --bg:#ffffff;
+  --bg-elev:#ffffff;
+  --text:#0f172a;
+  --border:#e2e8f0;
+  --shadow:0 1px 2px rgba(2,6,23,.05);
+  --focus:#4f46e5;
+  --focus-ring:rgba(79,70,229,.35);
   }
 }
 
