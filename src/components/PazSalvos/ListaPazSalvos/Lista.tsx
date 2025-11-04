@@ -22,9 +22,7 @@ export default function PazYSalvos() {
   const { rows, loadFirstPage } = usePazSalvos({LogSvc: Logs, PazYSalvos: PazYSalvos, TicketSvc: Tickets, Usuarios: Usuarios,});
 
   React.useEffect(() => {                             
-    let cancel = false;
     loadFirstPage()
-    return () => { cancel = true; };
   }, [Logs, ]);    
 
   return (
