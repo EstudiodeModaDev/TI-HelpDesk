@@ -28,6 +28,7 @@ import infoIcon from "./assets/info.svg";
 import settingsIcon from "./assets/settings.svg"
 import templateIcon from "./assets/template.svg"
 import PazySalvosMode from "./components/PazSalvos/PazYSalvo";
+import WelcomeSolvi from "./components/Welcome/Welcome";
 
 /* ============================================================
    Tipos de navegación y contexto de visibilidad
@@ -320,6 +321,7 @@ function Shell() {
     return (
       <div className="page layout">
         <HeaderBar user={user} role={"Usuario"} onPrimaryAction={{ label: actionLabel, onClick: handleAuthClick, disabled: !ready || loadingAuth }}/>
+        <WelcomeSolvi/>
       </div>
     );
   }

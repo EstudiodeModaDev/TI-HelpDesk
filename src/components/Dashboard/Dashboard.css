@@ -1,0 +1,83 @@
+:root{
+  --msb-bg: #0b73ff;          /* azul principal de fondo (columna) */
+  --msb-bg-light: #56a7ff;    /* celeste para tarjeta secundaria */
+  --msb-ink: #ffffff;         /* iconos y textos */
+  --msb-border: #ffffff;      /* borde blanco del activo */
+  --msb-rail: #0a2a52;        /* franjas oscuras laterales */
+  --msb-width: 76px;          /* ancho columna (similar a la captura) */
+}
+
+/* Columna fija */
+.msb{
+  position: relative;
+  width: var(--msb-width);
+  min-height: 100vh;
+  background: var(--msb-bg);
+  box-shadow: inset 6px 0 0 var(--msb-rail), inset -6px 0 0 var(--msb-rail);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Pista para apilar items */
+.msb-track{
+  display: flex;
+  flex-direction: column;
+  padding: 6px 0;
+  gap: 8px;
+  height: 100%;
+}
+
+/* Botón base */
+.msb-item{
+  width: 100%;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  color: var(--msb-ink);
+}
+
+/* Tarjeta interior */
+.msb-item__inner{
+  margin-inline: 8px;
+  height: 84px;                         /* alto de cada “tarjeta” */
+  background: var(--msb-bg-light);
+  border-radius: 2px;
+  display: grid;
+  place-items: center;
+  gap: 6px;
+  text-align: center;
+  position: relative;
+}
+
+/* Estado activo con “marco” blanco grueso */
+.msb-item.is-active .msb-item__inner{
+  background: #4da1ff;                  /* un poco más oscuro */
+  outline: 4px solid var(--msb-border); /* marco blanco como en la captura */
+  outline-offset: -6px;                  /* que quede “inset” */
+}
+
+/* Icono y texto */
+.msb-icon{
+  color: var(--msb-ink);
+  line-height: 1;
+}
+
+.msb-label{
+  color: var(--msb-ink);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .3px;
+  text-transform: none;                 /* “DASHBOARD” ya viene upper */
+  opacity: .95;
+}
+
+/* Hover sutil */
+.msb-item:not(.is-active) .msb-item__inner:hover{
+  filter: brightness(1.05);
+}
+
+/* Espaciador para llenar la columna como en la imagen */
+.msb-spacer{
+  flex: 1 1 auto;
+}

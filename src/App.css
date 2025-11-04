@@ -511,6 +511,11 @@
   text-overflow: ellipsis;
 }
 
+.sb-title,
+.sb-subtitle{
+  display:block;          /* fuerza salto de línea */
+}
+
 /* Mantén el estilo activo/hover con tus colores */
 .sideItem--active{
   background: var(--sb-pill);
