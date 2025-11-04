@@ -26,6 +26,7 @@ import tareasIcon from "./assets/tareas.svg";
 import filesIcon from "./assets/file.svg";
 import infoIcon from "./assets/info.svg";
 import settingsIcon from "./assets/settings.svg"
+import templateIcon from "./assets/template.svg"
 
 /* ============================================================
    Tipos de navegación y contexto de visibilidad
@@ -68,7 +69,7 @@ const NAV: MenuItem[] = [
   {id: "info", label: "Información", icon: <img src={infoIcon} alt="" className="sb-icon" />, to: <InfoPage />, roles: ["Administrador", "Tecnico"]  },
   {id: "admin", label: "Administración", icon: <img src={settingsIcon} className="sb-icon"/>, roles: ["Administrador", "Tecnico"], children: [
       { id: "anuncios", label: "Anuncios", to: <RegistroFactura />, roles: ["Administrador", "Tecnico"]},
-      { id: "plantillas", label: "Plantillas", to: <CrearPlantilla /> },
+      { id: "plantillas", label: "Plantillas", icon: <img src={templateIcon} className="sb-icon"/>,to: <CrearPlantilla /> },
       { id: "usuarios", label: "Usuarios", to: <UsuariosPanel />, roles: ["Administrador"] },
     ],
   },
