@@ -120,3 +120,41 @@
   .dash{ grid-template-columns: 1fr; }
   .dash-left, .dash-center, .dash-right{ grid-column: 1; }
 }
+
+.bullets{
+  list-style: none; margin: 8px 0 0; padding: 0;
+  display: grid; gap: 10px;
+  font: 600 12.5px/1.2 system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif;
+  color: #e5e7eb;
+}
+.bullets li{
+  display: grid;
+  grid-template-columns: 10px 1fr minmax(80px, 1fr) auto; /* swatch | label | barra | valor */
+  align-items: center; gap: 8px;
+}
+.b-swatch{ width:10px; height:10px; border-radius:2px; }
+
+.b-label{ opacity: .95; }
+
+/* barra */
+.b-track{
+  position: relative; height: 6px; border-radius: 999px;
+  background: rgba(255,255,255,.12);
+  overflow: hidden;
+}
+.b-fill{
+  position: absolute; inset: 0 auto 0 0;
+  width: 0%; height: 100%;
+  border-radius: 999px;
+  transition: width .35s ease; /* animación suave al cambiar datos */
+}
+
+.b-value{
+  color: #cbd5e1; min-width: 56px; text-align: right; margin-left: 8px;
+}
+
+/* móvil: un poco más compacto */
+@media (max-width: 420px){
+  .bullets li{ grid-template-columns: 10px 1fr 1fr auto; }
+  .b-value{ min-width: 48px; }
+}
