@@ -198,15 +198,17 @@ export function usePazSalvos(services: Svc) {
         };
       }, [filterMode, range.from, range.to, pageSize,]); 
 
-    const loadFirstPage = React.useCallback(async (e: React.FormEvent) => {
-        e.preventDefault();
+    const loadFirstPage = React.useCallback(async (e?: React.FormEvent) => {
+        if(e){
+          e.preventDefault();  
+        }
         setSubmitting(true);  
         try {
             const rows = await PazYSalvos.getAll(buildFilter());
             setRows(rows.items);
             setNextLink(rows.nextLink);
             setPageIndex(1)
-            console.log(rows)
+            console.table(rows)
         } catch (e: any) {
             setRows([]);
             setNextLink(null);
