@@ -136,6 +136,8 @@ export function usePazSalvos(services: Svc) {
         const fechaSolTexto = solucion ? new Date(solucion as unknown as string).toLocaleString() : "No aplica";
         const resolutorEmail = ticketCreated.CorreoResolutor || "";
         LogSvc.create({Actor: "Sitema", Descripcion:  `Se ha creado un nuevo ticket para el siguiente requerimiento: ${ticketCreated.Title}`,  Tipo_de_accion: "Creacion", Title: idTexto, CorreoActor: ""});   
+        setState({Cargo: "", Cedula: "", CO: "", Empresa: "", Fechadeingreso: "", Fechadesalida: "", Jefe: "", Nombre: "", Title: "", Consecutivo: "", CorreoJefe: "", Correos: "", Solicitante: ""});
+        setErrors({})
         if (resolutorEmail) {
           const title = `Nuevo caso asignado - ${idTexto}`;
           const message = `
@@ -161,8 +163,6 @@ export function usePazSalvos(services: Svc) {
             console.error("[Flow] Error enviando a resolutor:", err);
           }
         }
-        setState({Cargo: "", Cedula: "", CO: "", Empresa: "", Fechadeingreso: "", Fechadesalida: "", Jefe: "", Nombre: "", Title: "", Consecutivo: "", CorreoJefe: "", Correos: "", Solicitante: ""});
-        setErrors({})
       } catch (err) {
         console.error("Error actualizando contador del resolutor:", err);
       }finally {
