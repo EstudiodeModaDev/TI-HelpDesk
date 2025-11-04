@@ -38,19 +38,7 @@ export default function PazYSalvos() {
 
   return (
     <section className="pz-page">
-      {/* Header */}
-      <header className="pz-header">
-        <button className="pz-home" title="Inicio" aria-label="Inicio">🏠</button>
-        <h1 className="pz-title">PAZ Y SALVOS</h1>
-        <div className="pz-user">
-          <img className="pz-avatar" src="https://i.pravatar.cc/80?img=12" alt="Avatar" />
-          <div className="pz-user-info">
-            <div className="pz-user-name">Practicante Listo</div>
-            <div className="pz-user-role">Solicitante</div>
-          </div>
-        </div>
-      </header>
-
+    
       {/* Filtros */}
       <form className="pz-filters" onSubmit={(e) => e.preventDefault()}>
         <label className="pz-field">
@@ -72,13 +60,7 @@ export default function PazYSalvos() {
         </label>
 
         <div className="pz-search">
-          <input
-            type="search"
-            placeholder="Buscar…"
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            aria-label="Buscar"
-          />
+          <input type="search" placeholder="Buscar…" value={q} onChange={(e) => setQ(e.target.value)} aria-label="Buscar" />
         </div>
       </form>
 

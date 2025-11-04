@@ -33,7 +33,7 @@
 
 /* ===== Página ===== */
 .pz-page{
-  background: var(--pz-bg);
+  background: transparent;
   color: var(--pz-ink);
   padding: 12px;
   border-radius: 18px;
