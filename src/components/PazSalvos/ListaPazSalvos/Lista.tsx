@@ -1,5 +1,5 @@
 import * as React from "react";
-import "./PazYSalvos.css";
+import "./Lista.css";
 
 type Row = {consecutivo: number; nombre: string; cedula: string; fechaIngreso: string; fechaRetiro?: string; cargo: string; empresa: string; jefe: string; co: string; finalizada: boolean;};
 
