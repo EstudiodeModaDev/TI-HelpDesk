@@ -13,19 +13,21 @@ import type { PlantillasService } from "../../Services/Plantillas.service";
 import React from "react";
 import EscalamientoInternet from "./EscalamientoProveedor/Escalamiento";
 import InfoActaEntrega from "./ActaEntrega/InformacionCaso/InfoActa";
+import type { ComprasService } from "../../Services/Compras.service";
 
 export default function Documentar({ ticket, tipo, onDone }: { ticket: Ticket; tipo: "solucion" | "seguimiento"; onDone?: () => void | Promise<void>}) {
-  const { Tickets: TicketsSvc, Logs: LogsSvc, Plantillas: PlantillasSvc } =
+  const { Tickets: TicketsSvc, Logs: LogsSvc, Plantillas: PlantillasSvc, Compras} =
     (useGraphServices() as ReturnType<typeof useGraphServices> & {
       Franquicias: FranquiciasService;
       Usuarios: UsuariosSPService;
       Tickets: TicketsService;
       Logs: LogService;
       Plantillas: PlantillasService;
+      ComprasSvc: ComprasService
     });
 
   const { account } = useAuth();
-  const { state, errors, submitting, setField, handleSubmit } = useDocumentarTicket({ Tickets: TicketsSvc, Logs: LogsSvc });
+  const { state, errors, submitting, setField, handleSubmit } = useDocumentarTicket({ Tickets: TicketsSvc, Logs: LogsSvc, ComprasSvc: Compras });
 
   // ⬇️ usamos también loading/error por si quieres feedback
   const { ListaPlantillas, loading: loadingPlantillas, error: errorPlantillas } = usePlantillas(PlantillasSvc);
@@ -43,7 +45,7 @@ export default function Documentar({ ticket, tipo, onDone }: { ticket: Ticket; t
   };
 
   return (
-    <div className="ticket-form">
+    <div className="ticket-form ticket-form--edge">
       <h2 className="tf-title">
         {showEscalar
           ? "Escalamiento internet"

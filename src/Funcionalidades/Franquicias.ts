@@ -1,33 +1,64 @@
 import * as React from "react";
-import type { Franquicias } from "../Models/Franquicias";
+import type { FormFranquinciasError, Franquicias } from "../Models/Franquicias";
 import type { FranquiciasService } from "../Services/Franquicias.service";
 import type { UserOption } from "../Models/Commons";
 
-type UseFranquiciasReturn = {
-  franquicias: Franquicias[];
-  franqOptions: UserOption[];     // ← listo para el <Select>
-  loading: boolean;
-  error: string | null;
-  pageSize: number;
-  setPageSize: React.Dispatch<React.SetStateAction<number>>;
-  pageIndex: number;
-  hasNext: boolean;
-  nextLink: string | null;
-  refresh: () => Promise<void>;
-};
-
-export function useFranquicias(FranquiciasSvc: FranquiciasService): UseFranquiciasReturn {
+export function useFranquicias(FranquiciasSvc: FranquiciasService) {
   const [franquicias, setFranquicias] = React.useState<Franquicias[]>([]);
   const [franqOptions, setFranqOptions] = React.useState<UserOption[]>([]);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
+  const [state, setState] = React.useState<Franquicias>({
+    Celular: "",
+    Ciudad: "",
+    Correo: "",
+    Direccion: "",
+    Jefe_x0020_de_x0020_zona: "",
+    Title: ""
+  })
+  const [submitting, setSubmitting] = React.useState<boolean>(false)
+  const [errors, setErrors] = React.useState<FormFranquinciasError>({})
 
   // paginación (si el service la soporta)
   const [pageSize, setPageSize] = React.useState<number>(10); // = $top
   const [pageIndex, setPageIndex] = React.useState<number>(1); // 1-based
   const [nextLink, setNextLink] = React.useState<string | null>(null);
 
-  // --- helpers ---
+  const setField = <K extends keyof Franquicias>(k: K, v: Franquicias[K]) => setState((s) => ({ ...s, [k]: v }));
+
+  const validate = () => {
+    const e: FormFranquinciasError = {};
+    if (!state.Title.trim()) e.Title = "Ingresa el nombre de la franquicia.";
+    if (!state.Correo.trim()) e.Correo = "Ingresa el correo.";
+    if (!state.Celular.trim()) e.Correo = "Ingresa el celular.";
+    if (!state.Ciudad.trim()) e.Correo = "Ingresa la ciudad.";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(state.Correo)) e.Correo = "Correo inválido.";
+    setErrors(e);
+    return Object.keys(e).length === 0;
+  };
+
+  const addFranquicia = React.useCallback(async () => {
+    if(!validate()) return
+    setSubmitting(true);
+    setError(null);
+
+    let cancelled = false;
+    try {
+      const res = await FranquiciasSvc.create(state);
+      if (cancelled) return;
+
+      console.log(res)
+    } catch (e: any) {
+      if (!cancelled) {
+        setError(e?.message ?? "Error eliminado usuarios");
+      }
+    } finally {
+      if (!cancelled) setLoading(false);
+    }
+
+    return () => { cancelled = true; };
+  }, [FranquiciasSvc, state]);
+  
 
   // Aplana una fila cruda (con o sin fields) a tu modelo Franquicias
   const mapRowToFranquicia = React.useCallback((row: any): Franquicias => {
@@ -64,7 +95,6 @@ export function useFranquicias(FranquiciasSvc: FranquiciasService): UseFranquici
   }, []);
 
   // --- loader principal ---
-
   const loadFranquicias = React.useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -113,17 +143,12 @@ export function useFranquicias(FranquiciasSvc: FranquiciasService): UseFranquici
     await loadFranquicias();
   }, [loadFranquicias]);
 
+    
+
   const hasNext = !!nextLink;
 
   return {
-    franquicias,
-    franqOptions,
-    loading,
-    error,
-    pageSize, setPageSize,
-    pageIndex,
-    hasNext,
-    nextLink,
-    refresh,
+    franquicias, franqOptions, loading, error, pageSize, pageIndex, hasNext, nextLink, state, errors, submitting,
+    setPageSize, refresh, setField, addFranquicia, 
   };
 }

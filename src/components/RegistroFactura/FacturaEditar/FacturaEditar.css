@@ -15,39 +15,72 @@
 /* 🧩 Contenedor principal del modal */
 .modal {
   background: #ffffff;
-  padding: 25px 30px;
+  padding: 25px 35px;
   border-radius: 16px;
   width: 95%;
-  max-width: 520px;
+  max-width: 780px; /* 🆕 Más ancho para permitir 2–3 columnas */
   box-shadow: 0 8px 28px rgba(0, 0, 0, 0.15);
   animation: fadeIn 0.3s ease-out;
   font-family: "Poppins", sans-serif;
 }
 
-/* 🧠 Título del modal */
+/* 🧠 Título */
 .modal h3 {
   margin-bottom: 20px;
   font-weight: 600;
-  color: #1e3a8a; /* azul institucional */
+  color: #1e3a8a;
   text-align: center;
 }
 
-/* ✏️ Campos del formulario */
+/* 🧾 Formulario con dos columnas */
+.modal-form {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* 🧱 Dos columnas iguales */
+  gap: 16px 20px; /* espacio entre columnas y filas */
+}
+
+/* 🧩 Campos del formulario */
 .modal-form input,
-.modal-form textarea {
+.modal-form textarea,
+.modal-form select {
   width: 100%;
   padding: 10px 12px;
-  margin-bottom: 12px;
   border-radius: 10px;
   border: 1px solid #cbd5e1;
   background-color: #f9fafb;
   font-size: 14px;
   transition: all 0.3s ease;
+  box-sizing: border-box;
 }
 
+/* ✨ Enfoque */
+.modal-form input:focus,
+.modal-form textarea:focus,
+.modal-form select:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+  outline: none;
+}
+
+
+/* 🧾 Textarea ocupará ambas columnas */
+.modal-form textarea {
+  grid-column: span 2; /* 🆕 ocupa todo el ancho */
+  resize: vertical;
+  min-height: 70px;
+}
+
+/* 🏷️ Labels opcionales (por si los agregas) */
+.modal-form label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #374151;
+}
+
+/* ✨ Enfoque */
 .modal-form input:focus,
 .modal-form textarea:focus {
-  border-color: #2563eb; /* azul claro */
+  border-color: #2563eb;
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
   outline: none;
 }
@@ -57,9 +90,11 @@
   display: flex;
   justify-content: space-between;
   gap: 10px;
-  margin-top: 15px;
+  margin-top: 20px;
+  grid-column: span 2; /* 🆕 botones también ocupan toda la fila */
 }
 
+/* 🔘 Estilos de botones */
 .btn-guardar,
 .btn-cancelar,
 .btn-eliminar {
@@ -78,7 +113,6 @@
   background-color: #2563eb;
   color: #fff;
 }
-
 .btn-guardar:hover {
   background-color: #1d4ed8;
   transform: scale(1.03);
@@ -90,7 +124,6 @@
   color: #374151;
   border: 1px solid #d1d5db;
 }
-
 .btn-cancelar:hover {
   background-color: #e5e7eb;
   transform: scale(1.03);
@@ -101,13 +134,12 @@
   background-color: #ef4444;
   color: #fff;
 }
-
 .btn-eliminar:hover {
   background-color: #dc2626;
   transform: scale(1.03);
 }
 
-/* 🌟 Animación de aparición */
+/* 🌟 Animación */
 @keyframes fadeIn {
   from {
     opacity: 0;

@@ -42,7 +42,7 @@ export default function StoreInfoPanel() {
 
   return (
     <section className="store-info w-full max-w-[1100px] mx-auto p-6 md:p-10">
-      <h1 className="text-3xl md:text-4xl font-bold tracking-tight">INFORMACIÓN DE LA TIENDA</h1>
+      <h3 className="text-3xl md:text-4xl font-bold tracking-tight">Información de la tienda</h3>
 
       <form onSubmit={(e) => { e.preventDefault(); loadQuery(); }} className="store-actions">
         <div className="store-actions__left">

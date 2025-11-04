@@ -1,0 +1,171 @@
+/* ================================
+   🎨 ESTILOS LISTA DE DISTRIBUCIONES
+   ================================ */
+
+/* 🧩 Contenedor principal */
+.distribuciones-lista-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px 20px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* 🧭 Cabecera */
+.distribuciones-lista-container h4 {
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+/* Botón de volver */
+.btn.btn-secondary {
+  background-color: #f6f7f9;
+  border: 1px solid #ccc;
+  color: #333;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+  padding: 8px 14px;
+  border-radius: 8px;
+}
+
+.btn.btn-secondary:hover {
+  background-color: #e8e9ec;
+}
+
+/* ================================
+   🧾 TABLA SCROLLABLE
+   ================================ */
+
+/* Contenedor de tabla */
+.table-responsive {
+  overflow-x: auto; /* Scroll horizontal */
+  overflow-y: auto;
+  max-height: 65vh;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+}
+
+/* Tabla base */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed; /* Para columnas con ancho fijo */
+  min-width: 1000px;
+  background-color: #fff;
+  font-size: 14px;
+}
+
+.table th,
+.table td {
+  padding: 8px 6px; /* Reducido para caber mejor */
+  text-align: center;
+  border-bottom: 1px solid #e0e0e0;
+  word-wrap: break-word;
+  vertical-align: middle;
+}
+
+/* Cabecera */
+.table thead {
+  background-color: #f8f9fb;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.table th {
+  font-weight: 600;
+  color: #444;
+  text-transform: uppercase;
+  font-size: 13px;
+}
+
+/* Filas hover */
+.table tbody tr:hover {
+  background-color: #f6f7f9;
+  transition: background 0.2s ease-in-out;
+}
+
+/* ================================
+   📏 ANCHOS DE COLUMNAS
+   ================================ */
+
+.table th:nth-child(1),
+.table td:nth-child(1) {
+  width: 160px; /* Proveedor */
+}
+
+.table th:nth-child(2),
+.table td:nth-child(2) {
+  width: 200px; /* Título */
+}
+
+.table th:nth-child(3),
+.table td:nth-child(3) {
+  width: 120px; /* N° Factura */
+}
+
+.table th:nth-child(4),
+.table td:nth-child(4) {
+  width: 140px; /* Fecha Emisión */
+}
+
+.table th:nth-child(5),
+.table td:nth-child(5),
+.table th:nth-child(6),
+.table td:nth-child(6),
+.table th:nth-child(7),
+.table td:nth-child(7),
+.table th:nth-child(8),
+.table td:nth-child(8),
+.table th:nth-child(9),
+.table td:nth-child(9) {
+  width: 140px; /* Costos */
+}
+
+/* Última columna ACCIONES */
+.table th:nth-child(10),
+.table td:nth-child(10) {
+  width: 100px; /* Fijar ancho máximo */
+  white-space: nowrap; /* Evitar salto de línea en botones */
+  text-align: center;
+}
+
+/* Botón editar en ACCIONES */
+.table td:nth-child(10) .btn {
+  padding: 4px 8px;
+  font-size: 13px;
+  max-width: 90px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ================================
+   ✂️ TEXTO CON PUNTOS SUSPENSIVOS
+   ================================ */
+.one-line-ellipsis {
+  display: inline-block;
+  max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ================================
+   🔘 AJUSTES OPCIONALES
+   ================================ */
+.table-bordered {
+  border: 1px solid #ddd;
+}
+
+.table-hover tbody tr:hover {
+  background-color: #f3f4f6;
+}
+
+.table-light th {
+  background-color: #f8f9fb !important;
+  color: #444;
+}

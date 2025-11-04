@@ -1,103 +1,119 @@
-/* 🧩 Contenedor de la lista de facturas */
-.facturas-lista {
-  margin-top: 40px;
-  background-color: #fff;
-  border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  padding: 25px;
-  overflow: hidden;
-  max-height: 65vh;
-  display: flex;
-  flex-direction: column;
-}
-
-/* 🧩 Tabla con scroll vertical */
+/* 🧩 Contenedor de la tabla con scroll vertical y horizontal */
 .tabla-scroll {
   flex: 1;
   overflow-y: auto;
+  overflow-x: auto;           /* scroll horizontal si el contenido no cabe */
   max-height: 50vh;
   margin-bottom: 20px;
-  border-radius: 10px;
+  border-radius: 12px;        /* similar a tabla-tickets */
+  border: 1px solid #e5e7eb; /* borde ligero */
+  background: #ffffff;        /* fondo claro */
+  box-shadow: 0 8px 24px rgba(0,0,0,0.06);
 }
 
 /* 🧩 Tabla */
 .tabla-facturas {
   width: 100%;
-  border-collapse: collapse;
-  margin-top: 20px;
-}
-
-.tabla-facturas th,
-.tabla-facturas td {
-  padding: 12px 10px;
-  border-bottom: 1px solid #ddd;
-  text-align: center;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin-top: 10px;
+  min-width: 1200px;        /* evita que se aplaste demasiado */
   font-size: 14px;
+  background: transparent;
 }
 
+/* Encabezados */
 .tabla-facturas th {
-  background-color: #2980b9;
-  color: white;
-  font-weight: 700;
-}
-
-.tabla-facturas tr:hover {
-  background-color: #f2f6fa;
-}
-
-/* 🧩 Estilo de los botones de acción (editar y eliminar) */
-.btn-editar,
-.btn-eliminar {
-  border: none;
-  background: none;
-  cursor: pointer;
-  font-size: 18px;
-  color: #2980b9;
-  transition: color 0.3s;
-}
-
-.btn-editar:hover,
-.btn-eliminar:hover {
-  color: #3498db;
-}
-
-/* 🧩 Botón fijo de volver */
-.btn-volver-fijo {
   position: sticky;
-  bottom: 10px;
-  display: block;
-  margin: 20px auto 0 auto;
-  background-color: #3a31e5;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  padding: 10px 20px;
-  font-size: 15px;
+  top: 0;
+  z-index: 2;
+  background: #ffffff;
+  color: #111827;
+  padding: 10px 12px;
+  text-align: left;
   font-weight: 600;
+  border-bottom: 1px solid #e5e7eb;
+  box-shadow: 0 1px 0 #e5e7eb, 0 2px 10px rgba(0,0,0,.05);
+  white-space: nowrap;
+}
+
+/* Celdas */
+.tabla-facturas td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #e5e7eb;
+  text-align: left;
+  vertical-align: middle;
+  word-wrap: break-word;
+  white-space: normal;
+  background: #fff;
+}
+
+/* Filas alternadas y hover */
+.tabla-facturas tbody tr:nth-child(odd) {
+  background: #ffffff;
+}
+
+.tabla-facturas tbody tr:nth-child(even) {
+  background: #e6e6e6;
+}
+
+.tabla-facturas tbody tr:hover {
+  background: #eef2ff;
   cursor: pointer;
-  width: 300px;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
-.btn-volver-fijo:hover {
-  background-color: #1096f5;
-  transform: scale(1.05);
+/* Texto con puntos suspensivos */
+.one-line-ellipsis {
+  display: block;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-/* 🧩 Botón "Registrar factura" */
-.btn-registrar {
-  background-color: #2980b9;
-  color: white;
-  padding: 10px 20px;
-  font-size: 14px;
-  border-radius: 8px;
+/* Columnas específicas */
+.tabla-facturas th:nth-child(1),
+.tabla-facturas td:nth-child(1) { width: 50px; }   /* Num */
+.tabla-facturas th:nth-child(4),
+.tabla-facturas td:nth-child(4) { width: 150px; }  /* Proveedor */
+.tabla-facturas th:nth-child(5),
+.tabla-facturas td:nth-child(5) { width: 130px; }  /* NIT */
+.tabla-facturas th:nth-child(13),
+.tabla-facturas td:nth-child(13),
+.tabla-facturas th:nth-child(14),
+.tabla-facturas td:nth-child(14) {
+  width: 240px;
+  text-align: left;
+}
+
+/* Columna Acciones compacta */
+.tabla-facturas th:last-child,
+.tabla-facturas td:last-child {
+  width: 64px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* Botón editar */
+.btn-editar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: 10px;
+  background: #f6f7f9;
   cursor: pointer;
-  transition: background-color 0.3s, transform 0.1s;
-  border: none;
+  line-height: 1;
 }
 
-.btn-registrar:hover {
-  background-color: #3498db;
-  transform: scale(1.05);
+/* Responsive */
+@media (max-width: 980px){
+  .tabla-facturas { min-width: 900px; }
+}
+
+@media (max-width: 520px){
+  .tabla-facturas { min-width: 640px; }
 }

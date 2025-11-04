@@ -212,3 +212,23 @@
     grid-column: span 1;
   }
 }
+
+.rtb-box{
+  border: 1px solid #d9dde3;
+  border-radius: 10px;
+  overflow: hidden;           /* redondeo limpio si el editor tiene toolbar */
+}
+
+/* SOLO cuando hay error */
+.tf-field.has-error .rtb-box{
+  border-color: #dc2626 !important;
+  box-shadow: 0 0 0 3px rgba(220,38,38,.12);
+}
+
+/* quita el borde propio del editor para que no haya doble borde */
+.rtb-box .ProseMirror,
+.rtb-box .ql-container,
+.rtb-box .ck-editor__main .ck-editor__editable {
+  border: 0 !important;
+  box-shadow: none !important;
+}

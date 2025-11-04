@@ -1,0 +1,80 @@
+/* Layout */
+.msb-layout{
+  display:grid;
+  grid-template-columns: 86px 1fr;  /* rail + contenido */
+  min-height: 100dvh;
+}
+
+/* Sidebar */
+.msb{
+  position: sticky;
+  top: 0;
+  align-self: start;
+  background: #0b61ff;            /* azul del mock */
+  border-right: 2px solid #0a54db;
+  width: 86px;
+}
+.msb-track{
+  display:flex;
+  flex-direction:column;
+  gap: 10px;
+  padding: 8px;
+}
+
+/* Items */
+.msb-item{
+  appearance: none;
+  border: 2px solid transparent;
+  background: #57a5ff;
+  color: #fff;
+  border-radius: 6px;
+  padding: 8px 6px;
+  cursor: pointer;
+  transition: transform .08s ease, background .15s ease, border-color .15s ease;
+}
+.msb-item:hover{ background:#4a97f0; transform: translateY(-1px); }
+.msb-item.is-active{
+  background:#3c8cf0;
+  border-color:#fff;               /* marco blanco como en la imagen */
+}
+
+/* Contenido del item */
+.msb-item__inner{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap: 8px;
+}
+.msb-icon{
+  width: 46px; height: 46px;
+  display:grid; place-items:center;
+  border-radius: 6px;
+  outline: 2px solid rgba(255,255,255,.6); /* cuadro del icono */
+  background: rgba(255,255,255,.12);
+  font-size: 24px;                 /* si usas emoji/SVG */
+}
+.msb-label{
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .03em;
+  text-align:center;
+}
+
+/* Relleno al final del rail */
+.msb-spacer{ flex:1 1 auto; }
+
+/* Área de contenido */
+.msb-content{
+  background: #0a0f1a;            /* fondo oscuro del dashboard */
+  color: #e5f0ff;
+  padding: 16px;
+  min-width: 0;                    /* evita overflow en grid */
+}
+
+/* Responsive: colapsar rail en móviles si quieres */
+@media (max-width: 640px){
+  .msb-layout{ grid-template-columns: 72px 1fr; }
+  .msb-icon{ width:40px; height:40px; font-size:20px; }
+  .msb-label{ font-size: 11px; }
+}

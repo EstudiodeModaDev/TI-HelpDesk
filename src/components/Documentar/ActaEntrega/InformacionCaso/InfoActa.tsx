@@ -26,7 +26,7 @@ export default function InfoActaEntrega({ ticket }: Props) {
   const mostrarTipoPC = items.some((i) => ITEMS_CON_TIPO_COMPUTADOR.has(i) && state.entregas[i]) &&!!state.tipoUsuario;
 
   return (
-    <form className="acta-form" onSubmit={handleSubmit}>
+    <form className="acta-form" data-force-light onSubmit={handleSubmit}>
       <h1 className="acta-title">Nueva acta de entrega</h1>
 
       {/* Grid de cabecera */}

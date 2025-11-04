@@ -1,126 +1,185 @@
-/* ===== Forzar tema CLARO en TablaTickets (CSS puro) ===== */
+/* === 1) Persistencia real del tema === */
 .tabla-tickets{
-  /* Fuerza controles nativos (inputs/selects) en claro */
-  color-scheme: light;
-  isolation: isolate;                 /* evita inversiones heredadas */
-  background: var(--bg) !important;
-  color: var(--text);
-}
-
-/* Barra de filtros siempre clara */
-.tabla-tickets .filtros,
-.tabla-tickets .filtros input[type="text"],
-.tabla-tickets .filtros input[type="date"],
-.tabla-tickets .filtros select,
-.tabla-tickets .filtros button{
-  background: var(--bg) !important;
-  color: var(--text) !important;
-  border: 1px solid var(--border) !important;
-}
-
-.tabla-tickets .filtros input::placeholder{ color: var(--muted) !important; }
-.tabla-tickets .filtros input:focus,
-.tabla-tickets .filtros select:focus{
-  border-color: var(--primary) !important;
-  box-shadow: 0 0 0 4px rgba(147,197,253,.35) !important;
-  outline: none !important;
-}
-
-/* Contenedor de tabla y celdas */
-.tabla-tickets .table-wrap{
-  background: var(--bg) !important;
-  border: 1px solid var(--border) !important;
-  border-radius: 12px;
-  box-shadow: var(--shadow);
-}
-.tabla-tickets table{ color: var(--text); }
-.tabla-tickets thead th{
-  background: #f8fafc !important;      /* equivalente a var(--card) */
-  color: var(--text) !important;
-  border-bottom: 1px solid var(--border) !important;
-}
-.tabla-tickets tbody td{
-  border-top: 1px solid var(--border) !important;
-  color: var(--text) !important;
-}
-.tabla-tickets tbody tr:nth-child(odd){
-  background: #fbfdff !important;       /* alternado claro */
-}
-.tabla-tickets tbody tr:hover{
-  background: rgba(37,99,235,.08) !important; /* hover claro */
-}
-
-/* Paginación */
-.tabla-tickets .table-wrap + div button,
-.tabla-tickets .table-wrap + div select{
-  background: #f8fafc !important;
-  color: var(--text) !important;
-  border: 1px solid var(--border) !important;
-}
-.tabla-tickets .table-wrap + div button[disabled]{
-  background: #f8fafc !important;
-  color: var(--muted) !important;
-  border-color: var(--border) !important;
-}
-
-/* Chips/indicadores */
-.tabla-tickets .estado-circulo{
-  display: inline-block;
-  width: 10px; height: 10px;
-  border-radius: 999px;
-  border: 1px solid rgba(0,0,0,.06);
-}
-
-/* SVGs e iconos usan el color del texto del módulo */
-.tabla-tickets svg { fill: currentColor; color: var(--text); }
-
-/* Chrome autofill en claro */
-.tabla-tickets input:-webkit-autofill,
-.tabla-tickets input:-webkit-autofill:hover,
-.tabla-tickets input:-webkit-autofill:focus {
-  -webkit-text-fill-color: var(--text);
-  -webkit-box-shadow: 0 0 0 1000px var(--bg) inset;
-  transition: background-color 9999s ease-out 0s;
-}
-
-/* ===== Botones de paginación siempre claros ===== */
-.tabla-tickets button,
-.tabla-tickets select {
-  background: #fff !important;
-  color: #0f172a !important;
-  border: 1px solid #e5e7eb !important;
-  box-shadow: none !important;
-}
-
-.tabla-tickets button:hover:not(:disabled) {
-  background: #f3f4f6 !important;
-}
-
-.tabla-tickets button:disabled {
-  background: #f9fafb !important;
-  color: #9ca3af !important;
-  cursor: not-allowed !important;
-}
-
-/* Fuerza esquema claro */
-.tabla-tickets {
-  color-scheme: light;
+  color-scheme: light !important;   /* <-- typo corregido */
   isolation: isolate;
 }
 
-
-/* Si el SO está en oscuro, re-aplica los tokens claros aquí */
-@media (prefers-color-scheme: dark){
-  .tabla-tickets{
-    --bg: #ffffff !important;
-    --card: #f8fafc !important;
-    --text: #0f172a !important;
-    --muted: #6b7280 !important;
-    --border: #e5e7eb !important;
-    --primary: #2563eb !important;
-    --ring: #93c5fd !important;
-    --shadow: 0 8px 24px rgba(2,6,23,.08) !important;
-    background: var(--bg) !important;
-    color: var(--text) !important;
-  }
+/* Scope "forzado" */
+.tabla-tickets[data-force-light], .tabla-tickets[data-force-light] *{
+  color-scheme: light !important;
 }
+
+.dark .tabla-tickets[data-force-light]{
+  --tbl-max: 1600px;
+  --tbl-text: #111827;
+  --tbl-muted: #cfcfcf;
+  --tbl-border: #e5e7eb;
+  --tbl-odd: #ffffff;
+  --tbl-even: #e6e6e6;
+  --tbl-hover: #eef2ff;
+  --tbl-head: #ffffff;
+  --tbl-focus: #2563eb;
+}
+
+/* === 2) Tokens === */
+:root{
+  --tbl-text: #111827;
+  --tbl-muted: #cfcfcf;
+  --tbl-border: #e5e7eb;
+  --tbl-odd: #ffffff;
+  --tbl-even: #e6e6e6;
+  --tbl-hover: #eef2ff;
+  --tbl-head: #ffffff;
+  --tbl-focus: #2563eb;
+}
+
+.tabla-tickets{ background: transparent; color: var(--tbl-text); line-height: 1.35; }
+
+.tabla-tickets{
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-start !important; 
+  align-items: stretch !important;
+  gap: 10px !important;                   
+}
+
+.tabla-tickets > .filtros,
+.tabla-tickets > .table-wrap,
+.tabla-tickets .table-wrap + div{
+  width: 100%;
+  max-width: none; /* por si algún estilo anterior pone un tope */
+}
+
+/* === 3) Barra de filtros === */
+.tabla-tickets > .filtros{
+  margin: 0 !important;
+  padding: 8px;
+  display: grid;
+  gap: 8px;
+  grid-template-columns: 1fr repeat(6, auto);
+  align-items: center;
+}
+
+.tabla-tickets[data-force-light] > .filtros{
+  background: #ffffff !important;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 12px !important;
+  box-shadow: 0 8px 24px rgba(0,0,0,.06) !important;
+}
+
+.tabla-tickets input, .tabla-tickets select, .tabla-tickets button{
+  background-color: #ffffff !important;
+  color: #111827 !important;
+  border: 1px solid #e5e7eb !important;
+  box-shadow: none !important;
+  filter: none !important;
+}
+
+.tabla-tickets input::placeholder{ color: var(--tbl-muted); }
+
+.tabla-tickets input:focus, .tabla-tickets select:focus, .tabla-tickets button:focus{
+  outline: 0; border-color: var(--tbl-focus);
+  box-shadow: 0 0 0 3px rgba(37,99,235,.25);
+}
+
+.table-wrap{
+  border: 1px solid var(--tbl-border);
+  border-radius: 12px;
+  overflow: hidden;
+  background: transparent;
+  overflow-x: auto;
+  margin-top: 10px;                    /* separados solo 10px */
+}
+
+.table-wrap > table{
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: transparent;
+  font-size: 14px;
+}
+
+.table-wrap thead th{
+  position: sticky; top: 0; z-index: 1;
+  background: var(--tbl-head) !important;
+  color: var(--tbl-text) !important;
+  border-bottom: 1px solid var(--tbl-border);
+  text-align: left !important; padding: 10px 12px; white-space: nowrap; font-weight: 600;
+}
+
+.table-wrap tbody td{ padding: 10px 12px; border-bottom: 1px solid var(--tbl-border); vertical-align: middle; text-align: left !important; }
+
+.table-wrap tbody tr:nth-child(odd){  background: var(--tbl-odd) !important; }
+.table-wrap tbody tr:nth-child(even){ background: var(--tbl-even) !important; }
+.table-wrap tbody tr:hover{ background: var(--tbl-hover) !important; }
+.table-wrap tbody tr{ cursor: pointer; }
+
+.table-wrap thead th[role="button"]{ user-select: none; }
+.table-wrap thead th[role="button"]:focus{ outline: 0; box-shadow: inset 0 -2px 0 var(--tbl-focus); }
+
+.estado-circulo{ width: 12px; height: 12px; display: inline-block; border-radius: 999px; border: 1px solid rgba(0,0,0,.1); }
+
+/* === 5) Paginación en claro === */
+.tabla-tickets .table-wrap + div{
+  background: transparent !important;
+  color: #111827 !important;
+  box-shadow: none !important;
+  border: 0 !important;
+}
+
+.tabla-tickets .table-wrap + div button,
+.tabla-tickets .table-wrap + div select{
+  height: 32px;
+  border: 1px solid var(--tbl-border);
+  background: #fff !important;
+  color: var(--tbl-text) !important;
+  border-radius: 8px;
+  padding: 0 10px;
+}
+
+/* === 6) Responsive === */
+@media (max-width: 980px){
+  .tabla-tickets > .filtros{ grid-template-columns: 1fr; }
+  .tabla-tickets > .filtros > *{ width: 100%; }
+  .table-wrap table{ min-width: 720px; }
+}
+@media (max-width: 520px){
+  .table-wrap table{ min-width: 640px; }
+}
+
+/* === 7) Prefers-color-scheme: solo una vez === */
+@media (prefers-color-scheme: dark){
+  .tabla-tickets,
+  .tabla-tickets[data-force-light]{ color-scheme: light !important; }
+}
+
+/* Extras de compatibilidad */
+.tabla-tickets input:-webkit-autofill{
+  -webkit-box-shadow: 0 0 0 1000px #ffffff inset !important;
+  -webkit-text-fill-color: #111827 !important;
+}
+.tabla-tickets[data-force-light] input[type="date"]::-webkit-calendar-picker-indicator{
+  filter: none !important; opacity: 1 !important;
+}
+
+.tabla-tickets .table-wrap, .tabla-tickets table, .tabla-tickets thead, .tabla-tickets tbody, .tabla-tickets tr, .tabla-tickets th, .tabla-tickets td {
+  opacity: 1 !important;
+  filter: none !important;
+  mix-blend-mode: normal !important;
+  color: var(--tbl-text) !important;
+}
+
+.table-wrap tbody tr:nth-child(odd)  > * { background: var(--tbl-odd)  !important; }
+
+.table-wrap tbody tr:nth-child(even) > * { background: var(--tbl-even) !important; }
+
+.table-wrap tbody tr:hover > *{ background: var(--tbl-hover) !important; }
+
+.table-wrap thead th {
+  position: sticky; top: 0; z-index: 2;
+  box-shadow: 0 1px 0 var(--tbl-border), 0 2px 10px rgba(0,0,0,.05);
+}
+
+.table-wrap td.sticky, .table-wrap th.sticky { background: var(--tbl-head) !important; }
+
+.table-wrap td.sticky, .table-wrap th.sticky { background: var(--tbl-head) !important; }

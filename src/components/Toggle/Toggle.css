@@ -1,19 +1,23 @@
-/* ===== Variables (puedes moverlas a :root) ===== */
-.acta-toggle {
+/* ===== ActaToggle.css — toggle SIEMPRE CLARO, aislado y accesible ===== */
+
+/* Scope: el contenedor del toggle (label.acta-toggle) */
+.acta-toggle{
+  /* Persistencia de tema claro a nivel de UA */
+  color-scheme: light !important;
+  isolation: isolate;
+
+  /* ===== Variables locales (puedes subirlas a :root si quieres globalizarlas) ===== */
   --track-off: #d1d5db;         /* gris off */
   --track-on: #2563eb;          /* azul on */
   --knob: #ffffff;              /* color del “punto” */
-  --ring: 0 0 0 3px rgba(37,99,235,.25);
+  --ring-shadow: 0 0 0 3px rgba(37,99,235,.25);
   --size: 24px;                 /* alto del switch */
   --knob-gap: 3px;              /* padding interno del track */
   --label-color: #0b2b3a;
   --label-dim: #475569;
   --disabled: #cbd5e1;
   --disabled-text: #94a3b8;
-}
 
-/* ===== Contenedor del toggle + label ===== */
-.acta-toggle {
   display: inline-flex;
   align-items: center;
   gap: 10px;
@@ -21,10 +25,22 @@
   color: var(--label-color);
   user-select: none;
   cursor: pointer;
+
+  /* Blindajes contra efectos heredados */
+  mix-blend-mode: normal !important;
+  filter: none !important;
+  opacity: 1 !important;
+}
+
+/* Ajuste fino cuando el layout global está en oscuro (sin romper el modo claro) */
+.dark .acta-toggle{
+  color-scheme: light !important;
+  --track-off: #cfd6dd;      /* un gris un poco más marcado para mejor contraste sobre fondos oscuros */
+  --label-dim: #667085;
 }
 
 /* Ocultar el checkbox nativo pero mantenerlo accesible */
-.acta-toggle > input {
+.acta-toggle > input{
   position: absolute;
   opacity: 0;
   width: 0;
@@ -32,7 +48,7 @@
 }
 
 /* ===== Switch (track + knob) ===== */
-.acta-switch {
+.acta-switch{
   position: relative;
   display: inline-block;
   height: var(--size);
@@ -44,7 +60,7 @@
 }
 
 /* Knob */
-.acta-switch::after {
+.acta-switch::after{
   content: "";
   position: absolute;
   top: var(--knob-gap);
@@ -61,66 +77,50 @@
 /* ===== Estados ===== */
 
 /* ON */
-.acta-toggle > input:checked + .acta-switch {
+.acta-toggle > input:checked + .acta-switch{
   background: var(--track-on);
 }
-.acta-toggle > input:checked + .acta-switch::after {
+.acta-toggle > input:checked + .acta-switch::after{
   transform: translateX(calc(100% + var(--knob-gap) * -2));
 }
 
 /* Foco accesible (al tabear) */
-.acta-toggle > input:focus-visible + .acta-switch {
-  box-shadow: var(--ring);
+.acta-toggle > input:focus-visible + .acta-switch{
+  box-shadow: var(--ring-shadow);
 }
 
 /* Deshabilitado */
-.acta-toggle > input:disabled + .acta-switch {
+.acta-toggle > input:disabled + .acta-switch{
   background: var(--disabled);
   cursor: not-allowed;
 }
-.acta-toggle > input:disabled + .acta-switch::after {
+.acta-toggle > input:disabled + .acta-switch::after{
   box-shadow: none;
 }
-.acta-toggle > input:disabled ~ span:last-child {
+.acta-toggle > input:disabled ~ span:last-child{
   color: var(--disabled-text);
   cursor: not-allowed;
 }
 
 /* Estado indeterminado (si lo usas) */
-.acta-toggle > input:indeterminate + .acta-switch {
+.acta-toggle > input:indeterminate + .acta-switch{
   background: linear-gradient(90deg, var(--track-off), var(--track-on));
 }
 
 /* Etiqueta (texto) */
-.acta-toggle > span:last-child {
+.acta-toggle > span:last-child{
   line-height: 1.1;
   color: var(--label-color);
 }
-.acta-toggle:hover > span:last-child {
+.acta-toggle:hover > span:last-child{
   color: var(--label-dim);
 }
 
 /* ===== Tamaños opcionales ===== */
-/* Pequeño */
-.acta-toggle.is-sm { --size: 20px; --knob-gap: 2px; }
-/* Grande */
-.acta-toggle.is-lg { --size: 28px; --knob-gap: 3px; }
+.acta-toggle.is-sm{ --size: 20px; --knob-gap: 2px; }
+.acta-toggle.is-lg{ --size: 28px; --knob-gap: 3px; }
 
-/* ===== Modo oscuro opcional ===== */
-@media (prefers-color-scheme: dark) {
-  .acta-toggle {
-    --track-off: #334155;
-    --track-on: #3b82f6;
-    --label-color: #e5e7eb;
-    --label-dim: #cbd5e1;
-    --disabled: #475569;
-    --disabled-text: #94a3b8;
-  }
-}
-
-/* ===== Reduce motion ===== */
-@media (prefers-reduced-motion: reduce) {
-  .acta-switch, .acta-switch::after {
-    transition: none;
-  }
+/* ===== Respeta reduce motion ===== */
+@media (prefers-reduced-motion: reduce){
+  .acta-switch, .acta-switch::after{ transition: none; }
 }

@@ -6,25 +6,29 @@ import type { Ticket } from "../../../Models/Tickets";
 import "./TicketsAsociados.css";
 import type { TicketLite } from "./RelacionarTickets/Relacionador";
 import RelacionadorInline from "./RelacionarTickets/Relacionador";
+import { useUserRoleFromSP } from "../../../Funcionalidades/Usuarios";
+import { useAuth } from "../../../auth/authContext";
 
 type Props = {
   title?: string;
-  ticket: Ticket;                         // ticket actualmente seleccionado
+  ticket: Ticket;                        
   emptyChildrenText?: string;
-  onSelect?: (t: Ticket) => void;         // callback al seleccionar
-  buildHref?: (id: number | string) => string; // opcional: si también quieres navegar
+  onSelect?: (t: Ticket) => void;         
+  buildHref?: (id: number | string) => string;
   onRelateConfirm?: (payload: { mode: "padre" | "hijo" | "masiva"; selected: TicketLite[] }) => Promise<void> | void;
 };
 
-export default function TicketsAsociados({title = "Tickets Asociados", ticket, emptyChildrenText = "No es hijo de ningun caso", onSelect, buildHref,}: Props) {
+export default function TicketsAsociados({title = "Tickets Asociados", ticket, emptyChildrenText = "No es hijo de ningun caso", onSelect, buildHref}: Props) {
   const { Tickets } = useGraphServices();
-
-  // Hook de relacionados
+  const {account} = useAuth()
+  const userRole = useUserRoleFromSP(account?.username)
+  const isPrivileged = userRole.role === "Administrador" || userRole.role === "Tecnico" || userRole.role === "Técnico";
   const { padre, hijos, loading, error, loadRelateds } = useTicketsRelacionados(Tickets, ticket);
 
   // ====== Relacionador (UI) ======
   const [showRel, setShowRel] = React.useState(false);
   const [loadingOpts, setLoadingOpts] = React.useState(false);
+  
 
   async function openRelacionador() {
     try {
@@ -55,17 +59,13 @@ export default function TicketsAsociados({title = "Tickets Asociados", ticket, e
       <header className="ta-header">
         <div className="ta-header__left">
           <h2 className="ta-title">{title}</h2>
-          <button type="button" className="ta-iconbtn" aria-label={showRel ? "cancelar" : "nuevo"} title={showRel ? "Cancelar" : "Relacionar"} onClick={showRel ? closeRelacionador : openRelacionador}>
-            {showRel ? "Cancelar" : "Nuevo"}
-          </button>
         </div>
 
-        {/* Oculta el link cuando estás relacionando */}
-        {!showRel && (
-          <a className="ta-seeall" href="#" aria-label="Ver todos los tickets asociados">
-            Ver todos
-          </a>
-        )}
+          {isPrivileged &&
+            <a className="ta-seeall" onClick={showRel ? closeRelacionador : openRelacionador} aria-label="Relacionar nuevo">
+              Relacion nuevo
+            </a>
+          }
       </header>
 
       {/* ===== Contenido ===== */}
@@ -74,12 +74,7 @@ export default function TicketsAsociados({title = "Tickets Asociados", ticket, e
           {loadingOpts ? (
             <div className="ta-skeleton" style={{ height: 40 }} aria-hidden />
           ) : (
-            <RelacionadorInline
-                currentId={Number(ticket.ID)}
-                onCancel={closeRelacionador}
-                userMail={""} isAdmin={true}  
-                reload={loadRelateds}        
-            />
+            <RelacionadorInline currentId={Number(ticket.ID)} onCancel={closeRelacionador} userMail={""} isAdmin={true} reload={loadRelateds}/>
           )}
         </div>
       ) : (
@@ -98,11 +93,7 @@ export default function TicketsAsociados({title = "Tickets Asociados", ticket, e
                   <li className="ta-list__item">
                     <span className="ta-list__dash" aria-hidden>-</span>
                     {onSelect ? (
-                      <button
-                        type="button"
-                        className="ta-link ta-link--button"
-                        onClick={(e) => handleClick(e, padre)}
-                      >
+                      <button type="button" className="ta-link ta-link--button" onClick={(e) => handleClick(e, padre)}>
                         {padre.Title} <span className="ta-link__muted">- ID: {padre.ID}</span>
                       </button>
                     ) : (
@@ -126,11 +117,7 @@ export default function TicketsAsociados({title = "Tickets Asociados", ticket, e
                     <li key={t.ID} className="ta-list__item">
                       <span className="ta-list__dash" aria-hidden>-</span>
                       {onSelect ? (
-                        <button
-                          type="button"
-                          className="ta-link ta-link--button"
-                          onClick={(e) => handleClick(e, t)}
-                        >
+                        <button type="button" className="ta-link ta-link--button" onClick={(e) => handleClick(e, t)}>
                           {t.Title} <span className="ta-link__muted">- ID: {t.ID}</span>
                         </button>
                       ) : (

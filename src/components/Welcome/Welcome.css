@@ -1,0 +1,117 @@
+/* Fuente fresca (opcional). Si no deseas petición externa, borra @import y se usa el fallback. */
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap");
+
+:root{
+  --ws-bg1:#c9f1ec;   /* menta claro */
+  --ws-bg2:#e2fbf5;   /* menta aún más claro */
+  --ws-ink:#0f172a;   /* slate-900 */
+  --ws-dim:#334155;   /* slate-700 */
+  --ws-brand:#0ea5e9; /* sky-500 */
+  --ws-cta:#0ea5e9;
+  --ws-cta-ink:#fff;
+  --ws-cta-hover:#0284c7;
+  --ws-ghost:#0f172a14;
+}
+
+.ws-hero{
+  position: relative;
+  display: grid;
+  place-items: center;
+  padding: clamp(24px, 6vw, 48px);
+  background: linear-gradient(180deg, var(--ws-bg2) 0%, var(--ws-bg1) 100%);
+  overflow: hidden;
+  font-family: "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+  color: var(--ws-ink);
+  height: 100%;
+}
+
+/* Contenido */
+.ws-container{
+  text-align: center;
+  max-width: 820px;
+}
+
+.ws-title{
+  font-size: clamp(28px, 5vw, 56px);
+  line-height: 1.05;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin: 0 0 10px;
+}
+
+.ws-brand{
+  color: var(--ws-brand);
+}
+
+.ws-subtitle{
+  font-size: clamp(16px, 2.2vw, 22px);
+  line-height: 1.45;
+  color: var(--ws-dim);
+  margin: 0 0 24px;
+}
+
+/* Acciones */
+.ws-actions{
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.ws-cta{
+  appearance: none;
+  border: 0;
+  background: var(--ws-cta);
+  color: var(--ws-cta-ink);
+  font-weight: 700;
+  font-size: 15px;
+  padding: 12px 18px;
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(14,165,233,.25);
+  cursor: pointer;
+  transition: transform .08s ease, filter .15s ease, background .2s ease;
+}
+.ws-cta:hover{ filter: brightness(1.05); }
+.ws-cta:active{ transform: translateY(1px) scale(.99); }
+.ws-cta:focus-visible{ outline: 3px solid #bae6fd; outline-offset: 2px; }
+.ws-cta:hover{ background: var(--ws-cta-hover); }
+
+.ws-ghost{
+  appearance: none;
+  border: 0;
+  background: var(--ws-ghost);
+  color: var(--ws-ink);
+  font-weight: 700;
+  font-size: 15px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background .2s ease, transform .08s ease;
+}
+.ws-ghost:hover{ background: #0f172a24; }
+.ws-ghost:active{ transform: translateY(1px) scale(.99); }
+.ws-ghost:focus-visible{ outline: 3px solid #94a3b8; outline-offset: 2px; }
+
+/* Burbujas decorativas */
+.ws-bubble{
+  position: absolute;
+  filter: blur(40px);
+  opacity: .35;
+  border-radius: 999px;
+  pointer-events: none;
+}
+.ws-b1{ width: 380px; height: 380px; background: #22d3ee; top: -90px; left: -80px; }
+.ws-b2{ width: 320px; height: 320px; background: #60a5fa; bottom: -120px; right: -80px; }
+.ws-b3{ width: 220px; height: 220px; background: #34d399; bottom: 10%; left: 12%; }
+
+/* Soporte oscuro si tu app lo usa */
+@media (prefers-color-scheme: dark){
+  :root{
+    --ws-ink:#e5e7eb;
+    --ws-dim:#cbd5e1;
+    --ws-ghost:#ffffff14;
+  }
+  .ws-hero{
+    background: radial-gradient(1000px 600px at 20% -10%, #0b2533, #071923 50%, #08151b 100%);
+  }
+}

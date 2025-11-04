@@ -1,3 +1,5 @@
+import type { SolicitudUsuario } from "./Formatos";
+
 export type FormStateCajeros = {
     solicitante: string;
     usuario: string;
@@ -15,6 +17,12 @@ export type FlowToUser = {
   title?: string;
   mail: boolean
 };
+
+export type conectorFacturas = {
+  InitialDate: string;
+  FinalDate: string;
+  user: string;
+}
 
 export type AdjuntoPayload = {
   name: string;
@@ -63,4 +71,10 @@ export type MasiveFlow = {
     contentType: string
     contentBase64: string
   };
+}
+
+export type SoliictudServiciosFlow = {
+  User: string;
+  userEmail: string;
+  Datos: SolicitudUsuario 
 }

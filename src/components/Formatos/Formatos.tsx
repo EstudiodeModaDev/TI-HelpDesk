@@ -1,26 +1,14 @@
 // src/components/Formatos/Formatos.tsx
 import { useState } from "react";
 import "./Formatos.css";
-
 import SolicitudUsuarioForm from "./ServiciosTI/ServiciosTI";
 import SolicitudesRed from "./Seguridad de red/SeguridadRed";
 import SolicitudERP from "./SeguridadERP/SeguridadERP";
 import PermisosNavegacion from "./PermisosNavegacion/PermisosNavegacion";
-
-import type { SolicitudUsuario } from "../../Funcionalidades/Formatos";
 import type { OpcionSolicitud } from "../../Models/Formatos";
-import type { FilaSolicitudRed, FilaSolicitudERP } from "../../Models/Formatos";
-import type { FilaPermisoNav } from "../../Funcionalidades/PermisosNavegacion";
 
-/** Opciones del selector */
-const OPCIONES: OpcionSolicitud[] = [
-  "Solicitud de servicios de TI",
-  "FR Admin seguridad unidad de red",
-  "FR Administrador seguridad ERP",
-  "Permisos de navegacion",
-] as const;
+const OPCIONES: OpcionSolicitud[] = ["Solicitud de servicios de TI", "FR Admin seguridad unidad de red", "FR Administrador seguridad ERP", "Permisos de navegacion",] as const;
 
-/** TyC por opción (HTML controlado por nosotros) */
 const TYC_BY_OPCION: Record<OpcionSolicitud, string> = {
   "Solicitud de servicios de TI": `
     <p>Importante:</p>
@@ -46,10 +34,10 @@ const TYC_BY_OPCION: Record<OpcionSolicitud, string> = {
   "FR Administrador seguridad ERP": `
     <p>Recuerda:</p>
         <ul>
-          <li>El equipo de TI tiene un total de 8 horas <strong>HABILES</strong> para responder y solucionar su solicitud.</li>
-          <li>En el <strong>campo persona</strong> debe escoger la persona que requiere el permiso.</li>
-          <li>En el <strong>campo permiso</strong> debe especificar si requiere un permiso de lectura o de escritura sobre la carpeta.</li>
-          <li>En el <strong>campo observaciones</strong> debe indicar alguna observaciones si lo requiere.</li>
+          <li>El equipo de TI tiene un total de 8 horas HABILES para responder y solucionar su solicitud.</li>
+          <li>En el campo persona debe escoger la persona que requiere el permiso.</li>
+          <li>En el campo permiso debe especificar si requiere un permiso de lectura o de escritura sobre la carpeta.</li>
+          <li>En el campo observaciones debe indicar alguna observaciones si lo requiere.</li>
           <li>La solicitud debe ser realizada por el jefe inmediato o responsable del área.</li>
         </ul>
     <p><strong>NOTA: </strong> Favor diligenciar el formato en su totalidad (nombres y apellidos completos). Esto con el fin de evitar reprocesos solicitando la información faltante.</p>
@@ -57,7 +45,7 @@ const TYC_BY_OPCION: Record<OpcionSolicitud, string> = {
   "Permisos de navegacion": `
     <p>Recuerda:</p>
         <ul>
-          <li>El equipo de TI tiene un total de 8 horas <strong>HABILES</strong> para responder y solucionar su solicitud.</li>
+          <li>El equipo de TI tiene un total de 8 horas HABILES para responder y solucionar su solicitud.</li>
           <li>Por favor marque los sitios a los que el usuario requiere acceso.</li>
           <li>Si requiere acceso a otro sitio web escriba la URL.</li>
           <li>La solicitud debe ser realizada por el jefe inmediato o responsable del área.</li>
@@ -67,7 +55,7 @@ const TYC_BY_OPCION: Record<OpcionSolicitud, string> = {
 };
 
 export default function Formatos() {
-  const [opcion, setOpcion] = useState<OpcionSolicitud | null>(null);
+  const [opcion, setOpcion] = useState<OpcionSolicitud | null>("Solicitud de servicios de TI");
   const [acepta, setAcepta] = useState(false);
   const [confirmado, setConfirmado] = useState(false);
 
@@ -78,31 +66,19 @@ export default function Formatos() {
   // Enrutamiento al formulario según la opción elegida
   if (confirmado && opcion) {
     if (opcion === "Solicitud de servicios de TI") {
-      const handleSubmitTI = async (payload: SolicitudUsuario) => {
-        console.log("TI → payload", payload);
-      };
-      return <SolicitudUsuarioForm onSubmit={handleSubmitTI} />;
+      return <SolicitudUsuarioForm />;
     }
 
     if (opcion === "FR Admin seguridad unidad de red") {
-      const handleSubmitPermisosRed = async (payload: Omit<FilaSolicitudRed, "id">[]) => {
-        console.log("Permisos de red → payload", payload);
-      };
-      return <SolicitudesRed onSubmit={handleSubmitPermisosRed} />;
+      return <SolicitudesRed />;
     }
 
     if (opcion === "FR Administrador seguridad ERP") {
-      const handleSubmitERP = async (payload: Omit<FilaSolicitudERP, "id">[]) => {
-        console.log("ERP → payload", payload);
-      };
-      return <SolicitudERP onSubmit={handleSubmitERP} />;
+      return <SolicitudERP  />;
     }
 
     if (opcion === "Permisos de navegacion") {
-      const handleSubmitNav = async (payload: Omit<FilaPermisoNav, "id">[]) => {
-        console.log("Permisos de navegación → payload", payload);
-      };
-      return <PermisosNavegacion onSubmit={handleSubmitNav} jefeDefault="Practicante Listo" />;
+      return <PermisosNavegacion/>;
     }
   }
 

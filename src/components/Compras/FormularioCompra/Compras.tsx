@@ -1,6 +1,6 @@
 import * as React from "react";
 import Select, { components, type GroupBase } from "react-select";
-import type { CargarA, Opcion, TipoCompra } from "../../../Models/Compras";
+import { Items, type CargarA, type TipoCompra } from "../../../Models/Compras";
 import type { UserOptionEx } from "../../NuevoTicket/NuevoTicketForm";
 import { useFranquicias } from "../../../Funcionalidades/Franquicias";
 import { useWorkers } from "../../../Funcionalidades/Workers";
@@ -10,15 +10,10 @@ import { useGraphServices } from "../../../graph/GrapServicesContext";
 import type { COOption } from "../../../Models/CO";
 import type { CCOption } from "../../../Models/CentroCostos";
 
-const UN_OPTS: Opcion[] = [
-  { value: "UND", label: "UND" },
-  { value: "PAR", label: "PAR" },
-  { value: "CJ",  label: "CJ"  },
-];
 const Motivos = ["Cambio por daño", "Renovación de equipo", "Renovación de licencia"] as const;
 
 /** --- Props --- */
-type Props = {submitting?: boolean;};
+type Props = {submitting?: boolean; onClick: (valor: boolean) => void};
 
 /** --- Filtro simple para react-select --- */
 function userFilter(option: { label: string; value: string }, rawInput: string): boolean {
@@ -34,14 +29,14 @@ const Option = (props: any) => (
   </components.Option>
 );
 
-export default function CompraFormulario({submitting = false,}: Props) {
+export default function CompraFormulario({submitting = false, onClick}: Props) {
 
-  const { Franquicias, CentroCostos, CentroOperativo, Compras } = useGraphServices();
+  const { Franquicias, CentroCostos, CentroOperativo, Compras, Tickets, Logs, Usuarios } = useGraphServices();
   const { franqOptions, loading: loadingFranq, error: franqError } = useFranquicias(Franquicias as any);
-  const { workersOptions, loadingWorkers, error: usersError } = useWorkers({ onlyEnabled: true, domainFilter: "estudiodemoda.com.co" });
+  const { workersOptions, loadingWorkers, error: usersError } = useWorkers({ onlyEnabled: true,});
   const { ccOptions, loading: loadingCC, error: ccError } = useCentroCostos(CentroCostos as any);
-  const { COOptions, loading: loadingCO,} = useCO(CentroOperativo as any);
-  const { setField, setMarcaPct,  handleSubmit, setState, zeroMarcas, MARCAS, errors, totalPct, state, } = useCompras(Compras as any);
+  const { COOptions, loading: loadingCO, UNOptions} = useCO(CentroOperativo as any);
+  const { setField, setMarcaPct,  handleSubmit, setState, zeroMarcas, MARCAS, errors, totalPct, state, } = useCompras(Compras, Tickets, Logs, Usuarios);
 
   const combinedOptions: UserOptionEx[] = React.useMemo(() => {
     const map = new Map<string, UserOptionEx>();
@@ -65,6 +60,7 @@ export default function CompraFormulario({submitting = false,}: Props) {
 
   return (
     <div className="compra-form white-silo compra-wrap" data-darkreader-ignore>
+      <h2>{"Registro de Compras"}</h2>
       <form className="form-grid" onSubmit={(e) => { handleSubmit(e)}}>
         {/* Tipo */}
         <div className="field">
@@ -73,6 +69,7 @@ export default function CompraFormulario({submitting = false,}: Props) {
             <option value="Producto">Producto</option>
             <option value="Servicio">Servicio</option>
             <option value="Alquiler">Alquiler</option>
+            <option value="Contrato">Contrato</option>
           </select>
         </div>
 
@@ -87,7 +84,7 @@ export default function CompraFormulario({submitting = false,}: Props) {
             isDisabled={submitting || loadingWorkers || loadingFranq}
             isLoading={loadingWorkers || loadingFranq}
             value={selectedSolicitante}
-            onChange={(opt) => setField("solicitadoPor", opt?.label ?? "")}
+            onChange={(opt) => {setField("solicitadoPor", opt?.label ?? ""); setField("CorreoSolicitante", opt?.email ?? "")}}
             filterOption={(o, input) => userFilter({ label: o.label, value: String(o.value ?? "") }, input)}
             components={{ Option }}
             isClearable
@@ -104,6 +101,24 @@ export default function CompraFormulario({submitting = false,}: Props) {
             onChange={(e) => setField("fechaSolicitud", e.target.value)}
           />
           {errors.fechaSolicitud && <small className="error">{errors.fechaSolicitud}</small>}
+        </div>
+
+        {/*Tipificacion*/}
+        <div className="field">
+          <label className="label">Tipo de Item</label>
+          <select name="Items" value={state.codigoItem} onChange={(e) => {const codigo = e.target.value;
+                                                                    setField("codigoItem", codigo); 
+                                                                    const item = Items.find(i => String(i.codigo) === String(codigo));
+                                                                    setField("DescItem", item?.descripcion ?? "")
+                                                                    console.log("item ", item)
+                                                                    }} required>
+            <option value="">Seleccionar código</option>
+              {Items.map((op) => (
+                <option key={op.codigo} value={op.codigo}>
+                  {op.codigo} - {op.descripcion}
+                </option>
+                ))}
+          </select>
         </div>
 
         {/* Producto/Servicio/Alquiler */}
@@ -140,7 +155,7 @@ export default function CompraFormulario({submitting = false,}: Props) {
           <label className="label">UN</label>
           <select className="control" value={state.un} onChange={(e) => setField("un", e.target.value)}>
             <option value="">Seleccione UN</option>
-            {UN_OPTS.map((o) => (
+            {UNOptions.map((o) => (
               <option key={o.value} value={o.value}>{o.label}</option>
             ))}
           </select>
@@ -168,7 +183,7 @@ export default function CompraFormulario({submitting = false,}: Props) {
           {ccError && <small className="error">{ccError}</small>}
         </div>
 
-        {/* UN */}
+        {/* Motivo */}
         <div className="field">
           <label className="label">Motivo</label>
           <select className="control" value={state.motivo} onChange={(e) => setField("motivo", e.target.value)}>
@@ -248,6 +263,7 @@ export default function CompraFormulario({submitting = false,}: Props) {
           </button>
         </div>
       </form>
+      <button type="button" className="btn-ver" onClick={() => onClick(true)}>📄 Registrar compra</button>
     </div>
   );
 }

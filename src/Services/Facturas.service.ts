@@ -72,20 +72,23 @@ export class FacturasService {
     const f = item?.fields ?? {};
     return {
       id0: Number(item?.id ?? 0),
-      FechaEmision: f.FechadeEmision ?? "",
-      NoFactura: f.Numerofactura ?? "",
+      FechaEmision: f.FechaEmision ?? "",
+      NoFactura: f.NoFactura ?? "",
       Proveedor: f.Proveedor ?? "",
       Title: f.Title ?? "",
-      Items: f.Item ?? "",
-      DescripItems: f.Descripcion ?? "",
-      ValorAnIVA: Number(f.Valor) || 0,
-      CC: f.Cc ?? "",
-      CO: f.Co ?? "",
-      un: f.Un ?? "",
-      DetalleFac: f.Detalle ?? "",
+      Items: f.Items ?? "",
+      DescripItems: f.DescripItems ?? "",
+      ValorAnIVA: Number(f.ValorAnIVA) || 0,
+      CC: f.CC ?? "",
+      CO: f.CO ?? "",
+      un: f.un ?? "",
+      DetalleFac: f.DetalleFac ?? "",
       FecEntregaCont: f.FecEntregaCont ?? "",
       DocERP: f.DocERP ?? "",
       Observaciones: f.Observaciones ?? "",
+      RegistradoPor: f.RegistradoPor ?? "",
+      Created: f.Created ?? f.created ?? item.created ?? item.Created,
+      IdDistrubuida: f.IdDistrubuida ?? "",
     };
   }
 

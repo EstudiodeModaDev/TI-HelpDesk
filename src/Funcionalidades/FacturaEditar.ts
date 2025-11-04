@@ -1,47 +1,43 @@
 import { useCallback } from "react";
-import { ReFacturasService } from "../Services/ReFacturas.service";
+
 import type { ReFactura } from "../Models/RegistroFacturaInterface";
+import { useGraphServices } from "../graph/GrapServicesContext";
 
-// 🧩 Lógica para crear, actualizar o eliminar facturas
 export function FacturaEditar() {
-  const service = new ReFacturasService((window as any).graphInstance); // Graph se obtiene desde contexto global o se inyecta externamente
+  const { Facturas } = useGraphServices(); // ✅ Ya viene con GraphRest configurado
 
-  // 🟢 Crear nueva factura
+  // 🟢 Crear
   const registrarFactura = useCallback(async (nuevaFactura: ReFactura) => {
     try {
-      await service.create(nuevaFactura);
+      await Facturas.create(nuevaFactura);
       return true;
     } catch (error) {
       console.error("Error al registrar factura:", error);
       return false;
     }
-  }, []);
+  }, [Facturas]);
 
-  // ✏️ Actualizar factura existente
+  // ✏️ Actualizar
   const actualizarFactura = useCallback(async (id: number, cambios: Partial<ReFactura>) => {
     try {
-      await service.update(String(id), cambios);
+      await Facturas.update(String(id), cambios);
       return true;
     } catch (error) {
       console.error("Error al actualizar factura:", error);
       return false;
     }
-  }, []);
+  }, [Facturas]);
 
-  // 🗑️ Eliminar factura
+  // 🗑️ Eliminar
   const eliminarFactura = useCallback(async (id: number) => {
     try {
-      await service.delete(String(id));
+      await Facturas.delete(String(id));
       return true;
     } catch (error) {
       console.error("Error al eliminar factura:", error);
       return false;
     }
-  }, []);
+  }, [Facturas]);
 
-  return {
-    registrarFactura,
-    actualizarFactura,
-    eliminarFactura,
-  };
+  return { registrarFactura, actualizarFactura, eliminarFactura };
 }

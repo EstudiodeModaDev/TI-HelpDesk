@@ -1,15 +1,15 @@
 import * as React from "react";
 import type { Ticket } from "../../Models/Tickets";
 import "./DetalleTicket.css";
-
 import TicketHistorial from "../Seguimiento/Seguimiento";
 import HtmlContent from "../Renderizador/Renderizador";
-import { toISODateTimeFlex } from "../../utils/Date";
-
 import Recategorizar from "./ModalRecategorizar/Recategorizar";
 import Reasignar from "./Reasignar/Reasignar";
 import AsignarObservador from "./Observador/Observador";
 import TicketsAsociados from "./TicketsRelacionados/Relacionados";
+import { ParseDateShow } from "../../utils/Date";
+import Trunc from "../Trunc/trunc";
+import { useTicketsAttachments } from "../../Funcionalidades/AttachmentsTickets";
 
 /* ================== Helpers y tipos ================== */
 const hasRecatRole = (r?: string) => {
@@ -18,188 +18,250 @@ const hasRecatRole = (r?: string) => {
 };
 
 type Props = {
-  ticket: Ticket;          // Ticket con el que se abre el detalle
+  ticket: Ticket;          
   onVolver: () => void;
   role: string;
 };
 
 /* ================== Componente ================== */
-export default function DetalleTicket({ ticket, onVolver, role }: Props) {
-  // Estado interno: ticket seleccionado (se actualiza con los clics de TicketsAsociados)
-  const [selected, setSelected] = React.useState<Ticket>(ticket);
+export type Opcion = { value: string; label: string };
 
-  // Si cambia la prop `ticket` (por navegación externa), sincroniza el seleccionado
+
+function Row({label, children, className = "",}: {label: string; children: React.ReactNode; className?: string;}) {
+  return (
+    <div className={`cd-row ${className}`}>
+      <label className="cd-label">{label}</label>
+      <div className="cd-value">{children}</div>
+    </div>
+  );
+}
+export function CaseDetail({ ticket, onVolver, role }: Props) {
+  const {loadAttachments, rows} = useTicketsAttachments(ticket.ID ?? "");
+  // === Estado local del ticket seleccionado
+  const [selected, setSelected] = React.useState<Ticket>(ticket);
   React.useEffect(() => {
     if (!selected || selected.ID !== ticket.ID) {
       setSelected(ticket);
     }
+    // al cambiar de ticket, oculta paneles
+    setShowSeg(false);
+    setShowRecat(false);
+    setShowReasig(false);
+    setShowObservador(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ticket?.ID]);
 
-  // Modales y toggles
+  React.useEffect(() => {
+    loadAttachments()
+  }, [ticket?.ID]);
+
   const [showSeg, setShowSeg] = React.useState(false);
   const [showRecat, setShowRecat] = React.useState(false);
   const [showReasig, setShowReasig] = React.useState(false);
   const [showObservador, setShowObservador] = React.useState(false);
 
-  const canRecategorizar = hasRecatRole(role);
+  const canRecategorizar = hasRecatRole?.(role) ?? false;
 
-  // Derivados del ticket seleccionado
-  const categoria = [selected.Categoria, selected.SubCategoria, selected.SubSubCategoria]
-    .filter(Boolean)
-    .join(" > ");
-
-  const fechaApertura = toISODateTimeFlex(selected.FechaApertura) || "–";
-  const fechaMaxSolucion = selected.TiempoSolucion
-    ? `${toISODateTimeFlex(selected.TiempoSolucion)}${selected.ANS ? ` (${selected.ANS})` : ""}`
-    : "No hay fecha de solución establecida";
+  // === Derivados (memoizados)
+  const categoria = React.useMemo(
+    () =>
+      [selected?.Categoria, selected?.SubCategoria, selected?.SubSubCategoria]
+        .filter(Boolean)
+        .join(" > "),
+    [selected?.Categoria, selected?.SubCategoria, selected?.SubSubCategoria]
+  );
 
   if (!selected) return <div>Ticket no encontrado</div>;
 
   return (
-    <div className="detalle-ticket">
-      {/* Header superior */}
-      <button className="btn-volver" onClick={onVolver}>← Volver</button>
-      <h2>Detalles Ticket #{selected.ID}</h2>
+    <section className="case-detail">
+      {/* ===== Header ===== */}
+      <header className="cd-header">
+        <h2 className="cd-title">Caso – ID {selected.ID}</h2>
+        <button type="button" className="btn-volver" onClick={onVolver}>
+          ← Volver
+        </button>
+      </header>
 
-      {/* Fila 1: Asunto / Categoría */}
-      <div className="fila">
-        <div className="campo">
-          <label>Asunto</label>
-          <span>{selected.Title}</span>
-        </div>
+      {/* ===== GRID ===== */}
+      <div className="cd-grid">
+        {/* Fila 1 */}
+        <Row className="pos-apertura" label="Fecha de Apertura">
+          <Trunc text={ParseDateShow(selected.FechaApertura ?? "") ?? "—"} />
+        </Row>
 
-        <div className="campo">
-          <label>Categoría</label>
+        <Row className="pos-solucion" label="Fecha de solución">
+          <Trunc text={ParseDateShow(selected.TiempoSolucion ?? "") ?? "—"} />
+        </Row>
+
+        <Row className="pos-fuente" label="Fuente solicitante">
+          <Trunc text={selected.Fuente} lines={1} />
+        </Row>
+
+        {/* Fila 2 */}
+        <Row className="pos-categoria" label="Categoría">
           {canRecategorizar ? (
-            <button
-              type="button"
-              className="as-text"
-              onClick={() => setShowRecat(true)}
-              title="Recategorizar ticket"
-            >
-              {categoria || "–"}
+            <button type="button" className="as-text" onClick={() => setShowRecat(true)}>
+              <Trunc text={categoria || "–"} lines={1} />
             </button>
           ) : (
-            <span title="No tiene permisos para recategorizar">{categoria || "–"}</span>
+            <Trunc text={categoria || "–"} lines={1} />
           )}
-        </div>
-      </div>
+        </Row>
 
-      {/* Fila 2: Fechas */}
-      <div className="fila">
-        <div className="campo">
-          <label>Fecha de Apertura</label>
-          <span>{fechaApertura}</span>
-        </div>
-        <div className="campo">
-          <label>Fecha máxima de solución</label>
-          <span>{fechaMaxSolucion}</span>
-        </div>
-      </div>
+        <Row className="pos-ans" label="ANS">
+          <Trunc text={selected.ANS ?? "—"} lines={1} />
+        </Row>
 
-      {/* Fila 3: Resolutor / Solicitante */}
-      <div className="fila">
-        <div className="campo">
-          <label>Resolutor del caso</label>
-          {canRecategorizar ? (
-            <button
-              type="button"
-              className="as-text"
-              onClick={() => setShowReasig(true)}
-              title="Reasignar ticket"
-            >
-              {selected.Nombreresolutor || "–"}
-            </button>
-          ) : (
-            <span title="No tiene permisos para reasignar">{selected.Nombreresolutor || "–"}</span>
-          )}
-        </div>
-        <div className="campo">
-          <label>Solicitante del ticket</label>
-          <span>{selected.Solicitante || "–"}</span>
-        </div>
-      </div>
+        <Row className="pos-estado" label="Estado">
+          <div className="cd-inline">
+            <span className={`cd-badge ${selected.Estadodesolicitud === "Cerrado" ? "is-closed" : "is-open"}`} title={selected.Estadodesolicitud ?? ""}>
+              {selected.Estadodesolicitud}
+            </span>
+          </div>
+        </Row>
 
-      {/* Fila 4: Estado / Fuente */}
-      <div className="fila">
-        <div className="campo">
-          <label>Estado del caso</label>
-          <span>{selected.Estadodesolicitud || "–"}</span>
-        </div>
+        {/* Fila 3: personas */}
+        <div className="cd-people pos-people">
+          <div className="cd-people-item">
+            <div className="cd-people-label">Actor</div>
+            <div className="cd-people-value">—</div>
+          </div>
 
-        <div className="campo">
-          <label>Fuente de solicitud</label>
-          <span>{selected.Fuente || "–"}</span>
-        </div>
-      </div>
+          <div className="cd-people-item">
+            <div className="cd-people-label">Solicitante</div>
+            <div className="cd-people-value">
+              <Trunc text={selected.Solicitante} lines={1} />
+            </div>
+          </div>
 
-      {/* Fila 5: Descripción / Observador */}
-      <div className="fila">
-        <div className="campo">
-          <label>Descripción del caso</label>
-          <div className="descripcion-wrap">
-            <HtmlContent html={selected.Descripcion} />
+          <div className="cd-people-item">
+            <div className="cd-people-label">Observador</div>
+            <div className="cd-people-value">
+              {canRecategorizar ? (
+                <button
+                  type="button"
+                  className="as-text"
+                  onClick={() => setShowObservador(true)}
+                >
+                  <Trunc text={selected.Observador || "–"} lines={1} />
+                </button>
+              ) : (
+                <Trunc text={selected.Observador || "—"} lines={1} />
+              )}
+            </div>
+          </div>
+
+          <div className="cd-people-item">
+            <div className="cd-people-label">Resolutor</div>
+            <div className="cd-people-value">
+              {canRecategorizar ? (
+                <button
+                  type="button"
+                  className="as-text"
+                  onClick={() => setShowReasig(true)}
+                >
+                  <Trunc text={selected.Nombreresolutor || "–"} lines={1} />
+                </button>
+              ) : (
+                <Trunc text={selected.Nombreresolutor || "–"} lines={1} />
+              )}
+            </div>
           </div>
         </div>
 
-        <div className="campo">
-          <label>Observador del caso</label>
-          {canRecategorizar ? (
-            <button
-              type="button"
-              className="as-text"
-              onClick={() => setShowObservador(true)}
-              title="Asignar observador del ticket"
-            >
-              {selected.Observador || "–"}
-            </button>
-          ) : (
-            <span title="No tiene permisos para nombrar un observador">
-              {selected.Observador || "No hay observador asignado"}
-            </span>
-          )}
-        </div>
+        {/* Fila 4: Título */}
+        <Row className="pos-titulo" label="Título">
+          {/* 2 líneas en móvil para mejor legibilidad */}
+          <Trunc text={selected.Title} lines={2} />
+        </Row>
+
+        {/* Fila 5: Descripción (HTML truncada en móvil vía .html-trunc) */}
+        <Row className="pos-descr" label="Descripción">
+          <div className="html-trunc">
+            <HtmlContent html={selected.Descripcion ?? ""} />
+          </div>
+        </Row>
       </div>
 
-      {/* ======= Tickets relacionados (padre/hijos) ======= */}
-      <TicketsAsociados
-        key={selected.ID}              
-        ticket={selected}
-        onSelect={(t) => {
-          setSelected(t);              
-          setShowSeg(false);           // opcional: cierra seguimiento
-        }}
-      />
+      {/* ===== Adjuntos ===== */}
+      {Array.isArray(rows) && (
+        <section className="cd-attachments">
+          <h3 className="cd-subtitle">Adjuntos ({rows.length})</h3>
 
-      {/* Botón Seguimiento (toggle) */}
+
+          {(rows.length === 0 ? (
+            <p className="cd-empty">Sin adjuntos.</p>
+          ) : (
+            <ul className="cd-files" role="list">
+              {rows.map((r: any, i: number) => {
+                const name = r?.DisplayName ?? r?.name ?? `Archivo ${i + 1}`;
+                const href = r?.AbsoluteUri ?? r?.link ?? r?.Url ?? r?.url ?? "";
+                if (!href) return null;
+                return (
+                  <li key={`${href}-${i}`} className="cd-file">
+                    <a href={href} target="_blank" rel="noopener noreferrer" className="cd-file-link"
+                      title={name}
+                    >
+                      <span className={`cd-file-ico ext-${name}`} aria-hidden />
+                      <Trunc text={name} lines={1} />
+                    </a>
+                  </li>
+                );
+              })}
+            </ul>
+          ))}
+        </section>
+      )}
+
+
+      {/* ===== Tickets relacionados ===== */}
+      <div className="seccion">
+        <TicketsAsociados key={String(selected.ID)} ticket={selected} onSelect={(t: Ticket) => {setShowSeg(false); setSelected(t)}}/>
+      </div>
+
+      {/* ===== Botón de Seguimiento ===== */}
       <div>
-        <button className="btn-volver" onClick={() => setShowSeg((v) => !v)}>
+        <button
+          type="button"
+          className="btn-volver"
+          onClick={() => setShowSeg((v) => !v)}
+        >
           {showSeg ? "Ocultar seguimiento" : "Seguimiento ticket"}
         </button>
       </div>
 
-      {/* Historial (solo si showSeg = true) */}
+      {/* ===== Historial (toggle) ===== */}
       {showSeg && (
-        <div style={{ marginTop: 16 }}>
+        <div className="seccion">
           <TicketHistorial
             role={role ?? "Usuario"}
             onVolver={() => setShowSeg(false)}
             ticketId={selected.ID!}
-            onAddClick={() => {}}
-            onViewClick={() => {}}
             ticket={selected}
           />
         </div>
       )}
 
-      {/* ==== Modal de Recategorización ==== */}
+      {/* ===== Modal: Recategorización ===== */}
       {showRecat && (
-        <div className="modal-overlay" role="dialog" aria-modal="true" aria-label="Recategorizar ticket">
+        <div
+          className="modal-overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Recategorizar ticket"
+        >
           <div className="modal-card">
             <div className="modal-head">
               <h3>Recategorizar ticket #{selected.ID}</h3>
-              <button className="modal-close" onClick={() => setShowRecat(false)} aria-label="Cerrar">✕</button>
+              <button
+                type="button"
+                className="modal-close"
+                onClick={() => setShowRecat(false)}
+                aria-label="Cerrar"
+              >
+                ✕
+              </button>
             </div>
             <div className="modal-body">
               <Recategorizar ticket={selected} />
@@ -208,13 +270,25 @@ export default function DetalleTicket({ ticket, onVolver, role }: Props) {
         </div>
       )}
 
-      {/* ==== Modal de Reasignación ==== */}
+      {/* ===== Modal: Reasignación ===== */}
       {showReasig && (
-        <div className="modal-overlay" role="dialog" aria-modal="true" aria-label="Reasignar ticket">
+        <div
+          className="modal-overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Reasignar ticket"
+        >
           <div className="modal-card">
             <div className="modal-head">
               <h3>Reasignar ticket #{selected.ID}</h3>
-              <button className="modal-close" onClick={() => setShowReasig(false)} aria-label="Cerrar">✕</button>
+              <button
+                type="button"
+                className="modal-close"
+                onClick={() => setShowReasig(false)}
+                aria-label="Cerrar"
+              >
+                ✕
+              </button>
             </div>
             <div className="modal-body">
               <Reasignar ticket={selected} />
@@ -223,13 +297,25 @@ export default function DetalleTicket({ ticket, onVolver, role }: Props) {
         </div>
       )}
 
-      {/* ==== Modal de Observador ==== */}
+      {/* ===== Modal: Observador ===== */}
       {showObservador && (
-        <div className="modal-overlay" role="dialog" aria-modal="true" aria-label="Asignar observador">
+        <div
+          className="modal-overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Asignar observador"
+        >
           <div className="modal-card">
             <div className="modal-head">
               <h3>Asignar observador a ticket #{selected.ID}</h3>
-              <button className="modal-close" onClick={() => setShowObservador(false)} aria-label="Cerrar">✕</button>
+              <button
+                type="button"
+                className="modal-close"
+                onClick={() => setShowObservador(false)}
+                aria-label="Cerrar"
+              >
+                ✕
+              </button>
             </div>
             <div className="modal-body">
               <AsignarObservador ticket={selected} />
@@ -237,6 +323,8 @@ export default function DetalleTicket({ ticket, onVolver, role }: Props) {
           </div>
         </div>
       )}
-    </div>
+    </section>
   );
 }
+
+

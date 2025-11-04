@@ -42,6 +42,7 @@ export class ReFacturasService {
       FecEntregaCont: f.FecEntregaCont ?? "",
       DocERP: f.DocERP ?? "",
       Observaciones: f.Observaciones ?? "",
+      RegistradoPor: f.RegistradoPor ?? "",
     };
   }
 

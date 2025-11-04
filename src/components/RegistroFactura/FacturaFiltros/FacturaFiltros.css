@@ -19,19 +19,19 @@
 /* 📦 Rejilla de filtros (grid) */
 .filtros-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); /* ⬅️ antes era 180px */
+  gap: 8px; /* ⬅️ antes era 12px */
   align-items: center;
 }
 
 /* 🧩 Campos de filtro */
+/* Ajuste general de inputs/selects */
 .filtros-grid input,
 .filtros-grid select {
-  padding: 10px;
-  border-radius: 8px;
+  padding: 6px 8px; /* ⬅️ antes era 10px */
+  border-radius: 6px; /* ⬅️ antes era 8px */
   border: 1px solid #ccc;
-  font-size: 14px;
-  transition: border-color 0.3s, box-shadow 0.3s;
+  font-size: 13px; /* ⬅️ antes era 14px */
   width: 100%;
   box-sizing: border-box;
 }

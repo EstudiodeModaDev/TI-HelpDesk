@@ -1,21 +1,18 @@
-import { useSolicitudesRed} from "../../../Funcionalidades/SolicitudesRed";
-import type { FilaSolicitudRed, PermisoRed } from "../../../Models/Formatos";
+import { useSolicitudesRed } from "../../../Funcionalidades/Formatos";
+import { useGraphServices } from "../../../graph/GrapServicesContext";
+import type { PermisoRed } from "../../../Models/Formatos";
+import type { TicketsService } from "../../../Services/Tickets.service";
 import "./SeguridadRed.css";
-
-type Props = {
-  onSubmit: (payload: Omit<FilaSolicitudRed, "id">[]) => Promise<void> | void;
-};
 
 const PERMISOS: PermisoRed[] = ["Lectura", "Escritura", "Lectura y escritura"];
 
-export default function SeguridadRed({ onSubmit }: Props) {
-  const {
-    filas, sending, error, addFila, removeFila, setCampo, submit,
-  } = useSolicitudesRed(onSubmit);
+export default function SeguridadRed() {
+  const { Tickets: TicketsSvc} = (useGraphServices() as ReturnType<typeof useGraphServices> & {Tickets: TicketsService;})
+  const {filas, sending, error, addFila, removeFila, setCampo, submit,} = useSolicitudesRed(TicketsSvc);
 
   return (
     <section className="sr-scope">
-      <form className="sr-card" onSubmit={submit} noValidate>
+      <form className="sr-card" onSubmit={(e) => submit(e)} noValidate>
         <h2 className="sr-title">ADMINISTRADOR SEGURIDAD UNIDADES DE RED</h2>
 
         <div className="sr-table" role="table" aria-label="Solicitudes de acceso a unidades de red">
@@ -107,7 +104,7 @@ export default function SeguridadRed({ onSubmit }: Props) {
         {error && <div className="sr-error">{error}</div>}
 
         <div className="sr-actions">
-          <button type="button" className="sr-btn" onClick={addFila}>Agregar fila</button>
+          <button type="button" className="sr-btn" onClick={() => addFila()}>Agregar fila</button>
           <button type="submit" className="sr-btn sr-btn--primary" disabled={sending}>
             {sending ? "Enviando…" : "Enviar"}
           </button>

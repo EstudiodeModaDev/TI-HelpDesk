@@ -21,3 +21,5 @@ export type UserMe = {
   businessPhones?: string[]; 
   mobilePhone?: string | null;
 };
+
+export type FormNewUserErrors = Partial<Record<keyof UsuariosSP, string>>;

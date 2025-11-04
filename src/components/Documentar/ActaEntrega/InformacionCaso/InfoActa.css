@@ -1,5 +1,11 @@
-/* ====== Tokens (ajusta a tu paleta) ====== */
-:root{
+/* ====== ActaEntrega.css (tema claro persistente y aislado) ====== */
+
+/* 0) Scope: SIEMPRE claro y aislado */
+.acta-form{
+  color-scheme: light !important;  /* inputs nativos, scrollbars, datepicker en claro */
+  isolation: isolate;              /* evita blends/filtros/temas del padre */
+  
+  /* ===== Tokens locales (no globales) ===== */
   --bg: #ffffff;
   --surface: #ffffff;
   --text: #0f172a;          /* slate-900 */
@@ -20,17 +26,34 @@
 
   --font-title: clamp(22px, 2.6vw, 34px);
   --font-sub: clamp(16px, 1.6vw, 20px);
-}
 
-/* ====== Layout base ====== */
-.acta-form{
   max-width: 1100px;
   margin: 0 auto;
   padding: var(--space-5);
-  background: var(--bg);
+  background: var(--bg) !important;
   color: var(--text);
 }
 
+/* 0.1) Si la app está en dark, reafirma claro y ajusta bordes/grises */
+.dark .acta-form{
+  color-scheme: light !important;
+  --border: #dfe3e8;
+  --muted: #667085;
+}
+
+/* 0.2) Neutralización agresiva del dark global */
+.dark .acta-form, .dark .acta-form *{
+  color-scheme: light !important;
+}
+.acta-form, .acta-form *{
+  box-sizing: border-box;
+  min-width: 0;
+  mix-blend-mode: normal !important;
+  filter: none !important;
+  opacity: 1 !important;
+}
+
+/* ====== Título ====== */
 .acta-title{
   font-size: var(--font-title);
   font-weight: 800;
@@ -45,44 +68,58 @@
   gap: var(--space-4) var(--space-5);
   margin-bottom: var(--space-5);
 }
-
-.acta-field{
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
+.acta-field{ display: flex; flex-direction: column; gap: 6px; }
 .acta-field > label{
   font-size: 13px;
   font-weight: 600;
   color: var(--muted);
 }
 
+/* ====== Inputs / Selects ====== */
 .acta-input{
   width: 100%;
-  background: var(--surface);
+  background: var(--surface) !important;
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 10px 12px;
   font: inherit;
-  color: inherit;
+  color: var(--text) !important;
   outline: none;
   transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
+  -webkit-appearance: none;
+     -moz-appearance: none;
+          appearance: none;
 }
-
+.acta-input::placeholder{ color: var(--muted); }
 .acta-input:focus{
   border-color: var(--ring);
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--ring) 18%, transparent);
+  background: #ffffff !important;
+}
+
+/* Select: caret consistente y blanco */
+select.acta-input{
+  background-image:
+    linear-gradient(45deg, transparent 50%, #64748b 50%),
+    linear-gradient(135deg, #64748b 50%, transparent 50%),
+    linear-gradient(#ffffff, #ffffff);
+  background-position:
+    calc(100% - 18px) calc(50% - 3px),
+    calc(100% - 12px) calc(50% - 3px),
+    calc(100% - 2.2rem) 0;
+  background-size: 6px 6px, 6px 6px, 1px 100%;
+  background-repeat: no-repeat;
+  padding-right: 2.6rem;
 }
 
 /* Disabled-friendly */
 .acta-input:disabled{
-  background: #f8fafc;       /* slate-50 */
-  color: #64748b;            /* slate-500 */
+  background: #f8fafc;
+  color: #64748b;
   cursor: not-allowed;
 }
 
-/* Mensajes de error */
+/* Error */
 .error{
   color: var(--error);
   font-size: 12px;
@@ -95,11 +132,7 @@
   font-weight: 700;
   margin: var(--space-5) 0 var(--space-3);
 }
-
-.acta-label-strong{
-  font-weight: 700;
-  margin-bottom: 6px;
-}
+.acta-label-strong{ font-weight: 700; margin-bottom: 6px; }
 
 /* ====== Toggles / items a entregar ====== */
 .entregas-grid{
@@ -108,16 +141,8 @@
   gap: var(--space-3) var(--space-5);
   margin-bottom: var(--space-5);
 }
-
-.entrega-item{
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.entrega-item--span2{
-  grid-column: 1 / -1;
-}
+.entrega-item{ display: flex; align-items: center; gap: 10px; }
+.entrega-item--span2{ grid-column: 1 / -1; }
 
 /* ====== Galería (tarjetas) ====== */
 .galeria-grid{
@@ -126,7 +151,6 @@
   gap: var(--space-4);
   margin-bottom: var(--space-5);
 }
-
 .galeria-card{
   border: 1px solid var(--border);
   border-radius: var(--radius);
@@ -134,12 +158,7 @@
   box-shadow: var(--shadow);
   padding: var(--space-4);
 }
-
-.galeria-header{
-  font-weight: 700;
-  margin-bottom: var(--space-3);
-}
-
+.galeria-header{ font-weight: 700; margin-bottom: var(--space-3); }
 .galeria-row{
   display: grid;
   grid-template-columns: 180px 1fr;
@@ -147,7 +166,6 @@
   gap: var(--space-2);
   margin-bottom: var(--space-2);
 }
-
 .galeria-row > label{
   font-size: 13px;
   color: var(--muted);
@@ -161,7 +179,6 @@
   gap: var(--space-3);
   margin-top: var(--space-4);
 }
-
 .acta-primary{
   appearance: none;
   border: 1px solid transparent;
@@ -174,12 +191,10 @@
   transition: transform .06s ease, box-shadow .15s ease, background .2s ease;
   box-shadow: 0 2px 6px rgba(37,99,235,.25);
 }
-
 .acta-primary:hover{
   transform: translateY(-1px);
   box-shadow: 0 6px 16px rgba(37,99,235,.25);
 }
-
 .acta-primary:active{
   transform: translateY(0);
   box-shadow: 0 3px 8px rgba(37,99,235,.25);
@@ -189,10 +204,26 @@
 @media (max-width: 1024px){
   .acta-grid,
   .entregas-grid,
-  .galeria-grid{
-    grid-template-columns: 1fr;
-  }
-  .galeria-row{
-    grid-template-columns: 1fr;
-  }
+  .galeria-grid{ grid-template-columns: 1fr; }
+  .galeria-row{ grid-template-columns: 1fr; }
 }
+
+/* ====== Parches nativos ====== */
+.acta-form input[type="date"]::-webkit-calendar-picker-indicator{
+  filter: none !important; opacity: 1 !important;
+}
+.acta-form .acta-input:-webkit-autofill,
+.acta-form .acta-input:-webkit-autofill:hover,
+.acta-form .acta-input:-webkit-autofill:focus{
+  -webkit-text-fill-color: var(--text);
+  -webkit-box-shadow: 0 0 0px 1000px #ffffff inset;
+  transition: background-color 9999s ease-out 0s;
+}
+
+/* ====== Scrollbar clara (opcional) ====== */
+.acta-form{
+  scrollbar-color: #cfd8e3 #ffffff; /* Firefox */
+}
+.acta-form::-webkit-scrollbar{ height: 10px; width: 10px; }
+.acta-form::-webkit-scrollbar-thumb{ background: #cfd8e3; border-radius: 8px; }
+.acta-form::-webkit-scrollbar-track{ background: #ffffff; }

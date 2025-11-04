@@ -1,6 +1,6 @@
 import React from "react";
 import type { PlantillasService } from "../Services/Plantillas.service";
-import type { Plantillas } from "../Models/Plantilla";
+import type { FormPlantillas, Plantillas } from "../Models/Plantilla";
 
 export function usePlantillas(
   PlantillasSvc: PlantillasService,
@@ -8,7 +8,12 @@ export function usePlantillas(
   // UI state
   const [ListaPlantillas, setListaPlantillas] = React.useState<Plantillas[] | []>([]);
   const [loading, setLoading] = React.useState(false);
+  const [submiting, setSubmiting] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
+  const [state, setState] = React.useState<FormPlantillas>({
+    HTLM: "",
+    Titulo: ""
+  })
 
   // cargar primera página (o recargar)
   const loadPlantillas = React.useCallback(async () => {
@@ -28,10 +33,32 @@ export function usePlantillas(
     loadPlantillas();
   }, [loadPlantillas]);
 
+  const createPlantilla = React.useCallback(async () => {
+    setSubmiting(true); setError(null)
+    try{
+      const payload: Plantillas = {
+        CamposPlantilla: state.HTLM,
+        Title: state.Titulo
+      }
+      const created = await PlantillasSvc.create(payload)
+      console.log("Plantilla creada", created)
+      setSubmiting(false);
+      setState({HTLM: "",Titulo: ""})
+    } catch (e: any) {
+      setError(e?.message ?? "Error creando la pantilla");
+      setSubmiting(false)
+    } 
+  }, [state, PlantillasSvc])
+
+  const setField = <K extends keyof FormPlantillas>(k: K, v: FormPlantillas[K]) => setState((s) => ({ ...s, [k]: v }));
+
   return {
-    // datos visibles (solo la página actual)
     ListaPlantillas,
     loading,
     error,
+    createPlantilla,
+    submiting,
+    state,
+    setField
   };
 }

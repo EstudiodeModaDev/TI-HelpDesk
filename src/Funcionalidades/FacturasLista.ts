@@ -1,10 +1,10 @@
 import { useEffect, useState, useCallback } from "react";
-import { ReFacturasService } from "../Services/ReFacturas.service";
+import { FacturasService } from "../Services/Facturas.service";
 import type { ReFactura } from "../Models/RegistroFacturaInterface";
 
 // 🧠 Lógica principal para manejar la lista de facturas y sus filtros
 export function FacturasLista() {
-  const service = new ReFacturasService((window as any).graphInstance); // Asumimos que el graph se inyecta globalmente o se pasa luego
+  const service = new FacturasService((window as any).graphInstance); // Asumimos que el graph se inyecta globalmente o se pasa luego
   const [facturas, setFacturas] = useState<ReFactura[]>([]);
   const [filtros, setFiltros] = useState({
     fechadeemision: "",
@@ -19,7 +19,7 @@ export function FacturasLista() {
   useEffect(() => {
     (async () => {
       const lista = await service.getAll();
-      setFacturas(lista);
+      setFacturas(lista.items);
     })();
   }, []);
 

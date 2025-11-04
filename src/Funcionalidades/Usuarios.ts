@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useGraphServices } from "../graph/GrapServicesContext";
 import type { UsuariosSPService } from "../Services/Usuarios.Service";
-import type { UsuariosSP } from "../Models/Usuarios";
+import type { FormNewUserErrors, UsuariosSP } from "../Models/Usuarios";
 import type { UserOption } from "../Models/Commons";
 
 export function useUserRoleFromSP(email?: string | null) {
@@ -90,15 +90,27 @@ export function useIsAdmin(email?: string | null) {
 
 export function useUsuarios(usuariosSvc: UsuariosSPService) {
   const [usuarios, setUsuarios] = React.useState<UsuariosSP[]>([]);
+  const [tecnicos, setTecnicos] = React.useState<UsuariosSP[]>([]);
+  const [administradores, setAdmins] = React.useState<UsuariosSP[]>([]);
   const [UseruserOptions, setUserOptions] = React.useState<UserOption[]>([]);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
+  const [state, setState] = React.useState<UsuariosSP>({
+    Correo: "",
+    Rol: "",
+    Title: "",
+    Disponible: ""
+  })
+  const [errors, setErrors] = React.useState<FormNewUserErrors>({})
+  const [submitting, setSubmitting] = React.useState<Boolean>(false)
 
   // paginación
   const [pageSize, setPageSize] = React.useState<number>(10);
   const [pageIndex, setPageIndex] = React.useState<number>(1);
   const [nextLink, setNextLink] = React.useState<string | null>(null);
 
+  const setField = <K extends keyof UsuariosSP>(k: K, v: UsuariosSP[K]) => setState((s) => ({ ...s, [k]: v }));
+  
 
   const mapRowToUsuario = React.useCallback((row: any): UsuariosSP => {
     // Si el service ya aplanó, usa el nivel raíz; si no, lee de fields
@@ -131,7 +143,6 @@ export function useUsuarios(usuariosSvc: UsuariosSPService) {
   }, []);
 
   // --- loader principal ---
-
   const loadUsuarios = React.useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -167,14 +178,113 @@ export function useUsuarios(usuariosSvc: UsuariosSPService) {
     return () => { cancelled = true; };
   }, [usuariosSvc, /* pageSize, */ mapRowToUsuario, mapUsuariosToOptions]);
 
+  const loadTecnicos = React.useCallback(async () => {
+    setLoading(true);
+    setError(null);
+
+    let cancelled = false;
+    try {
+      const res = await usuariosSvc.getAll({filter: `fields/Rol eq 'Tecnico'`});
+      if (cancelled) return;
+
+      setTecnicos(res);
+    } catch (e: any) {
+      if (!cancelled) {
+        setError(e?.message ?? "Error cargando usuarios");
+        setUsuarios([]);
+        setUserOptions([]);
+      }
+    } finally {
+      if (!cancelled) setLoading(false);
+    }
+
+    return () => { cancelled = true; };
+  }, [usuariosSvc]);
+
+  const loadAdmins = React.useCallback(async () => {
+    setLoading(true);
+    setError(null);
+
+    let cancelled = false;
+    try {
+      const res = await usuariosSvc.getAll({filter: `fields/Rol eq 'Administrador'`});
+      if (cancelled) return;
+
+      setAdmins(res);
+    } catch (e: any) {
+      if (!cancelled) {
+        setError(e?.message ?? "Error cargando usuarios");
+        setAdmins([]);
+      }
+    } finally {
+      if (!cancelled) setLoading(false);
+    }
+
+    return () => { cancelled = true; };
+  }, [usuariosSvc]);
+
+  const deleteUser = React.useCallback(async (id: string) => {
+    setLoading(true);
+    setError(null);
+
+    let cancelled = false;
+    try {
+      const res = await usuariosSvc.delete(id);
+      if (cancelled) return;
+
+      console.log(res)
+    } catch (e: any) {
+      if (!cancelled) {
+        setError(e?.message ?? "Error eliminado usuarios");
+      }
+    } finally {
+      if (!cancelled) setLoading(false);
+    }
+
+    return () => { cancelled = true; };
+  }, [usuariosSvc]);
+
+  const validate = () => {
+    const e: FormNewUserErrors = {};
+    if (!state.Title.trim()) e.Title = "Ingresa el nombre completo.";
+    if (!state.Correo.trim()) e.Correo = "Ingresa el correo.";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(state.Correo)) e.Correo = "Correo inválido.";
+    setErrors(e);
+    return Object.keys(e).length === 0;
+  };
+
+  const addUser = React.useCallback(async () => {
+    if(!validate()) return
+    setSubmitting(true);
+    setError(null);
+
+    let cancelled = false;
+    try {
+      const res = await usuariosSvc.create(state);
+      if (cancelled) return;
+
+      console.log(res)
+    } catch (e: any) {
+      if (!cancelled) {
+        setError(e?.message ?? "Error eliminado usuarios");
+      }
+    } finally {
+      if (!cancelled) setSubmitting(false);
+    }
+
+    return () => { cancelled = true; };
+  }, [usuariosSvc, state]);
+
   React.useEffect(() => {
     let cancel = false;
     (async () => {
       if (cancel) return;
       await loadUsuarios();
+      await loadTecnicos();
+      await loadAdmins();
     })();
     return () => { cancel = true; };
-  }, [loadUsuarios]);
+  }, [loadUsuarios, loadTecnicos, loadAdmins]);
 
   const refreshUsuers = React.useCallback(async () => {
     await loadUsuarios();
@@ -183,14 +293,7 @@ export function useUsuarios(usuariosSvc: UsuariosSPService) {
   const hasNext = !!nextLink;
 
   return {
-    usuarios,
-    UseruserOptions,
-    loading,
-    error,
-    pageSize, setPageSize,
-    pageIndex,
-    hasNext,
-    nextLink,
-    refreshUsuers,
+    usuarios, UseruserOptions, loading, error, pageSize, pageIndex, hasNext, nextLink, tecnicos, administradores, state,errors, submitting,
+    refreshUsuers, deleteUser, setPageSize, setField, addUser 
   };
 }

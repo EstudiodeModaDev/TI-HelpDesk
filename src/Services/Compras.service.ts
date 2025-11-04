@@ -90,7 +90,11 @@ export class ComprasService {
       SolicitadoPor: f.SolicitadoPor,
       Title: f.Title,
       UN: f.UN,
-      Estado: f.Estado
+      Estado: f.Estado,
+      CodigoItem: f.CodigoItem,
+      DescItem: f.DescItem,
+      CorreoSolicitante: f.CorreoSolicitante,
+      IdCreado: f.IdCreado
     }
   }
 

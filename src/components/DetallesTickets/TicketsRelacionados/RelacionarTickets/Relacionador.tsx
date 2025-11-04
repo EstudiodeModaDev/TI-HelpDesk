@@ -69,7 +69,7 @@ export default function RelacionadorInline({currentId, onCancel, userMail, isAdm
             <div className="tf-field">
               <label htmlFor="archivo" className="tf-label">Cargar Excel de tickets</label>
 
-              <input id="archivo" type="file" className="tf-input" accept=".xlsx,.xls" onChange={(e) => {
+              <input id="archivo" type="file" className="relc-native" accept=".xlsx,.xls" onChange={(e) => {
                   const f = e.target.files?.[0] ?? null;
                   if (!f) { setField("archivo", null); return; }
                   // Validación básica de tamaño (opcional)

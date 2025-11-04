@@ -1,130 +1,257 @@
-.esc-form {
-  padding: 16px;
+/* ===== EscalamientoInternet.css ===== */
+
+/* 1) Núcleo: forzar SIEMPRE tema claro dentro del scope */
+.esc-form{
+  color-scheme: light !important;     /* inputs nativos en claro */
+  isolation: isolate;                 /* aísla filtros/mezclas del exterior */
+  --bg: #ffffff;
+  --text: #111827;
+  --muted: #6b7280;
+  --border: #e5e7eb;
+  --border-strong: #d1d5db;
+  --primary: #2563eb;
+  --primary-ink: #ffffff;
+  --ring: rgba(37, 99, 235, 0.35);
+  --error: #b91c1c;
+  --radius: 14px;
+
+  width: 100%;
+  max-width: 100%;
+  padding: 20px;
+  box-sizing: border-box;
+  background: var(--bg) !important;
+  color: var(--text);
+  line-height: 1.4;
 }
 
-.esc-title {
+/* 1.1) Ajuste fino de tokens cuando el ancestro global es oscuro */
+.dark .esc-form{
+  color-scheme: light !important;     /* reafirma claro dentro de layouts oscuros */
+  --border: #dfe3e8;                  /* micro-tuning de contrastes */
+  --border-strong: #cfd6dd;
+  --muted: #667085;
+}
+
+/* Neutraliza dark mode global de frameworks o del html */
+.dark .esc-form,
+.dark .esc-form *{
+  color-scheme: light !important;
+}
+
+/* 2) Reset suave dentro del scope */
+.esc-form, .esc-form *{
+  box-sizing: border-box;
+  min-width: 0;
+}
+
+/* 3) Título */
+.esc-title{
   margin: 0 0 12px 0;
   font-size: 28px;
   font-weight: 800;
-  letter-spacing: 0.2px;
+  letter-spacing: .2px;
+  color: #0f172a;
 }
 
-.esc-search {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  margin: 12px 0 16px 0;
-}
-
-.esc-card {
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 2px 12px rgba(30,41,59,0.08);
-  padding: 16px;
-}
-
-.esc-grid {
+/* 4) Buscador */
+.esc-search{
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px 16px;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.esc-button{
+  padding: 10px 16px;
+  border: 1px solid var(--border);
+  background: #f8fafc;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: box-shadow .15s ease, transform .02s ease, border-color .15s ease, background .15s ease;
+}
+.esc-button:hover{
+  border-color: var(--border-strong);
+  box-shadow: 0 0 0 4px var(--ring);
+}
+.esc-button:active{ transform: translateY(1px); }
+
+/* 5) Card del formulario */
+.esc-card{
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.06);
 }
 
-@media (max-width: 1024px) {
-  .esc-grid { grid-template-columns: 1fr 1fr; }
+/* 6) Grid del formulario */
+.esc-grid{
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 16px;
 }
-@media (max-width: 640px) {
-  .esc-grid { grid-template-columns: 1fr; }
-}
+.esc-field{ display: flex; flex-direction: column; gap: 6px; }
+.esc-col-2{ grid-column: span 2; }
 
-.esc-field {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.esc-col-2 {
-  grid-column: 1 / -1; /* ocupa el ancho completo */
-}
-
-.esc-input {
+/* 7) Inputs / Selects compartidos */
+.esc-input{
   width: 100%;
-  border: 1px solid rgba(0,0,0,0.12);
-  border-radius: 8px;
+  background: #ffffff !important;     /* SIEMPRE blanco */
+  color: var(--text) !important;
+  border: 1px solid var(--border);
+  border-radius: 10px;
   padding: 10px 12px;
   outline: none;
-  background: #fff;
+  transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
+  -webkit-appearance: none;
+     -moz-appearance: none;
+          appearance: none;
+}
+.esc-input::placeholder{ color: var(--muted); }
+.esc-input:focus{
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px var(--ring);
+  background: #ffffff !important;
 }
 
-.esc-input:focus {
-  outline: 2px solid rgba(0,0,0,0.25);
-  outline-offset: 2px;
+/* Select: elimina flecha fea en algunos navegadores y mantiene look blanco */
+select.esc-input{
+  background-image:
+    linear-gradient(45deg, transparent 50%, #6b7280 50%),
+    linear-gradient(135deg, #6b7280 50%, transparent 50%),
+    linear-gradient(#ffffff, #ffffff);
+  background-position:
+    calc(100% - 18px) calc(50% - 3px),
+    calc(100% - 12px) calc(50% - 3px),
+    calc(100% - 2.2rem) 0;
+  background-size: 6px 6px, 6px 6px, 1px 100%;
+  background-repeat: no-repeat;
+  padding-right: 2.6rem;
 }
 
-.esc-button {
-  padding: 8px 12px;
-  border-radius: 8px;
-  border: 1px solid rgba(0,0,0,0.12);
-  background: #fff;
-  cursor: pointer;
+/* 8) Etiquetas y errores */
+.esc-field > label{
+  font-size: 13px;
+  font-weight: 600;
+  color: #0f172a;
+}
+.error{
+  color: var(--error);
+  font-size: 12px;
+  margin-top: 2px;
 }
 
-.esc-attachments {
-  margin-top: 12px;
+/* 9) Adjuntos */
+.esc-attachments{
+  margin-top: 14px;
 }
-
-.esc-attachments-title {
+.esc-attachments-title{
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   font-weight: 700;
   margin-bottom: 8px;
-  display: flex;
-  gap: 6px;
-  align-items: center;
+  color: #0f172a;
 }
-
-.esc-asterisk { color: #0b2a7a; } /* solo un acento visual */
-
-.esc-attachments-box {
-  border: 2px solid #132b7a; /* similar al azul del borde en la captura */
+.esc-asterisk{ color: var(--error); }
+.esc-attachments-box{
+  border: 1px dashed var(--border-strong);
+  border-radius: 12px;
+  padding: 14px;
+  background: #ffffff;
+}
+.esc-muted{ color: var(--muted); }
+.esc-files{
+  list-style: none;
+  padding: 0;
+  margin: 0 0 10px 0;
+  display: grid;
+  gap: 6px;
+}
+.esc-files li{
+  padding: 8px 10px;
+  border: 1px solid var(--border);
   border-radius: 8px;
-  padding: 16px;
-  min-height: 110px;
   background: #fff;
 }
-
-.esc-muted {
-  margin: 0 0 12px 0;
-  opacity: 0.8;
-}
-
-.esc-files {
-  margin: 0 0 8px 0;
-  padding-left: 16px;
-}
-
-.esc-upload {
+.esc-upload{
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  font-weight: 600;
+  border: 1px solid var(--border);
+  padding: 10px 12px;
+  border-radius: 10px;
   cursor: pointer;
   user-select: none;
+  background: #f8fafc;
+  transition: box-shadow .15s ease, border-color .15s ease, transform .02s ease;
 }
+.esc-upload:hover{
+  border-color: var(--border-strong);
+  box-shadow: 0 0 0 4px var(--ring);
+}
+.esc-upload:active{ transform: translateY(1px); }
 
-.esc-actions {
+/* 10) Acciones */
+.esc-actions{
   display: flex;
-  justify-content: center;
+  justify-content: flex-end;
   margin-top: 16px;
 }
-
-.esc-primary {
-  padding: 10px 18px;
-  border-radius: 8px;
-  border: none;
-  background: #1d7167;      /* verde similar al de la captura */
-  color: #fff;
+.esc-primary{
+  padding: 12px 18px;
+  border: 1px solid var(--primary);
+  background: var(--primary);
+  color: var(--primary-ink);
+  border-radius: 12px;
   font-weight: 700;
   cursor: pointer;
+  transition: box-shadow .15s ease, transform .02s ease, filter .15s ease;
+}
+.esc-primary:hover{ box-shadow: 0 0 0 6px var(--ring); filter: brightness(1.03); }
+.esc-primary:active{ transform: translateY(1px); }
+.esc-primary:disabled{
+  opacity: .6;
+  cursor: not-allowed;
+  box-shadow: none;
+  filter: none;
 }
 
-.esc-primary:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+/* 11) Autofill Chrome (evita amarillo/oscuro) */
+.esc-input:-webkit-autofill,
+.esc-input:-webkit-autofill:hover,
+.esc-input:-webkit-autofill:focus{
+  -webkit-text-fill-color: var(--text);
+  -webkit-box-shadow: 0 0 0px 1000px #ffffff inset;
+  transition: background-color 9999s ease-out 0s;
 }
+
+/* 11.1) Datepicker WebKit: asegúrate de que no se “apague” */
+.esc-form input[type="date"]::-webkit-calendar-picker-indicator{
+  filter: none !important;
+  opacity: 1 !important;
+}
+
+/* 12) Responsivo */
+@media (max-width: 860px){
+  .esc-grid{ grid-template-columns: 1fr; }
+  .esc-col-2{ grid-column: auto; }
+  .esc-actions{ justify-content: stretch; }
+  .esc-primary{ width: 100%; }
+}
+
+/* 13) Seguridad extra: si algún contenedor fuerza dark, lo neutralizamos igual */
+:root[color-scheme="dark"] .esc-form,
+html[data-theme="dark"] .esc-form{
+  color-scheme: light !important;
+  background: #ffffff !important;
+}
+
+/* 14) (Opcional) Scrollbars claros y consistentes */
+.esc-form{
+  scrollbar-color: #cfd8e3 #ffffff;  /* Firefox */
+}
+.esc-form::-webkit-scrollbar{ height: 10px; width: 10px; }
+.esc-form::-webkit-scrollbar-thumb{ background: #cfd8e3; border-radius: 8px; }
+.esc-form::-webkit-scrollbar-track{ background: #ffffff; }

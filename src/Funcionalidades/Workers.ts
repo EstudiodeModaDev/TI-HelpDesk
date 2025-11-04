@@ -1,4 +1,4 @@
-// src/hooks/useWorkers.ts
+// src/hooks/useWorkers.tsx
 import * as React from 'react';
 import { useAuth } from '../auth/authContext';
 import { GraphRest } from '../graph/GraphRest';
@@ -6,7 +6,6 @@ import type { UserOption, Worker } from '../Models/Commons';
 
 type Options = {
   onlyEnabled?: boolean;
-  domainFilter?: string;
   previewLimit?: number;
   spListService?: { getAll: (opts?: any) => Promise<any[]> };
   spOrderBy?: string;
@@ -14,8 +13,15 @@ type Options = {
   spFilter?: string;
 };
 
-const norm = (s: string) =>
-  (s ?? '').normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase().trim();
+const norm = (s?: string) => {
+  const base = (s ?? '').normalize('NFD').toLowerCase().trim();
+  try {
+    return base.replace(/\p{Diacritic}/gu, '');
+  } catch {
+    // Fallback: elimina marcas combinantes (Mn)
+    return base.replace(/[\u0300-\u036f]/g, '');
+  }
+};
 
 type CacheKey = string;
 const cache: Record<CacheKey, { data: Worker[] | null; promise: Promise<Worker[]> | null }> = {};
@@ -23,7 +29,6 @@ const cache: Record<CacheKey, { data: Worker[] | null; promise: Promise<Worker[]
 function cacheKey(opts: Options) {
   return JSON.stringify({
     onlyEnabled: opts.onlyEnabled ?? true,
-    domainFilter: (opts.domainFilter ?? '').toLowerCase(),
     previewLimit: opts.previewLimit ?? null,
     hasSP: !!opts.spListService,
     spOrderBy: opts.spOrderBy ?? '',
@@ -56,14 +61,17 @@ function mapSPRowToWorker(r: any): Worker {
 
 async function fetchUsersFromGraph(graph: GraphRest, opts: Options): Promise<Worker[]> {
   const onlyEnabled = opts.onlyEnabled ?? true;
-  const domain = (opts.domainFilter ?? '').toLowerCase();
 
-  const select = encodeURIComponent('id,displayName,mail,userPrincipalName,jobTitle,accountEnabled');
+  const select = encodeURIComponent(
+    'id,displayName,mail,userPrincipalName,jobTitle,accountEnabled'
+  );
   const top = 999;
   const filters: string[] = [];
   if (onlyEnabled) filters.push('accountEnabled eq true');
 
-  let url = `/users?$select=${select}&$top=${top}` + (filters.length ? `&$filter=${encodeURIComponent(filters.join(' and '))}` : '');
+  let url =
+    `/users?$select=${select}&$top=${top}` +
+    (filters.length ? `&$filter=${encodeURIComponent(filters.join(' and '))}` : '');
   const acc: any[] = [];
 
   while (url) {
@@ -74,14 +82,18 @@ async function fetchUsersFromGraph(graph: GraphRest, opts: Options): Promise<Wor
     url = next ? next.replace('https://graph.microsoft.com/v1.0', '') : '';
   }
 
-  const emailToUser = new Map<string, any>();
+  // Dedup por email si existe, si no por id
+  const seen = new Set<string>();
+  const unique: any[] = [];
   for (const u of acc) {
     const email = String(u.mail || u.userPrincipalName || '').trim().toLowerCase();
-    if (!email) continue;
-    if (domain && !email.endsWith(`@${domain}`)) continue;
-    if (!emailToUser.has(email)) emailToUser.set(email, u);
+    const id = String(u.id ?? '');
+    const key = email || id;
+    if (!key || seen.has(key)) continue;
+    seen.add(key);
+    unique.push(u);
   }
-  return Array.from(emailToUser.values()).map(mapGraphUser);
+  return unique.map(mapGraphUser);
 }
 
 async function fetchUsersFromSharePoint(opts: Options): Promise<Worker[]> {
@@ -92,14 +104,9 @@ async function fetchUsersFromSharePoint(opts: Options): Promise<Worker[]> {
     ...(opts.spFilter ? { filter: opts.spFilter } : {}),
   });
 
-  const domain = (opts.domainFilter ?? '').toLowerCase();
   const mapped = (items ?? []).map(mapSPRowToWorker);
-
-  return mapped.filter(w => {
-    const email = String(w.mail ?? '').toLowerCase();
-    if (!email) return false;
-    return domain ? email.endsWith(`@${domain}`) : true;
-  });
+  // Sin filtro de dominio: devolvemos todos los válidos (con o sin email)
+  return mapped.filter((w) => !!(w.displayName || w.mail || w.id));
 }
 
 export function useWorkers(options: Options = {}) {
@@ -131,7 +138,10 @@ export function useWorkers(options: Options = {}) {
     try {
       if (cache[key]?.data) {
         const cached = cache[key]!.data!;
-        const sliced = typeof options.previewLimit === 'number' ? cached.slice(0, options.previewLimit) : cached;
+        const sliced =
+          typeof options.previewLimit === 'number'
+            ? cached.slice(0, options.previewLimit)
+            : cached;
         setWorkers(sliced);
         setWorkersOptions(mapWorkersToOptions(sliced));
         return;
@@ -146,18 +156,19 @@ export function useWorkers(options: Options = {}) {
             fetchUsersFromSharePoint(options),
           ]);
 
-          const emailToWorker = new Map<string, Worker>();
-          for (const g of fromGraph) {
-            const email = String(g.mail ?? '').trim().toLowerCase();
-            if (email) emailToWorker.set(email, g);
-          }
-          for (const s of fromSP) {
-            const email = String(s.mail ?? '').trim().toLowerCase();
-            if (!email) continue;
-            if (!emailToWorker.has(email)) emailToWorker.set(email, s);
-          }
+          // Dedup general por email o id
+          const map = new Map<string, Worker>();
+          const put = (w: Worker) => {
+            const email = String(w.mail ?? '').trim().toLowerCase();
+            const id = String(w.id ?? '');
+            const k = email || id;
+            if (!k) return;
+            if (!map.has(k)) map.set(k, w);
+          };
+          for (const g of fromGraph) put(g);
+          for (const s of fromSP) put(s);
 
-          const merged = Array.from(emailToWorker.values());
+          const merged = Array.from(map.values());
           merged.sort((a, b) => (a.displayName || '').localeCompare(b.displayName || ''));
 
           cache[key]!.data = merged;
@@ -168,9 +179,10 @@ export function useWorkers(options: Options = {}) {
       }
 
       const data = await cache[key]!.promise!;
-      const sliced = typeof options.previewLimit === 'number' ? data.slice(0, options.previewLimit) : data;
+      const sliced =
+        typeof options.previewLimit === 'number' ? data.slice(0, options.previewLimit) : data;
       setWorkers(sliced);
-      setWorkersOptions(mapWorkersToOptions(sliced)); // <-- faltaba setear en la rama no-cache
+      setWorkersOptions(mapWorkersToOptions(sliced));
     } catch (e: any) {
       setWorkers([]);
       setWorkersOptions([]);
@@ -178,16 +190,23 @@ export function useWorkers(options: Options = {}) {
     } finally {
       setLoading(false);
     }
-  }, [ready, getToken, key, options.previewLimit, mapWorkersToOptions]); // usa solo lo necesario
+  }, [ready, getToken, key, options.previewLimit, mapWorkersToOptions]);
 
-  // MUEVE el useEffect DESPUÉS de declarar `load`
-  React.useEffect(() => { load(); }, [load, key]);
+  // Efecto después de declarar `load`
+  React.useEffect(() => {
+    load();
+  }, [load, key]);
 
-  const filter = React.useCallback((term: string) => {
-    if (!term) return workers;
-    const q = norm(term);
-    return workers.filter(w => norm(`${w.displayName} ${w.jobTitle ?? ''} ${w.mail ?? ''}`).includes(q));
-  }, [workers]);
+  const filter = React.useCallback(
+    (term: string) => {
+      if (!term) return workers;
+      const q = norm(term);
+      return workers.filter((w) =>
+        norm(`${w.displayName} ${w.jobTitle ?? ''} ${w.mail ?? ''}`).includes(q)
+      );
+    },
+    [workers]
+  );
 
   const refresh = React.useCallback(async () => {
     if (!ready) return;
@@ -196,36 +215,5 @@ export function useWorkers(options: Options = {}) {
   }, [ready, load, key]);
 
   return { workers, workersOptions, loadingWorkers, error, filter, refresh };
-}
-
-export function useUserPhoto(userPrincipalName?: string) {
-  const { getToken } = useAuth();
-  const [url, setUrl] = React.useState<string | null>(null);
-
-  React.useEffect(() => {
-    let abort = false;
-    (async () => {
-      if (!userPrincipalName) return;
-
-      try {
-        const graph = new GraphRest(getToken);
-
-
-
-        const blob = await graph.getBlob(
-          `/users/${encodeURIComponent(userPrincipalName)}/photos/64x64/$value`
-        );
-
-        const reader = new FileReader();
-        reader.onloadend = () => { if (!abort) setUrl(String(reader.result)); };
-        reader.readAsDataURL(blob);
-      } catch (e: any) {
-        console.warn("[Graph photo]", e?.message ?? e);
-      }
-    })();
-    return () => { abort = true; };
-  }, [userPrincipalName, getToken]);
-
-  return url;
 }
 

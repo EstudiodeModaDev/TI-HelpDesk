@@ -1,0 +1,202 @@
+/* === FONDO OSCURO === */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 2rem;
+  overflow: hidden; /* evita scroll del body */
+}
+
+/* === TARJETA PRINCIPAL === */
+.modal-card {
+  background: #fff;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 780px;
+  max-height: 90vh; /* límite de alto visible */
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
+  overflow: hidden; /* bordes limpios */
+}
+
+/* === CABECERA === */
+.modal-header {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.modal-header h2 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
+}
+
+.modal-close {
+  border: none;
+  background: none;
+  font-size: 1.2rem;
+  color: #6b7280;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.modal-close:hover {
+  color: #111;
+}
+
+/* === CUERPO CON SCROLL === */
+.modal-body {
+  flex: 1;
+  overflow-y: auto; /* permite scroll aquí */
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  scrollbar-width: thin;
+  scrollbar-color: #cfcfcf transparent;
+}
+
+.modal-body::-webkit-scrollbar {
+  width: 6px;
+}
+.modal-body::-webkit-scrollbar-thumb {
+  background: #cfcfcf;
+  border-radius: 4px;
+}
+
+/* === SECCIONES === */
+.card-section {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 1.25rem;
+}
+
+.card-section h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.75rem;
+}
+
+/* === FILAS === */
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.4rem 0;
+  font-size: 0.95rem;
+  color: #333;
+  border-bottom: 1px solid #f0f0f0;
+}
+.row:last-child {
+  border-bottom: none;
+}
+.row div:last-child {
+  font-weight: 600;
+  color: #111;
+}
+
+/* === BLOQUE: Nombre + Serial === */
+.row-info {
+  display: flex;
+  align-items: center;
+  gap: 3rem; /* 🔥 controla el espacio entre nombre y serial */
+  min-width: 320px; /* mantiene alineación uniforme */
+}
+
+.row-info .nombre {
+  font-weight: 500;
+  color: #222;
+}
+
+.row-info .serial {
+  color: #666;
+  font-family: monospace; /* 🔤 hace que los espacios sean uniformes */
+  letter-spacing: 0.5px;
+}
+
+/* === COSTOS === */
+.co-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+.co-row:last-child {
+  border-bottom: none;
+}
+.co-desc {
+  display: flex;
+  flex-direction: column;
+}
+.co-title {
+  font-weight: 500;
+  color: #111;
+}
+.co-sub {
+  font-size: 0.85rem;
+  color: #666;
+}
+.co-value {
+  font-weight: 600;
+  color: #111;
+}
+
+/* === FOOTER === */
+.modal-footer {
+  flex-shrink: 0;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #e5e7eb;
+  background: #fafafa;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn-close {
+  background: #111827;
+  color: #fff;
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-close:hover {
+  background: #1f2937;
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 600px) {
+  .modal-card {
+    max-width: 95%;
+    max-height: 92vh;
+  }
+  .modal-body {
+    padding: 1rem;
+  }
+  .card-section {
+    padding: 1rem;
+  }
+
+  .row-info {
+    flex-direction: column;
+    gap: 0.25rem;
+    min-width: auto;
+    align-items: flex-start;
+  }
+}

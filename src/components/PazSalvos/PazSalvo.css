@@ -1,0 +1,119 @@
+/* =========================
+   Tokens (light / dark)
+   ========================= */
+:root{
+  color-scheme: light dark;
+  --pz-bg: #ffffff;            /* fondo página */
+  --pz-elev: #ffffff;          /* tarjetas / paneles internos */
+  --pz-ink: #0f172a;           /* texto principal */
+  --pz-muted: #64748b;         /* texto secundario */
+  --pz-border: #e2e8f0;        /* bordes */
+  --pz-shadow: 0 10px 30px rgba(2,6,23,.06);
+  --pz-focus: #4f46e5;         /* indigo-600 */
+  --pz-ring: rgba(79,70,229,.35);
+  --pz-radius: 14px;
+  --pz-pad: clamp(12px, 2vw, 20px);
+}
+
+@media (prefers-color-scheme: dark){
+  :root{
+    color-scheme: light dark;
+    --pz-bg: #ffffff;            /* fondo página */
+    --pz-elev: #ffffff;          /* tarjetas / paneles internos */
+    --pz-ink: #0f172a;           /* texto principal */
+    --pz-muted: #64748b;         /* texto secundario */
+    --pz-border: #e2e8f0;        /* bordes */
+    --pz-shadow: 0 10px 30px rgba(2,6,23,.06);
+    --pz-focus: #4f46e5;         /* indigo-600 */
+    --pz-ring: rgba(79,70,229,.35);
+    --pz-radius: 14px;
+    --pz-pad: clamp(12px, 2vw, 20px);
+  }
+}
+
+/* =========================
+   Página base
+   ========================= */
+.pz-page{
+  background: var(--pz-bg);
+  color: var(--pz-ink);
+  width: 100%;
+  min-height: 100%;
+  display: grid;
+  grid-auto-flow: row;
+  align-content: start;
+  justify-items: stretch;
+  gap: 12px;
+  padding: var(--pz-pad);
+}
+
+/* =========================
+   Toolbar superior (arriba a la derecha)
+   ========================= */
+.pz-toolbar{
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;   /* a la derecha */
+  gap: 10px;
+  background: transparent;     /* sin caja */
+  color: var(--pz-ink);
+  padding-inline: 2px;
+}
+
+.pz-toolbar__right{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Select de modo */
+.pz-select{
+  appearance: none;
+  background: var(--pz-elev);
+  color: var(--pz-ink);
+  border: 1px solid var(--pz-border);
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-size: .95rem;
+  line-height: 1.2;
+  box-shadow: var(--pz-shadow);
+  outline: none;
+  transition: border-color .15s ease, box-shadow .15s ease, background-color .15s ease, color .15s ease;
+}
+.pz-select:focus{
+  border-color: var(--pz-focus);
+  box-shadow: 0 0 0 3px var(--pz-ring);
+}
+.pz-select::-ms-expand{ display:none; }
+
+/* =========================
+   Contenido (lista / formulario)
+   ========================= */
+/* Separación sutil respecto a la toolbar */
+.pz-page > .pz-toolbar + *{
+  margin-top: 8px;
+}
+
+/* Que cualquier panel interno use todo el ancho disponible */
+.pz-page > *:not(.pz-toolbar){
+  width: 100%;
+  max-width: none;
+  min-width: 0;
+}
+
+/* Si dentro renderizas un wrapper tipo “card”, te dejo helpers comunes */
+.pz-card{
+  background: var(--pz-elev);
+  border: 1px solid var(--pz-border);
+  border-radius: var(--pz-radius);
+  box-shadow: var(--pz-shadow);
+  padding: clamp(14px, 2vw, 20px);
+}
+
+/* =========================
+   Responsive
+   ========================= */
+@media (max-width: 640px){
+  .pz-toolbar{ padding-inline: 0; }
+  .pz-select{ width: 100%; }
+}

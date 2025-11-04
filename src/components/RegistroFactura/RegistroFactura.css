@@ -1,84 +1,360 @@
-/* 🧩 Contenedor principal */
-.registro-container {
-  width: 100%;
-  max-width: 1200px;
-  min-height: 70vh;
-  margin: 0 auto;
-  background: #ffffff;
-  border-radius: 16px;
-  box-shadow: 0 6px 30px rgba(0, 0, 0, 0.1);
-  padding: 15px 20px;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  font-family: 'Arial', sans-serif;
+/* ========= Tokens base ========= */
+:root{
+  --ink:#0f172a;
+  --muted:#6b7280;
+  --bg:#ffffff;
+  --card:#ffffff;
+  --bd:#e5e7eb;
+  --bd-strong:#d1d5db;
+  --primary:#2563eb;
+  --ring:rgba(37,99,235,.35);
+  --radius:12px;
+  --shadow:0 8px 22px rgba(2,6,23,.06);
+  --input-h:44px;
 }
 
-/* 🧾 Formulario */
-.registro-form {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
+/* ========= Contenedor ========= */
+.registro-container{
+  max-width: 1400px;
+  margin: 24px auto;
+  padding: 20px;
+  background: var(--card);
+  border: 1px solid var(--bd);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  color: var(--ink);
+}
+.registro-container > h2{
+  margin: 0 0 16px;
+  font-size: 1.4rem;
+  letter-spacing: .2px;
 }
 
-/* 📦 Nueva rejilla (3 columnas en pantallas grandes y 1 columna en pantallas pequeñas) */
-.form-grid {
+/* ========= Form & grid ========= */
+.registro-form{ width: 100%; }
+.form-grid{
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px 15px;
-  align-items: start;
+  grid-template-columns: repeat(3, minmax(320px, 1fr));
+  gap: 16px;
+}
+@media (max-width: 1200px){
+  .form-grid{ grid-template-columns: repeat(3, minmax(280px, 1fr)); }
+}
+@media (max-width: 900px){
+  .form-grid{ grid-template-columns: 1fr; }
 }
 
-@media (max-width: 768px) {
-  .form-grid {
+.campo, .form-group{ grid-column: span 1; }
+
+/* ========= Etiquetas ========= */
+.campo label,
+.form-group > label{
+  display:block;
+  font-size:.92rem;
+  margin:0 0 6px;
+  color:var(--muted);
+  font-weight:600;
+}
+
+/* ========= Inputs base ========= */
+.campo input[type="text"],
+.campo input[type="number"],
+.campo input[type="date"],
+.campo textarea,
+.campo select,
+.form-group select,
+#compraSelect,
+#proveedor-select{
+  width:100%;
+  height:var(--input-h);
+  padding:0 14px;
+  border:1px solid var(--bd);
+  border-radius:10px;
+  background:#fff;
+  color:var(--ink);
+  outline:none;
+  transition:border-color .15s ease, box-shadow .15s ease, background .15s ease;
+  box-sizing:border-box;
+  font-size:.98rem;
+}
+
+/* Textarea */
+.campo textarea{
+  min-height:72px;
+  padding-top:10px;
+  padding-bottom:10px;
+  resize:vertical;
+}
+
+/* Hover / Focus SOLO en hijos directos (no inputs anidados como RS) */
+.campo > :is(input, select, textarea):hover{ border-color: var(--bd-strong); }
+.form-group > select:hover,
+#compraSelect:hover,
+#proveedor-select:hover{ border-color: var(--bd-strong); }
+
+.campo > :is(input, select, textarea):focus{
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px var(--ring);
+}
+.form-group > select:focus,
+#compraSelect:focus,
+#proveedor-select:focus{
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px var(--ring);
+}
+
+/* Disabled */
+.campo :is(input, select, textarea):disabled{
+  background:#f9fafb;
+  color:#9ca3af;
+  cursor:not-allowed;
+}
+
+/* ========= Flecha select nativo ========= */
+.campo select,
+.form-group select,
+#compraSelect,
+#proveedor-select{
+  -webkit-appearance:none;
+  -moz-appearance:none;
+  appearance:none;
+  padding-right:40px;
+  background-repeat:no-repeat;
+  background-position:right 12px center;
+  background-size:18px 18px;
+  background-image:
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+}
+
+/* ========= Botones ========= */
+.botones-container{
+  grid-column: 1 / -1;
+  display:flex;
+  gap:12px;
+  margin-top:6px;
+}
+.btn-registrar,
+.btn-ver-facturas,
+.btn-nuevo-proveedor{
+  height:42px;
+  padding:0 14px;
+  border-radius:10px;
+  border:1px solid var(--bd);
+  background:#f8fafc;
+  color:var(--ink);
+  cursor:pointer;
+  transition:transform .05s ease, box-shadow .15s ease, background .15s ease, filter .15s ease;
+}
+.btn-registrar{
+  background:var(--primary);
+  color:#fff;
+  border-color:var(--primary);
+}
+.btn-registrar:hover{ filter:brightness(1.05); }
+.btn-ver-facturas:hover,
+.btn-nuevo-proveedor:hover{
+  background:#eef2ff;
+  border-color:var(--bd-strong);
+}
+.btn-registrar:active,
+.btn-ver-facturas:active,
+.btn-nuevo-proveedor:active{
+  transform: translateY(1px);
+}
+.form-group.mb-3{ margin-bottom:6px; }
+.form-group .btn-nuevo-proveedor{ margin-top:8px; }
+
+/* ========= React-Select (classNamePrefix="rs" + className="rs-override") ========= */
+/* Control */
+.rs-override .rs__control{
+  min-height: var(--input-h);
+  height: var(--input-h);
+  border: 1px solid var(--bd) !important;
+  border-radius: 10px !important;
+  background:#fff !important;
+  box-shadow: none !important;
+  overflow: hidden; /* 👈 impide que la flecha se salga del borde */
+}
+.rs-override .rs__control:hover{
+  border-color: var(--bd-strong) !important;
+}
+.rs-override .rs__control--is-focused{
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 4px var(--ring) !important; /* halo exterior correcto */
+}
+
+/* Value & padding */
+.rs-override .rs__value-container{
+  padding: 0 12px !important;
+}
+
+/* Indicadores: SIN flecha custom y alineados dentro */
+.rs-override .rs__indicators{
+  width: auto;
+  padding-right: 8px;
+  justify-content: flex-end;
+}
+.rs-override .rs__indicator-separator{ display:none !important; }
+
+/* Elimina la flecha que añadíamos vía ::after */
+.rs-override .rs__indicators::after{
+  content: none !important;
+  display: none !important;
+}
+
+/* Asegura que el caret propio no desborde */
+.rs-override .rs__dropdown-indicator{
+  padding: 0 !important;
+}
+.rs-override .rs__dropdown-indicator svg{
+  display: block; /* evita espacios inline que empujan fuera */
+}
+
+/* Quitar halo interno del input de búsqueda */
+.rs-override .rs__input input,
+.rs-override .rs__input input:focus,
+.rs-override .rs__input input:focus-visible{
+  outline: none !important;
+  box-shadow: none !important;
+  background: transparent;
+}
+/* Cubre cualquier hijo con focus accidental */
+.rs-override .rs__control *:focus{
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Menú y opciones */
+.rs-override .rs__menu{
+  border:1px solid var(--bd);
+  border-radius:10px;
+  box-shadow:var(--shadow);
+  overflow:hidden;
+  margin-top:6px;
+}
+.rs-override .rs__menu-list{
+  padding:6px 0 !important;
+  max-height:280px;
+}
+.rs-override .rs__option{
+  padding:10px 14px !important;
+  font-size:.98rem;
+}
+.rs-override .rs__option--is-focused{
+  background:#f3f4f6 !important;
+}
+.rs-override .rs__option--is-selected{
+  background:#eef2ff !important;
+  color:var(--ink) !important;
+  font-weight:600;
+}
+
+/* Placeholder / texto */
+.rs-override .rs__placeholder{ color: var(--muted) !important; }
+.rs-override .rs__single-value{ color: var(--ink) !important; }
+.rs-override .rs__input-container input{ color: var(--ink) !important; }
+
+/* ========= Pequeños estados de carga/error del bloque proveedor ========= */
+.form-group.mb-3 span{ font-size:.95rem; }
+.form-group.mb-3 span[style*="red"]{ font-weight:600; }
+
+/* ====== Posicionamientos especiales ====== */
+.form-group:has(#compraSelect){ grid-column: 1 / -1; }
+.form-group:has(#proveedor-select){
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  column-gap: 12px;
+  align-items: end;
+}
+.form-group:has(#proveedor-select) > label{
+  grid-column: 1 / -1;
+  margin: 0 0 6px;
+}
+.form-group:has(#proveedor-select) > select{ grid-column: 1 / 2; }
+.form-group:has(#proveedor-select) > .btn-nuevo-proveedor{
+  grid-column: 2 / 3;
+  height: 44px;
+}
+
+.campo:has(input[name="FechaEmision"]) { grid-column: auto; }
+.campo:has(input[name="NoFactura"])     { grid-column: auto; }
+.campo:has(input[name="Title"])         { grid-column: auto; }
+
+.campo:has(.rs-override)                { grid-column: auto; }
+.campo:has(.rs-override){
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.campo:has(.rs-override) > label{
+  margin-bottom: 0;
+  font-weight: 600;
+}
+
+.campo:has(textarea[name="DescripItems"]){ grid-column: auto; }
+.campo:has(input[name="ValorAnIVA"])    { grid-column: auto; }
+.campo:has(textarea[name="DetalleFac"]) { grid-column: auto; }
+.campo:has(input[name="FecEntregaCont"]){ grid-column: auto; }
+.campo:has(input[name="DocERP"])        { grid-column: auto; }
+.campo:has(textarea[name="Observaciones"]){ grid-column: 1 / -1; }
+
+/* Responsive: proveedor apilado */
+@media (max-width: 900px){
+  .campo, .form-group,
+  .form-group:has(#compraSelect),
+  .form-group:has(#proveedor-select),
+  .campo:has(textarea[name="Observaciones"]),
+  .botones-container{ grid-column: 1 / -1; }
+
+  .form-group:has(#proveedor-select){
     grid-template-columns: 1fr;
+    row-gap: 8px;
+  }
+  .form-group:has(#proveedor-select) > .btn-nuevo-proveedor{
+    width: 100%;
   }
 }
 
-/* 🧩 Campo (label encima del input) */
-.campo {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.campo input,
-.campo select,
-.campo textarea {
-  padding: 6px 10px;
-  border-radius: 8px;
+.selector-fechas-container {
+  margin-top: 1rem;
+  padding: 1rem;
   border: 1px solid #ccc;
-  font-size: 13px;
-  transition: border-color 0.3s, box-shadow 0.3s;
-  width: 100%;
-}
-
-.campo input:focus,
-.campo select:focus,
-.campo textarea:focus {
-  border-color: #2980b9;
-  box-shadow: 0 0 8px rgba(41, 128, 185, 0.3);
-}
-
-/* 🧩 Botones */
-.botones-container {
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-  margin-top: 20px;
-}
-
-.btn-registrar {
-  background-color: #2980b9;
-  color: white;
-  padding: 10px 20px;
-  font-size: 14px;
   border-radius: 8px;
-  cursor: pointer;
-  transition: background 0.3s, transform 0.1s, box-shadow 0.3s;
+  background: #f9f9f9;
+  width: fit-content;
 }
 
-.btn-registrar:hover {
-  background-color: #3498db;
-  transform: scale(1.05);
+.selector-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.selector-label input[type="date"] {
+  margin-left: 0.5rem;
+}
+
+.selector-botones {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.btn-volver,
+.btn-cancelar {
+  padding: 0.4rem 0.8rem;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.btn-volver {
+  background-color: #007bff;
+  color: white;
+}
+
+.btn-cancelar {
+  background-color: #dc3545;
+  color: white;
 }

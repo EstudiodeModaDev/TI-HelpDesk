@@ -1,34 +1,13 @@
-/* TareasPage.css */
-.tareas-page{
-  display: grid;
-  grid-template-columns: minmax(420px, 520px) minmax(560px, 1fr);
-  gap: 24px;
-  align-items: start;
-  padding: 16px;
-}
+/* ==========================================================================
+   1) Scope + tokens (forzamos tema claro con tus variables)
+   ========================================================================== */
 
-.ft-card,
-.lt-card{
-  padding: 22px 22px 18px;
-  border-radius: 14px;
-}
-
-/* Responsive: en pantallas pequeñas apila */
-@media (max-width: 900px){
-  .tareas-page{
-    grid-template-columns: 1fr;
-  }
-}
-
-/* === Forzar tema CLARO en toda la página de Tareas === */
 .tareas-page,
 .tareas-page .ft-scope,
 .tareas-page .lt-scope{
-  /* hace que los controles nativos (date/time/select/scrollbars) usen tema claro */
   color-scheme: light;
   isolation: isolate;
 
-  /* tokens fijos en claro para ESTA página */
   --bg: #ffffff;
   --surface: #ffffff;
   --border: #e5e7eb;
@@ -42,9 +21,15 @@
   --danger: #dc2626;
   --radius: 14px;
   --shadow: 0 12px 28px rgba(2, 6, 23, .08);
+
+  /* Layout tokens */
+  --gap: 24px;
+  --pad: 18px;
+  --col-left: 340px;
+  --col-right: 300px;
 }
 
-/* Si el sistema está en oscuro, mantenemos EXACTAMENTE los mismos valores */
+/* Mantiene los mismos valores en modo oscuro */
 @media (prefers-color-scheme: dark){
   .tareas-page,
   .tareas-page .ft-scope,
@@ -65,127 +50,78 @@
   }
 }
 
-/* Asegura fondos y bordes claros explícitos (por si hay herencias externas) */
-.tareas-page .ft-card,
-.tareas-page .lt-card{
-  background: var(--surface) !important;
-  color: var(--ink) !important;
-  border-color: var(--border) !important;
-  box-shadow: var(--shadow) !important;
+/* ==========================================================================
+   2) Estructura principal
+   ========================================================================== */
+
+/* Fondo general limpio (sin color, sin sombra) */
+.tareas-page{
+  background: transparent;
+  color: var(--ink);
+  padding: 24px;
+  box-sizing: border-box;
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: var(--col-left) 1fr var(--col-right);
+  gap: var(--gap);
+  align-items: start;
 }
 
-/* Inputs y selects nativos: forzar claros */
-.tareas-page .ft-form input[type="text"],
-.tareas-page .ft-form input[type="date"],
-.tareas-page .ft-form input[type="time"],
-.tareas-page .ft-form select{
-  background: var(--field-bg) !important;
-  color: var(--ink) !important;
-  border-color: var(--border) !important;
-  caret-color: var(--ink) !important;
-}
-.tareas-page .ft-form input::placeholder{ color: #94a3b8 !important; }
+/* ==========================================================================
+   3) Paneles (los 3 hijos principales)
+   ========================================================================== */
 
-/* react-select en claro */
-.tareas-page .rs__control{
-  background: var(--field-bg) !important;
-  border-color: var(--border) !important;
-  color: var(--ink) !important;
-}
-.tareas-page .rs__single-value{ color: var(--ink) !important; }
-.tareas-page .rs__placeholder{ color: #94a3b8 !important; }
-.tareas-page .rs__menu{
-  background: #fff !important;
-  border-color: var(--border) !important;
-  box-shadow: var(--shadow) !important;
+.tareas-page > *{
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: var(--pad);
+  min-width: 0;
+  width: 100%;             /* todos mismo ancho en su grid cell */
+  box-sizing: border-box;
 }
 
-/* Botón principal */
-.tareas-page .ft-btn{
-  background: var(--primary) !important;
-  border-color: var(--primary) !important;
-  color: var(--primary-ink) !important;
+/* Laterales sticky */
+.tareas-page > :nth-child(1),
+.tareas-page > :nth-child(3){
+  position: sticky;
+  top: 20px;
 }
 
-/* ===== Confirm Dialog: forzar tema CLARO y tokens ===== */
-.tareas-page .cd-backdrop,
-.tareas-page .cd-dialog{
-  color-scheme: light;     /* inputs/scrollbars/focus en claro */
-  isolation: isolate;
+/* Ajuste visual del panel central */
+.tareas-page > :nth-child(2){
+  padding: calc(var(--pad) + 4px);
 }
 
-/* Si el SO está en oscuro, mantenemos exactamente los mismos valores claros */
-@media (prefers-color-scheme: dark){
-  .tareas-page .cd-backdrop,
-  .tareas-page .cd-dialog{
-    color-scheme: light !important;
+/* ==========================================================================
+   4) Responsividad
+   ========================================================================== */
+
+/* 2 columnas (form + lista) y resumen abajo */
+@media (max-width: 1023px){
+  .tareas-page{
+    grid-template-columns: var(--col-left) 1fr;
+    grid-template-areas:
+      "left center"
+      "right right";
+  }
+  .tareas-page > :nth-child(1){ grid-area: left; }
+  .tareas-page > :nth-child(2){ grid-area: center; }
+  .tareas-page > :nth-child(3){
+    grid-area: right;
+    position: static;
+    margin-top: var(--gap);
   }
 }
 
-/* Usa tus tokens (caen a valores por defecto si no existen) */
-.tareas-page .cd-backdrop{
-  position: fixed; inset: 0;
-  background: rgba(2,6,23,.45); /* velo */
-  display: grid; place-items: center;
-  z-index: 120; /* > que cards, menús, etc. */
-}
-
-.tareas-page .cd-dialog{
-  width: min(520px, 94vw);
-  background: var(--surface, #fff);
-  color: var(--ink, #0f172a);
-  border: 1px solid var(--border, #e5e7eb);
-  border-radius: var(--radius, 14px);
-  box-shadow: var(--shadow, 0 12px 28px rgba(2,6,23,.18));
-  padding: 16px;
-}
-
-.tareas-page .cd-message{
-  margin: 8px 0 14px;
-  color: var(--muted, #475569);
-}
-
-.tareas-page .cd-actions{
-  display: flex; justify-content: flex-end; gap: 10px;
-}
-
-.tareas-page .cd-btn{
-  height: 38px; padding: 0 14px;
-  border-radius: 10px; font-weight: 600; cursor: pointer;
-  border: 1px solid transparent;
-  background: var(--field-bg, #f1f5f9);
-  color: var(--ink, #0f172a);
-}
-
-.tareas-page .cd-cancel{
-  background: var(--field-bg, #f8fafc);
-  border-color: var(--border, #e5e7eb);
-  color: var(--ink, #0f172a);
-}
-
-.tareas-page .cd-primary{
-  background: var(--primary, #2563eb);
-  border-color: var(--primary, #2563eb);
-  color: var(--primary-ink, #fff);
-}
-
-.tareas-page .cd-danger{
-  background: var(--danger, #dc2626);
-  border-color: var(--danger, #dc2626);
-  color: #fff;
-}
-
-.tareas-page .cd-btn:focus{
-  outline: none;
-  box-shadow: 0 0 0 4px var(--ring, rgba(37,99,235,.35));
-}
-
-/* Hover/active sutil */
-.tareas-page .cd-btn:hover{ filter: brightness(1.02); }
-.tareas-page .cd-btn:active{ transform: translateY(1px); }
-
-/* Accesibilidad extra */
-@media (prefers-reduced-motion: reduce){
-  .tareas-page .cd-btn,
-  .tareas-page .cd-dialog{ transition: none !important; }
+/* 1 columna apilado */
+@media (max-width: 767px){
+  .tareas-page{
+    grid-template-columns: 1fr;
+  }
+  .tareas-page > *{
+    position: static;
+    width: 100%;
+  }
 }

@@ -1,0 +1,133 @@
+/* Fondo semitransparente detrás del modal */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+/* Contenedor del modal */
+.modal {
+  background: #ffffff;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+  width: 90%;
+  max-width: 500px;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Animación de entrada */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Encabezado */
+.modal h3 {
+  margin-top: 0;
+  text-align: center;
+  color: #333;
+  font-size: 1.3rem;
+  font-weight: 600;
+  border-bottom: 2px solid #4CAF50;
+  padding-bottom: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+/* Formulario dentro del modal */
+.modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Etiquetas y campos */
+.modal-form label {
+  display: flex;
+  flex-direction: column;
+  font-weight: 500;
+  color: #444;
+}
+
+.modal-form input {
+  padding: 0.5rem;
+  margin-top: 0.3rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  transition: border 0.2s, box-shadow 0.2s;
+}
+
+.modal-form input:focus {
+  border-color: #4CAF50;
+  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.15);
+  outline: none;
+}
+
+/* Título de sección */
+.modal-form h4 {
+  margin: 0.5rem 0;
+  color: #333;
+  font-size: 1.1rem;
+  text-align: left;
+}
+
+/* Botones */
+.modal-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1rem;
+}
+
+.modal-buttons button {
+  flex: 1;
+  margin: 0 0.3rem;
+  padding: 0.6rem 0.8rem;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background-color 0.25s, transform 0.15s;
+}
+
+.btn-guardar {
+  background-color: #4CAF50;
+}
+
+.btn-guardar:hover {
+  background-color: #3e8e41;
+  transform: translateY(-2px);
+}
+
+.btn-cancelar {
+  background-color: #999;
+}
+
+.btn-cancelar:hover {
+  background-color: #777;
+  transform: translateY(-2px);
+}
+
+.btn-eliminar {
+  background-color: #e53935;
+}
+
+.btn-eliminar:hover {
+  background-color: #c62828;
+  transform: translateY(-2px);
+}

@@ -67,6 +67,13 @@
   padding: 0 4px;
 }
 
+.tabla-tickets > h2 {
+  margin: 0 0 16px;
+  font-size: 1.4rem;
+  letter-spacing: .2px;
+}
+
+
 /* ---------- Contenedor de tabla ---------- */
 .table-wrap{
   width: 100%;
@@ -188,4 +195,91 @@ th:last-child,  td:last-child{  padding-right: 16px; }
     flex-wrap: wrap;
     row-gap: 6px;
   }
+}
+
+
+.btn-ver{
+  height:42px;
+  padding:0 14px;
+  border-radius:10px;
+  border:1px solid var(--bd);
+  background:#2563eb(210, 40%, 98%);
+  color:var(--ink);
+  cursor:pointer;
+  transition:transform .05s ease, box-shadow .15s ease, background .15s ease, filter .15s ease;
+}
+/* Centrar encabezados y celdas */
+.table-wrap table th,
+.table-wrap table td{
+  text-align: center;
+}
+ 
+/* Asegura centrado vertical (por si hay varias líneas o botones) */
+.table-wrap tbody td{
+  vertical-align: middle;
+}
+ 
+/* Centrar el contenedor de acciones (donde tienes dos botones) */
+.table-wrap td > div{
+  display: inline-flex;      /* se centra como contenido en la celda */
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+ 
+/* Si usas badges dentro de la celda, que no se peguen a la izquierda */
+.table-wrap .badge{
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+}
+/* Contenedor inferior: izquierda ↔ derecha */
+.pager{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;  /* separa extremos */
+  gap: 8px;
+  margin-top: 8px;
+}
+ 
+/* Grupo derecho (paginación) */
+.pager-right{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+ 
+/* Responsive: permite salto a dos filas si no cabe */
+@media (max-width: 920px){
+  .pager{
+    flex-wrap: wrap;
+    row-gap: 6px;
+  }
+  .pager-right{
+    width: 100%;
+    justify-content: flex-end;     /* paginación a la derecha en la segunda fila */
+  }
+}
+
+/* Centra texto en encabezados y celdas */
+.table-wrap th,
+.table-wrap td{
+  text-align: center;
+  vertical-align: middle; /* centra verticalmente */
+}
+ 
+/* Si dentro del TH/TD pones contenedores (div, span, button, etc.)
+   los centramos también */
+.table-wrap th > *,
+.table-wrap td > *{
+  margin-left: auto;
+  margin-right: auto;
+}
+ 
+/* Si usas contenedores de acciones dentro de celdas, mejor inline-flex */
+.table-wrap td > div{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }

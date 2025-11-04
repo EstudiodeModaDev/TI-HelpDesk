@@ -1,23 +1,34 @@
 import React from "react";
 
 import type { DateRange } from "../Models/Filtros";
-import { toISODateFlex } from "../utils/Date";
+import { toGraphDateTime, toISODateFlex, toISODateTimeFlex } from "../utils/Date";
 import type { GetAllOpts } from "../Models/Commons";
 import type { ComprasService } from "../Services/Compras.service";
-import type { Compra, comprasState } from "../Models/Compras";
+import { UN, type Compra, type comprasState } from "../Models/Compras";
 import type { CentroCostos } from "../Models/CentroCostos";
 import type { CentroCostosService } from "../Services/CentroCostos.service";
 import type { COService } from "../Services/COCostos.service";
+import { calcularFechaSolucion } from "../utils/ans";
+import { fetchHolidays } from "../Services/Festivos";
+import type { Holiday } from "festivos-colombianos";
+import type { Log } from "../Models/Log";
+import type { TicketsService } from "../Services/Tickets.service";
+import type { LogService } from "../Services/Log.service";
+import { pickTecnicoConMenosCasos } from "../utils/Commons";
+import type { UsuariosSPService } from "../Services/Usuarios.Service";
+import type { FlowToUser } from "../Models/FlujosPA";
+import { FlowClient } from "./FlowClient";
+const notifyFlow = new FlowClient("https://defaultcd48ecd97e154f4b97d9ec813ee42b.2c.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/a21d66d127ff43d7a940369623f0b27d/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=0ptZLGTXbYtVNKdmIvLdYPhw1Wcqb869N3AOZUf2OH4")
 
-export function useCompras(ComprasSvc: ComprasService) {
+export function useCompras(ComprasSvc: ComprasService, TicketsSvc: TicketsService, LogSvc: LogService, Usuarios: UsuariosSPService) {
 
   const MARCAS = ["MFG", "DIESEL", "PILATOS", "SUPERDRY", "KIPLING", "BROKEN CHAINS"] as const;
   const NEXT: Record<string, string> = {
     "Pendiente por orden de compra": "Pendiente por entrega de proveedor",
-    "Pendiente por entrega de proveedor": "Pendiente por registro de inventario",
-    "Pendiente por registro de inventario": "Pendiente por entrega al usuario",
+    "Pendiente por entrega de proveedor": "Pendiente por entrega al usuario",
     "Pendiente por entrega al usuario": "Pendiente por registro de factura",
     "Pendiente por registro de factura": "Completado"
+    //Los contratos y servicis no se van a inventario, pero deja la info para la causación de las facturas
   };
   type Marca = typeof MARCAS[number];
   const zeroMarcas = (): Record<Marca, number> => MARCAS.reduce((acc, m) => { acc[m] = 0; return acc; }, {} as Record<Marca, number>);
@@ -35,6 +46,7 @@ export function useCompras(ComprasSvc: ComprasService) {
     tipoCompra: "Producto",
     productoServicio: "",
     solicitadoPor: "",
+    solicitadoPorCorreo: "",
     fechaSolicitud: new Date().toISOString().slice(0, 10),
     dispositivo: "",
     co: null,         
@@ -43,9 +55,14 @@ export function useCompras(ComprasSvc: ComprasService) {
     cargarA: "CO",
     noCO: "",
     marcasPct: { ...zeroMarcas() },
-    motivo: ""
+    motivo: "",
+    codigoItem: "",
+    DescItem: "",
+    CorreoSolicitante: ""
   });
+  const [openModal, setOpenModal] = React.useState<boolean>(false)
   const [saving, setSaving] = React.useState(false)
+  const [holidays, setHolidays] = React.useState<Holiday[]>([])
 
   //HELPERS
   const totalPct = React.useMemo( () => state.cargarA === "Marca" ? 
@@ -70,10 +87,46 @@ export function useCompras(ComprasSvc: ComprasService) {
     setErrors(e);
     return Object.keys(e).length === 0;
   }
+
+  // Carga de festivos inicial
+  React.useEffect(() => {
+      let cancel = false;
+      (async () => {
+        try {
+          const hs = await fetchHolidays();
+          if (!cancel) setHolidays(hs);
+        } catch (e) {
+          if (!cancel) console.error("Error festivos:", e);
+        }
+      })();
+      return () => {
+        cancel = true;
+      };
+    }, []);
   
-  const handleSubmit = React.useCallback((e: React.FormEvent) => {
+  const handleSubmit = React.useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
+
+    const ticketpayload = {
+      Title: state.tipoCompra === "Alquiler" ? `Alquiler de ${state.productoServicio}` : `Compra de ${state.productoServicio}`,
+      Descripcion: `Se ha solicitado una compra del siguiente dispositivo:  ${state.productoServicio} por: ${state.solicitadoPor}`,
+      FechaApertura: toISODateTimeFlex(String(new Date())),
+      TiempoSolucion: toGraphDateTime(calcularFechaSolucion(new Date(), 240, holidays)),
+      Fuente: "Self service",
+      Categoria: state.tipoCompra === "Alquiler" ? "Alquiler" : "Compra",
+      SubCategoria: state.productoServicio,
+      IdResolutor: "83",
+      Nombreresolutor: "Cesar Eduardo Sanchez Salazar",
+      Correoresolutor: "cesanchez@estudiodemoda.com.co",
+      ANS: "ANS 5",
+      Solicitante: state.solicitadoPor,
+      Estadodesolicitud: "En Atención",
+      CorreoSolicitante: "",
+    }
+
+    const createdTicket = await TicketsSvc.create(ticketpayload)
+
     const compra = ComprasSvc.create({
       CargarA: state.cargarA, 
       CCosto: state.ccosto?.value ?? "", 
@@ -88,11 +141,31 @@ export function useCompras(ComprasSvc: ComprasService) {
       PorcentajeSuperdry: String(state.marcasPct["SUPERDRY"] ?? "0"),
       SolicitadoPor: state.solicitadoPor,
       Title: state.tipoCompra,
-      UN: state.un})
+      UN: state.un,
+      DescItem: state.DescItem,
+      CodigoItem: state.codigoItem,
+      CorreoSolicitante: state.CorreoSolicitante,
+      IdCreado: createdTicket.ID ?? ""
+    })
+
+    const logpayload: Log = {
+      Actor: "Sistema",
+      Descripcion: state.tipoCompra === "Alquiler" ? 
+        `Se ha creado un ticket bajo concepto de alquiler del siguiente dispositivo:  ${state.dispositivo} por solicitud de ${state.solicitadoPor}` :
+        `Se ha creado un ticket bajo concepto de compra:  ${state.dispositivo} por solicitud de ${state.solicitadoPor}`,
+      CorreoActor: "",
+      Tipo_de_accion: "Creacion",
+      Title: createdTicket.ID ?? ""
+    }
+
+    const createdLog = await LogSvc.create(logpayload)
+
+    console.log(createdLog)
+    
     alert("Se ha creado la solicitud de compra con éxito")
     console.log(compra)
-    setState({productoServicio: "", cargarA: "CO", solicitadoPor: "", motivo: "", fechaSolicitud: "", tipoCompra: "Producto", dispositivo: "", noCO: "", marcasPct: { ...zeroMarcas() }, co: null, ccosto: null, un: ""})  }, 
-    [state, ComprasSvc]
+    setState({productoServicio: "", cargarA: "CO", solicitadoPor: "", motivo: "", fechaSolicitud: "", tipoCompra: "Producto", dispositivo: "", noCO: "", marcasPct: { ...zeroMarcas() }, co: null, ccosto: null, un: "", solicitadoPorCorreo: "", codigoItem: "", DescItem: "", CorreoSolicitante: ""})  }, 
+    [state, ComprasSvc, holidays]
   ); 
   
   const buildFilter = React.useCallback((): GetAllOpts => {
@@ -125,25 +198,120 @@ export function useCompras(ComprasSvc: ComprasService) {
     }
   }, [ComprasSvc, buildFilter]);
 
+  const ticketEntrega = async (tipo: string, solicitante: string, Correosolicitante: string, entrega: string) => {
+    if(tipo === "Contrato") return
+    try {
+      const apertura = new Date();
+      const solucion = calcularFechaSolucion(apertura, 56, holidays);
+
+      const aperturaISO  = toGraphDateTime(apertura);
+      const tiempoSolISO = toGraphDateTime(solucion as any);
+
+      const resolutor = await pickTecnicoConMenosCasos(Usuarios);
+      console.log(resolutor);
+
+      const payload = {
+        Title: `Entrega de ${tipo} solicitada por ${solicitante}`,
+        Descripcion:  `El proveedor ha hecho enrega de ${entrega} se crea ticket para la configuración y entrega a ${solicitante}`,
+        FechaApertura: aperturaISO,
+        TiempoSolucion: tiempoSolISO,
+        Nombreresolutor: resolutor?.Title,
+        Correoresolutor: resolutor?.Correo,
+        Solicitante: solicitante,
+        CorreoSolicitante: Correosolicitante,
+        Estadodesolicitud: "En Atención",
+        Categoria: "Hardware",
+        SubCategoria: "Entrega",
+        Fuente: "Self service",     
+        ANS: "ANS 4"
+      };
+
+      const ticketCreated = await TicketsSvc?.create(payload);
+      console.log(ticketCreated);
+      if (resolutor) {
+        const casosActuales = Number(resolutor.Numerodecasos ?? 0);
+        const nuevoTotal = casosActuales + 1;
+        await Usuarios.update(String(resolutor.Id), {Numerodecasos: nuevoTotal,});
+      }
+
+      alert("caso creado con ID " + ticketCreated?.ID)
+      LogSvc.create({
+        Actor: "Sitema", 
+        Descripcion:  `Se ha creado un nuevo ticket para el siguiente requerimiento: ${ticketCreated!.ID ?? ""}`, 
+        CorreoActor: "", 
+        Tipo_de_accion: 
+        "Creacion", 
+        Title: ticketCreated?.ID ?? ""
+      })
+
+      if (ticketCreated?.CorreoSolicitante) {
+        const title = `Asignación de Caso - ${ticketCreated.ID}`;
+        const message = `
+          <p>¡Hola ${payload.Solicitante ?? ""}!<br><br>
+          Tu solicitud ha sido registrada exitosamente y ha sido asignada a un técnico para su gestión. Estos son los detalles del caso:<br><br>
+          <strong>ID del Caso:</strong> ${ticketCreated.ID}<br>
+          <strong>Asunto del caso:</strong> ${payload.Title}<br>
+          <strong>Resolutor asignado:</strong> ${payload.Nombreresolutor ?? "—"}<br>
+          El resolutor asignado se pondrá en contacto contigo en el menor tiempo posible para darte solución a tu requerimiento.<br><br>
+          Si hay algun cambio con su ticket sera notificado.
+          Este es un mensaje automático, por favor no respondas.
+          </p>`.trim();
+
+          try {
+            await notifyFlow.invoke<FlowToUser, any>({recipient: ticketCreated?.CorreoSolicitante, title, message, mail: true, });
+          } catch (err) {
+            console.error("[Flow] Error enviando a solicitante:", err);
+          }
+        }
+ 
+      if (ticketCreated?.CorreoResolutor) {
+        const title = `Nuevo caso asignado - ${ticketCreated.ID}`;
+        const message = `
+        <p>¡Hola!<br><br>
+        Tienes un nuevo caso asignado con estos detalles:<br><br>
+        <strong>ID del Caso:</strong> ${ticketCreated}<br>
+        <strong>Solicitante:</strong> ${payload.Solicitante ?? "—"}<br>
+        <strong>Correo del Solicitante:</strong> ${payload.CorreoSolicitante ?? "—"}<br>
+        <strong>Asunto:</strong> ${payload.Title}<br>
+        <strong>Fecha máxima para categorización:</strong> ${ticketCreated.FechaApertura}<br><br>
+        En caso de no categorizar el ticket este se vencera y sera irreversible.<br><br>
+        Este es un mensaje automático, por favor no respondas.
+        </p>`.trim();
+
+        try {
+          await notifyFlow.invoke<FlowToUser, any>({recipient: ticketCreated.CorreoResolutor, title, message, mail: true,});
+        } catch (err) {
+          console.error("[Flow] Error enviando a resolutor:", err);
+        }
+      }
+ 
+    } catch (err) {
+      console.error("Error en handleSubmit:", err);
+    }
+  };
+
   const handleNext = React.useCallback(async (idItem: string) => {
     if (saving) return;
     setSaving(true);
     setError(null);
 
     try {
-     
       const current = await ComprasSvc.get(idItem); 
       const prev = (current.Estado) ?? "";
       const next = NEXT[prev];
 
-      // 2) Si ya está en terminal, no hay nada que hacer
       if (prev === next) {
         setSaving(false);
         return;
       }
 
       try {
-        const updated = await ComprasSvc.update(idItem, { Estado: next },        );
+        const updated = await ComprasSvc.update(idItem, { Estado: next },);
+
+        if(updated.Estado === "Pendiente por entrega al usuario"){
+          await ticketEntrega(current.Title, current.SolicitadoPor, current.CorreoSolicitante, state.productoServicio)
+          setOpenModal(true)
+        }
         alert(`Se ha actualizado el registro con el siguiente estado: ${updated?.Estado ?? "—"}`)
         reloadAll()
 
@@ -203,8 +371,8 @@ export function useCompras(ComprasSvc: ComprasService) {
   const reloadAll  = React.useCallback(() => { loadFirstPage(); }, [loadFirstPage]);
 
   return {
-    rows, loading, error, MARCAS, pageSize,  pageIndex, hasNext, errors, state, range, totalPct,
-    setPageSize, nextPage, setRange, applyRange, reloadAll, setField, setMarcaPct, setState, zeroMarcas, handleSubmit, handleNext
+    rows, loading, error, MARCAS, pageSize,  pageIndex, hasNext, errors, state, range, totalPct, openModal,
+    setPageSize, nextPage, setRange, applyRange, reloadAll, setField, setMarcaPct, setState, zeroMarcas, handleSubmit, handleNext, setOpenModal
   };
 }
 
@@ -272,9 +440,15 @@ export function useCO(COSvc: COService) {
     [CentrosOperativos]
   );
 
+  const UNOptions = React.useMemo(
+    () => UN.map(un => ({value: un.codigo, label: `${un.codigo} - ${un.descripcion}`})),
+    []
+  )
+
   return {
     CentrosOperativos, COOptions, loading, error,
     reload: LoadCentroOperativos,
+    UNOptions
   };
 }
 

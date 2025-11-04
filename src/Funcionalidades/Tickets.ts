@@ -82,7 +82,6 @@ export function calcularColorEstado(ticket: Ticket): string {
   return `rgba(${r},${g},${b},${alpha})`;
 }
 
-
 export function useTickets(TicketsSvc: TicketsService, userMail: string, isAdmin: boolean) {
   const [rows, setRows] = React.useState<Ticket[]>([]);
   const [loading, setLoading] = React.useState(false);
@@ -90,7 +89,7 @@ export function useTickets(TicketsSvc: TicketsService, userMail: string, isAdmin
   const [filterMode, setFilterMode] = React.useState<FilterMode>("En curso");
   const today = React.useMemo(() => toISODateFlex(new Date()), []);
   const [range, setRange] = React.useState<DateRange>({ from: today, to: today });
-  const [pageSize, setPageSize] = React.useState<number>(10); // = $top
+  const [pageSize, setPageSize] = React.useState<number>(15); // = $top
   const [pageIndex, setPageIndex] = React.useState<number>(1); // 1-based
   const [nextLink, setNextLink] = React.useState<string | null>(null);
   const [sorts, setSorts] = React.useState<Array<{field: SortField; dir: SortDir}>>([{ field: 'id', dir: 'desc' }]);

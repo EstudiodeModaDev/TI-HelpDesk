@@ -76,7 +76,8 @@ export class FranquiciasService {
         Ciudad: f.Ciudad,
         Correo: f.Correo,
         Direccion: f.Direccion,
-        Jefe_x0020_de_x0020_zona: f.Jefe_x0020_de_x0020_zona
+        Jefe_x0020_de_x0020_zona: f.Jefe_x0020_de_x0020_zona,
+        Celular: f.Celular
     };
   }
 
@@ -150,7 +151,6 @@ export class FranquiciasService {
     try {
       const res = await this.graph.get<any>(url);
       const mappedRes = (res.value ?? []).map((x: any) => this.toModel(x));
-      console.log(mappedRes)
       return (mappedRes);
 
     } catch (e: any) {

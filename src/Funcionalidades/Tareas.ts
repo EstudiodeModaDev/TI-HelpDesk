@@ -40,10 +40,12 @@ async function patchTarea(TareaSvc: any, id: string, data: Partial<Tarea>) {
 
 export function useTareas(TareaSvc: TareasService) {
   const [rows, setRows] = React.useState<Tarea[]>([]);
+  const [monthlyItems, setMonthlyItems] = React.useState<Tarea[]>([]);
+  const [cantidadTareas, setCantidadTareas] = React.useState<number>(0);
+  const [percentaje, setPercentaje] = React.useState<number>(0)
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const [filterMode, setFilterMode] = React.useState<FilterMode>("Pendientes");
-
   const [state, setState] = React.useState<NuevaTarea>({
     diasRecordatorio: 2,
     titulo: "",
@@ -69,7 +71,7 @@ export function useTareas(TareaSvc: TareasService) {
 
     return {
       filter: f.join(" and "),
-      orderby: "createdDateTime desc",
+      orderby: "fields/Fechadesolicitud desc",
       top: 1000,
     };
   }, [filterMode]);
@@ -88,8 +90,56 @@ export function useTareas(TareaSvc: TareasService) {
     }
   }, [TareaSvc, buildFilter]);
 
-  const setField = <K extends keyof NuevaTarea>(k: K, v: NuevaTarea[K]) =>
-    setState((s) => ({ ...s, [k]: v }));
+  
+  const loadMonthTask = React.useCallback(async () => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      // Rango: [start, end)
+      const now = new Date();
+      const start = new Date(now.getFullYear(), now.getMonth(), 1);
+      const end = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+
+      const startIso = start.toISOString().split(".")[0] + "Z";
+      const endIso   = end.toISOString().split(".")[0] + "Z";
+
+      const rango = `(fields/Fechadesolicitud ge '${startIso}' and fields/Fechadesolicitud lt '${endIso}')`;
+
+      const filterPendInit =
+        `(fields/Estado eq 'Pendiente' or fields/Estado eq 'Iniciada') and ${rango}`;
+
+      // Usa startswith si tienes variantes de “Finalizada”
+      const filterFinalizadas = `startswith(fields/Estado,'Finalizada') and ${rango}`;
+
+      const filterAll = rango;
+
+      // Paraleliza
+      const [itemsPendientes, itemsFinalizadas, allItems] = await Promise.all([
+        TareaSvc.getAll({ filter: filterPendInit }),
+        TareaSvc.getAll({ filter: filterFinalizadas }),
+        TareaSvc.getAll({ filter: filterAll }),
+      ]);
+
+      const total = allItems.length ?? 0;
+      const done  = itemsFinalizadas.length ?? 0;
+
+      const porcentaje = total > 0 ? (done / total) * 100 : 0;
+
+      setMonthlyItems(itemsPendientes);
+      setPercentaje(porcentaje);
+      setCantidadTareas(total)
+    } catch (e: any) {
+      setError(e?.message ?? "Error cargando tareas");
+      setMonthlyItems([]);
+      setPercentaje(0);
+    } finally {
+      setLoading(false);
+    }
+  }, [TareaSvc]);
+
+
+  const setField = <K extends keyof NuevaTarea>(k: K, v: NuevaTarea[K]) => setState((s) => ({ ...s, [k]: v }));
 
   const validate = () => {
     const e: TareasError = {};
@@ -182,27 +232,15 @@ export function useTareas(TareaSvc: TareasService) {
 
   React.useEffect(() => {
     loadTasks();
-  }, [loadTasks]);
+    loadMonthTask()
+  }, [loadTasks, loadMonthTask]);
 
   const reloadAll = React.useCallback(() => {
     loadTasks();
   }, [loadTasks]);
 
   return {
-    rows,
-    loading,
-    error,
-    filterMode,
-    setFilterMode,
-    // form
-    state,
-    errors,
-    setField,
-    handleSubmit,
-    // acciones
-    deleteTask,
-    iniciarTarea,
-    finalizarTarea,
-    reloadAll,
+    rows, loading, error, filterMode,  state, errors, percentaje, monthlyItems, cantidadTareas,
+    setFilterMode, setField, handleSubmit, deleteTask, iniciarTarea, finalizarTarea, reloadAll,
   };
 }

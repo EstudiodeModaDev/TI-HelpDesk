@@ -1,246 +1,527 @@
-/* ===================== TOKENS / THEME ===================== */
 :root{
-  --sb-width: 260px;
-  --sb-bg: #1f2a3a;        /* fondo sidebar */
-  --sb-bg-2: #223247;      /* hover */
-  --sb-text: #e9eef7;
-  --sb-text-dim: #a9b4c7;
-  --accent: #007bff;       /* barra azul activo */
-  --header-h: 64px;
-  --content-bg: #f6f8fb;
-  --bg-app: #0f1720;       /* fondo base app */
-  --bg-content: var(--content-bg);
-  --sb-indent: 12px;
-  --ring: rgba(0,123,255,.35);
-  --header-bg: #ffffff;
-  --header-text: #0b2b6a;
-  --header-sub: #6b7a90; 
+  --sb-bg:#176d72;
+  --sb-bg-2:#1e7e83;
+  --sb-pill:rgba(255,255,255,0.12);
+  --sb-hover:rgba(255,255,255,0.08);
+  --sb-text:#eaf6f6;
+  --sb-muted:#bfe4e4;
+  --sb-shadow:0 10px 30px rgba(0,0,0,.15);
+  --page-pad:16px;              
+  --radius-3xl:28px;
 }
 
-/* ===================== PAGE LAYOUT ===================== */
-.page.layout{
-  min-height: 100vh;
-  background: var(--content-bg);
+.layout{
+  min-height:100dvh;
+  background:#8dc2c5;
 }
 
-.layout.layout--withSidebar{
-  display: grid;
-  grid-template-columns: var(--sb-width) 1fr;
-  grid-template-rows: auto 1fr;
-  grid-template-areas:
-    "sidebar header"
-    "sidebar content";
-  min-height: 100vh;
-  background: var(--bg-app);
-}
-
-/* ============== SIDEBAR (dentro del grid, no fixed) ============== */
 .sidebar{
-  grid-area: sidebar;
-  position: sticky;      /* visible al hacer scroll */
-  top: 0;
-  width: var(--sb-width);
-  min-width: var(--sb-width);
-  height: 100vh;
-  background: var(--sb-bg);
-  color: var(--sb-text);
-  display: grid;
-  grid-template-rows: auto 1fr auto;
-  border-right: 1px solid rgba(255,255,255,.05);
-  box-sizing: border-box;
-  padding: 12px 12px 16px;
-  overflow-y: auto;
-  overflow-x: hidden;
-  z-index: 3;
+  grid-area:sidebar;
+  display:flex;
+  flex-direction:column;
+  background:var(--sb-bg);
+  border-radius:var(--radius-3xl);
+  box-shadow:var(--sb-shadow);
+  color:var(--sb-text);
+  padding:14px;
+  padding-bottom: 5px;
+  position:sticky;
+  top:var(--page-pad);
+  height:calc(100dvh - (var(--page-pad) * 2));
 }
 
 .sidebar__header{
-  font-weight: 800;
-  letter-spacing: .5px;
-  margin: 6px 0 10px;
+  font-weight:700;
+  letter-spacing:.3px;
+  opacity:.9;
+  padding:8px 10px 14px 10px;
 }
 
 .sidebar__nav{
-  padding: 6px 8px;
-  display: grid;
-  gap: 4px;
+  overflow:auto;
+  padding:4px;
+  flex:1;
+  scrollbar-width:thin;
+  scrollbar-color:var(--sb-hover) transparent;
+}
+.sidebar__nav::-webkit-scrollbar{ width:8px; }
+
+.sidebar__nav::-webkit-scrollbar-thumb{
+  background:var(--sb-hover);
+  border-radius:999px;
 }
 
+.sb-ul{ list-style:none; margin:0; padding:0; }
+
+.sb-li + .sb-li{ margin-top:2px; }
+
+.sideItem{
+  width:100%;
+  display:flex; align-items:center; gap:10px;
+  padding:12px 12px;
+  border:0; background:transparent; color:var(--sb-text);
+  border-radius:14px; cursor:pointer;
+  transition:background .2s ease, transform .04s ease;
+  text-align:left;
+}
+
+.sideItem:hover{ background:var(--sb-hover); }
+
+.sideItem:active{ transform:translateY(1px); }
+
+.sideItem--leaf{ position:relative; }
+
+.sideItem--active{
+  background:var(--sb-pill);
+  outline:2px solid rgba(255,255,255,0.08);
+}
+.sideItem__icon{ width:22px; display:inline-flex; justify-content:center; opacity:.92; }
+
+.sideItem__label{ font-size:15px; }
+
+.sideItem--folder{ font-weight:600; }
+
+.caret{ margin-right:6px; opacity:.8; transition:transform .2s ease; }
+
+.caret.rot{ transform:rotate(90deg); }
+
 .sidebar__footer{
-  padding: 14px 16px 18px;
-  color: var(--sb-text-dim);
+  background:rgba(255,255,255,0.06);
+  border-radius:14px;
+  padding:10px 12px;
+  display:flex; align-items:center; gap:10px;
+  color:var(--sb-muted);
+}
+
+.sb-prof__avatar{
+  width:28px; height:28px; border-radius:999px;
+  background:var(--sb-bg-2); display:grid; place-items:center;
+  font-weight:800; color:white;
+}
+
+.sb-prof__info{ display:grid; }
+
+.sb-prof__name{ font-weight:700; color:var(--sb-text); font-size:14px; }
+
+.sb-prof__mail{ font-size:12px; opacity:.9; }
+
+.content--withSidebar{
+  grid-area: content;
+  display: grid;
+  min-height: 0;
+  align-items: stretch;
+}
+
+.page--fluid{
+  place-items:stretch;
+}
+
+.page--fluid > *{
+  width:100%;
+  height:100%;
+  min-width:0;
+  min-height:0;
+  display:grid;              /* para poder centrar su contenido interno */
+}
+
+.page--fluid iframe{
+  display:block;
+  width:100%;
+  height:100%;
+  border:0;
+}
+
+.page > form,
+.page > .form-wrapper,
+.page > .card,
+.page > .panel{
+  margin:0;
+}
+
+.content--withSidebar input,
+.content--withSidebar select,
+.content--withSidebar textarea{
+  background:#ffffff;
+  border:1px solid #e6eef0;
+  border-radius:12px;
+}
+
+@media (max-width:960px){
+  .layout--withSidebar{
+    grid-template-columns:1fr;             /* sidebar arriba, contenido abajo */
+    grid-template-rows:auto 1fr;
+    grid-template-areas:
+      "sidebar"
+      "content";
+  }
+  .sidebar{
+    position:relative;
+    top:auto;
+    height:auto;
+  }
+  .page-viewport{
+    min-height:calc(100dvh - (var(--page-pad))); /* un poco más flexible en móvil */
+  }
+}
+
+.layout--withSidebar{
+  display:grid;
+  grid-template-columns:280px 1fr;
+  grid-template-rows:1fr;
+  grid-template-areas:"sidebar content";
+  gap:16px;
+  padding:16px;
+  grid-area:content;
+  min-height:0;  
+  align-items:stretch;
+}
+
+.page-viewport{
+  width:100%;
+  min-height:calc(100dvh - 32px);
+  display:grid;
+  min-width:0; 
+}
+
+.page{
+  width:100%;
+  height:100%;
+  display:grid;
+  place-items:center;        /* centrado por defecto */
+  min-width:0;
+  min-height:0;
+  overflow:auto;             /* permite scroll cuando el contenido lo requiere */
+}
+
+/* 1) La columna de contenido se puede expandir al 100% sin colapsar */
+.layout--withSidebar{
+  grid-template-columns: 280px minmax(0, 1fr) !important;
+}
+
+/* 2) El área de contenido NO centra: estira siempre a todo el ancho */
+.content--withSidebar{
+  grid-area: content;
+  display: grid;
+  place-items: stretch;   /* <-- clave */
+  min-height: 0;
+  min-width: 0;
+}
+
+/* 3) Wrappers internos: ocupar todo el panel, nada de shrink */
+.page-viewport{
+  width: 100%;
+  display: grid;
+  place-items: stretch;
+  min-width: 0;           /* evita min-content */
+}
+
+.page{
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: stretch;   /* ya no centramos aquí */
+  min-width: 0;
+  min-height: 0;
+  overflow: auto;         /* scroll si el contenido lo necesita */
+}
+
+/* 4) Cada vista (como tu HomeDashboard) ocupa 100% */
+.page > *{
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+}
+
+/* Por si quedó alguna regla vieja que centre o limite ancho */
+.content__inner,
+.center-all{
+  width: 100% !important;
+  max-width: none !important;
+  justify-self: stretch !important;
+  align-self: stretch !important;
+}
+
+.center-all > *{
+  place-items:center;        /* centra dentro del componente */
+}
+
+.sb-icon-wrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  margin-right: .5rem;
+  flex-shrink: 0;
+}
+
+.sb-icon {        /* para los SVG */
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.sb-emoji {       /* para los emojis */
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+/* ==========================================================================
+   Header (usa los tokens globales que ya definiste)
+   ========================================================================== */
+
+.headerRow{
+  /* layout */
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 16px;
+
+  /* visual */
+  background: var(--surface);
+  color: var(--ink);
+  border-bottom: 1px solid var(--border);
+  box-shadow: 0 2px 10px rgba(2, 6, 23, .04);
+
+  /* espaciado */
+  padding: 12px 16px;
+}
+
+/* Marca/título a la izquierda */
+.brand{
   display: flex;
   align-items: center;
   gap: 10px;
+  min-width: 0;
 }
-.sidebar__footer small{ font-size: 12px; }
-
-/* Scrollbar agradable */
-.sidebar::-webkit-scrollbar{ width: 10px; }
-.sidebar::-webkit-scrollbar-thumb{
-  background: rgba(255,255,255,.12);
-  border-radius: 10px;
-}
-.sidebar::-webkit-scrollbar-thumb:hover{
-  background: rgba(255,255,255,.20);
-}
-
-/* ============== HEADER (en su área de grid) ============== */
-.headerRow{
-  grid-area: header;
-  position: sticky;
-  top: 0;
-  z-index: 2;
-  background:  var(--header-bg);
-  color: var(--header-text);
-  padding: 10px 16px;
-  border-bottom: 1px solid rgba(255,255,255,.08);
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 10px 16px;
-  min-height: var(--header-h);
-}
-
-.layout--withSidebar .headerRow{ left: auto; }
-
 .brand h1{
   margin: 0;
   font-size: 18px;
-  font-weight: 700;
-  color: var(--header-text);
-  letter-spacing: .5px;
+  font-weight: 800;
+  line-height: 1.1;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
+/* Cluster de usuario a la derecha */
 .userCluster{
-  margin-left: auto;      /* empuja a la derecha */
-  display: flex;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
+/* Avatar simple con inicial */
 .avatar{
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  background: var(--field-bg);
+  color: var(--ink);
+  border: 1px solid var(--border);
   display: grid;
   place-items: center;
-  background: #e9eef7;
-  color: var(--header-text);
   font-weight: 700;
 }
 
-.userInfo{ line-height: 1.1; text-align: left; }
-.userName{ font-size: 13px; color: var(--header-text); font-weight: 600; }
-.userMail{ font-size: 12px; color: var(--header-sub); }
+/* Info del usuario */
+.userInfo{
+  display: grid;
+  align-content: center;
+  line-height: 1.15;
+}
+.userName{
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--ink);
+}
+.userMail{
+  font-size: 12px;
+  color: var(--muted);
+}
 
+/* Botón de acción primaria del header (login/logout) */
 .btn-logout{
-  border: 1px solid #e1e7f0;
-  background: #fff;
-  color: #111827;
-  padding: 6px 10px;
-  border-radius: 8px;
+  appearance: none;
+  border: 1px solid var(--primary);
+  background: var(--primary);
+  color: var(--primary-ink);
+  padding: 8px 12px;
+  border-radius: calc(var(--radius) - 8px);
+  font-weight: 600;
   cursor: pointer;
+  transition: transform .06s ease, box-shadow .15s ease, opacity .15s ease;
 }
-.btn-logout:hover{ box-shadow: 0 0 0 3px var(--ring); }
-
-/* ============== MAIN CONTENT (en su área de grid) ============== */
-.content{
-  padding: calc(var(--header-h) + 16px) 16px 24px;
+.btn-logout:hover{
+  box-shadow: 0 0 0 4px var(--ring);
 }
-
-.content.content--withSidebar{
-  grid-area: content;
-  min-width: 0;
-  background: var(--bg-content);
-  padding: 16px;
-  z-index: 1;
-  overflow: auto;
+.btn-logout:active{
+  transform: translateY(1px);
+}
+.btn-logout:disabled,
+.btn-logout[aria-busy="true"]{
+  opacity: .6;
+  cursor: default;
+  box-shadow: none;
 }
 
-/* ===================== ÁRBOL / MENÚ ===================== */
-.sb-ul{ list-style: none; margin: 0; padding: 0; }
-.sb-li{ margin: 2px 0; }
+/* ==========================================================================
+   Detalles opcionales
+   ========================================================================== */
 
-/* Ítem base */
-.sideItem{
-  position: relative;            /* para el acento ::after */
+/* Fijar el header arriba si quieres efecto sticky */
+.headerRow.is-sticky{
+  position: sticky;
+  top: 0;
+  z-index: 40;
+}
+
+/* Contenedor centrado máximo (si tu layout lo requiere) */
+.headerRow .container{
+  max-width: 1280px;
+  margin: 0 auto;
   width: 100%;
-  display: flex;
-  align-items: flex-start;       /* permite varias líneas */
-  gap: 8px;
+}
+
+/* ==========================================================================
+   Responsive
+   ========================================================================== */
+
+@media (max-width: 640px){
+  .headerRow{
+    grid-template-columns: 1fr;
+    gap: 8px;
+    padding: 10px 12px;
+  }
+  .userCluster{
+    justify-content: space-between;
+  }
+  .brand h1{
+    font-size: 16px;
+  }
+  .btn-logout{
+    padding: 6px 10px;
+  }
+}
+
+/* =========================
+   Sidebar plegable (sin tocar tu paleta)
+   ========================= */
+:root{
+  --sb-w-open: 280px;   /* coincide con tu grid actual */
+  --sb-w-closed: 72px;  /* ancho compacto: solo iconos */
+}
+
+/* Base actual (ya la tienes), la adaptamos a variable */
+.layout--withSidebar{
+  grid-template-columns: var(--sb-w, var(--sb-w-open)) minmax(0, 1fr) !important;
+  transition: grid-template-columns .22s ease;
+}
+
+/* Estado colapsado (se aplica a la raíz del layout) */
+.layout--withSidebar.is-collapsed{
+  --sb-w: var(--sb-w-closed);
+}
+
+/* Sidebar visual en colapsado: compacta paddings y oculta labels */
+.layout--withSidebar.is-collapsed .sidebar{
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.layout--withSidebar.is-collapsed .sideItem{
+  gap: 0;
+  padding-left: 10px;
+  padding-right: 10px;
+  justify-content: center;
+}
+
+.layout--withSidebar.is-collapsed .sideItem__label,
+.layout--withSidebar.is-collapsed .sidebar__header .sb-title,
+.layout--withSidebar.is-collapsed .sb-prof__info,
+.layout--withSidebar.is-collapsed .caret{
+  display: none !important;
+}
+
+.layout--withSidebar.is-collapsed .sb-icon-wrap{
+  margin-right: 0;
+}
+
+/* Footer compacto mantiene avatar */
+.layout--withSidebar.is-collapsed .sidebar__footer{
+  justify-content: center;
+  padding-left: 8px;
+  padding-right: 8px;
+}
+
+/* Scroll suave y sin saltos al colapsar */
+.sidebar{
+  transition: padding .22s ease;
+}
+
+/* Botón de toggle en el header del sidebar */
+.sb-toggle{
   border: 0;
-  background: transparent;
-  color: #eaf2ff;
-  border-radius: 12px;
-  text-align: left;
-  cursor: pointer;
-  white-space: normal;           /* NO se corta; envuelve */
-  word-wrap: break-word;
-  text-overflow: ellipsis;
-  line-height: 1.2;
+  background: var(--sb-pill);
+  color: var(--sb-text);
   padding: 8px 10px;
-  outline: none;
+  border-radius: 10px;
+  cursor: pointer;
+  box-shadow: var(--sb-shadow);
+  transition: transform .06s ease, background .2s ease;
+}
+.sb-toggle:hover{ background: var(--sb-hover); }
+.sb-toggle:active{ transform: translateY(1px); }
+
+/* Encabezado del sidebar: coloca marca y toggle */
+.sidebar__header{
+  display: grid;
+  grid-template-columns: 1fr auto;  /* título + botón */
+  align-items: center;
+  gap: 8px;
 }
 
-.sideItem:hover{ background: var(--sb-bg-2); }
-.sideItem:focus-visible{ box-shadow: 0 0 0 3px var(--ring); }
-
-.sideItem__icon{
-  width: 18px; height: 18px;
-  display: inline-grid; place-items: center;
-  opacity:.9; filter:saturate(.9);
+/* Marca compacta: emoji/logo + texto (texto ya se oculta en colapsado) */
+.sb-brand{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.sb-logo{ font-size: 18px; }
+.sb-title{
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--sb-text);
+  opacity: .9;
 }
 
-.sideItem__label{
-  /* permite múltiples líneas */
-  white-space: normal;
+.sb-subtitle{
+  font-size: 12px;
+  line-height: 1.25;
+  font-weight: 500;
+  color: var(--sb-text, #94a3b8); /* usa un tono más tenue */
+  opacity: .8;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-/* Carpeta vs hoja (color sutil) */
-.sideItem--folder{ color: #d5dfef; }
-.sideItem--leaf  { color: #eef4ff; }
+.sb-title,
+.sb-subtitle{
+  display:block;          /* fuerza salto de línea */
+}
 
-/* Activo + barra de acento */
+/* Mantén el estilo activo/hover con tus colores */
 .sideItem--active{
-  background: rgba(255,255,255,.08);
-  color: #ffffff;
+  background: var(--sb-pill);
+  outline: 2px solid rgba(255,255,255,0.08);
 }
-.sideItem--active::after{
-  content: "";
-  position: absolute;
-  right: 6px;
-  top: 8px;
-  bottom: 8px;
-  width: 4px;
-  border-radius: 2px;
-  background: var(--accent);
-}
+.sideItem:hover{ background: var(--sb-hover); }
 
-.caret{
-  width: 14px;
-  display:inline-block;
-  transform: translateY(2px);
-  transition: transform .15s ease;
-}
-.caret.rot{ transform: rotate(90deg) translateY(2px); }
 
-/* ===================== RESPONSIVE ===================== */
-@media (max-width: 920px){
-  :root{ --sb-width: 232px; --header-h: 60px; }
-  .brand h1{ font-size:16px; }
-}
-@media (max-width: 680px){
-  :root{ --sb-width: 220px; --header-h: 56px; }
-  .sideItem{ font-size:13px; }
-}
 
-/* ===================== EXTRA (botón logout rojo) ===================== */
-.logout-btn {
-  border-color: #b91c1c;
-  color: #b91c1c;
-}
-.logout-btn:hover:not(:disabled) {
-  background: #b91c1c;
-  color: #fff;
-}

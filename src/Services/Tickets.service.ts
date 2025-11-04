@@ -2,7 +2,6 @@
 import { GraphRest } from '../graph/GraphRest';
 import type { GetAllOpts, PageResult } from '../Models/Commons';
 import type { Ticket } from '../Models/Tickets';
-import { ensureIds, esc } from '../utils/Commons';
 
 export class TicketsService {
   private graph!: GraphRest;
@@ -107,21 +106,6 @@ export class TicketsService {
     };
   }
 
-  // ---------- ids ----------
-  private async ensure(): Promise<void> {
-    // Asegura y persiste los IDs resueltos
-    const ids = await ensureIds(
-      this.siteId,
-      this.listId,
-      this.graph,
-      this.hostname,
-      this.sitePath,
-      this.listName
-    );
-    this.siteId = ids.siteId;
-    this.listId = ids.listId;
-  }
-
   // ---------- CRUD ----------
   async create(record: Omit<Ticket, 'ID'>) {
     await this.ensureIds();
@@ -185,21 +169,56 @@ export class TicketsService {
     const nextLink = res?.['@odata.nextLink'] ? String(res['@odata.nextLink']) : null;
     return { items, nextLink };
   }
-  // ---------- helpers de consulta ----------
-  async findById(itemId: string | number, top = 1) {
-    await this.ensure();
-    // Mejor filtrar por el id del listItem (numérico) en top-level, no en fields/*
-    const idNum = Number(itemId);
-    const qs = new URLSearchParams({
-      $expand: 'fields',
-      $filter: Number.isFinite(idNum) ? `id eq ${idNum}` : `id eq ${esc(String(itemId))}`,
-      $top: String(top),
-    });
-    const res = await this.graph.get<any>(
-      `/sites/${this.siteId}/lists/${this.listId}/items?${qs.toString()}`
-    );
-    return (res.value ?? []).map((x: any) => this.toModel(x));
+
+  async getAllPlane(opts?: GetAllOpts) {
+    await this.ensureIds()
+
+    const normalizeFieldTokens = (s: string) =>
+      s
+        .replace(/\bID\b/g, 'id')
+        .replace(/(^|[^/])\bTitle\b/g, '$1fields/Title');
+
+    const escapeODataLiteral = (v: string) => v.replace(/'/g, "''");
+
+    // Normaliza expresiones del $filter (minimiza 404 por sintaxis)
+    const normalizeFilter = (raw: string) => {
+      let out = normalizeFieldTokens(raw.trim());
+      // escapa todo literal '...'
+      out = out.replace(/'(.*?)'/g, (_m, p1) => `'${escapeODataLiteral(p1)}'`);
+      return out;
+    };
+
+    const normalizeOrderby = (raw: string) => normalizeFieldTokens(raw.trim());
+
+    const qs = new URLSearchParams();
+    qs.set('$expand', 'fields');        // necesario si filtras por fields/*
+    qs.set('$select', 'id,webUrl');     // opcional; añade fields(...) si quieres
+    if (opts?.orderby) qs.set('$orderby', normalizeOrderby(opts.orderby));
+    if (opts?.top != null) qs.set('$top', String(opts.top));
+    if (opts?.filter) qs.set('$filter', normalizeFilter(String(opts.filter)));
+
+    // Evita '+' por espacios (algunos proxies se quejan)
+    const query = qs.toString().replace(/\+/g, '%20');
+
+    const url = `/sites/${encodeURIComponent(this.siteId!)}/lists/${encodeURIComponent(this.listId!)}/items?${query}`;
+
+    try {
+      const res = await this.graph.get<any>(url);
+      return (res.value ?? []).map((x: any) => this.toModel(x));
+    } catch (e: any) {
+      // Si la ruta es válida pero el $filter rompe, reintenta sin $filter para diagnóstico
+      const code = e?.error?.code ?? e?.code;
+      if (code === 'itemNotFound' && opts?.filter) {
+        const qs2 = new URLSearchParams(qs);
+        qs2.delete('$filter');
+        const url2 = `/sites/${encodeURIComponent(this.siteId!)}/lists/${encodeURIComponent(this.listId!)}/items?${qs2.toString()}`;
+        const res2 = await this.graph.get<any>(url2);
+        return (res2.value ?? []).map((x: any) => this.toModel(x));
+      }
+      throw e;
+    }
   }
+
 }
 
 

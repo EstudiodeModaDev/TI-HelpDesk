@@ -23,7 +23,7 @@ export default function EscalamientoInternet({ticket,}: Props) {
   );
 
   return (
-    <div className="esc-form">
+    <div className="esc-form" data-force-light>
       <h1 className="esc-title">Escalamiento internet</h1>
 
       {loading && <p style={{ opacity: 0.7, marginBottom: 8 }}>Cargando datos…</p>}

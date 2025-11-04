@@ -1,6 +1,6 @@
 // src/components/Tickets/Tickets.tsx
 import * as React from "react";
-import DetalleTicket from "../DetallesTickets/DetallesTickets";
+import { CaseDetail } from "../DetallesTickets/DetallesTickets";
 import "./Tickets.css";
 
 import { useAuth } from "../../auth/authContext";
@@ -20,7 +20,7 @@ function renderSortIndicator(field: SortField, sorts: Array<{field: SortField; d
 export default function TablaTickets() {
   const { account } = useAuth();
   const userMail = account?.username ?? "";
-  const isAdmin = useIsAdmin(userMail); // ajusta tu lógica real de roles
+  const isAdmin = useIsAdmin(userMail);
   const userRole = useUserRoleFromSP(userMail)
 
   const { Tickets } = useGraphServices();
@@ -42,52 +42,26 @@ export default function TablaTickets() {
   }, [rows, search]);
 
   return (
-    <div className="tabla-tickets">
-      {/* Barra de filtros (oculta en detalle) */}
-      {!ticketSeleccionado && (
-        <div
-          className="filtros"
-          style={{ display: "grid", gap: 8, gridTemplateColumns: "1fr auto auto auto auto auto auto" }}
-        >
-          {/* Búsqueda local (solo página actual) */}
-          <input
-            type="text"
-            placeholder="Buscar (resolutor, solicitante, asunto)…"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
+    <div className="tabla-tickets" data-force-light>
 
-          {/* Modo (servidor) */}
-          <select
-            value={filterMode}
-            onChange={(e) => setFilterMode(e.target.value as any)}
-            title="Estado"
-          >
+      {!ticketSeleccionado && (
+        <div className="filtros">
+
+          <input type="text" placeholder="Buscar (resolutor, solicitante, asunto)..." value={search} onChange={(e) => setSearch(e.target.value)}/>
+
+          <select value={filterMode} onChange={(e) => setFilterMode(e.target.value as any)} title="Estado">
             <option value="En curso">En curso</option>
             <option value="Cerrados">Cerrados</option>
           </select>
 
-          {/* Rango (servidor) */}
-          <input
-            type="date"
-            value={range.from}
-            onChange={(e) => setRange({ ...range, from: e.target.value })}
-            title="Desde"
-          />
+          <input type="date" value={range.from} onChange={(e) => setRange({ ...range, from: e.target.value })} title="Desde"/>
           <span>→</span>
-          <input
-            type="date"
-            value={range.to}
-            onChange={(e) => setRange({ ...range, to: e.target.value })}
-            title="Hasta"
-          />
+          <input type="date" value={range.to} onChange={(e) => setRange({ ...range, to: e.target.value })} title="Hasta"/>
 
-          {/* Aplicar rango (recarga primera página) */}
           <button type="button" onClick={applyRange} title="Aplicar rango">
             Aplicar
           </button>
 
-          {/* Recargar primera página */}
           <button type="button" onClick={reloadAll} title="Recargar">
             ⟳
           </button>
@@ -101,7 +75,7 @@ export default function TablaTickets() {
 
       {/* Tabla o Detalle */}
       {ticketSeleccionado ? (
-        <DetalleTicket ticket={ticketSeleccionado} onVolver={() => setTicketSeleccionado(null)} role={userRole.role} />
+        <CaseDetail onVolver={() => setTicketSeleccionado(null)} ticket={ticketSeleccionado} role={userRole.role} />
       ) : (
         <div className="table-wrap">
           <table>
@@ -125,13 +99,8 @@ export default function TablaTickets() {
                   Fecha de apertura {renderSortIndicator('FechaApertura', sorts)}
                 </th>
 
-                <th role="button"
-                  tabIndex={0}
-                  onClick={(e) => toggleSort('TiempoSolucion', e.shiftKey)}
-                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') toggleSort('TiempoSolucion', e.shiftKey); }}
-                  aria-label="Ordenar por Fecha máxima"
-                  style={{ cursor: 'pointer', whiteSpace: 'nowrap' }}
-                >
+                <th role="button" tabIndex={0} onClick={(e) => toggleSort('TiempoSolucion', e.shiftKey)} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') toggleSort('TiempoSolucion', e.shiftKey); }}
+                  aria-label="Ordenar por Fecha máxima" style={{ cursor: 'pointer', whiteSpace: 'nowrap' }}>
                   Fecha máxima {renderSortIndicator('TiempoSolucion', sorts)}
                 </th>
 
@@ -140,24 +109,15 @@ export default function TablaTickets() {
             </thead>
             <tbody>
               {filtered.map((ticket) => (
-                <tr
-                  key={ticket.ID}
-                  onClick={() => setTicketSeleccionado(ticket)}
-                  tabIndex={0}
-                  onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && setTicketSeleccionado(ticket)}
-                >
+                <tr key={ticket.ID} onClick={() => setTicketSeleccionado(ticket)} tabIndex={0} onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && setTicketSeleccionado(ticket)}>
                   <td>{ticket.ID}</td>
                   <td>{ticket.Nombreresolutor}</td>
                   <td>{ticket.Solicitante}</td>
-                  <td>{ticket.Title}</td>
+                  <td>{ticket.Title!.slice(0, 75)}</td>
                   <td>{toISODateTimeFlex(ticket.FechaApertura) || "–"}</td>
-                  <td>{toISODateTimeFlex(ticket.TiempoSolucion) || "No tiene fecha máxima"}</td>
+                  <td>{toISODateTimeFlex(ticket.TiempoSolucion) || "N/A"}</td>
                   <td>
-                    <span
-                      className="estado-circulo"
-                      style={{ backgroundColor: calcularColorEstado(ticket) }}
-                      title={ticket.Estadodesolicitud || "Sin estado"}
-                    />
+                    <span className="estado-circulo" style={{ backgroundColor: calcularColorEstado(ticket) }} title={ticket.Estadodesolicitud || "Sin estado"} />
                   </td>
                 </tr>
               ))}
@@ -166,7 +126,7 @@ export default function TablaTickets() {
 
           {/* Paginación servidor: Anterior = volver a primera página (loadFirstPage), Siguiente = nextLink */}
           {filtered.length > 0 && (
-            <div style={{ display: "flex", gap: 8, alignItems: "center", marginTop: 8 }}>
+            <div>
               <button onClick={reloadAll} disabled={loading || pageIndex <= 1}>
                 Anterior
               </button>
@@ -175,13 +135,9 @@ export default function TablaTickets() {
                 Siguiente
               </button>
 
-              <span style={{ marginLeft: 12 }}>Registris por pagina:</span>
-              <select
-                value={pageSize}
-                onChange={(e) => setPageSize(Number(e.target.value))}
-                disabled={loading}
-              >
-                {[10, 20, 50, 100].map((n) => (
+              <span style={{ marginLeft: 12 }}>Tickets por pagina:</span>
+              <select value={pageSize} onChange={(e) => setPageSize(Number(e.target.value))} disabled={loading}>
+                {[10, 15, 20, 50, 100].map((n) => (
                   <option key={n} value={n}>
                     {n}
                   </option>

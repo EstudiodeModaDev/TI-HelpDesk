@@ -1,156 +1,163 @@
-// src/App.tsx
-import * as React from 'react';
-import './App.css';
+import * as React from "react";
+import "./App.css";
+import NuevoTicketForm from "./components/NuevoTicket/NuevoTicketForm";
+import NuevoTicketUsuarioForm from "./components/NuevoTicketUsuario/NuevoTicketFormUsuario";
+import TablaTickets from "./components/Tickets/Tickets";
+import TareasPage from "./components/Tareas/Tareas";
+import Formatos from "./components/Formatos/Formatos";
+import InfoPage from "./components/Info/Informacion";
+import CrearPlantilla from "./components/NuevaPlantilla/NuevaPlantilla";
+import UsuariosPanel from "./components/Usuarios/Usuarios";
+import CajerosPOSForm from "./components/CajerosPOS/CajerosPOS";
+import ComprasPage from "./components/Compras/ComprasPage";
+import RegistroFactura from "./components/RegistroFactura/RegistroFactura";
+import type { User } from "./Models/User";
+import { AuthProvider, useAuth } from "./auth/authContext";
+import { useUserRoleFromSP } from "./Funcionalidades/Usuarios";
+import { GraphServicesProvider, useGraphServices } from "./graph/GrapServicesContext";
+import type { TicketsService } from "./Services/Tickets.service";
+import type { UsuariosSPService } from "./Services/Usuarios.Service";
+import type { LogService } from "./Services/Log.service";
+import HomeIcon from "./assets/home.svg";
+import addIcon from "./assets/add.svg";
+import seeTickets from "./assets/tickets.svg";
+import tareasIcon from "./assets/tareas.svg";
+import filesIcon from "./assets/file.svg";
+import infoIcon from "./assets/info.svg";
+import settingsIcon from "./assets/settings.svg"
+import templateIcon from "./assets/template.svg"
+import PazySalvosMode from "./components/PazSalvos/PazYSalvo";
+import WelcomeSolvi from "./components/Welcome/Welcome";
+//import DashBoardPage from "./components/Dashboard/DashboardPage";
+import HomeDashboard from "./components/Home/Home";
 
-import Home from './components/Home/Home';
-import NuevoTicketForm from './components/NuevoTicket/NuevoTicketForm';
-import TablaTickets from './components/Tickets/Tickets';
-import TareasPage from './components/Tareas/Tareas';
-import Formatos from './components/Formatos/Formatos';
-import type { User } from './Models/User';
-import { GraphServicesProvider, useGraphServices } from './graph/GrapServicesContext';
-import { AuthProvider, useAuth } from './auth/authContext';
-import { useUserRoleFromSP } from './Funcionalidades/Usuarios';
-import CajerosPOSForm from './components/CajerosPOS/CajerosPOS';
-import type { TicketsService } from './Services/Tickets.service';
-import type { UsuariosSPService } from './Services/Usuarios.Service';
-import type { LogService } from './Services/Log.service';
-import ComprasPage from './components/Compras/ComprasPage';
-import NuevoTicketUsuarioForm from './components/NuevoTicketUsuario/NuevoTicketFormUsuario';
-import RegistroFactura from './components/RegistroFactura/RegistroFactura';
-import InfoPage from './components/Info/Informacion';
+/* ============================================================
+   Tipos de navegación y contexto de visibilidad
+   ============================================================ */
 
-/* ---------------------- ROLES & NAVS ---------------------- */
+type Role = "Administrador" | "Tecnico" | "Usuario";
 
-// Roles de la aplicación
-type Role = 'Administrador' | 'Técnico' | 'Usuario';
+type RenderCtx = {services?: { Tickets: TicketsService; Usuarios: UsuariosSPService; Logs: LogService }};
+
+type Services = {Tickets: TicketsService; Usuarios: UsuariosSPService; Logs: LogService;};
 
 export type MenuItem = {
   id: string;
   label: string;
   icon?: React.ReactNode;
-  to?: React.ReactNode;   // componente a renderizar si es hoja (opcional)
-  children?: MenuItem[];  // subitems si es carpeta
+  to?: React.ReactNode | ((ctx: RenderCtx) => React.ReactNode);
+  children?: MenuItem[];
+  roles?: Role[];
+  flags?: string[];
+  when?: (ctx: NavContext) => boolean;
+  /** Si true, al seleccionarlo el sidebar se colapsa automáticamente */
+  autocollapse?: boolean;
 };
 
-/* Árbol de navegación con nivel intermedio "Siesa" */
-const NAVS_ADMIN: MenuItem[] = [
-  { id: 'home',        label: 'Home',         icon: '🏠', to: <Home/> },
-  { id: 'ticketform',  label: 'Nuevo Ticket', icon: '➕', to: <NuevoTicketForm/> },
-  { id: 'ticketTable', label: 'Ver Tickets',  icon: '👁️', to: <TablaTickets/>},
-  { id: 'task',        label: 'Tareas',       icon: '✅', to: <TareasPage/> },
-  { id: 'formatos',    label: 'Formatos',     icon: '📄', to: <Formatos/> },
-  { id: 'info',        label: 'Información',  icon: '📘', to: <InfoPage/> },
-  {
-    id: 'admin', label: 'Administración', icon: '⚙️', children: [
-       { id: 'anuncios',    label: 'Anuncios', to: <RegistroFactura/>},
-       { id: 'plantillas',  label: 'Plantillas', to: <RegistroFactura/>},
-       { id: 'usuarios',    label: 'Usuarios', to: <RegistroFactura/>},
-    ]
-  },
-  {
-    id: 'acciones', label: 'Acciones', icon: '🛠️', children: [
-      {
-        id: 'siesa', label: 'Siesa', icon: '📂', children: [
-          // ⚠️ Para Cajeros POS no usamos `to` aquí porque requiere inyectar servicios
-          { id: 'cajpos', label: 'Cajeros POS', icon: '🧾' },
-        ]
-      },
-      {
-        id: 'cesar', label: 'Cesar', icon: '', children: [
-          { id: 'facturas', label: 'Facturas', icon: '🧾', to: <RegistroFactura/>},
-          { id: 'compras', label: 'Compras', icon: '💰', to: <ComprasPage/>},
-        ]
-      },
-    ]
-  },
-];
+export type NavContext = {
+  role: Role;
+  flags?: Set<string>;
+  hasService?: (k: keyof Services) => boolean;   // ya no es never
+};
 
-const NAVS_TECNICO: MenuItem[] = [
-  { id: 'home',        label: 'Home',         icon: '🏠', to: <Home/> },
-  { id: 'ticketform',  label: 'Nuevo Ticket', icon: '➕', to: <NuevoTicketForm/> },
-  { id: 'ticketTable', label: 'Ver Tickets',  icon: '👁️', to: <TablaTickets/>},
-  { id: 'task',        label: 'Tareas',       icon: '✅', to: <TareasPage/> },
-  { id: 'info',        label: 'Información',  icon: '📘', to: <InfoPage/> },
-  {
-    id: 'acciones', label: 'Acciones', icon: '🛠️', children: [
-      {
-        id: 'siesa', label: 'Siesa', icon: '📂', children: [
-          { id: 'cajpos', label: 'Cajeros POS', icon: '🧾' },
-        ]
-      },
+/* ============================================================
+   Árbol único de navegación con reglas de visibilidad
+   ============================================================ */
 
-    ]
+const NAV: MenuItem[] = [
+  {id: "home", label: "Home", icon: <img src={HomeIcon} alt="" className="sb-icon" />, to: <HomeDashboard />, roles: ["Administrador", "Tecnico"], autocollapse: true },
+  {id: "ticketform", label: "Nuevo Ticket", icon: <img src={addIcon} alt="" className="sb-icon" />, to: () => <NuevoTicketForm />, roles: ["Administrador", "Tecnico"],},
+  {id: "ticketform_user", label: "Nuevo Ticket", icon: <img src={addIcon} alt="" className="sb-icon" />, to: <NuevoTicketUsuarioForm />, roles: ["Usuario"],},
+  {id: "ticketTable", label: "Ver Tickets", icon: <img src={seeTickets} alt="" className="sb-icon" />, to: <TablaTickets />, autocollapse: true},
+  {id: "task", label: "Tareas", icon: <img src={tareasIcon} alt="" className="sb-icon" />, to: <TareasPage />, roles: ["Administrador", "Tecnico"], autocollapse: true },
+  {id: "formatos", label: "Formatos", icon: <img src={filesIcon} alt="" className="sb-icon" />, to: <Formatos />, roles: ["Administrador"] },
+  {id: "info", label: "Información", icon: <img src={infoIcon} alt="" className="sb-icon" />, to: <InfoPage />, roles: ["Administrador", "Tecnico"]  },
+  {id: "admin", label: "Administración", icon: <img src={settingsIcon} className="sb-icon"/>, roles: ["Administrador", "Tecnico"], children: [
+      { id: "anuncios", label: "Anuncios", to: <RegistroFactura />, roles: ["Administrador", "Tecnico"]},
+      { id: "plantillas", label: "Plantillas", icon: <img src={templateIcon} className="sb-icon"/>,to: <CrearPlantilla /> },
+      { id: "usuarios", label: "Usuarios", to: <UsuariosPanel />, roles: ["Administrador"] },
+    ],
+  },
+  {id: "acciones", label: "Acciones", roles: ["Administrador", "Tecnico"], children: [
+      {id: "siesa", label: "Siesa", children: [{id: "cajpos", label: "Cajeros POS", to: (rctx: RenderCtx) =>
+                                                                                      rctx.services ? (
+                                                                                        <CajerosPOSForm services={{ Tickets: rctx.services.Tickets, Logs: rctx.services.Logs }} />
+                                                                                      ) : (
+                                                                                        <div>Cargando servicios…</div>
+                                                                                      ),
+          },
+        ],
+      },
+      {id: "cesar", label: "Cesar", children: [
+          { id: "compras", label: "Compras", to: <ComprasPage />},
+          { id: "facturas", label: "Facturas", to: <RegistroFactura /> },
+          { id: "paz", label: "Paz y Salvos", to: <PazySalvosMode /> },
+        ],
+      },
+    ],
   },
 ];
 
-const NAVS_USUARIO: MenuItem[] = [
-  { id: 'home',        label: 'Home',         icon: '🏠', to: <Home/> },
-  { id: 'ticketTable', label: 'Ver Tickets',  icon: '👁️', to: <TablaTickets/>},
-  { id: 'ticketform',  label: 'Nuevo Ticket', icon: '➕', to: <NuevoTicketUsuarioForm/> },
-];
+/* ============================================================
+   Utilidades de árbol: filtrado, búsqueda y primera hoja
+   ============================================================ */
 
-function getNavsForRole(role: Role | string) {
-  switch (role) {
-    case 'Administrador': return NAVS_ADMIN as readonly MenuItem[];
-    case 'Tecnico':       return NAVS_TECNICO as readonly MenuItem[];
-    case 'Técnico':       return NAVS_TECNICO as readonly MenuItem[];
-    default:              return NAVS_USUARIO as readonly MenuItem[];
+// Aplica reglas de visibilidad a un nodo
+function isVisible(node: MenuItem, ctx: NavContext): boolean {
+  if (node.roles && !node.roles.includes(ctx.role)) return false;
+  if (node.flags && node.flags.some((f) => !ctx.flags?.has(f))) return false;
+  if (node.when && !node.when(ctx)) return false;
+  return true;
+}
+
+// Devuelve el árbol filtrado (oculta carpetas sin hijos visibles)
+function filterNavTree(nodes: readonly MenuItem[], ctx: NavContext): MenuItem[] {
+  return nodes
+    .map((n) => {
+      const children = n.children ? filterNavTree(n.children, ctx) : undefined;
+      const self = isVisible(n, ctx);
+      if (children && children.length === 0 && !self) return null;
+      if (!self && !children) return null;
+      return { ...n, children };
+    })
+    .filter(Boolean) as MenuItem[];
+}
+
+// Primer leaf para selección inicial
+function firstLeafId(nodes: readonly MenuItem[]): string {
+  const pick = (n: MenuItem): string => (n.children?.length ? pick(n.children[0]) : n.id);
+  return nodes.length ? pick(nodes[0]) : "";
+}
+
+// Busca un ítem por id
+function findById(nodes: readonly MenuItem[], id: string): MenuItem | undefined {
+  for (const n of nodes) {
+    if (n.id === id) return n;
+    if (n.children) {
+      const hit = findById(n.children, id);
+      if (hit) return hit;
+    }
   }
+  return undefined;
 }
 
-/* -------- Helpers para menú anidado -------- */
-function forEachItem(
-  nodes: readonly MenuItem[],
-  fn: (n: MenuItem, path: string[]) => void,
-  path: string[] = []
-) {
-  nodes.forEach(n => {
-    const p = [...path, n.id];
-    fn(n, p);
-    if (n.children?.length) forEachItem(n.children, fn, p);
-  });
-}
+/* ============================================================
+   Header superior simple
+   ============================================================ */
 
-function hasNavDeep(navs: readonly MenuItem[], id: string) {
-  let found = false;
-  forEachItem(navs, (n) => { if (n.id === id) found = true; });
-  return found;
-}
-
-function hasNav(navs: readonly MenuItem[], key: string) {
-  return hasNavDeep(navs, key);
-}
-
-function findItemById(navs: readonly MenuItem[], id: string): MenuItem | undefined {
-  let out: MenuItem | undefined;
-  forEachItem(navs, (n) => { if (n.id === id) out = n; });
-  return out;
-}
-
-/* Devuelve la primera hoja (descendiendo por los primeros hijos) */
-function firstLeafId(navs: readonly MenuItem[]): string {
-  if (!navs.length) return '';
-  const pick = (n: MenuItem): string => n.children?.length ? pick(n.children[0]) : n.id;
-  return pick(navs[0]);
-}
-
-/* ---------------------- UI: Header ---------------------- */
-function HeaderBar(props: {
-  user: User;
-  role: string; // "Administrador" | "Técnico" | "Usuario"
-  onPrimaryAction?: { label: string; onClick: () => void; disabled?: boolean } | null;
-}) {
+function HeaderBar(props: {user: User; role: string; onPrimaryAction?: { label: string; onClick: () => void; disabled?: boolean } | null}) {
   const { user, role, onPrimaryAction } = props;
   const isLogged = Boolean(user);
   return (
     <div className="headerRow">
-      <div className="brand"><h1>Helpdesk EDM</h1></div>
+      <div className="brand">
+        <h1>Helpdesk EDM</h1>
+      </div>
       <div className="userCluster">
-        <div className="avatar">{user?.displayName ? user.displayName[0] : '?'}</div>
+        <div className="avatar">{user?.displayName ? user.displayName[0] : "?"}</div>
         <div className="userInfo">
-          <div className="userName">{isLogged ? user?.displayName : 'Invitado'}</div>
-          <div className="userMail">{isLogged ? role : '–'}</div>
+          <div className="userName">{isLogged ? user?.displayName : "Invitado"}</div>
+          <div className="userMail">{isLogged ? role : "–"}</div>
         </div>
         {onPrimaryAction && (
           <button
@@ -159,7 +166,7 @@ function HeaderBar(props: {
             disabled={onPrimaryAction.disabled}
             aria-busy={onPrimaryAction.disabled}
           >
-            ⎋ {onPrimaryAction.label}
+            {onPrimaryAction.label}
           </button>
         )}
       </div>
@@ -167,29 +174,32 @@ function HeaderBar(props: {
   );
 }
 
-/* ---------------------- UI: Sidebar (anidado) ---------------------- */
-function Sidebar(props: {
-  navs: readonly MenuItem[];
-  selected: string;
-  onSelect: (k: string) => void;
-}) {
-  const { navs, selected, onSelect } = props;
+/* ============================================================
+   Sidebar con árbol recursivo y apertura de carpetas
+   ============================================================ */
+
+function Sidebar(props: {navs: readonly MenuItem[]; selected: string; onSelect: (k: string) => void; user: User; role: string; collapsed?: boolean; onToggle?: () => void;}) {
+  const { navs, selected, onSelect, user, role, collapsed = false, onToggle } = props;
   const [open, setOpen] = React.useState<Record<string, boolean>>({});
 
-  // abre la rama que contiene el seleccionado
   React.useEffect(() => {
     const next: Record<string, boolean> = {};
-    forEachItem(navs, (n, path) => {
-      if (n.id === selected) path.slice(0, -1).forEach(id => next[id] = true);
-    });
-    setOpen(prev => ({ ...prev, ...next }));
+    const walk = (nodes: readonly MenuItem[], path: string[] = []) => {
+      nodes.forEach((n) => {
+        const p = [...path, n.id];
+        if (n.id === selected) p.slice(0, -1).forEach((id) => (next[id] = true));
+        if (n.children?.length) walk(n.children, p);
+      });
+    };
+    walk(navs);
+    setOpen((prev) => ({ ...prev, ...next }));
   }, [selected, navs]);
 
-  const toggle = (id: string) => setOpen(s => ({ ...s, [id]: !s[id] }));
+  const toggle = (id: string) => setOpen((s) => ({ ...s, [id]: !s[id] }));
 
   const renderTree = (nodes: readonly MenuItem[], depth = 0) => (
     <ul className="sb-ul">
-      {nodes.map(n => {
+      {nodes.map((n) => {
         const hasChildren = !!n.children?.length;
         const expanded = !!open[n.id];
         const pad = 10 + depth * 14;
@@ -198,16 +208,19 @@ function Sidebar(props: {
           return (
             <li key={n.id} className="sb-li">
               <button
-                className="sideItem sideItem--folder"
-                style={{ paddingLeft: pad }}
-                onClick={() => toggle(n.id)}
-                aria-expanded={expanded}
+                className={`sideItem sideItem--folder ${collapsed ? "is-compact" : ""}`}
+                style={{ paddingLeft: collapsed ? 12 : pad }}
+                onClick={() => (collapsed ? onSelect(n.id) : toggle(n.id))}
+                aria-expanded={!collapsed && expanded}
+                title={n.label}
               >
-                <span className={`caret ${expanded ? 'rot' : ''}`}>▸</span>
-                <span className="sideItem__icon" aria-hidden="true">{n.icon ?? '•'}</span>
-                <span className="sideItem__label">{n.label}</span>
+                {!collapsed && <span className={`caret ${expanded ? "rot" : ""}`}>▸</span>}
+                <span className="sb-icon-wrap" aria-hidden>
+                  {n.icon ?? null}
+                </span>
+                {!collapsed && <span className="sideItem__label">{n.label}</span>}
               </button>
-              {expanded && renderTree(n.children!, depth + 1)}
+              {!collapsed && expanded && renderTree(n.children!, depth + 1)}
             </li>
           );
         }
@@ -216,13 +229,14 @@ function Sidebar(props: {
         return (
           <li key={n.id} className="sb-li">
             <button
-              className={`sideItem sideItem--leaf ${active ? 'sideItem--active' : ''}`}
-              style={{ paddingLeft: pad + 18 }}
+              className={`sideItem sideItem--leaf ${active ? "sideItem--active" : ""} ${collapsed ? "is-compact" : ""}`}
+              style={{ paddingLeft: collapsed ? 12 : pad + 18 }}
               onClick={() => onSelect(n.id)}
-              aria-current={active ? 'page' : undefined}
+              aria-current={active ? "page" : undefined}
+              title={n.label}
             >
-              <span className="sideItem__icon" aria-hidden="true">{n.icon ?? '•'}</span>
-              <span className="sideItem__label">{n.label}</span>
+              <span className="sideItem__icon" aria-hidden="true">{n.icon ?? "•"}</span>
+              {!collapsed && <span className="sideItem__label">{n.label}</span>}
             </button>
           </li>
         );
@@ -231,28 +245,51 @@ function Sidebar(props: {
   );
 
   return (
-    <aside className="sidebar" aria-label="Navegación principal">
-      <div className="sidebar__header">Menú</div>
+    <aside className={`sidebar ${collapsed ? "sidebar--collapsed" : ""}`} aria-label="Navegación principal">
+      <div className="sidebar__header">
+        <div className="sb-brand">
+          {!collapsed && (
+            <>
+              <span className="sb-logo" aria-hidden="true">🛠️</span>
+              <span className="sb-title">Soporte Técnico</span>
+            </>
+          )}
+        </div>
+        <button className="sb-toggle" onClick={onToggle} aria-label={collapsed ? "Expandir menú" : "Colapsar menú"}>
+          {collapsed ? "»" : "«"}
+        </button>
+      </div>
+
       <nav className="sidebar__nav" role="navigation">
         {renderTree(navs)}
       </nav>
-      <div className="sidebar__footer"><small>Estudio de moda</small></div>
+
+      <div className="sidebar__footer">
+        <div className="sb-prof__avatar" title={user?.displayName || "Usuario"}>
+          {user?.displayName ? user.displayName[0] : "U"}
+        </div>
+        {!collapsed && (
+          <div className="sb-prof__info">
+            <div className="sb-prof__mail">{user?.mail || "usuario@empresa.com"}</div>
+            <div className="sb-prof__mail" aria-hidden="true">{role}</div>
+          </div>
+        )}
+      </div>
     </aside>
   );
 }
 
-/* ---------------------- Shell (usa Auth) ---------------------- */
+/* ============================================================
+   Shell: controla autenticación básica y muestra LoggedApp
+   ============================================================ */
+
 function Shell() {
   const { ready, account, signIn, signOut } = useAuth();
   const [loadingAuth, setLoadingAuth] = React.useState(false);
 
-  // Mapear la cuenta MSAL a tu tipo User (para el Header)
+  // mapea la cuenta MSAL a tipo User para el header
   const user: User = account
-    ? {
-        displayName: account.name ?? account.username ?? 'Usuario',
-        mail: account.username ?? '',
-        jobTitle: '',
-      }
+    ? { displayName: account.name ?? account.username ?? "Usuario", mail: account.username ?? "", jobTitle: "" }
     : null;
 
   const isLogged = Boolean(account);
@@ -262,112 +299,117 @@ function Shell() {
     setLoadingAuth(true);
     try {
       if (isLogged) await signOut();
-      else await signIn('popup');
+      else await signIn("popup");
     } finally {
       setLoadingAuth(false);
     }
   };
 
   const actionLabel = !ready
-    ? 'Cargando…'
+    ? "Cargando…"
     : loadingAuth
-    ? (isLogged ? 'Cerrando…' : 'Abriendo Microsoft…')
-    : (isLogged ? 'Cerrar sesión' : 'Iniciar sesión');
+    ? isLogged
+      ? "Cerrando…"
+      : "Abriendo Microsoft…"
+    : isLogged
+    ? "Cerrar sesión"
+    : "Iniciar sesión";
 
-  // NO LOGUEADO: solo header con botón
+  // estado no logueado: solo header con botón de acción
   if (!ready || !isLogged) {
     return (
       <div className="page layout">
-        <HeaderBar
-          user={user}
-          role={'Usuario'}
-          onPrimaryAction={{
-            label: actionLabel,
-            onClick: handleAuthClick,
-            disabled: !ready || loadingAuth,
-          }}
-        />
+        <HeaderBar user={user} role={"Usuario"} onPrimaryAction={{ label: actionLabel, onClick: handleAuthClick, disabled: !ready || loadingAuth }}/>
+        <WelcomeSolvi/>
       </div>
     );
   }
 
-  // LOGUEADO
-  return (
-    <LoggedApp
-      user={user as User}
-      actionLabel={actionLabel}
-      onAuthClick={handleAuthClick}
-    />
-  );
+  // estado logueado
+  return <LoggedApp user={user as User} />;
 }
 
-/* ---------------------- LoggedApp: nav por rol ---------------------- */
-function LoggedApp({
-  user,
-  actionLabel,
-  onAuthClick,
-}: {
-  user: User;
-  actionLabel: string;
-  onAuthClick: () => void;
-}) {
-  const { role } = useUserRoleFromSP(user!.mail); // 'Administrador' | 'Técnico' | 'Usuario'
-  const navs = getNavsForRole(role);
+/* ============================================================
+   LoggedApp: calcula árbol visible y renderiza el contenido
+   ============================================================ */
 
-  // ❗️Servicios Graph aquí (ya estamos dentro de GraphServicesProvider)
-  const services = useGraphServices() as {
-    Tickets: TicketsService;
-    Usuarios: UsuariosSPService;
-    Logs: LogService;
-  };
+function LoggedApp({ user }: { user: User }) {
+  const { role } = useUserRoleFromSP(user!.mail);
+  const services = useGraphServices() as {Tickets: TicketsService; Usuarios: UsuariosSPService; Logs: LogService;};
 
-  // selecciona la primera hoja del menú por rol
-  const [selected, setSelected] = React.useState<string>(firstLeafId(navs));
+  const navCtx = React.useMemo<NavContext>(() => {
+    const safeRole: Role = role === "Administrador" || role === "Tecnico" || role === "Usuario" ? (role as Role) : "Usuario";
+    return {
+      role: safeRole,
+      flags: new Set<string>([]),
+      hasService: (k) => {
+        if (k === "Usuarios") return Boolean(services?.Usuarios);
+        if (k === "Tickets") return Boolean(services?.Tickets);
+        if (k === "Logs") return Boolean(services?.Logs);
+        return false;
+      },
+    };
+  }, [role, services]);
 
-  // si cambia rol/menú y el seleccionado ya no existe, caer en la primera hoja
+  const navs = React.useMemo(() => filterNavTree(NAV, navCtx), [navCtx]);
+
+  const [selected, setSelected] = React.useState<string>(() => firstLeafId(navs));
   React.useEffect(() => {
-    if (!hasNav(navs, selected)) setSelected(firstLeafId(navs));
-  }, [role, navs, selected]);
+    if (!findById(navs, selected)) setSelected(firstLeafId(navs));
+  }, [navs, selected]);
 
-  const selectedItem = React.useMemo(() => findItemById(navs, selected), [navs, selected]);
+  const item = React.useMemo(() => findById(navs, selected), [navs, selected]);
+  const element = React.useMemo(() => {
+    if (!item) return null;
+    if (typeof item.to === "function") {
+      return (item.to as (ctx: RenderCtx) => React.ReactNode)({ services });
+    }
+    return item.to ?? null;
+  }, [item, services]);
+
+  // === NEW: sidebar plegable (con persistencia simple)
+  const [collapsed, setCollapsed] = React.useState<boolean>(() => {
+    try { return localStorage.getItem("sb-collapsed") === "1"; } catch { return false; }
+  });
+
+  const toggleCollapsed = React.useCallback(() => {
+    setCollapsed((v) => {
+      const next = !v;
+      try { localStorage.setItem("sb-collapsed", next ? "1" : "0"); } catch {}
+      return next;
+    });
+  }, []);
+
+  const handleSelect = React.useCallback((id: string) => {
+    setSelected(id);
+    const it = findById(navs, id);
+    if (!it) return;
+
+    // regla: si el ítem tiene autocollapse, colapsa.
+    // (Opcional) Solo en pantallas pequeñas:
+    const isNarrow = typeof window !== "undefined" && window.innerWidth < 1100;
+
+    if (it.autocollapse && (isNarrow || true /* quita esto si quieres sólo en móvil */)) {
+      setCollapsed(true);
+      try { localStorage.setItem("sb-collapsed", "1"); } catch {}
+    }
+  }, [navs]);
 
   return (
-    <div className="page layout layout--withSidebar">
-      {/* Sidebar SIEMPRE visible */}
-      <Sidebar navs={navs} selected={selected} onSelect={setSelected} />
-
-      <HeaderBar
-        user={user}
-        role={role}
-        onPrimaryAction={{ label: actionLabel, onClick: onAuthClick, disabled: false }}
-      />
-
+    <div className={`page layout layout--withSidebar ${collapsed ? "is-collapsed" : ""}`}>
+      <Sidebar navs={navs} selected={selected} onSelect={handleSelect} user={user} role={role} collapsed={collapsed} onToggle={toggleCollapsed}/>
       <main className="content content--withSidebar">
-        {/* Render genérico cuando la hoja ya trae `to` */}
-        {selectedItem?.to ?? (
-          <>
-            {/* Fallbacks por id, útil para hojas que requieren inyectar servicios */}
-            {selected === 'cajpos' && (
-              services?.Usuarios
-                ? <CajerosPOSForm services={{ Tickets: services.Tickets, Logs: services.Logs }} />
-                : <div>Cargando servicios…</div>
-            )}
-
-            {/* (Opcionales) Otros renders explícitos si quieres soportar ambos esquemas */}
-            {selected === 'home' && <Home />}
-            {selected === 'ticketform' && <NuevoTicketForm />}
-            {selected === 'ticketTable' && <TablaTickets />}
-            {selected === 'task' && <TareasPage />}
-            {selected === 'formatos' && <Formatos />}
-            {selected === 'info' && <InfoPage />}
-          </>
-        )}
+        <div className="page-viewport">
+          <div className="page page--fluid center-all">{element}</div>
+        </div>
       </main>
     </div>
   );
 }
+/* ============================================================
+   App root y gate de servicios
+   ============================================================ */
 
-/* ---------------------- App Root ---------------------- */
 export default function App() {
   return (
     <AuthProvider>
@@ -378,7 +420,7 @@ export default function App() {
   );
 }
 
-/* Gate: provee GraphServices sólo si hay cuenta (evita pedir token antes de login) */
+// Provee GraphServices solo si hay sesión iniciada
 function GraphServicesGate({ children }: { children: React.ReactNode }) {
   const { ready, account } = useAuth();
   if (!ready || !account) return <>{children}</>;

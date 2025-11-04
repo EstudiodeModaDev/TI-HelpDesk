@@ -1,5 +1,7 @@
 // src/utils/Commons.ts
 import type { GraphRest } from "../graph/GraphRest";
+import type { UsuariosSP } from "../Models/Usuarios";
+import type { UsuariosSPService } from "../Services/Usuarios.Service";
 
 export type EnsureIdsResult = { siteId: string; listId: string };
 
@@ -34,11 +36,6 @@ function saveCache(
   } catch {}
 }
 
-/**
- * Resuelve y devuelve { siteId, listId } para una lista de SharePoint usando Graph.
- * - Usa cache localStorage si está disponible.
- * - Corrige sitePath y evita el ":" sobrante al final.
- */
 export async function ensureIds(
   siteId: string | undefined,
   listId: string | undefined,
@@ -80,10 +77,38 @@ export async function ensureIds(
   return { siteId, listId };
 }
 
-
 export function  norm (s?: string){
  return (s ?? "").normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase().trim();
 }
+
+export async function pickTecnicoConMenosCasos(Usuarios: UsuariosSPService): Promise<UsuariosSP | null>{
+  const tecnicos = await Usuarios.getAll({filter: "fields/Rol eq 'Tecnico' and fields/Disponible eq 'Disponible'", top: 50});
+
+  console.table(tecnicos)
+
+  if (!tecnicos || tecnicos.length === 0) return null;
+
+  let min = Number.POSITIVE_INFINITY;
+  let candidatos: UsuariosSP[] = [];
+
+  for (const t of tecnicos) {
+    const carga = Number(t.Numerodecasos ?? 0); 
+    if (carga < min) {
+      min = carga;
+      candidatos = [t];
+    } else if (carga === min) {
+      candidatos.push(t);
+    }
+  }
+
+  const elegido = candidatos[Math.floor(Math.random() * candidatos.length)] ?? null;
+
+  if (elegido) {
+    console.log(`Asignar a: ${elegido.Title} (casos activos: ${elegido.Numerodecasos ?? 0})`);
+  }
+
+  return elegido;
+};
 
 export const fileToBase64 = (file: Blob): Promise<string> =>
   new Promise((resolve, reject) => {
@@ -105,3 +130,64 @@ export function fileToBasePA64(file: File): Promise<string> {
     fr.onerror = reject;
   });
 }
+
+export function truncateNoCutGraphemes(s: string, max: number, suffix = "...") {
+  const seg = new Intl.Segmenter("es", { granularity: "grapheme" });
+  const graphemes = Array.from(seg.segment(s), x => x.segment);
+  if (graphemes.length <= max) return s;
+
+  const upTo = graphemes.slice(0, max).join("");
+
+  // busca el último separador de palabra antes del límite
+  const m = upTo.match(/[\s\p{P}]+(?=[^\s\p{P}]*$)/u);
+  const cutAt = m ? upTo.length - m[0].length : upTo.length;
+
+  const safe = upTo.slice(0, cutAt).replace(/[.,;:!?\s]+$/u, "");
+  return safe + suffix;
+}
+
+const getByPath = (obj: any, path: string) => path.split(".").reduce((o, k) => (o == null ? o : o[k]), obj);
+
+export const sortByPath = (
+  path: string,
+  type: string = "string",
+  dir: string = "asc",
+  nulls: string = "last"
+) => {
+  const dirMul = dir === "asc" ? 1 : -1;
+  const nullMul = nulls === "first" ? -1 : 1;
+
+  return (a: any, b: any) => {
+    let va = getByPath(a, path);
+    let vb = getByPath(b, path);
+
+    const aNull = va == null || va === "";
+    const bNull = vb == null || vb === "";
+    if (aNull && bNull) return 0;
+    if (aNull) return nullMul;
+    if (bNull) return -nullMul;
+
+    if (type === "date") {
+      const ta = new Date(va).getTime();
+      const tb = new Date(vb).getTime();
+      return (ta - tb) * dirMul;
+    }
+
+    if (type === "number") {
+      const na = Number(va);
+      const nb = Number(vb);
+      // NaN al final siempre
+      const aNaN = Number.isNaN(na);
+      const bNaN = Number.isNaN(nb);
+      if (aNaN && bNaN) return 0;
+      if (aNaN) return 1;
+      if (bNaN) return -1;
+      return (na - nb) * dirMul;
+    }
+
+    // string
+    const sa = String(va);
+    const sb = String(vb);
+    return sa.localeCompare(sb, "es", { sensitivity: "base", numeric: true }) * dirMul;
+  };
+};

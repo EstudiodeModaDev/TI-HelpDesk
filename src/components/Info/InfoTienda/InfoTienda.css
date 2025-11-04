@@ -14,17 +14,20 @@
   --it-ring: 0 0 0 3px rgba(79, 70, 229, 0.35);
 }
 
-/* Modo oscuro automático (respetando el `dark:` del JSX) */
 @media (prefers-color-scheme: dark) {
   :root {
-    --it-bg: #0b1220;            /* navy/slate profundo */
-    --it-ink: #e5e7eb;
-    --it-ink-muted: #9ca3af;
-    --it-border: #1e293b;
-    --it-border-strong: #334155;
-    --it-row-alt: #0f172a;
-    --it-row-hover: #1e1b4b;     /* indigo-950 */
-    --it-shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
+    --it-bg: #ffffff;
+    --it-ink: #0f172a;
+    --it-ink-muted: #475569;
+    --it-border: #e2e8f0;
+    --it-border-strong: #cbd5e1;
+    --it-accent: #4f46e5;    /* Indigo-600 */
+    --it-accent-ink: #ffffff;
+    --it-row-alt: #f8fafc;   /* slate-50 */
+    --it-row-hover: #eef2ff; /* indigo-50 */
+    --it-shadow: 0 8px 24px rgba(2, 6, 23, 0.08);
+    --it-radius: 14px;
+    --it-ring: 0 0 0 3px rgba(79, 70, 229, 0.35);
   }
 }
 
@@ -33,14 +36,13 @@
 .store-info { color: var(--it-ink); }
 
 /* ========== Título ==========
-   Se complementa con las clases tailwind del JSX */
+
 .store-info h1 {
   letter-spacing: -0.02em;
 }
 
 /* ========== Formulario de acciones (input + botón + select) ========== */
-.store-info input[type="text"],
-.store-info select {
+.store-info input[type="text"], .store-info select {
   background: #fff;
   border: 1px solid var(--it-border);
   color: var(--it-ink);
@@ -48,16 +50,7 @@
   transition: box-shadow .15s ease, border-color .15s ease;
 }
 
-@media (prefers-color-scheme: dark) {
-  .store-info input[type="text"],
-  .store-info select {
-    background: #0f172a;
-    color: var(--it-ink);
-  }
-}
-
-.store-info input[type="text"]:focus,
-.store-info select:focus {
+.store-info input[type="text"]:focus, .store-info select:focus {
   outline: none;
   border-color: var(--it-accent);
   box-shadow: var(--it-ring);
@@ -68,6 +61,7 @@
   border-radius: 12px;
   box-shadow: var(--it-shadow);
 }
+
 .store-info button[type="submit"]:focus-visible {
   outline: none;
   box-shadow: var(--it-ring);
@@ -92,6 +86,7 @@
   border-radius: 10px;
   padding: .75rem 1rem;
 }
+
 @media (prefers-color-scheme: dark) {
   .store-info .alert-error {
     border-color: #7f1d1d;
@@ -109,8 +104,6 @@
   overflow: hidden;
 }
 
-/* ========== Tabla ==========
-   Refuerza estilos del JSX (zebra, hover, sticky col) */
 .store-info table {
   width: 100%;
   border-collapse: collapse;
@@ -122,6 +115,7 @@
 .store-info tbody tr:nth-child(even) {
   background: var(--it-row-alt);
 }
+
 .store-info tbody tr:hover {
   background: var(--it-row-hover);
 }
@@ -140,8 +134,7 @@
 }
 
 /* Bordes inferiores suaves */
-.store-info th[scope="row"],
-.store-info td {
+.store-info th[scope="row"], .store-info td {
   border-bottom: 1px solid var(--it-border);
   padding: .75rem 1rem;
   vertical-align: top;
@@ -149,9 +142,11 @@
 
 /* Valor vacío/N/A: estilo sutil (opcional, detectado por texto) */
 .store-info td:has(> code),
+
 .store-info td:has(> kbd) { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
 
 .store-info td:where(:has(> *)) { color: var(--it-ink); }
+
 .store-info .store-scroll {
   overflow: auto;
 }
@@ -199,9 +194,13 @@
   line-height: 1;
   border: 1px solid var(--it-border-strong);
 }
+
 .store-info .badge--muted { background: var(--it-row-alt); color: var(--it-ink-muted); }
+
 .store-info .badge--ok { background: #ecfdf5; border-color: #a7f3d0; color: #065f46; }
+
 .store-info .badge--warn { background: #fff7ed; border-color: #fed7aa; color: #9a3412; }
+
 .store-info .badge--danger { background: #fef2f2; border-color: #fecaca; color: #991b1b; }
 /* Barra de acciones: izquierda y derecha */
 .store-actions {
@@ -242,10 +241,65 @@
   }
 }
 
-
-
 /* ========== Compactación responsiva ========== */
 @media (max-width: 680px) {
   .store-info th[scope="row"] { width: 200px; }
   .store-info table { font-size: 0.9rem; }
+}
+
+/* === Forzar esquema claro SOLO en StoreInfo === */
+.store-info, .store-info *{
+  color-scheme: light !important;
+}
+
+/* Inputs y selects siempre claros en este scope */
+.store-info input[type="text"], .store-info select{
+  background: #ffffff !important;
+  color: #0f172a !important;
+  border: 1px solid var(--it-border) !important;
+  border-radius: 12px;
+}
+
+/* Placeholder y autofill (Chrome/Edge) */
+.store-info input::placeholder{ color: var(--it-ink-muted); }
+
+.store-info input[type="text"]:-webkit-autofill{
+  -webkit-box-shadow: 0 0 0 1000px #ffffff inset !important;
+  -webkit-text-fill-color: #0f172a !important;
+}
+
+/* === Botón 'Buscar' siempre claro dentro de .store-info === */
+.store-info button[type="submit"], .store-info button[type="submit"] *{
+  color-scheme: light !important;   /* neutraliza UI nativa en dark */
+}
+
+.store-info button[type="submit"]{
+  appearance: none;
+  -webkit-appearance: none;
+  background: #4f46e5 !important;   /* indigo-600 */
+  color: #ffffff !important;
+  border: 1px solid #4338ca;         /* indigo-700 */
+  border-radius: 12px;
+  box-shadow: var(--it-shadow);
+  transition: background .15s ease, box-shadow .15s ease, border-color .15s ease;
+}
+
+.store-info button[type="submit"]:hover{
+  background: #4338ca !important;    /* indigo-700 */
+}
+
+.store-info button[type="submit"]:focus-visible{
+  outline: none;
+  box-shadow: var(--it-ring);
+  border-color: #4338ca;
+}
+
+.store-info button[type="submit"]:disabled{
+  opacity: .6;
+  cursor: default;
+}
+
+/* Asegura que el ícono use el color del texto (blanco) */
+.store-info button[type="submit"] .i-lucide-check{
+  color: currentColor;
 }

@@ -1,10 +1,17 @@
-// src/components/RegistrarFactura/FacturaFiltros.tsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./FacturaFiltros.css";
 import type { ReFactura } from "../../../Models/RegistroFacturaInterface";
+import { opcionescc, opcionesco, opcionesun } from "../RegistroFactura";
 
-export default function FacturaFiltros() {
-  // 🔍 Estado interno para manejar los filtros
+/**
+ * 🔎 Componente de filtros reutilizable
+ * Recibe una prop `onFiltrar` para comunicar los filtros al padre.
+ */
+export default function FacturaFiltros({
+  onFiltrar,
+}: {
+  onFiltrar: (filtros: Partial<ReFactura>) => void;
+}) {
   const [filtros, setFiltros] = useState<Partial<ReFactura>>({
     FechaEmision: "",
     NoFactura: "",
@@ -14,7 +21,6 @@ export default function FacturaFiltros() {
     DescripItems: "",
   });
 
-  // 📘 Diccionario de opciones (mismo que en el registro principal)
   const opcionesFactura = [
     { codigo: "SC11", descripcion: "ARREND. EQ. COMPUTAC Y COMUNICACIÓN" },
     { codigo: "SC40", descripcion: "MMTO. EQ. COMPUTO Y COMU COMPRAS RC" },
@@ -23,13 +29,16 @@ export default function FacturaFiltros() {
     { codigo: "SC80", descripcion: "SERVICIO DE TELEFONIA" },
   ];
 
-  // 🧠 Maneja los cambios dentro del mismo componente
+  // 🔁 Llama automáticamente al padre cada vez que cambian los filtros
+  useEffect(() => {
+    onFiltrar(filtros);
+  }, [filtros]);
+
+  // 🧠 Actualiza los filtros locales
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
-
-    // Si cambia el ítem, también actualiza la descripción automáticamente
     if (name === "Items") {
       const seleccion = opcionesFactura.find((o) => o.codigo === value);
       setFiltros((prev) => ({
@@ -37,24 +46,18 @@ export default function FacturaFiltros() {
         Items: value,
         DescripItems: seleccion ? seleccion.descripcion : "",
       }));
+      
     } else {
       setFiltros((prev) => ({ ...prev, [name]: value }));
     }
   };
 
-  // 🧩 Renderizado
   return (
     <div className="filtros-container">
       <h3>🔍 Filtros de búsqueda</h3>
 
       <div className="filtros-grid">
-        <input
-          type="date"
-          name="FechaEmision"
-          value={filtros.FechaEmision || ""}
-          onChange={handleChange}
-          placeholder="Fecha"
-        />
+         
 
         <input
           type="text"
@@ -80,12 +83,8 @@ export default function FacturaFiltros() {
           placeholder="NIT"
         />
 
-        {/* 🧾 Ítem (Código + descripción automática) */}
-        <select
-          name="Items"
-          value={filtros.Items || ""}
-          onChange={handleChange}
-        >
+        {/* 🧾 Selector de ítem */}
+        <select name="Items" value={filtros.Items || ""} onChange={handleChange}>
           <option value="">Seleccionar código</option>
           {opcionesFactura.map((op) => (
             <option key={op.codigo} value={op.codigo}>
@@ -94,7 +93,6 @@ export default function FacturaFiltros() {
           ))}
         </select>
 
-        {/* 📝 Descripción del ítem (solo lectura) */}
         <input
           type="text"
           name="DescripItems"
@@ -102,6 +100,71 @@ export default function FacturaFiltros() {
           readOnly
           placeholder="Descripción del ítem"
         />
+
+
+        {/* 🧾 Selector de cc */}
+        <select name="CC" value={filtros.CC || ""} onChange={handleChange}>
+          <option value="">Sel centro cos</option>
+          {opcionescc.map((oc) => (
+            <option key={oc.codigo} value={oc.codigo}>
+              {oc.codigo} - {oc.descripcion}
+            </option>
+          ))}
+        </select>
+
+
+        {/* 🧾 Selector de co */}
+        <select name="CO" value={filtros.CO || ""} onChange={handleChange}>
+          <option value="">Sel centro ope</option>
+          {opcionesco.map((oco) => (
+            <option key={oco.codigo} value={oco.codigo}>
+              {oco.codigo} - {oco.descripcion}
+            </option>
+          ))}
+        </select>
+
+         {/* 🧾 Selector de un */}
+        <select name="un" value={filtros.un || ""} onChange={handleChange}>
+          <option value="">Sel und. negocio</option>
+          {opcionesun.map((ou) => (
+            <option key={ou.codigo} value={ou.codigo}>
+              {ou.codigo} - {ou.descripcion}
+            </option>
+          ))}
+        </select>
+
+
+       
+
+                <input
+          type="text"
+          name="DocERP"
+          value={filtros.DocERP || ""}
+          onChange={handleChange}   // ← 👈 falta esto
+          placeholder="Doc ERP"
+        />
+
+         <label>
+          Fecha entrega cont
+          <input
+            type="date"
+            name="FecEntregaCont"
+            value={filtros.FecEntregaCont || ""}
+            onChange={handleChange}
+          />
+        </label>
+
+        <label>
+            Fecha de emisión
+            <input
+              type="date"
+              name="FechaEmision"
+              value={filtros.FechaEmision || ""}
+              onChange={handleChange}
+            />
+          </label>
+
+
       </div>
     </div>
   );

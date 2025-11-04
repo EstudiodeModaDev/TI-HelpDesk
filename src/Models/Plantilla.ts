@@ -1,5 +1,10 @@
 export type Plantillas = {
-    Id: string;
+    Id?: string;
     Title: string;
     CamposPlantilla: string;
 };
+
+export type FormPlantillas = {
+    Titulo: string;
+    HTLM: string;
+}

@@ -1,0 +1,192 @@
+/* ==========================================================================
+   ActivityStatusCard – estilos base y tokens
+   ========================================================================== */
+
+/* ===== Tokens (puedes mapearlos a tu theme) ===== */
+.as-card {
+  --as-bg: #ffffff;
+  --as-fg: #111827;
+  --as-muted: #6b7280;
+  --as-border: #e5e7eb;
+  --as-shadow: 0 10px 28px rgba(0,0,0,.08);
+
+  /* Color de acento (stroke del anillo) – se puede sobreescribir via style */
+  --as-accent: #3b82f6;
+  --as-ring-track: #eef2f7;
+}
+
+/* Modo oscuro opcional (si tu app usa .dark en <html> o <body>) */
+.dark .as-card {
+  --as-bg: #0b1220;
+  --as-fg: #e5e7eb;
+  --as-muted: #9ca3af;
+  --as-border: #1f2937;
+  --as-shadow: 0 10px 28px rgba(0,0,0,.45);
+  --as-ring-track: #1e293b;
+}
+
+/* ==========================================================================
+   Contenedor principal
+   ========================================================================== */
+
+.as-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  width: 260px;                 /* aprox. como el mockup */
+  background: var(--as-bg);
+  color: var(--as-fg);
+  border: 1px solid var(--as-border);
+  border-radius: 16px;
+  padding: 14px 16px;
+  box-shadow: var(--as-shadow);
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  line-height: 1.25;
+}
+
+/* Título principal */
+.as-title {
+  font-size: 18px;
+  font-weight: 800;
+  margin: 0;
+}
+
+/* ==========================================================================
+   Anillo de progreso (SVG)
+   ========================================================================== */
+
+.as-ring {
+  position: relative;
+  display: grid;
+  place-items: center;
+  margin: 4px 0 8px;
+}
+
+.as-ring-svg {
+  display: block;
+  transform: rotate(-90deg); /* inicia en la parte superior */
+}
+
+/* pista circular */
+.as-ring-track {
+  fill: none;
+  stroke: var(--as-ring-track);
+  stroke-linecap: round;
+}
+
+/* progreso circular */
+.as-ring-progress {
+  fill: none;
+  stroke: var(--as-accent);
+  stroke-linecap: round;
+  transition: stroke-dashoffset 600ms ease;
+}
+
+/* valor en el centro del anillo */
+.as-ring-center {
+  position: absolute;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 2px;
+  font-weight: 800;
+}
+
+.as-ring-value {
+  font-size: 28px;
+}
+
+.as-ring-unit {
+  font-size: 14px;
+  color: var(--as-muted);
+}
+
+/* ==========================================================================
+   Sección de próximas tareas
+   ========================================================================== */
+
+.as-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.as-subtitle {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--as-muted);
+  margin: 0;
+}
+
+.as-tasklist {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 10px;
+}
+
+/* Cada tarea: título + fecha en dos líneas */
+.as-task {
+  display: grid;
+  gap: 2px;
+}
+
+.as-task-title {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.as-task-date {
+  font-size: 12px;
+  color: var(--as-muted);
+  display: flex;
+  gap: 6px;
+  align-items: baseline;
+}
+
+/* Día en grande (ej: “25”) y resto (mes corto y año) */
+.as-task-day {
+  font-weight: 800;
+}
+.as-task-rest {
+  opacity: .9;
+}
+
+/* Separador sutil (opcional) */
+.as-task + .as-task {
+  padding-top: 8px;
+  border-top: 1px dashed var(--as-border);
+}
+
+/* ==========================================================================
+   Footer / frecuencia
+   ========================================================================== */
+
+.as-footer {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  padding-top: 6px;
+  border-top: 1px solid var(--as-border);
+  margin-top: 4px;
+}
+
+.as-footer-value {
+  font-size: 18px;
+  font-weight: 900;
+}
+
+.as-footer-text {
+  font-size: 13px;
+  color: var(--as-muted);
+}
+
+/* ==========================================================================
+   Responsividad pequeña (si el card se usa más ancho)
+   ========================================================================== */
+
+@media (min-width: 360px) {
+  .as-card { width: 300px; }
+  .as-ring-value { font-size: 32px; }
+}

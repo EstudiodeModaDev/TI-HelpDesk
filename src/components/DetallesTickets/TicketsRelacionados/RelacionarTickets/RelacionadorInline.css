@@ -19,13 +19,21 @@
 
 @media (prefers-color-scheme: dark){
   :root{
-    --relc-bg:#0b1220;
-    --relc-elev:#111827;
-    --relc-ink:#e5e7eb;
-    --relc-muted:#9ca3af;
-    --relc-bd:#273244;
-    --relc-shadow:0 12px 32px rgba(0,0,0,.35);
-    --relc-shadow-pop:0 22px 50px rgba(0,0,0,.45);
+  color-scheme: light dark;
+  --relc-bg:#ffffff;
+  --relc-elev:#ffffff;
+  --relc-ink:#0f172a;
+  --relc-muted:#6b7280;
+  --relc-bd:#e5e7eb;
+  --relc-ring:rgba(45,109,246,.42);
+  --relc-accent:#2d6df6;
+  --relc-danger:#ef4444;
+  --relc-ok:#10b981;
+
+  --relc-radius:14px;
+  --relc-radius-sm:10px;
+  --relc-shadow:0 10px 26px rgba(2,6,23,.08);
+  --relc-shadow-pop:0 18px 40px rgba(2,6,23,.12);
   }
 }
 

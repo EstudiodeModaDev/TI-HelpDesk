@@ -1,175 +1,227 @@
-/* src/components/Tareas/ListaTareas.css */
-:root{
-  --card-bg:#fff; --card-bd:#e5e7eb; --text:#0f172a; --muted:#6b7280;
-  --radius:14px; --shadow:0 10px 28px rgba(2,6,23,.08);
-  --tab:#6b7280; --tab-active:#111827; --divider:#e5e7eb;
-  --link:#2563eb; --danger:#dc2626;
-}
-@media (prefers-color-scheme: dark){
-  :root{
-    --card-bg:#0f172a; --card-bd:#1f2937; --text:#e5e7eb; --muted:#9ca3af;
-    --shadow:0 12px 30px rgba(0,0,0,.35);
-    --tab:#9ca3af; --tab-active:#e5e7eb; --divider:#1f2937;
-    --link:#60a5fa; --danger:#f87171;
-  }
-}
-
+/* =========================================================
+   1) TOKENS (modo claro persistente)
+   =======================================================*/
 .lt-scope{
-  color-scheme: light;
+  color-scheme: light !important;
   isolation: isolate;
-
-  /* Tokens fijos en claro */
-  --card-bg:#ffffff;
-  --card-bd:#e5e7eb;
-  --text:#0f172a;
-  --muted:#6b7280;
-  --radius:14px;
-  --shadow:0 10px 28px rgba(2,6,23,.08);
-  --tab:#6b7280;
-  --tab-active:#111827;
-  --divider:#e5e7eb;
-  --link:#2563eb;
-  --danger:#dc2626;
-
-  background: transparent;  /* no oscurecer el contenedor */
+  --bg: #ffffff;
+  --card: #ffffff;
+  --card-soft: #fafbff;
+  --ink: #0f172a;
+  --muted: #6b7280;
+  --muted-2: #94a3b8;
+  --bd: #e6e8f0;
+  --bd-soft: #eef2ff;
+  --primary: #2563eb;
+  --primary-weak: rgba(37,99,235,.12);
+  --ok: #22c55e;
+  --warn: #f59e0b;
+  --danger: #ef4444;
+  --pill-bg: #f3f4f6;
+  --radius-xl: 18px;
+  --radius-lg: 14px;
+  --shadow: 0 10px 30px rgba(2,6,23,.08);
 }
 
+/* neutraliza dark global si existe */
+.dark .lt-scope, .dark .lt-scope *{ color-scheme: light !important; }
 
+/* =========================================================
+   2) CONTENEDOR / CARD
+   =======================================================*/
 .lt-card{
-  background:var(--card-bg);
-  border:1px solid var(--card-bd);
-  border-radius:var(--radius);
-  box-shadow:var(--shadow);
-  padding:0;
-  min-height: 420px;
+  background: var(--bg);
+  border: 1px solid var(--bd);
+  border-radius: 20px;
+  box-shadow: var(--shadow);
+  padding: 16px 14px 12px;
 }
 
-.lt-header{
-  padding: 12px 16px 0;
-}
+/* =========================================================
+   3) HEADER + TABS
+   =======================================================*/
+.lt-header{ display: grid; gap: 8px; }
+
 .lt-title{
-  margin: 8px 0 10px; text-align:center; font-size:1.25rem; font-weight:700; color:var(--text);
+  margin: 0 4px 2px;
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--ink);
+  letter-spacing: .2px;
 }
 
 .lt-tabs{
-  display:flex; gap:10px; justify-content:flex-end; padding: 0 4px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 0 4px;
 }
+
 .lt-tab{
-  background:transparent; border:none; color:var(--tab); cursor:pointer;
-  padding:6px 8px; border-radius:8px;
+  appearance: none;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--muted);
+  font-weight: 700;
+  font-size: 14px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background .15s ease, color .15s ease, border-color .15s ease;
 }
-.lt-tab.is-active{ color:var(--tab-active); background:rgba(2,6,23,.05); }
-@media (prefers-color-scheme: dark){
-  .lt-scope{
-    --card-bg:#ffffff !important;
-    --card-bd:#e5e7eb !important;
-    --text:#0f172a !important;
-    --muted:#6b7280 !important;
-    --tab:#6b7280 !important;
-    --tab-active:#111827 !important;
-    --divider:#e5e7eb !important;
-    --link:#2563eb !important;
-    --danger:#dc2626 !important;
-    --shadow:0 10px 28px rgba(2,6,23,.08) !important;
-  }
+.lt-tab:hover{ color: var(--ink); }
+.lt-tab.is-active{
+  color: #1e40af;                      /* azul más intenso */
+  background: #eef2ff;                 /* píldora azul clara */
+  border-color: #e0e7ff;
 }
-/* Lista con scroll propio */
+
+/* =========================================================
+   4) LISTA
+   =======================================================*/
 .lt-list{
-  padding: 0 0 8px;
-  max-height: min(68vh, 720px);
-  overflow: auto;
-  border-top:1px solid var(--divider);
+  display: grid;
+  gap: 12px;
+  margin-top: 6px;
+  padding: 6px 4px 12px;
 }
 
-/* Ítem */
+/* =========================================================
+   5) ITEM / CARD SUAVE
+   =======================================================*/
 .lt-item{
-  padding:14px 16px;
-  border-bottom:1px solid var(--divider);
+  background: var(--card);
+  border: 1px solid var(--bd);
+  border-radius: var(--radius-xl);
+  padding: 14px 16px 12px;
+  box-shadow: 0 1px 0 var(--bd-soft) inset;
 }
+
 .lt-item__head{
-  display:flex; align-items:center; gap:10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
+
 .lt-item__title{
-  margin:0; font-size:1.05rem; font-weight:700; color:var(--text);
-  flex:1; min-width:0;
+  margin: 0;
+  color: var(--ink);
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: .2px;
+  flex: 1;
+  min-width: 0;
 }
+
+/* Estado a la derecha (punto + texto) */
 .lt-badge{
-  font-size:.9rem; display:inline-flex; align-items:center; gap:6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--muted);
 }
-.lt-badge.pendiente{ color:#ef4444; }     /* rojo */
-.lt-badge.iniciada{ color:#f59e0b; }      /* ámbar */
-.lt-badge.finalizada{ color:#22c55e; }    /* verde */
+.lt-badge::before{
+  content: "";
+  width: 9px; height: 9px;
+  border-radius: 999px;
+  background: var(--muted);
+}
+/* mapea tus estados: pendiente / iniciadas / finalizadas */
+.lt-badge.pendiente{ color: #f59e0b; }
+.lt-badge.pendiente::before{ background: #f59e0b; }
+.lt-badge.iniciadas,
+.lt-badge.en-progreso{ color: var(--ok); }
+.lt-badge.iniciadas::before,
+.lt-badge.en-progreso::before{ background: var(--ok); }
+.lt-badge.finalizadas{ color: var(--ok); }
+.lt-badge.finalizadas::before{ background: var(--ok); }
 
+/* =========================================================
+   6) META (líneas secundarias)
+   =======================================================*/
 .lt-meta{
-  margin:8px 0 0; padding:0; list-style:none; color:var(--muted); font-size:.95rem;
-  display:grid; gap:4px;
+  list-style: none;
+  padding: 6px 0 0;
+  margin: 4px 0 8px;
+  display: grid;
+  gap: 4px;
+  color: var(--muted);
+  font-size: 14px;
+}
+.lt-meta strong{
+  color: var(--ink);
+  font-weight: 800;
 }
 
+/* Etiquetas tipo “Alta / Media / Baja” y fechas */
+.lt-chip{
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 13px;
+  background: var(--pill-bg);
+  color: var(--muted);
+  border: 1px solid #eceff3;
+}
+.lt-chip::before{
+  content: "";
+  width: 8px; height: 8px;
+  border-radius: 999px;
+  background: var(--muted);
+}
+
+/* variantes de prioridad */
+.lt-chip.alta{ background:#fde9e9; color:#b91c1c; border-color:#fbd2d2; }
+.lt-chip.alta::before{ background:#ef4444; }
+.lt-chip.media{ background:#fff3d6; color:#a16207; border-color:#ffe6ad; }
+.lt-chip.media::before{ background:#f59e0b; }
+.lt-chip.baja{ background:#eaf8ee; color:#166534; border-color:#d4f0de; }
+.lt-chip.baja::before{ background:#22c55e; }
+
+/* fecha “neutra” */
+.lt-date{
+  color: var(--muted-2);
+  font-weight: 700;
+  margin-left: 10px;
+}
+
+/* =========================================================
+   7) ACCIONES
+   =======================================================*/
 .lt-actions{
-  display:flex; justify-content:flex-end; gap:12px; margin-top:8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
 }
+
+/* Link a la izquierda/derecha según necesites */
 .lt-link{
-  background:transparent; border:none; color:var(--link); cursor:pointer; padding:4px 6px;
+  appearance: none;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  color: var(--primary);
+  font-weight: 800;
+  font-size: 14px;
+  cursor: pointer;
+  transition: opacity .15s ease;
 }
-.lt-link:hover{ text-decoration:underline; }
-.lt-link.danger{ color:var(--danger); }
+.lt-link:hover{ opacity: .85; }
+.lt-link.danger{ color: #b91c1c; }
 
-/* === Forzar tema CLARO solo en ListaTareas === */
-.lista-tareas {
-  /* evita que el navegador invierta estilos en dark-mode */
-  color-scheme: light;
-  isolation: isolate;
-
-  /* tokens fijos en claro (sobrescriben los :root previos) */
-  --card-bg: #ffffff;
-  --card-bd: #e5e7eb;
-  --text: #0f172a;
-  --muted: #6b7280;
-  --radius: 14px;
-  --shadow: 0 10px 28px rgba(2,6,23,.08);
-  --tab: #6b7280;
-  --tab-active: #111827;
-  --divider: #e5e7eb;
-  --link: #2563eb;
-  --danger: #dc2626;
+/* =========================================================
+   8) UTILIDADES (para construir la línea inferior del item)
+   - Úsalas en tu render si quieres chips + fecha + acción
+   =======================================================*/
+.lt-row{
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 12px;
 }
-
-/* Si el SO está en oscuro, mantenemos los mismos valores claros */
-@media (prefers-color-scheme: dark) {
-  .lista-tareas {
-    --card-bg: #ffffff !important;
-    --card-bd: #e5e7eb !important;
-    --text: #0f172a !important;
-    --muted: #6b7280 !important;
-    --shadow: 0 10px 28px rgba(2,6,23,.08) !important;
-    --tab: #6b7280 !important;
-    --tab-active: #111827 !important;
-    --divider: #e5e7eb !important;
-    --link: #2563eb !important;
-    --danger: #dc2626 !important;
-  }
-}
-
-/* Opcional: leves mejoras de interacción coherentes en claro */
-.lista-tareas .lt-tab.is-active { background: rgba(2,6,23,.05); }
-.lista-tareas .lt-link:hover { text-decoration: underline; }
-.lista-tareas .lt-card { background: var(--card-bg); color: var(--text); }
-.lt-scope .lt-card{
-  background:#fff !important;
-  color:var(--text) !important;
-  border:1px solid var(--card-bd) !important;
-  box-shadow:var(--shadow) !important;
-}
-.lt-scope .lt-field input,
-.lt-scope .lt-field select{
-  background:#fff !important;
-  color:var(--text) !important;
-  border:1px solid var(--card-bd) !important;
-}
-.lt-scope .lt-field input::placeholder{ color:var(--muted) !important; }
-
-/* Tabs y links */
-.lt-scope .lt-tab.is-active{ background:rgba(2,6,23,.05) !important; color:var(--tab-active) !important; }
-.lt-scope .lt-link{ color:var(--link) !important; }
-.lt-scope .lt-link.danger{ color:var(--danger) !important; }
-

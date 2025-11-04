@@ -19,7 +19,7 @@ export default function FormTarea() {
       Tareas: TareasService;
     };
   const { handleSubmit, errors, setField, state } = useTareas(Tareas);
-  const {workersOptions, loadingWorkers, error: usersError, } = useWorkers({ onlyEnabled: true, domainFilter: "estudiodemoda.com.co" });
+  const {workersOptions, loadingWorkers, error: usersError, } = useWorkers({ onlyEnabled: true });
   const { franqOptions, loading: loadingFranq, error: franqError,} = useFranquicias(FranquiciasSvc);
 
   // Deduplicación y orden

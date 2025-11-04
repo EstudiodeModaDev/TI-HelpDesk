@@ -1,148 +1,519 @@
-/* ====== Layout general a ancho completo ====== */
-.detalle-ticket{
-  width: 100%;
-  max-width: 100%;
-  margin-inline: 0;
+/* === 1) Caja ÚNICA === */
+.case-detail{
   background: #fff;
-  border: 1px solid #e5e7eb;
-  border-radius: 14px;
-  box-shadow: 0 10px 24px rgba(0,0,0,.06);
-  padding: 18px 20px 22px;
-  color: #0b2b6a;
+  border: 1px solid #d9dde3;
+  border-radius: 8px;
+  padding: 12px;
 }
 
-/* (Opcional) Si tu contenedor padre limita el ancho y quieres
-   que la tarjeta “sangre” de borde a borde de la ventana:
-   .detalle-ticket { width: 100vw; margin-left: calc(50% - 50vw); } */
-
-/* Título */
-.detalle-ticket h2{
-  margin: 4px 0 16px;
-  font-size: 1.1rem;
-  font-weight: 800;
-  letter-spacing: .2px;
-}
-
-/* ====== Grid de campos: 3 columnas ====== */
-.fila{
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr)); /* 3 cols */
-  gap: 24px 36px;
-  padding: 14px 0;
-  border-bottom: 1px solid #e5e7eb;
-}
-.fila:last-of-type{ border-bottom: 0; }
-
-/* Utilidades de span para campos largos */
-.campo--span-2 { grid-column: span 2; }
-.campo--span-3 { grid-column: 1 / -1; } /* ocupa las 3 columnas */
-
-/* Cada campo */
-.campo{
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-.campo > label{
-  font-size: .78rem;
-  color: #6b7280;
-  font-weight: 700;
-  letter-spacing: .3px;
-}
-.campo > span{
-  font-size: 1rem;
-  color: #0f172a;
-  line-height: 1.45;
-  word-break: break-word;
-}
-
-/* Descripción con ancho completo (aplícale .campo--span-3 en JSX) */
-.campo > span img,
-.campo > span video{
-  display: block;
-  max-width: 100%;
-  height: auto;
-  border-radius: 10px;
-  margin-top: 10px;
-  background: #000;
-}
-
-/* Botón volver */
-.btn-volver{
-  appearance: none;
-  border: none;
-  background: #f1f5f9;
-  color: #0f172a;
-  padding: 8px 12px;
-  border-radius: 10px;
-  cursor: pointer;
-  font-weight: 600;
+/* header con borde inferior sutil */
+.cd-header{
+  display:flex; align-items:center; justify-content:space-between;
   margin-bottom: 10px;
-  transition: transform .06s ease, box-shadow .2s ease, background .2s;
-}
-.btn-volver:hover{
-  transform: translateY(-1px);
-  box-shadow: 0 6px 14px rgba(2,6,23,.08);
-}
-.btn-volver:active{ transform: translateY(0); }
-
-/* Botón “Seguimiento ticket” (look primario) */
-.detalle-ticket > div > .btn-volver{
-  background: #62d4bf;
-  color: #083b35;
-  padding: 10px 16px;
-  margin-top: 10px;
-}
-.detalle-ticket > div > .btn-volver:hover{
-  background: #48b7a3;
-  box-shadow: 0 8px 18px rgba(72,183,163,.25);
+  padding-bottom: 8px;
+  border-bottom: 1px solid #eef1f4;
 }
 
-/* Link-like (categoría clickeable) */
-.link-like,
-.as-text{
-  background: none;
-  border: 0;
-  padding: 0;
-  margin: 0;
-  color: #0ea5e9;
-  cursor: pointer;
-  text-decoration: underline;
-  font: inherit;
-  text-align: left;
-  line-height: inherit;
-}
-.link-like:hover, .as-text:hover { color: #0284c7; }
-.as-text:focus-visible{
-  outline: 2px solid #94a3b8;
-  outline-offset: 2px;
-  border-radius: 4px;
+/* === 2) Grid interno de 3 columnas SIN paneles === */
+.cd-grid{
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px 16px;           /* row-gap / column-gap */
 }
 
-/* ====== Breakpoints ====== */
+/* Quita “cajas” de columna (si existía) */
+.cd-panel{ background: transparent; border: 0; padding: 0; }
+
+/* Cada fila (label/valor) conserva su cajita */
+.cd-row{
+  display: grid;
+  grid-template-columns: 220px minmax(0,1fr);
+  gap: 10px;
+  margin: 0;               /* limpio */
+}
+.cd-label{
+  background: #eceff3;
+  border: 1px solid #d9dde3;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-weight: 700;
+}
+.cd-value{
+  background: #fff;
+  border: 1px solid #d9dde3;
+  border-radius: 8px;
+  padding: 10px 12px;
+  min-height: 36px;
+  display: flex; align-items: center; gap: 8px;
+}
+
+/* Pastilla y badge (como ya lo tienes) */
+.cd-pill{ background:#fff; border:1px solid #d9dde3; border-radius:6px; padding:6px 8px; font-weight:600; }
+.cd-badge{ display:inline-block; padding:6px 10px; border-radius:999px; font-weight:700; font-size:12px; }
+.cd-badge.is-open{ background:#e7f6f1; color:#118a72; border:1px solid #cfe9e2; }
+.cd-badge.is-closed{ background:#f5f7fa; color:#243341; border:1px solid #e4e7ec; }
+.as-text{ background:none; border:none; padding:0; color:#1e63c6; font-weight:600; cursor:pointer; }
+.as-text:hover{ text-decoration:underline; }
+
+/* === 3) Ubicaciones dentro del grid === */
+/* (Los Row se colocan automáticamente ocupando 1 columna) */
+
+/* La franja de personas ocupa columnas 2 y 3 */
+.cd-people{
+  grid-column: 2 / span 2;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+.cd-people-item{ border:1px solid #d9dde3; border-radius:8px; overflow:hidden; background:#fff; }
+.cd-people-label{ background:#eceff3; padding:8px 10px; font-weight:700; border-bottom:1px solid #d9dde3; }
+.cd-people-value{ padding:8px 10px; min-height:34px; display:flex; align-items:center; }
+
+/* Título/Descripción/Casos se quedan en la columna 3 */
+.cd-fields{ grid-column: 3; }
+.cd-fields .cd-row{ margin: 0 0 10px; }
+.cd-fields .cd-value{ align-items: flex-start; }
+.cd-fields .cd-value p{ margin:0; }
+
+/* ===== Tickets Asociados (sección inferior dentro de la misma caja) ===== */
+.seccion{
+  grid-column: 1 / -1;        /* ocupa las 3 columnas */
+  background: #fff;
+  border-top: 1px solid #eef1f4;
+  padding-top: 10px;
+  margin-top: 4px;
+}
+
+/* Opcional: si quieres una línea vertical tenue entre columnas */
+.cd-grid.cd-grid--dividers > *{ position:relative; }
+.cd-grid.cd-grid--dividers > *:not(:nth-child(3n))::after{
+  content:""; position:absolute; top:0; right:-8px; bottom:0; width:1px; background:#e8ecf1;
+}
+
+/* === Responsive === */
 @media (max-width: 1100px){
-  .fila{ grid-template-columns: repeat(2, minmax(0,1fr)); } /* 2 cols */
-}
-@media (max-width: 700px){
-  .fila{ grid-template-columns: 1fr; gap: 14px; } /* 1 col */
-  .detalle-ticket{ padding: 14px; }
-  .detalle-ticket h2{ font-size: 1rem; margin-bottom: 10px; }
+  .cd-grid{ grid-template-columns: 1fr 1fr; }
+  .cd-people{ grid-column: 1 / -1; } /* ocupa todo el ancho */
+  .cd-fields{ grid-column: 1 / -1; }
 }
 
-.tabla-tickets{
-  padding-left: 0;
-  padding-right: 0;
+@media (max-width: 720px){
+  .cd-grid{ grid-template-columns: 1fr; }
+  .cd-row{ grid-template-columns: 160px 1fr; }
 }
 
-.tabla-tickets > .detalle-ticket{
-  width: 100% !important;
-  max-width: none !important;
-  margin: 0 !important;
+/* === GRID LÓGICO: 3 columnas, autoflow denso === */
+.cd-grid{
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-auto-rows: min-content;
+  grid-auto-flow: dense;
+  gap: 12px 16px;
 }
 
-.detalle-ticket--bleed{
-  width: 100vw;
-  margin-left: calc(50% - 50vw);
-  margin-right: calc(50% - 50vw);
+/* Utilidades de colocación */
+.col-1 { grid-column: 1; }
+.col-2 { grid-column: 2; }
+.col-3 { grid-column: 3; }
+.span-2 { grid-column: span 2; }
+.full  { grid-column: 1 / -1; }
+
+.row-span-2 { grid-row: span 2; }     /* alto doble */
+.row-tall   .cd-value { min-height: 96px; } /* alto cómodo para textos */
+.row-lg     .cd-value { min-height: 140px; }
+
+/* Franja personas y campos a la derecha */
+.cd-people { grid-column: 2 / span 2; }   /* ocupa columnas 2 y 3 */
+.cd-fields { grid-column: 3; }            /* bloque derecho */
+
+@media (max-width: 1100px){
+  .cd-grid{ grid-template-columns: 1fr 1fr; }
+  .cd-people, .cd-fields { grid-column: 1 / -1; }
 }
+@media (max-width: 720px){
+  .cd-grid{ grid-template-columns: 1fr; }
+  .col-1, .col-2, .col-3, .span-2, .full { grid-column: 1 !important; }
+}
+
+/* === GRID LÓGICO: 3 columnas, autoflow denso === */
+.cd-grid{
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px 16px;
+  grid-auto-rows: min-content;
+}
+
+/* Utilidades de colocación por CELDA */
+.pos-apertura   { grid-column: 1; grid-row: 1; }
+.pos-solucion   { grid-column: 2; grid-row: 1; }
+.pos-categoria  { grid-column: 3; grid-row: 1; }
+
+.pos-estado     { grid-column: 1; grid-row: 2; }
+.pos-ans        { grid-column: 2; grid-row: 2; }
+
+.pos-fuente     { grid-column: 1; grid-row: 3 / span 2; }   /* alto doble */
+.pos-people     { grid-column: 2 / span 2; grid-row: 3; }   /* ocupa col 2-3 */
+
+.pos-titulo     { grid-column: 3; grid-row: 4; }
+.pos-descr      { grid-column: 3; grid-row: 5; }
+.pos-casos      { grid-column: 3; grid-row: 6; }
+
+/* tickets asociados ocupa todo el ancho del grid */
+.seccion{ grid-column: 1 / -1; }
+
+@media (max-width: 1100px){
+  .cd-grid{ grid-template-columns: 1fr 1fr; }
+  .pos-people, .pos-titulo, .pos-descr, .pos-casos{ grid-column: 1 / -1; }
+  .pos-fuente{ grid-row: auto; grid-column: 1 / -1; }
+}
+
+@media (max-width: 720px){
+  .cd-grid{ grid-template-columns: 1fr; }
+  .cd-row{ grid-template-columns: 160px 1fr; }
+}
+
+/* === Grid base (ya lo tienes) === */
+.cd-grid{
+  display:grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px 16px;
+  grid-auto-rows: min-content;
+}
+
+/* ===== POSICIONES NUEVAS ===== */
+/* Fila 1 */
+.pos-apertura { grid-column: 1; grid-row: 1; }
+
+.pos-solucion { grid-column: 2; grid-row: 1; }
+
+.pos-fuente   { grid-column: 3; grid-row: 1; }   /* aquí colocamos “Fuente solicitante” */
+
+/* Fila 2 */
+.pos-categoria{ grid-column: 1; grid-row: 2; }
+
+.pos-ans      { grid-column: 2; grid-row: 2; }
+
+.pos-estado   { grid-column: 3; grid-row: 2; }
+
+/* Fila 3: franja personas en una sola fila (4 cajas internas) */
+.pos-people   { grid-column: 1 / -1; grid-row: 3; }
+
+/* Fila 4-6: bloques independientes full-width */
+.pos-titulo   { grid-column: 1 / -1; grid-row: 4; }
+
+.pos-descr    { grid-column: 1 / -1; grid-row: 5; }
+
+.pos-casos    { grid-column: 1 / -1; grid-row: 6; }
+
+/* Franja de personas: 4 columnas internas */
+.cd-people{
+  display:grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+@media (max-width: 1100px){
+  .cd-grid{ grid-template-columns: 1fr 1fr; }
+  .pos-people, .pos-titulo, .pos-descr, .pos-casos{ grid-column: 1 / -1; }
+}
+
+@media (max-width: 720px){
+  .cd-grid{ grid-template-columns: 1fr; }
+  .cd-row{ grid-template-columns: 160px 1fr; }
+}
+
+/* ====== Ajustes base “fluid” ====== */
+.case-detail{
+  /* padding fluido: 10–16px según ancho */
+  padding: clamp(10px, 2.2vw, 16px);
+}
+
+.cd-grid{
+  /* gaps un poco más compactos en general */
+  gap: clamp(8px, 1.6vw, 16px) clamp(10px, 1.8vw, 16px);
+}
+
+.cd-label, .cd-value{
+  /* altura cómoda pero no rígida para que quepa texto en móvil */
+  min-height: 36px;
+}
+
+/* ====== Tablet y pantallas medianas ====== */
+@media (max-width: 1024px){
+  .cd-grid{
+    grid-template-columns: 1fr 1fr;   /* de 3 a 2 columnas */
+  }
+
+  /* Opcional: compacta tipografías un punto */
+  .cd-label{ font-size: 0.95rem; }
+
+  .cd-value{ font-size: 0.95rem; }
+
+  /* Franja de personas a todo el ancho y 2 columnas internas */
+  .pos-people{ grid-column: 1 / -1; } 
+  
+  .cd-people{
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  /* Bloques grandes a ancho completo para lectura */
+  .pos-titulo, .pos-descr, .pos-casos{
+    grid-column: 1 / -1;
+  }
+
+  /* Labels un poco más estrechos en filas label/valor */
+  .cd-row{
+    grid-template-columns: 180px minmax(0,1fr);
+    gap: 8px 10px;
+  }
+}
+
+/* ====== Teléfonos (stack real, una columna) ====== */
+@media (max-width: 680px){
+  .cd-grid{
+    grid-template-columns: 1fr;     /* 1 columna */
+    grid-auto-rows: auto;
+  }
+
+  /* Todas las posiciones pasan a full-width sin sorpresas */
+  .col-1, .col-2, .col-3, .span-2, .full, .pos-apertura, .pos-solucion, .pos-fuente, .pos-categoria, .pos-ans, .pos-estado, .pos-people, .pos-titulo, .pos-descr, .pos-casos{
+    grid-column: 1 / -1 !important;
+  }
+
+  /* FILAS: apila label sobre valor para ahorrar ancho */
+  .cd-row{
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  .cd-label{
+    padding: 8px 10px;
+    font-size: 0.92rem;
+    border-radius: 8px;
+  }
+
+  .cd-value{
+    padding: 10px;
+    min-height: unset;    
+  }
+
+  /* Franja de personas: scroll horizontal con snap (comodísimo en móvil) */
+  .cd-people{
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(240px, 1fr);  /* cards legibles */
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    gap: 10px;
+    padding-bottom: 6px;
+  }
+
+  .cd-people-item{
+    scroll-snap-align: start;
+    min-width: 240px;
+  }
+
+  /* Pastillas y badges: permiten salto de línea y truncado amigable */
+  .cd-value, .cd-pill, .cd-badge{
+    white-space: normal;
+    word-break: break-word;
+  }
+
+  .cd-value .truncate{
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+  }
+
+  /* Reduce un poco sombras y bordes para menos ruido visual */
+  .cd-label, .cd-value, .cd-people-item{
+    border-color: #e5e9ef;
+  }
+}
+
+/* ====== Teléfonos muy pequeños ====== */
+@media (max-width: 400px){
+  .case-detail{ padding: 10px; }
+  .cd-label{ font-size: 0.88rem; padding: 7px 9px; }
+  .cd-value{ font-size: 0.92rem; padding: 9px; }
+
+  /* Botones tipo “as-text” más tocables */
+  .as-text{
+    padding: 6px 4px;
+    margin: -4px;
+  }
+
+  /* Personas un poco más estrechas para caber mejor */
+  .cd-people{
+    grid-auto-columns: minmax(200px, 85%);
+  }
+}
+
+/* ====== Accesibilidad y pulido ====== */
+/* Evita animaciones bruscas si el usuario las desactiva */
+@media (prefers-reduced-motion: reduce){
+  *{ animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}
+
+/* Evita que chips/badges rompan el layout por espacios largos */
+.cd-badge, .cd-pill{ white-space: nowrap; }
+.cd-value{ min-width: 0; } /* clave para truncar en grid */
+
+/* ===== Tokens para controlar el ancho del label ===== */
+:root{
+  --cd-label-min: 0px;          /* mínimo real (permite truncar si hace falta) */
+  --cd-label-ideal: 18vw;       /* ancho preferido relativo al viewport */
+  --cd-label-max: 180px;        /* techo en desktop */
+}
+
+/* === Fila label/valor con label responsivo (min 0, max X) === */
+/* clamp(min, ideal, max) garantiza que no se pase del máximo ni baje del mínimo */
+.cd-row{
+  grid-template-columns: clamp(var(--cd-label-min), var(--cd-label-ideal), var(--cd-label-max)) minmax(0, 1fr);
+}
+
+/* Seguro para truncado dentro de grid (evita desbordes) */
+.cd-label{ 
+  min-width: 0;                 /* <- importante para que clamp funcione bien */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;          /* quítalo si prefieres que el label salte de línea */
+}
+
+/* ===== Ajustes por “breakpoint” ===== */
+/* Tablet: labels un poco más angostos y techo más bajo */
+@media (max-width: 1024px){
+  :root{
+    --cd-label-ideal: 28vw;     /* más flexible en pantallas medianas */
+    --cd-label-max: 180px;      /* techo más pequeño */
+  }
+}
+
+/* Teléfonos: ya apilas label encima del valor; por si mantienes 2 columnas, lo hacemos aún más compacto */
+@media (max-width: 680px){
+  :root{
+    --cd-label-ideal: 40vw;
+    --cd-label-max: 150px;
+  }
+}
+
+/* Muy pequeños */
+@media (max-width: 400px){
+  :root{
+    --cd-label-ideal: 48vw;
+    --cd-label-max: 140px;
+  }
+}
+
+/* —— Botón “link” dentro de cd-value: reset fuerte —— */
+.cd-value button.as-text,
+.cd-value .as-text {
+  /* quita cualquier estilo heredado de botones */
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+  margin: 0;
+  display: inline;              /* no bloque, no pill */
+  color: #1e63c6 !important;
+  font: inherit;                /* hereda tipografía del contenedor */
+  font-weight: 600;
+  line-height: 1.25;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  
+  /* truncado seguro dentro de la cajita */
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* hover/focus accesibles sin fondo raro */
+.cd-value .as-text:hover {
+  text-decoration: underline;
+  background: transparent !important;
+}
+.cd-value .as-text:focus-visible {
+  outline: 2px solid #1e63c6;      /* aro claro */
+  outline-offset: 2px;
+  border-radius: 2px;
+  background: transparent !important;
+}
+
+/* Si tienes un reset global tipo 'button { background: ... }',
+   esto lo neutraliza específicamente cuando lleva .as-text */
+button.as-text {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+
+/* ---- truncado responsivo ---- */
+.trunc{
+  min-width: 0;
+  display: block;
+  /* en desktop no forzamos truncado */
+}
+
+/* En pantallas pequeñas: truncar a N líneas (por defecto 1) */
+@media (max-width: 720px){
+  .trunc{
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: var(--lines, 1);
+    -webkit-box-orient: vertical;
+    text-overflow: ellipsis;
+    word-break: break-word;
+  }
+}
+
+/* ---- tooltip al pasar el mouse (desktop) ---- */
+@media (hover:hover){
+  .ttip{ position: relative; }
+  .ttip:hover::after{
+    content: attr(data-full);
+    position: fixed;             /* evita que contenedores con overflow lo recorten */
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
+    max-height: 60vh;
+    overflow: auto;
+    padding: 10px 12px;
+    background: #111827;
+    color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.25);
+    z-index: 9999;
+    white-space: pre-wrap;
+    word-break: break-word;
+    font-size: 14px;
+    line-height: 1.35;
+  }
+}
+
+/* Opcional: borde sutil al foco teclado */
+.ttip:focus-visible{
+  outline: 2px solid #1e63c6;
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* ---- descripción HTML: clampa solo en móvil (3–5 líneas) ---- */
+@media (max-width: 720px){
+  .html-trunc{
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 5;       /* ajusta a gusto */
+    -webkit-box-orient: vertical;
+  }
+  .html-trunc p{ margin: 0 0 .5rem 0; }
+}
+

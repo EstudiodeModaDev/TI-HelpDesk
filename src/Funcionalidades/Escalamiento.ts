@@ -11,8 +11,6 @@ import type { Escalamiento, } from "../Models/FlujosPA";
 import type { InternetTiendasService } from "../Services/InternetTiendas.service";
 import type { FormEscalamientoStateErrors } from "../Models/nuevoTicket";
 
-const normLower = (s?: string | null) =>
-  String(s ?? "").normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase().trim();
 const normUpper = (s?: string | null) =>
   String(s ?? "").normalize("NFD").replace(/\p{Diacritic}/gu, "").toUpperCase().trim();
 
@@ -86,32 +84,30 @@ export function useEscalamiento(correoSolicitante: string, ticketId: string) {
         setLoading(true);
         setError(null);
         try {
-        const correoNorm = normLower(correoSolicitante);
-        const Tiendas = await IntTiendasSvc.getAll({filter: `fields/CORREO eq '${String(correoNorm).replace(/'/g, "''")}'`,top: 1});
+        const Tiendas = await IntTiendasSvc.getAll({filter: `fields/CORREO eq '${correoSolicitante}'`,top: 1});
         const tiendaSel = Tiendas[0]
         setInfoInternet(tiendaSel)
 
         if (tiendaSel) {
             const compNorm = normUpper((tiendaSel as any).Compa_x00f1__x00ed_a);
-            const Companias = await SociedadesSvc.getAll({filter: `fields/CORREO eq '${String(correoNorm).replace(/'/g, "''")}'`,top: 1});
-            const comp = (Companias ?? []).find((s: Sociedades) => normUpper(s.Title) === compNorm) ?? null;
-            setCompania(comp);
+            const sociedades = await SociedadesSvc.get(compNorm)
+            setCompania(sociedades);
 
             //Setear state
             setState({
                 apellidos: account?.name!,
                 cedula: "",
-                centroComercial: infoInternet?.Centro_x0020_Comercial ?? "",
-                ciudad: infoInternet?.Title ?? "",
+                centroComercial: tiendaSel?.Centro_x0020_Comercial ?? "",
+                ciudad: tiendaSel?.Title ?? "",
                 descripcion: "",
-                empresa: infoInternet?.Compa_x00f1__x00ed_a ?? "",
-                identificador: infoInternet?.IDENTIFICADOR ?? "",
-                local: infoInternet?.Local ?? "",
-                nit: compania?.Nit ?? "",
+                empresa: sociedades?.Title ?? "",
+                identificador: tiendaSel?.IDENTIFICADOR ?? "",
+                local: tiendaSel?.Local ?? "",
+                nit: sociedades?.Nit ?? "",
                 nombre: account?.username ?? "",
-                proveedor: infoInternet?.PROVEEDOR ?? "",
+                proveedor: tiendaSel?.PROVEEDOR ?? "",
                 telefono: "313 745 3700/319 254 9920",
-                tienda: infoInternet?.Tienda ?? "",
+                tienda: tiendaSel?.Tienda ?? "",
                 adjuntos: []
             })
         } else {
@@ -128,7 +124,6 @@ export function useEscalamiento(correoSolicitante: string, ticketId: string) {
         setLoading(true);
         setError(null);
         try {
-             // Busca la tienda por CORREO (usa top:1 si esperas único resultado)
             const tiendas = await IntTiendasSvc.getAll({filter: `(fields/CORREO eq '${term}' or fields/Tienda eq '${term}' or fields/IDENTIFICADOR eq '${term}')`, top: 1, });
 
             const tiendaSel = tiendas?.[0] ?? null;

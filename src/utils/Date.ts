@@ -1,12 +1,3 @@
-// src/utils/Date.ts
-/** Intenta parsear fechas en formatos comunes:
- *  - "dd/mm/yyyy hh:mm"
- *  - "dd/mm/yy hh:mm"
- *  - "dd/mm/yyyy"
- *  - ISO (new Date(...))
- *  - Date
- * Retorna "" si es inválida. Si es válida, "YYYY-MM-DD".
- */
 export function toISODateFlex(v?: string | Date | null): string {
   if (v == null || v === '') return '';
 
@@ -46,6 +37,16 @@ export function toISODateFlex(v?: string | Date | null): string {
   }
 
   return d && !Number.isNaN(d.getTime()) ? d.toISOString().slice(0, 10) : '';
+}
+
+export function ParseDateShow(fecha: string){
+  try{
+    const fechaParse = new Date(fecha)
+    const shortDate = fechaParse.toLocaleString("es-CO", {day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit", hour12: false});
+    return shortDate
+  }catch{
+    return "N/A"
+  }
 }
 
 function pad(n: number) { return String(n).padStart(2, '0'); }
@@ -160,3 +161,7 @@ export function toGraphDateOnly(
         .slice(0, 10)
     : `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
 }
+
+export function toDate(d: string | Date){(d instanceof Date ? d : new Date(d))};
+
+export const formatYYYYMMDD = (d: Date) => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;

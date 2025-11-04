@@ -24,7 +24,7 @@ export default function NuevoTicketUsuarioForm() {
     <div className="ticket-form" data-force-light>
       <h2 className="tf-title">Nuevo Ticket</h2>
 
-      <form onSubmit={handleSubmit} noValidate className="tf-grid">
+      <form onSubmit={(e) => {e.preventDefault(); handleSubmit()}} noValidate className="tf-grid">
 
         {/* Motivo */}
         <div className="tf-field tf-col-2">
@@ -36,7 +36,9 @@ export default function NuevoTicketUsuarioForm() {
         {/* Descripción */}
         <div className="tf-field tf-col-2">
           <label className="tf-label">Descripción del problema</label>
-          <RichTextBase64 value={state.descripcion} onChange={(html) => setField("descripcion", html)} placeholder="Describe el problema y pega capturas (Ctrl+V)…"/>
+          <div className="rtb-box">
+            <RichTextBase64 value={state.descripcion} onChange={(html) => setField("descripcion", html)} placeholder="Describe el problema y pega capturas (Ctrl+V)..."/>
+          </div>
           {errors.descripcion && <small className="error">{errors.descripcion}</small>}
         </div>
 

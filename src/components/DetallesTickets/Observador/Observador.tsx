@@ -27,7 +27,7 @@ export default function AsignarObservador({ticket}: {ticket: Ticket}) {
   };
   const {state,errors, submitting, setField, handleObservador,} = useAsignarObservador({Logs: LogsSvc, Tickets: TicketSvc}, ticket);
   const { franqOptions, loading: loadingFranq, error: franqError } = useFranquicias(FranquiciasSvc!);
-  const { workersOptions, loadingWorkers, error: usersError } = useWorkers({onlyEnabled: true, domainFilter: "estudiodemoda.com.co",});
+  const { workersOptions, loadingWorkers, error: usersError } = useWorkers({onlyEnabled: true,});
 
   // ====== Combinar usuarios con franquicias
   const combinedOptions: UserOptionEx[] = React.useMemo(() => {

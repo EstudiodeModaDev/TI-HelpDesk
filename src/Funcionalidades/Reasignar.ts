@@ -63,9 +63,7 @@ export function useReasignarTicket(services: Svc, ticket: Ticket) {
         Usuarios.getAll(filterCandidato),
         Usuarios.getAll(filterSolicitante),
       ]);
-
-      console.log("Candidato ", candidatos)
-      console.log("Solicitante ", solicitantes)
+      
       const candidato = candidatos?.[0];
       const solicitante = solicitantes?.[0];
 

@@ -11,8 +11,8 @@ export type Facturas = {
 
 export type Proveedor = {
   Id?: string;
-  Title: string; // Nombre proveedor
-  Nit: string;
+  Title: string; // nit proveedor
+  Nombre: string;
 }
 
 export type ItemFactura = {

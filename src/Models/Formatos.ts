@@ -14,25 +14,15 @@ export type ExtensionTelefonica =
   | "Solicitud nueva"
   | "Traslado";
 
-export type ServicioPrograma =
-  | "ERP"
-  | "Sistema de pedidos"
-  | "AdminPOS"
-  | "POS Principal"
-  | "Correo"
-  | "Office"
-  | "Impresoras"
-  | "Generic Transfer";
-
-  export type PermisoRed = "Lectura" | "Escritura" | "Lectura y escritura";
+export type PermisoRed = "Lectura" | "Escritura" | "Lectura y escritura";
 
   //Modelo solicitud de permisos de red
-  export interface FilaSolicitudRed {
+export interface FilaSolicitudRed {
   id: string;       
   carpeta1: string;
   subcarpeta1: string;
   subcarpeta2: string;
-  personas: string;    // puedes cambiar a string[] si usas multiselect real
+  personas: string;    
   permiso: PermisoRed | "";
   observaciones: string;
 }
@@ -44,12 +34,12 @@ export type State = {
 };
 
 export type Action =
-  | { type: "ADD" }
+  | { type: "ADD"; initial?: Partial<Omit<FilaSolicitudRed, "id">> }
   | { type: "REMOVE"; id: string }
-  | { type: "SET"; id: string; key: keyof FilaSolicitudRed; value: any }
+  | { type: "SET"; id: string; key: keyof FilaSolicitudRed; value: FilaSolicitudRed[keyof FilaSolicitudRed] }
   | { type: "RESET" }
   | { type: "SENDING"; value: boolean }
-  | { type: "ERROR"; message?: string };
+  | { type: "ERROR"; message: string | null };
 
   //Modelo seguridad de reERP
 export interface FilaSolicitudERP {
@@ -61,4 +51,55 @@ export interface FilaSolicitudERP {
   usuarioNombre: string;
   usuarioMail: string;
   observaciones: string;
+}
+
+export type Servicios = {
+  correo: boolean;
+  office: boolean;
+  erp: boolean;
+  pedidos: boolean;
+  adminpos: boolean;
+  posprincipal: boolean;
+  impresoras: boolean;
+  generictransfer: boolean;
+};
+
+export type SolicitudUsuario = {
+  solicitadoPor: string;
+  correoSolicitadoPor: string;
+  contratacion: string;
+  nombre: string;
+  apellidos: string;
+  cedula: string;
+  contacto: string;
+  cargo: string;
+  direccion: string;
+  gerencia: string;
+  jefatura: string;
+  centroCostos: string;
+  centroOperativo: string;
+  ciudad: string;
+  fechaIngreso: string; // "yyyy-mm-dd"
+  tipoEquipo: string;
+  extensionTelefonica: string;
+  servicios: Servicios;
+  observaciones: string; 
+};
+
+export type SolicitudUsuarioErrors = Partial<Record<keyof SolicitudUsuario, string>>;
+
+export interface FilaPermisoNav {
+  id: string;
+  Empleado: string,
+  "Jefe / Quien autoriza": string,
+  Youtube: boolean,
+  Facebook: boolean,
+  Twitter: boolean,
+  Instagram: boolean,
+  Whatsapp: boolean,
+  Pinterest: boolean,
+  "Google Anatytics": boolean,
+  "Google Drive": boolean,
+  Wetransfer: boolean,
+  "Otro (Link de la pagina )": string
 }

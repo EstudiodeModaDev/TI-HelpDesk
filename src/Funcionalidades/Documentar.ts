@@ -7,8 +7,10 @@ import type { Log } from "../Models/Log";
 import type { AccountInfo } from "@azure/msal-browser";
 import { FlowClient } from "./FlowClient";
 import type { FlowToUser } from "../Models/FlujosPA";
+import type { ComprasService } from "../Services/Compras.service";
+import { norm } from "../utils/Commons";
 
-type Svc = { Tickets?: TicketsService; Logs: LogService };
+type Svc = { Tickets?: TicketsService; Logs: LogService; ComprasSvc: ComprasService };
 
 export type FormDocumentarState = {
   resolutor: string;
@@ -20,8 +22,7 @@ export type FormDocumentarState = {
 export type FormDocErrors = Partial<Record<keyof FormDocumentarState, string>>;
 
 export function useDocumentarTicket(services: Svc) {
-  const { Tickets, Logs } = services;
-
+  const { Tickets, Logs, ComprasSvc } = services;
   const [state, setState] = useState<FormDocumentarState>({
     resolutor: "",
     correoresolutor: "",
@@ -31,8 +32,7 @@ export function useDocumentarTicket(services: Svc) {
   const [errors, setErrors] = useState<FormDocErrors>({});
   const [submitting, setSubmitting] = useState(false);
 
-  const setField = <K extends keyof FormDocumentarState>(k: K, v: FormDocumentarState[K]) =>
-    setState((s) => ({ ...s, [k]: v }));
+  const setField = <K extends keyof FormDocumentarState>(k: K, v: FormDocumentarState[K]) => setState((s) => ({ ...s, [k]: v }));
 
   const validate = () => {
     const e: FormDocErrors = {};
@@ -44,13 +44,6 @@ export function useDocumentarTicket(services: Svc) {
   };
 
   const notifyFlow = new FlowClient("https://defaultcd48ecd97e154f4b97d9ec813ee42b.2c.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/a21d66d127ff43d7a940369623f0b27d/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=0ptZLGTXbYtVNKdmIvLdYPhw1Wcqb869N3AOZUf2OH4")
-
-  const norm = (s: string) =>
-    (s ?? "")
-      .normalize("NFD")
-      .replace(/\p{Diacritic}/gu, "")
-      .toLowerCase()
-      .trim();
 
   const handleSubmit = async (
     e: React.FormEvent,
@@ -83,6 +76,11 @@ export function useDocumentarTicket(services: Svc) {
         const nuevoEstado = estadoActual === "en atencion" ? "Cerrado" : "Cerrado fuera de tiempo";
         alert("Caso cerrado. Enviando notificación al solicitante")
         await Tickets.update(ticket.ID!, { Estadodesolicitud: nuevoEstado });
+        const casodecompra = await ComprasSvc.getAll({filter:  `fields/IdCreado eq '${ticket.ID}'`})
+        const casodeentrega = await ComprasSvc.getAll({filter:  `fields/IdEntrega eq '${ticket.ID}'`})
+        await Promise.allSettled( casodecompra.items.map((it) => { const id = String(it.Id);    return ComprasSvc.update(id, { Estado: "Pendiente por registro de factura" });}));
+        await Promise.allSettled( casodeentrega.items.map((it) => { const id = String(it.Id);    return ComprasSvc.update(id, { Estado: "Pendiente por registro de factura" });}));
+
         if (ticket.CorreoSolicitante) {
           const title = `Cierre de Ticket - ${ticket.ID}`;
           const message = `
