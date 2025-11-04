@@ -49,7 +49,7 @@
    Layout base
    ========================= */
 .tpl-page{
-  background: var(--bg);
+  background: transparent;
   color: var(--ink);
   padding: clamp(12px, 2vw, 24px);
 }

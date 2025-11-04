@@ -24,11 +24,6 @@ export default function CrearPlantilla() {
         <div className="tpl-field">
           <label className="tpl-label">Campos de la plantilla</label>
 
-          {/* Toolbar */}
-          <div className="tpl-toolbar" role="toolbar" aria-label="Formato del texto">
-                
-          </div>
-
           {/* Editor */}
           <div className="tpl-editorWrapper">
              <RichTextBase64 value={state.HTLM} onChange={(html) => setField("HTLM", html)} placeholder="Cree su plantilla..."/>
