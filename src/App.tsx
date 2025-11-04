@@ -246,8 +246,13 @@ function Sidebar(props: {navs: readonly MenuItem[]; selected: string; onSelect: 
     <aside className={`sidebar ${collapsed ? "sidebar--collapsed" : ""}`} aria-label="Navegación principal">
       <div className="sidebar__header">
         <div className="sb-brand">
-          {!collapsed &&<span className="sb-logo" aria-hidden>🛠️</span> &&
-          <span className="sb-title">Soporte Técnico</span>}
+          {!collapsed && (
+            <>
+              <span className="sb-logo" aria-hidden="true">🛠️</span>
+              <span className="sb-title">Soporte Técnico</span>
+              <span className="sb-subtitle">Tu solución empieza aquí</span>
+            </>
+          )}
         </div>
         <button className="sb-toggle" onClick={onToggle} aria-label={collapsed ? "Expandir menú" : "Colapsar menú"}>
           {collapsed ? "»" : "«"}
