@@ -26,30 +26,47 @@ export function useDashboard(TicketsSvc: TicketsService) {
     const { account } = useAuth();
 
     const buildFilterTickets = React.useCallback((mode: string): GetAllOpts => {
-        const filters: string[] = [];
-    
-        if(mode === "resumen"){
-             filters.push(`fields/Correoresolutor eq '${account!.username}'`)
-                filters.push(`fields/Correoresolutor eq '${account!.username}'`);
+      const filters: string[] = [];
 
-                const now = new Date();
-                const monthStart = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0);
-                const monthEnd   = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
-                const fromIso = toGraphDateTime(monthStart); // -> "YYYY-MM-DDTHH:mm:ssZ"
-                const toIso   = toGraphDateTime(monthEnd);
-                filters.push(`fields/FechaApertura ge ${fromIso}`);
-                filters.push(`fields/FechaApertura le ${toIso}`);
+      // Helper: escapa comillas simples por seguridad en OData
+      const esc = (s: string) => (s ?? "").replace(/'/g, "''");
+
+      // Helper: construye límites día en Z
+      const dayStartIso = (d: string) => `${d}T00:00:00Z`;
+      const dayEndIso   = (d: string) => `${d}T23:59:59Z`;
+
+      if (mode === "resumen") {
+        const user = esc(account!.username);
+
+        // Solo una condición para el resolutor
+        filters.push(`fields/CorreoResolutor eq '${user}'`);
+
+        // Mes en curso [1..último día]
+        const now = new Date();
+        const monthStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1, 0, 0, 0, 0));
+        const monthEnd   = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 0, 23, 59, 59, 999));
+        // toGraphDateTime debería devolver ISO con Z (ej. 2025-11-01T00:00:00Z)
+        const fromIso = toGraphDateTime(monthStart);
+        const toIso   = toGraphDateTime(monthEnd);
+
+        filters.push(`fields/FechaApertura ge ${fromIso}`);
+        filters.push(`fields/FechaApertura le ${toIso}`);
+      }
+
+      // Rango manual (si ambos están y son consistentes)
+      if (range.from && range.to && range.from <= range.to) {
+        // Evita duplicar el filtro del mes en curso si ya aplicaste "resumen"
+        if (mode !== "resumen") {
+          filters.push(`fields/FechaApertura ge ${dayStartIso(range.from)}`);
+          filters.push(`fields/FechaApertura le ${dayEndIso(range.to)}`);
         }
-                    
-        if(range.from && range.to && range.from <= range.to && range.to !== today && range.from !== today){
-            filters.push(`fields/FechaApertura ge ${range.from}`);
-            filters.push(`fields/FechaApertura le ${range.to}`);
-        }
-    
-        return {
-          filter: filters.join(" and "),
-        };
-      }, [range.from, range.to,]); 
+      }
+
+      return {
+        filter: filters.join(" and "),
+      };
+      // deps: usa lo que lees adentro
+    }, [account?.username, range.from, range.to]);
 
     const obtenerTotal = React.useCallback(async (mode: string, ) => {
         setLoading(true);
