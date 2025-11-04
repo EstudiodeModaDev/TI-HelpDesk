@@ -27,6 +27,7 @@ import filesIcon from "./assets/file.svg";
 import infoIcon from "./assets/info.svg";
 import settingsIcon from "./assets/settings.svg"
 import templateIcon from "./assets/template.svg"
+import PazYSalvos from "./components/PazSalvos/ListaPazSalvos/Lista";
 
 /* ============================================================
    Tipos de navegación y contexto de visibilidad
@@ -86,6 +87,7 @@ const NAV: MenuItem[] = [
       {id: "cesar", label: "Cesar", children: [
           { id: "compras", label: "Compras", to: <ComprasPage />},
           { id: "facturas", label: "Facturas", to: <RegistroFactura /> },
+          { id: "paz", label: "Paz y Salvos", to: <PazYSalvos /> },
         ],
       },
     ],
