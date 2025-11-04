@@ -2,7 +2,7 @@ import * as React from "react";
 import Select, { components, type OptionProps, type SingleValue } from "react-select";
 import "./NuevoTicketForm.css";
 import { useFranquicias } from "../../Funcionalidades/Franquicias";
-import type { FranquiciasService } from "../../Services/Franquicias.service";
+import type { FranquiciasService } from "../../Services/Franquicias.service";3
 import type { UserOption } from "../../Models/Commons";
 import { useGraphServices } from "../../graph/GrapServicesContext";
 import { useNuevoTicketForm } from "../../Funcionalidades/NuevoTicket";
@@ -26,7 +26,6 @@ type TreeOption = {
     artTitle: string;
   };
 };
-
 
 export default function NuevoTicketForm() {
   const {Categorias, SubCategorias, Articulos, Franquicias: FranquiciasSvc, Usuarios: UsuariosSPServiceSvc, Tickets: TicketsSvc, Logs: LogsSvc} = useGraphServices() as ReturnType<typeof useGraphServices> & {
@@ -217,15 +216,15 @@ export default function NuevoTicketForm() {
           </div>
 
           {/* Descripción */}
-        <div className={`tf-field tf-col-2 ${errors.descripcion ? "has-error" : ""}`}>
-          <label className="tf-label">Descripción del problema</label>
+          <div className={`tf-field tf-col-2 ${errors.descripcion ? "has-error" : ""}`}>
+            <label className="tf-label">Descripción del problema</label>
 
-          <div className="rtb-box">
-            <RichTextBase64 value={state.descripcion} onChange={(html) => setField("descripcion", html)} placeholder="Describe el problema y pega capturas (Ctrl+V)..."/>
+            <div className="rtb-box">
+              <RichTextBase64 value={state.descripcion} onChange={(html) => setField("descripcion", html)} placeholder="Describe el problema y pega capturas (Ctrl+V)..."/>
+            </div>
+
+            {errors.descripcion && <small className="error">{errors.descripcion}</small>}
           </div>
-
-          {errors.descripcion && <small className="error">{errors.descripcion}</small>}
-        </div>
 
           {/* Categoría / Subcategoría / Artículo */}
           <div className="tf-row tf-row--cats tf-col-2"> 
