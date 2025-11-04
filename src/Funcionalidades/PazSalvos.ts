@@ -70,7 +70,7 @@ export function usePazSalvos(services: Svc) {
     const setField = <K extends keyof PazSalvos>(k: K, v: PazSalvos[K]) => setState((s) => ({ ...s, [k]: v }));
 
     const validate = () => {
-        const e: PazSalvos = {};
+        const e: PazSalvosErrors = {};
         if (!state.CO) e.CO = "Requerido";
         if (!state.Cargo) e.Cargo = "Requerido";
         if (!state.Cedula) e.Cedula = "Requerido";
@@ -79,6 +79,7 @@ export function usePazSalvos(services: Svc) {
         if (!state.Fechadesalida) e.Fechadesalida = "Requerido";
         if (!state.Jefe) e.Jefe = "Requerido";
         if (!state.Nombre) e.Nombre = "Requerido";
+        if (!state.Correos) e.Correos = "Debe seleccionar almenos un aprobador";
         setErrors(e);
         return Object.keys(e).length === 0;
     };
