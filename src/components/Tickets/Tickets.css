@@ -23,7 +23,6 @@
 
 /* === 2) Tokens === */
 :root{
-  --tbl-max: 1600px;
   --tbl-text: #111827;
   --tbl-muted: #cfcfcf;
   --tbl-border: #e5e7eb;
@@ -44,8 +43,11 @@
   gap: 10px !important;                   
 }
 
-.tabla-tickets > .filtros, .tabla-tickets > .table-wrap, .tabla-tickets .table-wrap + div{
-  width: min(100%, var(--tbl-max));
+.tabla-tickets > .filtros,
+.tabla-tickets > .table-wrap,
+.tabla-tickets .table-wrap + div{
+  width: 100%;
+  max-width: none; /* por si algún estilo anterior pone un tope */
 }
 
 /* === 3) Barra de filtros === */

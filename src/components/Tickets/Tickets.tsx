@@ -99,13 +99,8 @@ export default function TablaTickets() {
                   Fecha de apertura {renderSortIndicator('FechaApertura', sorts)}
                 </th>
 
-                <th role="button"
-                  tabIndex={0}
-                  onClick={(e) => toggleSort('TiempoSolucion', e.shiftKey)}
-                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') toggleSort('TiempoSolucion', e.shiftKey); }}
-                  aria-label="Ordenar por Fecha máxima"
-                  style={{ cursor: 'pointer', whiteSpace: 'nowrap' }}
-                >
+                <th role="button" tabIndex={0} onClick={(e) => toggleSort('TiempoSolucion', e.shiftKey)} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') toggleSort('TiempoSolucion', e.shiftKey); }}
+                  aria-label="Ordenar por Fecha máxima" style={{ cursor: 'pointer', whiteSpace: 'nowrap' }}>
                   Fecha máxima {renderSortIndicator('TiempoSolucion', sorts)}
                 </th>
 
@@ -114,12 +109,7 @@ export default function TablaTickets() {
             </thead>
             <tbody>
               {filtered.map((ticket) => (
-                <tr
-                  key={ticket.ID}
-                  onClick={() => setTicketSeleccionado(ticket)}
-                  tabIndex={0}
-                  onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && setTicketSeleccionado(ticket)}
-                >
+                <tr key={ticket.ID} onClick={() => setTicketSeleccionado(ticket)} tabIndex={0} onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && setTicketSeleccionado(ticket)}>
                   <td>{ticket.ID}</td>
                   <td>{ticket.Nombreresolutor}</td>
                   <td>{ticket.Solicitante}</td>
@@ -127,11 +117,7 @@ export default function TablaTickets() {
                   <td>{toISODateTimeFlex(ticket.FechaApertura) || "–"}</td>
                   <td>{toISODateTimeFlex(ticket.TiempoSolucion) || "N/A"}</td>
                   <td>
-                    <span
-                      className="estado-circulo"
-                      style={{ backgroundColor: calcularColorEstado(ticket) }}
-                      title={ticket.Estadodesolicitud || "Sin estado"}
-                    />
+                    <span className="estado-circulo" style={{ backgroundColor: calcularColorEstado(ticket) }} title={ticket.Estadodesolicitud || "Sin estado"} />
                   </td>
                 </tr>
               ))}
@@ -150,11 +136,7 @@ export default function TablaTickets() {
               </button>
 
               <span style={{ marginLeft: 12 }}>Tickets por pagina:</span>
-              <select
-                value={pageSize}
-                onChange={(e) => setPageSize(Number(e.target.value))}
-                disabled={loading}
-              >
+              <select value={pageSize} onChange={(e) => setPageSize(Number(e.target.value))} disabled={loading}>
                 {[10, 15, 20, 50, 100].map((n) => (
                   <option key={n} value={n}>
                     {n}
