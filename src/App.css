@@ -407,4 +407,168 @@
   }
 }
 
+/* ===== Variables y layout base ===== */
+:root{
+  --sb-w-open: 260px;
+  --sb-w-closed: 68px; /* solo íconos */
+  --sb-bg: #0f172a;    /* pizarra */
+  --sb-fg: #e5e7eb;    /* gris claro */
+  --sb-accent: #38bdf8;/* cian */
+  --content-bg: #f7f8fa;
+}
+
+.layout.layout--withSidebar{
+  --sb-w: var(--sb-w-open);
+  display: grid;
+  grid-template-columns: var(--sb-w) 1fr;
+  grid-template-rows: 100%;
+  width: 100%;
+  min-height: 100dvh;
+  background: var(--content-bg);
+  transition: grid-template-columns .22s ease;
+}
+
+/* Cuando está colapsado, estrecha la columna 1 */
+.layout.layout--withSidebar.is-collapsed{
+  --sb-w: var(--sb-w-closed);
+}
+
+/* ===== Sidebar ===== */
+.sidebar{
+  position: sticky;
+  top: 0;
+  height: 100dvh;
+  background: var(--sb-bg);
+  color: var(--sb-fg);
+  border-right: 1px solid rgba(255,255,255,.06);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: width .22s ease, padding .22s ease;
+}
+
+.sidebar__header{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 12px 10px;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+}
+
+.sb-brand{
+  display: flex; align-items: center; gap: 8px;
+  min-width: 0;
+}
+.sb-logo{ font-size: 18px; }
+.sb-title{ font-weight: 700; letter-spacing:.2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.sb-toggle{
+  border: 0;
+  background: transparent;
+  color: var(--sb-fg);
+  opacity: .9;
+  font-weight: 700;
+  padding: 6px 8px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.sb-toggle:hover{ background: rgba(255,255,255,.08); }
+
+/* Navegación */
+.sidebar__nav{
+  flex: 1;
+  overflow: auto;
+  padding: 8px 6px 10px 6px;
+}
+
+.sb-ul{ list-style: none; margin: 0; padding: 0; }
+.sb-li + .sb-li{ margin-top: 2px; }
+
+.sideItem{
+  width: 100%;
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 10px;
+  border: 0;
+  background: transparent;
+  color: var(--sb-fg);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background .12s ease, color .12s ease, padding .2s ease;
+}
+.sideItem:hover{ background: rgba(255,255,255,.06); }
+.sideItem--active{ background: rgba(56,189,248,.18); color: #fff; }
+
+.sideItem--folder .caret{
+  display: inline-block;
+  margin-right: 4px;
+  transform: translateY(-1px);
+  transition: transform .15s ease;
+  opacity: .9;
+}
+.sideItem--folder .caret.rot{ transform: rotate(90deg) translateY(-1px); }
+
+.sb-icon-wrap,
+.sideItem__icon{
+  width: 20px; height: 20px; display: inline-grid; place-items: center;
+}
+.sb-icon{ width: 18px; height: 18px; }
+
+.sideItem__label{
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+/* Compacto cuando está colapsado: ocultamos labels con el markup, pero refinamos paddings */
+.sideItem.is-compact{
+  justify-content: center;
+  gap: 0;
+  padding-left: 8px !important;
+  padding-right: 8px !important;
+}
+
+/* Footer del sidebar */
+.sidebar__footer{
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 10px 12px 10px;
+  border-top: 1px solid rgba(255,255,255,.08);
+}
+
+.sb-prof__avatar{
+  width: 28px; height: 28px; border-radius: 999px;
+  display: grid; place-items: center;
+  background: rgba(255,255,255,.1);
+  font-weight: 800;
+}
+.sb-prof__info{
+  display: grid; gap: 2px;
+  min-width: 0;
+}
+.sb-prof__mail{
+  font-size: 12px; opacity: .9;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+/* ===== Content ===== */
+.content.content--withSidebar{
+  min-width: 0;
+  overflow: hidden;
+  background: var(--content-bg);
+  transition: padding .22s ease;
+}
+.page-viewport{ width: 100%; height: 100%; }
+
+/* Un poco de respiración alrededor del render */
+.page.page--fluid.center-all{
+  padding: 16px;
+}
+
+/* ===== Responsive ===== */
+/* En pantallas pequeñas, el sidebar se comporta como "rail" estrecho por defecto */
+@media (max-width: 900px){
+  .layout.layout--withSidebar{
+    --sb-w-open: 220px;
+    --sb-w-closed: 56px;
+  }
+}
+
 

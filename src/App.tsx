@@ -169,8 +169,8 @@ function HeaderBar(props: {user: User; role: string; onPrimaryAction?: { label: 
    Sidebar con árbol recursivo y apertura de carpetas
    ============================================================ */
 
-function Sidebar(props: {navs: readonly MenuItem[]; selected: string; onSelect: (k: string) => void; user: User; role: string;}) {
-  const { navs, selected, onSelect, user, role } = props;
+function Sidebar(props: {navs: readonly MenuItem[]; selected: string; onSelect: (k: string) => void; user: User; role: string; collapsed?: boolean; onToggle?: () => void;}) {
+  const { navs, selected, onSelect, user, role, collapsed = false, onToggle } = props;
   const [open, setOpen] = React.useState<Record<string, boolean>>({});
 
   React.useEffect(() => {
@@ -198,14 +198,20 @@ function Sidebar(props: {navs: readonly MenuItem[]; selected: string; onSelect: 
         if (hasChildren) {
           return (
             <li key={n.id} className="sb-li">
-              <button className="sideItem sideItem--folder" style={{ paddingLeft: pad }} onClick={() => toggle(n.id)} aria-expanded={expanded}>
-                <span className={`caret ${expanded ? "rot" : ""}`}>▸</span>
+              <button
+                className={`sideItem sideItem--folder ${collapsed ? "is-compact" : ""}`}
+                style={{ paddingLeft: collapsed ? 12 : pad }}
+                onClick={() => (collapsed ? onSelect(n.id) : toggle(n.id))}
+                aria-expanded={!collapsed && expanded}
+                title={n.label}
+              >
+                {!collapsed && <span className={`caret ${expanded ? "rot" : ""}`}>▸</span>}
                 <span className="sb-icon-wrap" aria-hidden>
                   {n.icon ?? null}
                 </span>
-                <span className="sideItem__label">{n.label}</span>
+                {!collapsed && <span className="sideItem__label">{n.label}</span>}
               </button>
-              {expanded && renderTree(n.children!, depth + 1)}
+              {!collapsed && expanded && renderTree(n.children!, depth + 1)}
             </li>
           );
         }
@@ -213,11 +219,15 @@ function Sidebar(props: {navs: readonly MenuItem[]; selected: string; onSelect: 
         const active = selected === n.id;
         return (
           <li key={n.id} className="sb-li">
-            <button className={`sideItem sideItem--leaf ${active ? "sideItem--active" : ""}`} style={{ paddingLeft: pad + 18 }} onClick={() => onSelect(n.id)} aria-current={active ? "page" : undefined}>
-              <span className="sideItem__icon" aria-hidden="true">
-                {n.icon ?? "•"}
-              </span>
-              <span className="sideItem__label">{n.label}</span>
+            <button
+              className={`sideItem sideItem--leaf ${active ? "sideItem--active" : ""} ${collapsed ? "is-compact" : ""}`}
+              style={{ paddingLeft: collapsed ? 12 : pad + 18 }}
+              onClick={() => onSelect(n.id)}
+              aria-current={active ? "page" : undefined}
+              title={n.label}
+            >
+              <span className="sideItem__icon" aria-hidden="true">{n.icon ?? "•"}</span>
+              {!collapsed && <span className="sideItem__label">{n.label}</span>}
             </button>
           </li>
         );
@@ -226,26 +236,36 @@ function Sidebar(props: {navs: readonly MenuItem[]; selected: string; onSelect: 
   );
 
   return (
-    <aside className="sidebar" aria-label="Navegación principal">
+    <aside className={`sidebar ${collapsed ? "sidebar--collapsed" : ""}`} aria-label="Navegación principal">
       <div className="sidebar__header">
-        <div style={{ fontWeight: 800 }}>Soporte Técnico</div>
-        <div style={{ opacity: 0.8, fontSize: 12, marginTop: 4 }}>Estamos aquí para ayudarte.</div>
+        <div className="sb-brand">
+          <span className="sb-logo" aria-hidden>🛠️</span>
+          {!collapsed && <span className="sb-title">Soporte Técnico</span>}
+        </div>
+        <button className="sb-toggle" onClick={onToggle} aria-label={collapsed ? "Expandir menú" : "Colapsar menú"}>
+          {collapsed ? "»" : "«"}
+        </button>
       </div>
+
       <nav className="sidebar__nav" role="navigation">
         {renderTree(navs)}
       </nav>
+
       <div className="sidebar__footer">
-        <div className="sb-prof__avatar">{user?.displayName ? user.displayName[0] : "U"}</div>
-        <div className="sb-prof__info">
-          <div className="sb-prof__mail">{user?.mail || "usuario@empresa.com"}</div>
-          <div className="sb-prof__mail" aria-hidden="true">
-            {role}
-          </div>
+        <div className="sb-prof__avatar" title={user?.displayName || "Usuario"}>
+          {user?.displayName ? user.displayName[0] : "U"}
         </div>
+        {!collapsed && (
+          <div className="sb-prof__info">
+            <div className="sb-prof__mail">{user?.mail || "usuario@empresa.com"}</div>
+            <div className="sb-prof__mail" aria-hidden="true">{role}</div>
+          </div>
+        )}
       </div>
     </aside>
   );
 }
+
 
 /* ============================================================
    Shell: controla autenticación básica y muestra LoggedApp
@@ -302,14 +322,13 @@ function Shell() {
 
 function LoggedApp({ user }: { user: User }) {
   const { role } = useUserRoleFromSP(user!.mail);
-  // servicios de Graph para condiciones y render perezoso
   const services = useGraphServices() as {Tickets: TicketsService; Usuarios: UsuariosSPService; Logs: LogService;};
 
   const navCtx = React.useMemo<NavContext>(() => {
     const safeRole: Role = role === "Administrador" || role === "Tecnico" || role === "Usuario" ? (role as Role) : "Usuario";
     return {
       role: safeRole,
-      flags: new Set<string>([ ]),
+      flags: new Set<string>([]),
       hasService: (k) => {
         if (k === "Usuarios") return Boolean(services?.Usuarios);
         if (k === "Tickets") return Boolean(services?.Tickets);
@@ -319,21 +338,14 @@ function LoggedApp({ user }: { user: User }) {
     };
   }, [role, services]);
 
-  // árbol filtrado según reglas
   const navs = React.useMemo(() => filterNavTree(NAV, navCtx), [navCtx]);
 
-  // selección actual
   const [selected, setSelected] = React.useState<string>(() => firstLeafId(navs));
-
-  // corrige selección si el árbol cambia y el id ya no existe
   React.useEffect(() => {
     if (!findById(navs, selected)) setSelected(firstLeafId(navs));
   }, [navs, selected]);
 
-  // busca item seleccionado
   const item = React.useMemo(() => findById(navs, selected), [navs, selected]);
-
-  // resuelve el elemento a renderizar (soporta factory con contexto)
   const element = React.useMemo(() => {
     if (!item) return null;
     if (typeof item.to === "function") {
@@ -342,9 +354,21 @@ function LoggedApp({ user }: { user: User }) {
     return item.to ?? null;
   }, [item, services]);
 
+  // === NEW: sidebar plegable (con persistencia simple)
+  const [collapsed, setCollapsed] = React.useState<boolean>(() => {
+    try { return localStorage.getItem("sb-collapsed") === "1"; } catch { return false; }
+  });
+  const toggleCollapsed = React.useCallback(() => {
+    setCollapsed((v) => {
+      const next = !v;
+      try { localStorage.setItem("sb-collapsed", next ? "1" : "0"); } catch {}
+      return next;
+    });
+  }, []);
+
   return (
-    <div className="page layout layout--withSidebar">
-      <Sidebar navs={navs} selected={selected} onSelect={setSelected} user={user} role={role} />
+    <div className={`page layout layout--withSidebar ${collapsed ? "is-collapsed" : ""}`}>
+      <Sidebar navs={navs} selected={selected} onSelect={setSelected} user={user} role={role} collapsed={collapsed} onToggle={toggleCollapsed}/>
       <main className="content content--withSidebar">
         <div className="page-viewport">
           <div className="page page--fluid center-all">{element}</div>
@@ -353,7 +377,6 @@ function LoggedApp({ user }: { user: User }) {
     </div>
   );
 }
-
 /* ============================================================
    App root y gate de servicios
    ============================================================ */
