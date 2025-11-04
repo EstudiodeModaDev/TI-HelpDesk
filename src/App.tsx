@@ -48,6 +48,8 @@ export type MenuItem = {
   roles?: Role[];
   flags?: string[];
   when?: (ctx: NavContext) => boolean;
+  /** Si true, al seleccionarlo el sidebar se colapsa automáticamente */
+  autocollapse?: boolean;
 };
 
 export type NavContext = {
@@ -61,11 +63,11 @@ export type NavContext = {
    ============================================================ */
 
 const NAV: MenuItem[] = [
-  {id: "home", label: "Home", icon: <img src={HomeIcon} alt="" className="sb-icon" />, to: <Home />, roles: ["Administrador", "Tecnico"] },
+  {id: "home", label: "Home", icon: <img src={HomeIcon} alt="" className="sb-icon" />, to: <Home />, roles: ["Administrador", "Tecnico"], autocollapse: true },
   {id: "ticketform", label: "Nuevo Ticket", icon: <img src={addIcon} alt="" className="sb-icon" />, to: () => <NuevoTicketForm />, roles: ["Administrador", "Tecnico"],},
   {id: "ticketform_user", label: "Nuevo Ticket", icon: <img src={addIcon} alt="" className="sb-icon" />, to: <NuevoTicketUsuarioForm />, roles: ["Usuario"],},
-  {id: "ticketTable", label: "Ver Tickets", icon: <img src={seeTickets} alt="" className="sb-icon" />, to: <TablaTickets />,},
-  {id: "task", label: "Tareas", icon: <img src={tareasIcon} alt="" className="sb-icon" />, to: <TareasPage />, roles: ["Administrador", "Tecnico"] },
+  {id: "ticketTable", label: "Ver Tickets", icon: <img src={seeTickets} alt="" className="sb-icon" />, to: <TablaTickets />, autocollapse: true},
+  {id: "task", label: "Tareas", icon: <img src={tareasIcon} alt="" className="sb-icon" />, to: <TareasPage />, roles: ["Administrador", "Tecnico"], autocollapse: true },
   {id: "formatos", label: "Formatos", icon: <img src={filesIcon} alt="" className="sb-icon" />, to: <Formatos />, roles: ["Administrador"] },
   {id: "info", label: "Información", icon: <img src={infoIcon} alt="" className="sb-icon" />, to: <InfoPage />, roles: ["Administrador", "Tecnico"]  },
   {id: "admin", label: "Administración", icon: <img src={settingsIcon} className="sb-icon"/>, roles: ["Administrador", "Tecnico"], children: [
@@ -244,8 +246,8 @@ function Sidebar(props: {navs: readonly MenuItem[]; selected: string; onSelect: 
     <aside className={`sidebar ${collapsed ? "sidebar--collapsed" : ""}`} aria-label="Navegación principal">
       <div className="sidebar__header">
         <div className="sb-brand">
-          <span className="sb-logo" aria-hidden>🛠️</span>
-          {!collapsed && <span className="sb-title">Soporte Técnico</span>}
+          {!collapsed &&<span className="sb-logo" aria-hidden>🛠️</span> &&
+          <span className="sb-title">Soporte Técnico</span>}
         </div>
         <button className="sb-toggle" onClick={onToggle} aria-label={collapsed ? "Expandir menú" : "Colapsar menú"}>
           {collapsed ? "»" : "«"}
@@ -363,6 +365,7 @@ function LoggedApp({ user }: { user: User }) {
   const [collapsed, setCollapsed] = React.useState<boolean>(() => {
     try { return localStorage.getItem("sb-collapsed") === "1"; } catch { return false; }
   });
+
   const toggleCollapsed = React.useCallback(() => {
     setCollapsed((v) => {
       const next = !v;
@@ -371,9 +374,24 @@ function LoggedApp({ user }: { user: User }) {
     });
   }, []);
 
+  const handleSelect = React.useCallback((id: string) => {
+    setSelected(id);
+    const it = findById(navs, id);
+    if (!it) return;
+
+    // regla: si el ítem tiene autocollapse, colapsa.
+    // (Opcional) Solo en pantallas pequeñas:
+    const isNarrow = typeof window !== "undefined" && window.innerWidth < 1100;
+
+    if (it.autocollapse && (isNarrow || true /* quita esto si quieres sólo en móvil */)) {
+      setCollapsed(true);
+      try { localStorage.setItem("sb-collapsed", "1"); } catch {}
+    }
+  }, [navs]);
+
   return (
     <div className={`page layout layout--withSidebar ${collapsed ? "is-collapsed" : ""}`}>
-      <Sidebar navs={navs} selected={selected} onSelect={setSelected} user={user} role={role} collapsed={collapsed} onToggle={toggleCollapsed}/>
+      <Sidebar navs={navs} selected={selected} onSelect={handleSelect} user={user} role={role} collapsed={collapsed} onToggle={toggleCollapsed}/>
       <main className="content content--withSidebar">
         <div className="page-viewport">
           <div className="page page--fluid center-all">{element}</div>
