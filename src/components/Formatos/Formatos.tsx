@@ -34,10 +34,10 @@ const TYC_BY_OPCION: Record<OpcionSolicitud, string> = {
   "FR Administrador seguridad ERP": `
     <p>Recuerda:</p>
         <ul>
-          <li>El equipo de TI tiene un total de 8 horas <strong>HABILES</strong> para responder y solucionar su solicitud.</li>
-          <li>En el <strong>campo persona</strong> debe escoger la persona que requiere el permiso.</li>
-          <li>En el <strong>campo permiso</strong> debe especificar si requiere un permiso de lectura o de escritura sobre la carpeta.</li>
-          <li>En el <strong>campo observaciones</strong> debe indicar alguna observaciones si lo requiere.</li>
+          <li>El equipo de TI tiene un total de 8 horas HABILES para responder y solucionar su solicitud.</li>
+          <li>En el campo persona debe escoger la persona que requiere el permiso.</li>
+          <li>En el campo permiso debe especificar si requiere un permiso de lectura o de escritura sobre la carpeta.</li>
+          <li>En el campo observaciones debe indicar alguna observaciones si lo requiere.</li>
           <li>La solicitud debe ser realizada por el jefe inmediato o responsable del área.</li>
         </ul>
     <p><strong>NOTA: </strong> Favor diligenciar el formato en su totalidad (nombres y apellidos completos). Esto con el fin de evitar reprocesos solicitando la información faltante.</p>
@@ -45,7 +45,7 @@ const TYC_BY_OPCION: Record<OpcionSolicitud, string> = {
   "Permisos de navegacion": `
     <p>Recuerda:</p>
         <ul>
-          <li>El equipo de TI tiene un total de 8 horas <strong>HABILES</strong> para responder y solucionar su solicitud.</li>
+          <li>El equipo de TI tiene un total de 8 horas HABILES para responder y solucionar su solicitud.</li>
           <li>Por favor marque los sitios a los que el usuario requiere acceso.</li>
           <li>Si requiere acceso a otro sitio web escriba la URL.</li>
           <li>La solicitud debe ser realizada por el jefe inmediato o responsable del área.</li>
