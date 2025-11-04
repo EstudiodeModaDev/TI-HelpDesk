@@ -14,7 +14,6 @@
   --it-ring: 0 0 0 3px rgba(79, 70, 229, 0.35);
 }
 
-/* Modo oscuro automático (respetando el `dark:` del JSX) */
 @media (prefers-color-scheme: dark) {
   :root {
     --it-bg: #ffffff;
@@ -50,14 +49,6 @@
   color: var(--it-ink);
   border-radius: 12px;
   transition: box-shadow .15s ease, border-color .15s ease;
-}
-
-@media (prefers-color-scheme: dark) {
-  .store-info input[type="text"],
-  .store-info select {
-    background: #0f172a;
-    color: var(--it-ink);
-  }
 }
 
 .store-info input[type="text"]:focus,
