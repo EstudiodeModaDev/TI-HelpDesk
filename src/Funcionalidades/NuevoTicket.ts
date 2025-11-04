@@ -44,13 +44,10 @@ export function useNuevoTicketForm(services: Svc) {
     ANS: "",
     archivo: null,
   });
-
   const [errors, setErrors] = useState<FormErrors>({});
   const [submitting, setSubmitting] = useState(false);
   const [holidays, setHolidays] = useState<Holiday[]>([]);
   const [fechaSolucion, setFechaSolucion] = useState<Date | null>(null);
-
-  // ---- Catálogos
   const [categorias, setCategorias] = useState<Categoria[]>([]);
   const [subcategorias, setSubcategorias] = useState<Subcategoria[]>([]);
   const [articulosAll, setArticulosAll] = useState<Articulo[]>([]);

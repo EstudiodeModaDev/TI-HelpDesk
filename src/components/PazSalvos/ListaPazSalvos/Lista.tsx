@@ -1,40 +1,25 @@
 import * as React from "react";
 import "./Lista.css";
-
-type Row = {consecutivo: number; nombre: string; cedula: string; fechaIngreso: string; fechaRetiro?: string; cargo: string; empresa: string; jefe: string; co: string; finalizada: boolean;};
-
-const MOCK: Row[] = [
-  // ejemplo vacío; conecta tus datos reales aquí
-];
+import { useGraphServices } from "../../../graph/GrapServicesContext";
+import type { UsuariosSPService } from "../../../Services/Usuarios.Service";
+import type { TicketsService } from "../../../Services/Tickets.service";
+import type { LogService } from "../../../Services/Log.service";
+import type { PazSalvosService } from "../../../Services/PazSalvos.service";
+import { usePazSalvos } from "../../../Funcionalidades/PazSalvos";
 
 export default function PazYSalvos() {
   const todayISO = new Date().toISOString().slice(0, 10);
   const [desde, setDesde] = React.useState(todayISO);
   const [hasta, setHasta] = React.useState(todayISO);
-  const [anio, setAnio] = React.useState<string>("");
+  const [estado, setEstado] = React.useState<string>("")
   const [q, setQ] = React.useState("");
-
-  const years = React.useMemo(() => {
-    const y = new Date().getFullYear();
-    return Array.from({ length: 8 }, (_, i) => String(y - i));
-  }, []);
-
-  const rows = React.useMemo(() => {
-    return MOCK.filter(r => {
-      const byYear = anio ? (r.fechaIngreso?.startsWith(anio) || r.fechaRetiro?.startsWith(anio)) : true;
-      const byText =
-        !q ||
-        [r.nombre, r.cedula, r.cargo, r.empresa, r.jefe, r.co]
-          .join(" ")
-          .toLowerCase()
-          .includes(q.toLowerCase());
-      const d1 = desde ? new Date(desde) : null;
-      const d2 = hasta ? new Date(hasta) : null;
-      const f = r.fechaIngreso ? new Date(r.fechaIngreso) : null;
-      const inRange = !d1 || !d2 || !f ? true : f >= d1 && f <= d2;
-      return byYear && byText && inRange;
-    });
-  }, [anio, q, desde, hasta]);
+  const { Usuarios, Tickets, Logs, PazYSalvos } = useGraphServices() as ReturnType<typeof useGraphServices> & {
+    Usuarios: UsuariosSPService;
+    Tickets: TicketsService;
+    Log: LogService;
+    PazYSalvos: PazSalvosService;
+  };
+  const { rows } = usePazSalvos({LogSvc: Logs, PazYSalvos: PazYSalvos, TicketSvc: Tickets, Usuarios: Usuarios,});
 
   return (
     <section className="pz-page">
@@ -52,10 +37,11 @@ export default function PazYSalvos() {
         </label>
 
         <label className="pz-field pz-field--sm">
-          <span>Filtro por año</span>
-          <select value={anio} onChange={(e) => setAnio(e.target.value)}>
-            <option value="">Todos</option>
-            {years.map(y => <option key={y} value={y}>{y}</option>)}
+          <span>Estado</span>
+          <select value={estado} onChange={(e) => setEstado(e.target.value)}>
+            <option value="todos">Todos</option>
+            <option value="finalizado">Finalizados</option>
+            <option value="espera">En espera</option>
           </select>
         </label>
 
@@ -88,18 +74,18 @@ export default function PazYSalvos() {
               </tr>
             )}
             {rows.map(r => (
-              <tr key={r.consecutivo}>
-                <td>{r.consecutivo}</td>
-                <td>{r.nombre}</td>
-                <td>{r.cedula}</td>
-                <td>{r.fechaIngreso || "–"}</td>
-                <td>{r.fechaRetiro || "–"}</td>
-                <td>{r.cargo}</td>
-                <td>{r.empresa}</td>
-                <td>{r.jefe}</td>
-                <td>{r.co}</td>
+              <tr key={r.Consecutivo}>
+                <td>{r.Consecutivo}</td>
+                <td>{r.Nombre}</td>
+                <td>{r.Cedula}</td>
+                <td>{r.Fechadeingreso || "–"}</td>
+                <td>{r.Fechadesalida || "–"}</td>
+                <td>{r.Cargo}</td>
+                <td>{r.Empresa}</td>
+                <td>{r.Jefe}</td>
+                <td>{r.CO}</td>
                 <td>
-                  <span className={`pz-dot ${r.finalizada ? "is-ok" : "is-bad"}`} aria-label={r.finalizada ? "Finalizada" : "Pendiente"} />
+                  <span className={`pz-dot ${r.Title ? "is-ok" : "is-bad"}`} aria-label={r.Title ? "En curso" : "Finalizado"} />
                 </td>
               </tr>
             ))}
