@@ -47,7 +47,7 @@ export function usePazSalvos(services: Svc) {
     const [submitting, setSubmitting] = useState(false);
     const [holidays, setHolidays] = useState<Holiday[]>([]);
     const [rows, setRows] = useState<PazSalvos[]>([])
-    const [filterMode, setFilterMode] = useState<String>("");
+    const [filterMode, setFilterMode] = useState<string>("");
     const today = React.useMemo(() => toISODateFlex(new Date()), []);
     const [range, setRange] = React.useState<DateRange>({ from: today, to: today });
     const [pageSize, setPageSize] = React.useState<number>(20);
@@ -220,7 +220,7 @@ export function usePazSalvos(services: Svc) {
 
 
   return {
-    state, errors, submitting, rows, nextLink, pageIndex,
+    state, errors, submitting, rows, nextLink, pageIndex, filterMode, range,
     setField, handleSubmit, loadFirstPage, setFilterMode, setRange, setPageSize, 
   };
 }

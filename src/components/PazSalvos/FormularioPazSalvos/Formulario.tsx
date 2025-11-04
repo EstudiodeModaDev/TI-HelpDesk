@@ -11,7 +11,6 @@ import type { UserOptionEx } from "../../NuevoTicket/NuevoTicketForm";
 import { useWorkers } from "../../../Funcionalidades/Workers";
 
 type Aprobador = { correo: string; nombre: string };
-type UsuarioLite = { Correo: string; Nombre: string };
 
 export default function FormularioPazSalvo() {
   const { Usuarios, Tickets, Logs, PazYSalvos } = useGraphServices() as ReturnType<typeof useGraphServices> & {
@@ -22,29 +21,8 @@ export default function FormularioPazSalvo() {
   };
   const { state, errors, setField, handleSubmit } = usePazSalvos({LogSvc: Logs, PazYSalvos: PazYSalvos, TicketSvc: Tickets, Usuarios: Usuarios,});
   const [colCorreosSeleccionado, setColCorreosSeleccionado] = React.useState<Aprobador[]>([]);
-  const [usuarios, setUsuarios] = React.useState<UsuarioLite[]>([]); // si mantienes la lista manual                // si mantienes la lista manual
   const { workersOptions, loadingWorkers, error: usersError } = useWorkers({ onlyEnabled: true });
   const [selectedWorker, setSelectedWorker] = React.useState<UserOptionEx | null>(null);
-
-  React.useEffect(() => {
-    let alive = true;
-    (async () => {
-      try {
-        // Si ya usas workersOptions, esta lista manual podría no ser necesaria.
-        const sample: UsuarioLite[] = [
-          { Correo: "ana@acme.com", Nombre: "Ana Ruiz" },
-          { Correo: "luis@acme.com", Nombre: "Luis Soto" },
-          { Correo: "maria@acme.com", Nombre: "María Pérez" },
-        ];
-        if (alive) setUsuarios(sample);
-        console.log(usuarios)
-      } catch (e) {
-        console.error("Error cargando usuarios:", e);
-        if (alive) setUsuarios([]);
-      }
-    })();
-    return () => { alive = false; };
-  }, [Usuarios]);
 
   const toCorreosConcat = React.useCallback((arr: Aprobador[]) => {
     return arr.length ? arr.map(a => a.correo).join("; ") + "; " : "";
