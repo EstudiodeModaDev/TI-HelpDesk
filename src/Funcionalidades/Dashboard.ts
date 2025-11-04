@@ -25,7 +25,7 @@ export function useDashboard(TicketsSvc: TicketsService) {
    // const [state, setState] = React.useState<RelacionadorState>({TicketRelacionar: null});
     const { account } = useAuth();
 
-    const buildFilter = React.useCallback((mode: string, changeRange: boolean): GetAllOpts => {
+    const buildFilter = React.useCallback((mode: string): GetAllOpts => {
         const filters: string[] = [];
     
         if(mode === "resumen"){
@@ -41,7 +41,7 @@ export function useDashboard(TicketsSvc: TicketsService) {
                 filters.push(`fields/FechaApertura le ${toIso}`);
         }
                     
-        if(changeRange){
+        if(range.from && range.to && range.from <= range.to && range.to !== today && range.from !== today){
             filters.push(`fields/FechaApertura ge ${range.from}`);
             filters.push(`fields/FechaApertura le ${range.to}`);
         }
@@ -51,12 +51,12 @@ export function useDashboard(TicketsSvc: TicketsService) {
         };
       }, [range.from, range.to,]); 
 
-    const obtenerTotal = React.useCallback(async (mode: string, changeRange:boolean) => {
+    const obtenerTotal = React.useCallback(async (mode: string, ) => {
         setLoading(true);
         setError(null);
         try {
         // pasa el filtro al servicio (ajusta la firma si tu svc usa otra shape)
-        const casos = await TicketsSvc.getAllPlane(buildFilter(mode, changeRange));
+        const casos = await TicketsSvc.getAllPlane(buildFilter(mode));
         //const casosEnCurso = await TicketsSvc.getAllPlane({});
         const total = Array.isArray(casos)
             ? casos.length
