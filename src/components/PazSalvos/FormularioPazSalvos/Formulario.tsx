@@ -157,11 +157,17 @@ export default function FormularioPazSalvo() {
 
           <div className="cr-field">
             <label className="cr-label"><span className="req">*</span> Jefe directo</label>
-            <select className="cr-input" value={state.Jefe ?? ""} onChange={(e) => setField("Jefe", e.target.value)}>
-              <option value="">Buscar elementos</option>
-              <option value="j1">Jefe 1</option>
-              <option value="j2">Jefe 2</option>
-            </select>
+            <Select<UserOptionEx, false>
+              classNamePrefix="rs"
+              placeholder={loadingWorkers ? "Cargando opciones…" : "Busca por nombre o correo…"}
+              isLoading={loadingWorkers}
+              isClearable
+              options={workersOptions}
+              components={{ Option }}
+              value={selectedWorker}
+              onChange={(e) => {setField("Jefe", e?.label); setField("CorreoJefe", e?.value)}}
+              noOptionsMessage={() => (usersError ? "Error cargando opciones" : "Sin coincidencias")}
+            />
             {errors.Jefe && <small className="error">{errors.Jefe}</small>}
           </div>
 
@@ -173,7 +179,11 @@ export default function FormularioPazSalvo() {
 
           <div className="cr-field">
             <label className="cr-label"><span className="req">*</span> Empresa</label>
-            <input className="cr-input" value={state.Empresa ?? ""} onChange={(e) => setField("Empresa", e.target.value)}/>
+            <select className="cr-input" value={state.Jefe ?? ""} onChange={(e) => setField("Empresa", e.target.value)}>
+              <option value="">Buscar elementos</option>
+              <option value="Estudio de moda">Estudio de moda</option>
+              <option value="DH Retail">DH Retail</option>
+            </select>
             {errors.Empresa && <small className="error">{errors.Empresa}</small>}
           </div>
 

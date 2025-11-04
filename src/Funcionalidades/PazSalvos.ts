@@ -84,95 +84,183 @@ export function usePazSalvos(services: Svc) {
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    console.table(state)
-    if (!validate()) return;
+        e.preventDefault();
+        console.table(state)
+        if (!validate()) return;
 
-    setSubmitting(true);
-        const apertura = new Date();
-        let solucion: TZDate | null = null;
-        solucion = calcularFechaSolucion(apertura, 8, holidays);
-        const aperturaISO  = toGraphDateTime(apertura);           
-        const tiempoSolISO = toGraphDateTime(solucion as any);      
-        const payload: PazSalvos = {
-            Title: state.Title,
-            Cargo: state.Cargo,
-            Cedula: state.Cedula,
-            CO: state.CO,
-            Empresa: state.Empresa,
-            Fechadeingreso: state.Fechadeingreso,       
-            Fechadesalida: state.Fechadesalida, 
-            Jefe: state.Jefe,  
-            Nombre: state.Nombre,
-            Consecutivo: state.Consecutivo,
-            CorreoJefe: state.CorreoJefe,
-            Correos: state.Correos,
-            Solicitante: account?.name ?? ""
-        };
-        const resolutor = await pickTecnicoConMenosCasos(Usuarios) 
-        const ticketPayload = {
-            ANS: "ANS 3",
-            Categoria: "Inventario",
-            CorreoObservador: "",
-            Correoresolutor: resolutor?.Correo,
-            CorreoSolicitante: account?.username,
-            Descripcion: `Se ha solicitado el paz y salvo del tercero ${state.Nombre} port ${account?.name}`,
-            Estadodesolicitud: "En espera",
-            FechaApertura: aperturaISO,
-            Fuente: "Aplicativo",
-            IdResolutor: resolutor?.Id,
-            Nombreresolutor: resolutor?.Title,
-            Solicitante: account?.name,
-            SubCategoria: "Salida",
-            Title: `LIQUIDACIÓN FINAL ${state.Cedula} - ${state.Nombre}`,
-            SubSubCategoria: "Paz y salvo",
-            TiempoSolucion: tiempoSolISO
-        }
-      try {
-        PazYSalvos.create(payload);
-        const ticketCreated = await TicketSvc.create(ticketPayload);
-        alert("Se ha registrado la solicitud con éxito")
-        const idTexto = String(ticketCreated.ID || "—");
-        const fechaSolTexto = solucion ? new Date(solucion as unknown as string).toLocaleString() : "No aplica";
-        const resolutorEmail = ticketCreated.CorreoResolutor || "";
-        LogSvc.create({Actor: "Sitema", Descripcion:  `Se ha creado un nuevo ticket para el siguiente requerimiento: ${ticketCreated.Title}`,  Tipo_de_accion: "Creacion", Title: idTexto, CorreoActor: ""});   
-        setState({Cargo: "", Cedula: "", CO: "", Empresa: "", Fechadeingreso: "", Fechadesalida: "", Jefe: "", Nombre: "", Title: "", Consecutivo: "", CorreoJefe: "", Correos: "", Solicitante: ""});
-        setErrors({})
-        if (resolutorEmail) {
-          const title = `Nuevo caso asignado - ${idTexto}`;
-          const message = `
-          <p>¡Hola!<br><br>
-          Tienes un nuevo caso asignado con estos detalles:<br><br>
-          <strong>ID del Caso:</strong> ${idTexto}<br>
-          <strong>Solicitante:</strong> ${ticketCreated.Solicitante ?? "—"}<br>
-          <strong>Correo del Solicitante:</strong> ${ticketCreated.CorreoSolicitante ?? "—"}<br>
-          <strong>Asunto:</strong> ${ticketCreated.Title}<br>
-          <strong>Fecha máxima de solución:</strong> ${fechaSolTexto}<br><br>
-          Por favor, contacta al usuario para brindarle solución.<br><br>
-          Este es un mensaje automático, por favor no respondas.
-          </p>`.trim();
+        setSubmitting(true);
+            const apertura = new Date();
+            let solucion: TZDate | null = null;
+            solucion = calcularFechaSolucion(apertura, 8, holidays);
+            const aperturaISO  = toGraphDateTime(apertura);           
+            const tiempoSolISO = toGraphDateTime(solucion as any);      
+            const payload: PazSalvos = {
+                Title: state.Title,
+                Cargo: state.Cargo,
+                Cedula: state.Cedula,
+                CO: state.CO,
+                Empresa: state.Empresa,
+                Fechadeingreso: state.Fechadeingreso,       
+                Fechadesalida: state.Fechadesalida, 
+                Jefe: state.Jefe,  
+                Nombre: state.Nombre,
+                Consecutivo: state.Consecutivo,
+                CorreoJefe: state.CorreoJefe,
+                Correos: state.Correos,
+                Solicitante: account?.name ?? ""
+            };
+            const resolutor = await pickTecnicoConMenosCasos(Usuarios) 
+            const ticketPayload = {
+                ANS: "ANS 3",
+                Categoria: "Inventario",
+                CorreoObservador: "",
+                Correoresolutor: resolutor?.Correo,
+                CorreoSolicitante: account?.username,
+                Descripcion: `Se ha solicitado el paz y salvo del tercero ${state.Nombre} port ${account?.name}`,
+                Estadodesolicitud: "En espera",
+                FechaApertura: aperturaISO,
+                Fuente: "Aplicativo",
+                IdResolutor: resolutor?.Id,
+                Nombreresolutor: resolutor?.Title,
+                Solicitante: account?.name,
+                SubCategoria: "Salida",
+                Title: `LIQUIDACIÓN FINAL ${state.Cedula} - ${state.Nombre}`,
+                SubSubCategoria: "Paz y salvo",
+                TiempoSolucion: tiempoSolISO
+            }
+        try {
+            PazYSalvos.create(payload);
+            const ticketCreated = await TicketSvc.create(ticketPayload);
+            alert("Se ha registrado la solicitud con éxito")
+            const idTexto = String(ticketCreated.ID || "—");
+            const fechaSolTexto = solucion ? new Date(solucion as unknown as string).toLocaleString() : "No aplica";
+            const resolutorEmail = ticketCreated.CorreoResolutor || "";
+            LogSvc.create({Actor: "Sitema", Descripcion:  `Se ha creado un nuevo ticket para el siguiente requerimiento: ${ticketCreated.Title}`,  Tipo_de_accion: "Creacion", Title: idTexto, CorreoActor: ""});   
+            setState({Cargo: "", Cedula: "", CO: "", Empresa: "", Fechadeingreso: "", Fechadesalida: "", Jefe: "", Nombre: "", Title: "", Consecutivo: "", CorreoJefe: "", Correos: "", Solicitante: ""});
+            setErrors({})
+            if (resolutorEmail) {
+            const title = `Nuevo caso asignado - ${idTexto}`;
+            const message = `
+            <p>¡Hola!<br><br>
+            Tienes un nuevo caso asignado con estos detalles:<br><br>
+            <strong>ID del Caso:</strong> ${idTexto}<br>
+            <strong>Solicitante:</strong> ${ticketCreated.Solicitante ?? "—"}<br>
+            <strong>Correo del Solicitante:</strong> ${ticketCreated.CorreoSolicitante ?? "—"}<br>
+            <strong>Asunto:</strong> ${ticketCreated.Title}<br>
+            <strong>Fecha máxima de solución:</strong> ${fechaSolTexto}<br><br>
+            Por favor, contacta al usuario para brindarle solución.<br><br>
+            Este es un mensaje automático, por favor no respondas.
+            </p>`.trim();
 
-          try {
-            await notifyFlow.invoke<FlowToUser, any>({
-              recipient: resolutorEmail, 
-              title,
-              message,
-              mail: true,
-            });
-          } catch (err) {
-            console.error("[Flow] Error enviando a resolutor:", err);
-          }
+            try {
+                await notifyFlow.invoke<FlowToUser, any>({
+                recipient: resolutorEmail, 
+                title,
+                message,
+                mail: true,
+                });
+            } catch (err) {
+                console.error("[Flow] Error enviando a resolutor:", err);
+            }
+            }
+        } catch (err) {
+            console.error("Error actualizando contador del resolutor:", err);
+        }finally {
+            setSubmitting(false);
         }
-      } catch (err) {
-        console.error("Error actualizando contador del resolutor:", err);
-      }finally {
-        setSubmitting(false);
-      }
     };
+
+    const GetPazSalvos = async (e: React.FormEvent) => {
+        e.preventDefault();
+        console.table(state)
+        if (!validate()) return;
+
+        setSubmitting(true);
+            const apertura = new Date();
+            let solucion: TZDate | null = null;
+            solucion = calcularFechaSolucion(apertura, 8, holidays);
+            const aperturaISO  = toGraphDateTime(apertura);           
+            const tiempoSolISO = toGraphDateTime(solucion as any);      
+            const payload: PazSalvos = {
+                Title: state.Title,
+                Cargo: state.Cargo,
+                Cedula: state.Cedula,
+                CO: state.CO,
+                Empresa: state.Empresa,
+                Fechadeingreso: state.Fechadeingreso,       
+                Fechadesalida: state.Fechadesalida, 
+                Jefe: state.Jefe,  
+                Nombre: state.Nombre,
+                Consecutivo: state.Consecutivo,
+                CorreoJefe: state.CorreoJefe,
+                Correos: state.Correos,
+                Solicitante: account?.name ?? ""
+            };
+            const resolutor = await pickTecnicoConMenosCasos(Usuarios) 
+            const ticketPayload = {
+                ANS: "ANS 3",
+                Categoria: "Inventario",
+                CorreoObservador: "",
+                Correoresolutor: resolutor?.Correo,
+                CorreoSolicitante: account?.username,
+                Descripcion: `Se ha solicitado el paz y salvo del tercero ${state.Nombre} port ${account?.name}`,
+                Estadodesolicitud: "En espera",
+                FechaApertura: aperturaISO,
+                Fuente: "Aplicativo",
+                IdResolutor: resolutor?.Id,
+                Nombreresolutor: resolutor?.Title,
+                Solicitante: account?.name,
+                SubCategoria: "Salida",
+                Title: `LIQUIDACIÓN FINAL ${state.Cedula} - ${state.Nombre}`,
+                SubSubCategoria: "Paz y salvo",
+                TiempoSolucion: tiempoSolISO
+            }
+        try {
+            PazYSalvos.create(payload);
+            const ticketCreated = await TicketSvc.create(ticketPayload);
+            alert("Se ha registrado la solicitud con éxito")
+            const idTexto = String(ticketCreated.ID || "—");
+            const fechaSolTexto = solucion ? new Date(solucion as unknown as string).toLocaleString() : "No aplica";
+            const resolutorEmail = ticketCreated.CorreoResolutor || "";
+            LogSvc.create({Actor: "Sitema", Descripcion:  `Se ha creado un nuevo ticket para el siguiente requerimiento: ${ticketCreated.Title}`,  Tipo_de_accion: "Creacion", Title: idTexto, CorreoActor: ""});   
+            setState({Cargo: "", Cedula: "", CO: "", Empresa: "", Fechadeingreso: "", Fechadesalida: "", Jefe: "", Nombre: "", Title: "", Consecutivo: "", CorreoJefe: "", Correos: "", Solicitante: ""});
+            setErrors({})
+            if (resolutorEmail) {
+            const title = `Nuevo caso asignado - ${idTexto}`;
+            const message = `
+            <p>¡Hola!<br><br>
+            Tienes un nuevo caso asignado con estos detalles:<br><br>
+            <strong>ID del Caso:</strong> ${idTexto}<br>
+            <strong>Solicitante:</strong> ${ticketCreated.Solicitante ?? "—"}<br>
+            <strong>Correo del Solicitante:</strong> ${ticketCreated.CorreoSolicitante ?? "—"}<br>
+            <strong>Asunto:</strong> ${ticketCreated.Title}<br>
+            <strong>Fecha máxima de solución:</strong> ${fechaSolTexto}<br><br>
+            Por favor, contacta al usuario para brindarle solución.<br><br>
+            Este es un mensaje automático, por favor no respondas.
+            </p>`.trim();
+
+            try {
+                await notifyFlow.invoke<FlowToUser, any>({
+                recipient: resolutorEmail, 
+                title,
+                message,
+                mail: true,
+                });
+            } catch (err) {
+                console.error("[Flow] Error enviando a resolutor:", err);
+            }
+            }
+        } catch (err) {
+            console.error("Error actualizando contador del resolutor:", err);
+        }finally {
+            setSubmitting(false);
+        }
+    };
+
 
   return {
     state, errors, submitting, 
-    setField, handleSubmit,
+    setField, handleSubmit, GetPazSalvos
   };
 }
 
