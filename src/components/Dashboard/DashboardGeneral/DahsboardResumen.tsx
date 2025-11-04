@@ -1,4 +1,4 @@
-import "./DashboardResumen.css";
+import "./Dashboard.css"
 
 type Resolutor = { nombre: string; porcentaje: number; total: number };
 type Fuente = { label: string; total: number };
