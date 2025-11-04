@@ -55,7 +55,7 @@ const TYC_BY_OPCION: Record<OpcionSolicitud, string> = {
 };
 
 export default function Formatos() {
-  const [opcion, setOpcion] = useState<OpcionSolicitud | null>(null);
+  const [opcion, setOpcion] = useState<OpcionSolicitud | null>("Solicitud de servicios de TI");
   const [acepta, setAcepta] = useState(false);
   const [confirmado, setConfirmado] = useState(false);
 
