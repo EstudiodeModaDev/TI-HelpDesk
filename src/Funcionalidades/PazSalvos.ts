@@ -10,7 +10,6 @@ import { useAuth } from "../auth/authContext";
 import { pickTecnicoConMenosCasos } from "../utils/Commons";
 import type { PazSalvosService } from "../Services/PazSalvos.service";
 import type { PazSalvos, PazSalvosErrors } from "../Models/PazYsalvos";
-import type { Ticket } from "../Models/Tickets";
 import type { UsuariosSPService } from "../Services/Usuarios.Service";
 import type { TicketsService } from "../Services/Tickets.service";
 import type { LogService } from "../Services/Log.service";
@@ -111,11 +110,11 @@ export function usePazSalvos(services: Svc) {
             Solicitante: account?.name ?? ""
         };
         const resolutor = await pickTecnicoConMenosCasos(Usuarios) 
-        const ticketPayload: Ticket = {
+        const ticketPayload = {
             ANS: "ANS 3",
             Categoria: "Inventario",
             CorreoObservador: "",
-            CorreoResolutor: resolutor?.Correo,
+            Correoresolutor: resolutor?.Correo,
             CorreoSolicitante: account?.username,
             Descripcion: `Se ha solicitado el paz y salvo del tercero ${state.Nombre} port ${account?.name}`,
             Estadodesolicitud: "En espera",
