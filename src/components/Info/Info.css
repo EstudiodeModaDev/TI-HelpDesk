@@ -1,184 +1,114 @@
 /* ===== Tokens + soporte modo oscuro ===== */
-:root {
+:root{
   color-scheme: light dark;
-  --bg: #ffffff;
-  --bg-elev: #ffffff;
-  --text: #0f172a;
-  --border: #e2e8f0;
-  --shadow: 0 1px 2px rgba(2, 6, 23, 0.05);
-  --focus: #4f46e5;
-  --focus-ring: rgba(79, 70, 229, 0.35);
+  --bg:#ffffff;
+  --bg-elev:#ffffff;
+  --text:#0f172a;
+  --border:#e2e8f0;
+  --shadow:0 1px 2px rgba(2,6,23,.05);
+  --focus:#4f46e5;
+  --focus-ring:rgba(79,70,229,.35);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
+@media (prefers-color-scheme: dark){
+  :root{
     color-scheme: light dark;
-    --bg: #ffffff;
-    --bg-elev: #ffffff;
-    --text: #0f172a;
-    --border: #e2e8f0;
-    --shadow: 0 1px 2px rgba(2, 6, 23, 0.05);
-    --focus: #4f46e5;
-    --focus-ring: rgba(79, 70, 229, 0.35);
+    --bg:#ffffff;
+    --bg-elev:#ffffff;
+    --text:#0f172a;
+    --border:#e2e8f0;
+    --shadow:0 1px 2px rgba(2,6,23,.05);
+    --focus:#4f46e5;
+    --focus-ring:rgba(79,70,229,.35);
   }
 }
 
-/* ===== Página ===== */
-.Info-page {
-  display: grid;
-  gap: 12px;
-  color: var(--text);
+/* ===== Página (no centrar, arriba) ===== */
+.Info-page{
+  display:grid;
+  grid-auto-flow:row;
+  gap:12px;
+  color:var(--text);
+  width:100%;
+  justify-items:stretch;   /* no centrar */
+  align-content:start;     /* pegar arriba */
 }
 
-/* ===== Toolbar superior ===== */
-.info-toolbar {
-  display: flex;
-  gap: 12px;
-  padding: 8px 16px;
-  margin-bottom: 4px;
-  background: var(--bg);
-  color: var(--text);
+/* ===== Toolbar arriba a la derecha ===== */
+.info-toolbar{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;   /* todo a la derecha */
+  gap:12px;
+  padding:8px 16px 0 16px;    /* sin fondo “caja” */
+  background:transparent;
+  color:var(--text);
 }
-
-.info-toolbar__right {
-  margin-left: auto;
-  display: flex;
-  align-items: end;
-  gap: 8px;
+.info-toolbar__right{
+  display:flex;
+  align-items:center;
+  gap:8px;
 }
 
 /* ===== Select ===== */
-.info-select {
-  appearance: none;
-  background: var(--bg-elev);
-  color: var(--text);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 10px 14px;
-  font-size: .95rem;
-  line-height: 1.2;
-  box-shadow: var(--shadow);
-  outline: none;
-  transition: border-color .15s ease, box-shadow .15s ease, background-color .15s ease, color .15s ease;
+.info-select{
+  appearance:none;
+  background:var(--bg-elev);
+  color:var(--text);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:10px 14px;
+  font-size:.95rem;
+  line-height:1.2;
+  box-shadow:var(--shadow);
+  outline:none;
+  transition:border-color .15s, box-shadow .15s, background-color .15s, color .15s;
+}
+.info-select:focus{
+  border-color:var(--focus);
+  box-shadow:0 0 0 3px var(--focus-ring);
+}
+.info-select::-ms-expand{ display:none; }
+
+/* ===== Espaciado: lo que sigue al toolbar baja un poco ===== */
+.Info-page > .info-toolbar + *{
+  margin-top:12px;  /* espacio entre select y tabla/panel */
 }
 
-.info-select:focus {
-  border-color: var(--focus);
-  box-shadow: 0 0 0 3px var(--focus-ring);
+/* ===== Contenedores internos: ancho completo ===== */
+.Info-page .table-wrap,
+.Info-page .info-panel,
+.Info-page table{
+  width:100%;
+  max-width:none;
 }
 
-/* Opcional: caret mínimo para navegadores que ocultan el nativo */
-.info-select::-ms-expand { display: none; }
-.info-select:after { content: ""; }
-
-/* ===== Contenedores base para los paneles internos ===== */
-.info-panel {
-  background: var(--bg-elev);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  box-shadow: var(--shadow);
-  padding: 16px;
+/* ===== Utilidades opcionales (por si las usas) ===== */
+.info-panel{
+  background:var(--bg-elev);
+  border:1px solid var(--border);
+  border-radius:16px;
+  box-shadow:var(--shadow);
+  padding:16px;
 }
-
-/* Grid responsivo para tarjetas/listas dentro de los paneles */
-.info-grid {
-  display: grid;
-  gap: 12px;
-  grid-template-columns: repeat(12, minmax(0, 1fr));
+.info-table{
+  width:100%;
+  border-collapse:separate;
+  border-spacing:0;
+  font-size:.95rem;
 }
-
-.info-grid--2col > * { grid-column: span 6; }
-.info-grid--3col > * { grid-column: span 4; }
-.info-grid--1col > * { grid-column: 1 / -1; }
-
-@media (max-width: 1024px) {
-  .info-grid--3col > * { grid-column: span 6; }
+.info-table th, .info-table td{
+  text-align:left;
+  padding:10px 12px;
+  border-bottom:1px solid var(--border);
 }
-@media (max-width: 640px) {
-  .info-grid--2col > *,
-  .info-grid--3col > * { grid-column: 1 / -1; }
-}
-
-/* Tarjeta genérica útil para items de tienda/proveedor */
-.info-card {
-  background: var(--bg-elev);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 14px;
-  box-shadow: var(--shadow);
-  display: grid;
-  gap: 8px;
-  min-width: 0;
-}
-
-.info-card__title {
-  font-weight: 700;
-  font-size: 1rem;
-  line-height: 1.2;
-}
-
-.info-card__meta {
-  font-size: .85rem;
-  opacity: .85;
-}
-
-/* Lista clave-valor */
-.info-kv {
-  display: grid;
-  grid-template-columns: max-content 1fr;
-  gap: 6px 12px;
-  align-items: start;
-}
-.info-kv dt {
-  font-weight: 600;
-}
-.info-kv dd {
-  margin: 0;
-  min-width: 0;
-  overflow-wrap: anywhere;
-}
-
-/* Tabla ligera por si la usas en Proveedores */
-.info-table {
-  width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
-  font-size: .95rem;
-}
-.info-table th, .info-table td {
-  text-align: left;
-  padding: 10px 12px;
-  border-bottom: 1px solid var(--border);
-}
-.info-table thead th {
-  background: var(--bg-elev);
-  position: sticky;
-  top: 0;
-  z-index: 1;
-}
-
-/* Badges/píldoras */
-.info-badge {
-  display: inline-block;
-  padding: 2px 8px;
-  border-radius: 999px;
-  border: 1px solid var(--border);
-  background: var(--bg);
-  font-size: .78rem;
-  line-height: 1.2;
-}
-
-/* ===== Accesibilidad ===== */
-.sr-only {
-  position: absolute !important;
-  width: 1px; height: 1px;
-  padding: 0; margin: -1px;
-  overflow: hidden; clip: rect(0,0,0,0);
-  white-space: nowrap; border: 0;
+.info-table thead th{
+  background:var(--bg-elev);
+  position:sticky; top:0; z-index:1;
 }
 
 /* ===== Responsive ===== */
-@media (max-width: 767px) {
-  .info-toolbar { padding: 8px 10px; }
-  .info-select { width: 100%; }
+@media (max-width:767px){
+  .info-toolbar{ padding:8px 10px 0 10px; }
+  .info-select{ width:auto; max-width:100%; }
 }
