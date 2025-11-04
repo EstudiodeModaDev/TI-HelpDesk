@@ -1,158 +1,229 @@
-/* ===================== Tokens & theming ===================== */
+/* =========================
+   Tokens (Light / Dark)
+   ========================= */
 :root{
-  --page-bg:#f7fafc;            /* fondo general */
-  --card:#ffffff;               /* fondo tarjeta/form */
-  --ink:#0f172a;                /* texto principal */
-  --muted:#64748b;              /* texto secundario */
-  --bd:#e5e7eb;                 /* bordes */
-  --ring:rgba(45,109,246,.35);  /* focus ring */
-  --shadow:0 10px 28px rgba(2,6,23,.08);
+  color-scheme: light dark;
+  --bg: #f8fafc;              /* page */
+  --bg-elev: #ffffff;         /* cards/forms */
+  --ink: #0f172a;             /* text */
+  --muted: #64748b;           /* secondary text */
+  --border: #e2e8f0;          /* strokes */
+  --shadow: 0 8px 24px rgba(2,6,23,.06);
 
-  --primary:#2d6df6;
-  --primary-ink:#ffffff;
+  --primary: #4f46e5;         /* indigo-600 */
+  --primary-ink: #ffffff;
+  --primary-hover: #4338ca;   /* indigo-700 */
+  --ring: rgba(79,70,229,.35);
 
-  --radius-lg:14px;
-  --radius-md:12px;
-  --radius-sm:10px;
+  --radius: 14px;
+  --pad: 16px;
+  --gap: 14px;
+  --input-h: 44px;
+  --font: system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif;
 }
 
 @media (prefers-color-scheme: dark){
   :root{
-    --page-bg:#0b1220;
-    --card:#0f172a;
-    --ink:#e5e7eb;
-    --muted:#9ca3af;
-    --bd:#1f2937;
-    --shadow:0 16px 34px rgba(0,0,0,.45);
+    color-scheme: light dark;
+    --bg: #f8fafc;              /* page */
+    --bg-elev: #ffffff;         /* cards/forms */
+    --ink: #0f172a;             /* text */
+    --muted: #64748b;           /* secondary text */
+    --border: #e2e8f0;          /* strokes */
+    --shadow: 0 8px 24px rgba(2,6,23,.06);
+
+    --primary: #4f46e5;         /* indigo-600 */
+    --primary-ink: #ffffff;
+    --primary-hover: #4338ca;   /* indigo-700 */
+    --ring: rgba(79,70,229,.35);
+
+    --radius: 14px;
+    --pad: 16px;
+    --gap: 14px;
+    --input-h: 44px;
+    --font: system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif;
   }
 }
 
-/* ===================== Layout base ===================== */
+/* =========================
+   Layout base
+   ========================= */
 .tpl-page{
-  min-height:100dvh;
-  background:var(--page-bg);
-  color:var(--ink);
-  padding:24px clamp(16px,4vw,48px);
+  background: var(--bg);
+  color: var(--ink);
+  padding: clamp(12px, 2vw, 24px);
 }
 
 .tpl-form{
-  max-width:980px;
-  margin:0 auto;
-  background:var(--card);
-  border:1px solid var(--bd);
-  border-radius:var(--radius-lg);
-  box-shadow:var(--shadow);
-  padding:28px;
+  max-width: 980px;
+  margin: 0 auto;
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius) + 2px);
+  box-shadow: var(--shadow);
+  padding: clamp(16px, 2.2vw, 28px);
+  display: grid;
+  gap: max(14px, 1.2vw);
+  font-family: var(--font);
 }
 
+/* =========================
+   Título
+   ========================= */
 .tpl-title{
-  font-size:clamp(20px,2.2vw,28px);
-  font-weight:800;
-  margin:4px 0 18px;
-  letter-spacing:.2px;
+  margin: 0;
+  font-size: clamp(1.4rem, 2vw, 1.9rem);
+  line-height: 1.15;
+  letter-spacing: -0.015em;
 }
 
-/* ===================== Campos ===================== */
-.tpl-field{ margin:18px 0; }
+/* =========================
+   Fieldset
+   ========================= */
+.tpl-field{
+  display: grid;
+  gap: 8px;
+}
 
 .tpl-label{
-  display:block;
-  font-weight:700;
-  color:var(--muted);
-  margin-bottom:10px;
-  letter-spacing:.2px;
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 1.2;
 }
 
+/* =========================
+   Inputs
+   ========================= */
 .tpl-input{
-  width:100%;
-  height:48px;
-  border:1px solid var(--bd);
-  border-radius:var(--radius-md);
-  background:var(--card);
-  color:var(--ink);
-  padding:0 14px;
-  font-size:16px;
-  outline:none;
-  transition:border-color .15s ease, box-shadow .15s ease;
+  height: var(--input-h);
+  padding: 10px 12px;
+  background: var(--bg-elev);
+  color: var(--ink);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  outline: none;
+  transition: border-color .15s ease, box-shadow .15s ease, background-color .15s ease, color .15s ease;
 }
-.tpl-input::placeholder{ color:color-mix(in oklab, var(--muted) 70%, transparent); }
+.tpl-input::placeholder{ color: var(--muted); }
 .tpl-input:focus{
-  border-color:var(--primary);
-  box-shadow:0 0 0 4px var(--ring);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--ring);
 }
 
-/* ===================== Toolbar ===================== */
+/* =========================
+   Toolbar (placeholder)
+   ========================= */
 .tpl-toolbar{
-  display:flex;
-  align-items:center;
-  gap:8px;
-  border:1px solid var(--bd);
-  border-radius:var(--radius-md) var(--radius-md) 0 0;
-  background:var(--card);
-  padding:8px;
-  min-height:44px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: color-mix(in oklab, var(--bg-elev) 92%, transparent);
 }
 
-/* (opcional) si luego agregas botones dentro de la toolbar */
-.tpl-toolbar .tpl-btn{
-  border:1px solid var(--bd);
-  background:var(--card);
-  color:var(--ink);
-  padding:.45rem .6rem;
-  border-radius:var(--radius-sm);
-  cursor:pointer;
+/* Si agregas botones en la toolbar, estos estilos ayudan */
+.tpl-toolbar button{
+  appearance: none;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--ink);
+  border-radius: 10px;
+  padding: 6px 10px;
+  font-weight: 600;
+  font-size: .9rem;
+  cursor: pointer;
+  transition: background .15s, border-color .15s, box-shadow .15s;
 }
-.tpl-toolbar .tpl-btn:hover{ background:rgba(0,0,0,.04); }
+.tpl-toolbar button:hover{
+  background: color-mix(in oklab, var(--bg-elev) 85%, transparent);
+}
+.tpl-toolbar button:focus-visible{
+  outline: none;
+  box-shadow: 0 0 0 3px var(--ring);
+  border-color: var(--primary);
+}
 
-/* ===================== Editor ===================== */
+/* =========================
+   Editor
+   ========================= */
 .tpl-editorWrapper{
-  border:1px solid var(--bd);
-  border-top:none; /* se funde con la toolbar */
-  border-radius:0 0 var(--radius-md) var(--radius-md);
-  overflow:hidden;
-  background:var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: clip;
+  background: var(--bg-elev);
+  min-height: 260px; /* por si el editor tarda en cargar */
 }
 
-/* Si tu RichTextBase64 pinta un div contenteditable interno,
-   deja buen padding y altura mínima desde el contenedor */
-.tpl-editorWrapper > *{
-  min-height:340px;           /* alto del área de edición */
-  padding:14px 16px 120px;    /* espacio cómodo + "zona segura" inferior */
-  outline:none;
-  color:var(--ink);
-  background:transparent;
+/* Si el editor usa un iframe o contenteditable, esto ayuda */
+.tpl-editorWrapper *{
+  color-scheme: light dark;
+}
+.tpl-editorWrapper [contenteditable="true"],
+.tpl-editorWrapper iframe{
+  background: var(--bg-elev);
+  color: var(--ink);
 }
 
-/* ===================== Footer / acciones ===================== */
+/* =========================
+   Acciones
+   ========================= */
 .tpl-actions{
-  display:flex;
-  justify-content:center;
-  margin-top:24px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 4px;
 }
 
 .tpl-primary{
-  height:46px;
-  padding:0 22px;
-  border:none;
-  border-radius:999px;
-  background:var(--primary);
-  color:var(--primary-ink);
-  font-weight:700;
-  cursor:pointer;
-  box-shadow:0 10px 22px rgba(45,109,246,.24);
-  transition:transform .06s ease, filter .12s ease, box-shadow .12s ease;
+  appearance: none;
+  -webkit-appearance: none;
+  background: var(--primary);
+  color: var(--primary-ink);
+  border: 1px solid var(--primary-hover);
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  font-weight: 700;
+  line-height: 1.2;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: background .15s ease, border-color .15s ease, box-shadow .15s ease, transform .04s ease;
 }
-.tpl-primary:hover{ filter:brightness(1.06); }
-.tpl-primary:active{ transform:translateY(1px); }
+.tpl-primary:hover{ background: var(--primary-hover); }
+.tpl-primary:active{ transform: translateY(1px); }
+.tpl-primary:focus-visible{
+  outline: none;
+  box-shadow: 0 0 0 4px var(--ring);
+}
 .tpl-primary:disabled{
-  opacity:.6;
-  cursor:not-allowed;
-  box-shadow:none;
+  opacity: .6;
+  cursor: default;
+  box-shadow: none;
 }
 
-/* ===================== Utilidades (opcionales) ===================== */
-@media (max-width:640px){
-  .tpl-form{ padding:18px; }
-  .tpl-toolbar{ padding:6px; }
-  .tpl-editorWrapper > *{ padding:12px 12px 90px; }
+/* =========================
+   Estados / feedback (opcionales)
+   ========================= */
+.tpl-hint{
+  color: var(--muted);
+  font-size: .85rem;
+}
+
+.tpl-error{
+  color: #b91c1c;
+  font-weight: 600;
+  font-size: .9rem;
+}
+@media (prefers-color-scheme: dark){
+  .tpl-error{ color: #fecaca; }
+}
+
+/* =========================
+   Responsive
+   ========================= */
+@media (max-width: 640px){
+  .tpl-form{ padding: 14px; gap: 12px; }
+  .tpl-actions{ justify-content: stretch; }
+  .tpl-primary{ width: 100%; }
 }
