@@ -8,9 +8,9 @@ import { toGraphDateTime, toISODateFlex } from "../utils/Date";
 export function useDashboard(TicketsSvc: TicketsService) {
    // const [resolutures, setResolutores] = React.useState<Usuario[]>([])
     const [totalCasos, setTotalCasos] = React.useState<number>(0)
-    //const [totalEnCurso, setTotalencurso] = React.useState<number>(0)
-    //const [totalFueraTiempo, setTotalFueraTiempo] = React.useState<number>(0)
-    //const [totalFinalizados, setTotalFinalizados] = React.useState<number>(0)
+    const [totalEnCurso, setTotalencurso] = React.useState<number>(0)
+    const [totalFueraTiempo, setTotalFueraTiempo] = React.useState<number>(0)
+    const [totalFinalizados, setTotalFinalizados] = React.useState<number>(0)
     const [loading, setLoading] = React.useState(false);
     const [error, setError] = React.useState<string | null>(null);
     const today = React.useMemo(() => toISODateFlex(new Date()), []);
@@ -25,7 +25,7 @@ export function useDashboard(TicketsSvc: TicketsService) {
    // const [state, setState] = React.useState<RelacionadorState>({TicketRelacionar: null});
     const { account } = useAuth();
 
-    const buildFilter = React.useCallback((mode: string): GetAllOpts => {
+    const buildFilterTickets = React.useCallback((mode: string): GetAllOpts => {
         const filters: string[] = [];
     
         if(mode === "resumen"){
@@ -55,16 +55,27 @@ export function useDashboard(TicketsSvc: TicketsService) {
         setLoading(true);
         setError(null);
         try {
-        // pasa el filtro al servicio (ajusta la firma si tu svc usa otra shape)
-        const casos = await TicketsSvc.getAllPlane(buildFilter(mode));
-        //const casosEnCurso = await TicketsSvc.getAllPlane({});
-        const total = Array.isArray(casos)
-            ? casos.length
-            : Array.isArray((casos as any)?.value)
-            ? (casos as any).value.length
-            : 0;
+        const filter = buildFilterTickets(mode)
+        //Todos los casos
+        const casos = await TicketsSvc.getAllPlane(filter);
+         const total = Array.isArray(casos) ? casos.length : Array.isArray((casos as any)?.value) ? (casos as any).value.length : 0;
 
+        //Casos finalizados
+        const casosFinalizados = await TicketsSvc.getAllPlane({filter: filter.filter + " and fields/Estado eq 'Cerrado'" });
+        const totalFinalizados = Array.isArray(casosFinalizados) ? casosFinalizados.length : Array.isArray((casosFinalizados as any)?.value) ? (casosFinalizados as any).value.length : 0;
+
+        //Casos fuera de tiempo
+        const casosVencidos = await TicketsSvc.getAllPlane({filter: filter.filter + "or (fields/Estado eq 'Fuera de tiempo' or fields/Estado 'Cerrado fuera de tiempo')" });
+        const totalVencidos = Array.isArray(casosVencidos) ? casos.length : Array.isArray((casosVencidos as any)?.value) ? (casosVencidos as any).value.length : 0;
+        
+        //Casos en curso
+        const casosEnCurso = await TicketsSvc.getAllPlane({filter: filter.filter + " and fields/Estado eq 'En curso'" });
+        const totalEnCurso = Array.isArray(casosEnCurso) ? casosEnCurso.length : Array.isArray((casosEnCurso as any)?.value) ? (casosEnCurso as any).value.length : 0;
+            
         setTotalCasos(total);
+        setTotalFinalizados(totalFinalizados);
+        setTotalFueraTiempo(totalVencidos);
+        setTotalencurso(totalEnCurso);
         } catch (e: any) {
         setError(e?.message ?? "Error al inicializar escalamiento");
         } finally {
@@ -107,7 +118,7 @@ export function useDashboard(TicketsSvc: TicketsService) {
 
   return {
     obtenerTotal, setRange,
-    totalCasos, error, loading
+    totalCasos, error, loading, totalEnCurso, totalFinalizados, totalFueraTiempo,
   };
 }
 
