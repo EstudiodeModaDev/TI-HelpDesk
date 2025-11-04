@@ -82,17 +82,17 @@
 
 /* ===== Filtros ===== */
 .pz-filters{
-  background: var(--pz-card);
-  border: 1px solid var(--pz-border);
-  border-radius: 12px;
-  box-shadow: var(--pz-shadow);
-  padding: 10px 12px;
-
-  display: grid;
-  grid-template-columns: repeat(5, max-content);
-  gap: 14px 18px;
-  align-items: end;
-  justify-content: center;
+    background: var(--pz-card);
+    border: 1px solid var(--pz-border);
+    border-radius: 12px;
+    box-shadow: var(--pz-shadow);
+    padding: 10px 12px;
+    display: grid;
+    grid-template-columns: auto auto auto 1fr; 
+    gap: 14px 18px;
+    align-items: end;
+    justify-content: stretch;
+    column-gap: 18px;
 }
 
 .pz-field{ display: grid; gap: 6px; }
@@ -118,7 +118,8 @@
 
 .pz-search input[type="search"]{
   height: 36px;
-  width: 260px;
+  width: 100%;
+  min-width: 240px;
   background: var(--pz-card);
   color: var(--pz-ink);
   border: 1px solid var(--pz-border);
@@ -155,7 +156,7 @@
   text-align: left;
   padding: 10px 12px;
   border-bottom: 1px solid var(--pz-border);
-  white-space: nowrap;
+  white-space: normal;
 }
 .pz-sort{ opacity: .7; font-weight: 700; }
 
@@ -188,3 +189,6 @@
   }
   .pz-search input{ width: 100%; }
 }
+
+.pz-page, .pz-header, .pz-filters, .pz-tableWrap{ width:100%; }
+
