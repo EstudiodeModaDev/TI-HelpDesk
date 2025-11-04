@@ -50,7 +50,7 @@
    ========================= */
 .cr-page{
   min-height: 100dvh;
-  background: var(--bg);
+  background: transparent;
   color: var(--ink);
   display: grid;
   place-items: start center; /* ancho completo pero centrado visual */
