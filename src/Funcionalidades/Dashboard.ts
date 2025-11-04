@@ -29,8 +29,8 @@ export function useDashboard(TicketsSvc: TicketsService) {
         const filters: string[] = [];
     
         if(mode === "resumen"){
-             filters.push(`fields/CorreoResolutor eq '${account!.username}'`)
-                filters.push(`fields/CorreoResolutor eq '${account!.username}'`);
+             filters.push(`fields/Correoresolutor eq '${account!.username}'`)
+                filters.push(`fields/Correoresolutor eq '${account!.username}'`);
 
                 const now = new Date();
                 const monthStart = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0);
