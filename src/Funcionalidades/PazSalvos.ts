@@ -73,7 +73,7 @@ export function usePazSalvos(services: Svc) {
         const e: PazSalvos = {};
         if (!state.CO) e.CO = "Requerido";
         if (!state.Cargo) e.Cargo = "Requerido";
-        if (state.Cedula) e.Cedula = "Requerido";
+        if (!state.Cedula) e.Cedula = "Requerido";
         if (!state.Empresa) e.Empresa = "Requerido";
         if (!state.Fechadeingreso) e.Fechadeingreso = "Requerido";
         if (!state.Fechadesalida) e.Fechadesalida = "Requerido";

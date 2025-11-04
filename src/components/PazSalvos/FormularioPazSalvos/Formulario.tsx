@@ -20,7 +20,7 @@ export default function FormularioPazSalvo() {
     Log: LogService;
     PazYSalvos: PazSalvosService;
   };
-  const { state, setField, handleSubmit } = usePazSalvos({LogSvc: Logs, PazYSalvos: PazYSalvos, TicketSvc: Tickets, Usuarios: Usuarios,});
+  const { state, errors, setField, handleSubmit } = usePazSalvos({LogSvc: Logs, PazYSalvos: PazYSalvos, TicketSvc: Tickets, Usuarios: Usuarios,});
   const [colCorreosSeleccionado, setColCorreosSeleccionado] = React.useState<Aprobador[]>([]);
   const [usuarios, setUsuarios] = React.useState<UsuarioLite[]>([]); // si mantienes la lista manual                // si mantienes la lista manual
   const { workersOptions, loadingWorkers, error: usersError } = useWorkers({ onlyEnabled: true });
@@ -137,6 +137,7 @@ export default function FormularioPazSalvo() {
             onChange={handleSelectAprobador}
             noOptionsMessage={() => (usersError ? "Error cargando opciones" : "Sin coincidencias")}
           />
+          {errors.Correos && <small className="error">{errors.Correos}</small>}
         </div>
         {/* ====== Sección: Empleado ====== */}
         <h2 className="cr-sectionTitle">DATOS DEL EMPLEADO (RETIRADO)</h2>
@@ -145,11 +146,13 @@ export default function FormularioPazSalvo() {
           <div className="cr-field">
             <label className="cr-label"><span className="req">*</span> Fecha de retiro</label>
             <input type="date" className="cr-input" value={state.Fechadesalida ?? ""} onChange={(e) => setField("Fechadesalida", e.target.value)}/>
+            {errors.Fechadesalida && <small className="error">{errors.Fechadesalida}</small>}
           </div>
 
           <div className="cr-field">
             <label className="cr-label"><span className="req">*</span> Fecha de ingreso</label>
             <input type="date" className="cr-input" value={state.Fechadeingreso ?? ""} onChange={(e) => setField("Fechadeingreso", e.target.value)}/>
+            {errors.Fechadeingreso && <small className="error">{errors.Fechadeingreso}</small>}
           </div>
 
           <div className="cr-field">
@@ -159,31 +162,37 @@ export default function FormularioPazSalvo() {
               <option value="j1">Jefe 1</option>
               <option value="j2">Jefe 2</option>
             </select>
+            {errors.Jefe && <small className="error">{errors.Jefe}</small>}
           </div>
 
           <div className="cr-field">
             <label className="cr-label"><span className="req">*</span> CO</label>
             <input className="cr-input" value={state.CO ?? ""} onChange={(e) => setField("CO", e.target.value)}/>
+            {errors.CO && <small className="error">{errors.CO}</small>}
           </div>
 
           <div className="cr-field">
             <label className="cr-label"><span className="req">*</span> Empresa</label>
             <input className="cr-input" value={state.Empresa ?? ""} onChange={(e) => setField("Empresa", e.target.value)}/>
+            {errors.Empresa && <small className="error">{errors.Empresa}</small>}
           </div>
 
           <div className="cr-field">
             <label className="cr-label"><span className="req">*</span> Nombre</label>
             <input className="cr-input" value={state.Nombre ?? ""} onChange={(e) => setField("Nombre", e.target.value)}/>
+            {errors.Nombre && <small className="error">{errors.Nombre}</small>}
           </div>
 
           <div className="cr-field">
             <label className="cr-label">Cargo</label> 
             <input className="cr-input" value={state.Cargo ?? ""} onChange={(e) => setField("Cargo", e.target.value)}/>
+            {errors.Cargo && <small className="error">{errors.Cargo}</small>}
           </div>
 
           <div className="cr-field">
             <label className="cr-label">Cédula (Tercero)</label>
             <input className="cr-input" value={state.Cedula ?? ""} onChange={(e) => setField("Cedula", e.target.value)}/>
+            {errors.Cedula && <small className="error">{errors.Cedula}</small>}
           </div>
         </div>
 
