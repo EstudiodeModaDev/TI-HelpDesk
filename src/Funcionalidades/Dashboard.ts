@@ -39,7 +39,7 @@ export function useDashboard(TicketsSvc: TicketsService) {
         const user = esc(account!.username);
 
         // Solo una condición para el resolutor
-        filters.push(`fields/CorreoResolutor eq '${user}'`);
+        filters.push(`fields/Correoresolutor eq '${user}'`);
 
         // Mes en curso [1..último día]
         const now = new Date();
