@@ -43,7 +43,7 @@
 .info-toolbar__right {
   margin-left: auto;
   display: flex;
-  align-items: center;
+  align-items: end;
   gap: 8px;
 }
 
