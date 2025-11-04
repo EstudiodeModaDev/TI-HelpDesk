@@ -244,3 +244,25 @@
   .store-info th[scope="row"] { width: 200px; }
   .store-info table { font-size: 0.9rem; }
 }
+
+/* === Forzar esquema claro SOLO en StoreInfo === */
+.store-info,
+.store-info *{
+  color-scheme: light !important;
+}
+
+/* Inputs y selects siempre claros en este scope */
+.store-info input[type="text"],
+.store-info select{
+  background: #ffffff !important;
+  color: #0f172a !important;
+  border: 1px solid var(--it-border) !important;
+  border-radius: 12px;
+}
+
+/* Placeholder y autofill (Chrome/Edge) */
+.store-info input::placeholder{ color: var(--it-ink-muted); }
+.store-info input[type="text"]:-webkit-autofill{
+  -webkit-box-shadow: 0 0 0 1000px #ffffff inset !important;
+  -webkit-text-fill-color: #0f172a !important;
+}
