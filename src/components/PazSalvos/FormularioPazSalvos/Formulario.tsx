@@ -1,6 +1,5 @@
 import * as React from "react";
 import "./Formulario.css";
-import { useGraphServicesTest } from "../../../graph/GrapServicesContextTest";
 import type { PazSalvosService } from "../../../Services/PazSalvos.service";
 import { useGraphServices } from "../../../graph/GrapServicesContext";
 import type { UsuariosSPService } from "../../../Services/Usuarios.Service";
@@ -12,12 +11,11 @@ type Aprobador = { correo: string; nombre: string };
 type UsuarioLite = { Correo: string; Nombre: string };
 
 export default function FormularioPazSalvo() {
-  // Servicios
-  const { PazYSalvos } = useGraphServicesTest() as ReturnType<typeof useGraphServicesTest> & {PazYSalvos: PazSalvosService;}
-  const { Usuarios, Tickets, Logs } = useGraphServices() as ReturnType<typeof useGraphServices> & {
+  const { Usuarios, Tickets, Logs, PazYSalvos } = useGraphServices() as ReturnType<typeof useGraphServices> & {
     Usuarios: UsuariosSPService;
     Tickets: TicketsService;
     Log: LogService;
+    PazYSalvos: PazSalvosService
   };
   const { state, setField, handleSubmit } = usePazSalvos({LogSvc: Logs, PazYSalvos: PazYSalvos, TicketSvc: Tickets, Usuarios: Usuarios});
   const [colCorreosSeleccionado, setColCorreosSeleccionado] = React.useState<Aprobador[]>([]);
