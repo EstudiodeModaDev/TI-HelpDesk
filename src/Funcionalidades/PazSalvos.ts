@@ -49,42 +49,43 @@ export function usePazSalvos(services: Svc) {
   const notifyFlow = new FlowClient("https://defaultcd48ecd97e154f4b97d9ec813ee42b.2c.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/a21d66d127ff43d7a940369623f0b27d/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=0ptZLGTXbYtVNKdmIvLdYPhw1Wcqb869N3AOZUf2OH4")
 
   // Carga de festivos inicial
-  useEffect(() => {
-    let cancel = false;
-    (async () => {
-      try {
-        const hs = await fetchHolidays();
-        if (!cancel) setHolidays(hs);
-      } catch (e) {
-        if (!cancel) console.error("Error festivos:", e);
-      }
-    })();
-    return () => {
-      cancel = true;
-    };
-  }, []);
+    useEffect(() => {
+        let cancel = false;
+        (async () => {
+        try {
+            const hs = await fetchHolidays();
+            if (!cancel) setHolidays(hs);
+        } catch (e) {
+            if (!cancel) console.error("Error festivos:", e);
+        }
+        })();
+        return () => {
+        cancel = true;
+        };
+    }, []);
 
   /* ============================
      Helpers de formulario
      ============================ */
-  const setField = <K extends keyof PazSalvos>(k: K, v: PazSalvos[K]) => setState((s) => ({ ...s, [k]: v }));
+    const setField = <K extends keyof PazSalvos>(k: K, v: PazSalvos[K]) => setState((s) => ({ ...s, [k]: v }));
 
-  const validate = () => {
-    const e: PazSalvos = {};
-    if (!state.CO) e.CO = "Requerido";
-    if (!state.Cargo) e.Cargo = "Requerido";
-    if (state.Cedula) e.Cedula = "Requerido";
-    if (!state.Empresa) e.Empresa = "Requerido";
-    if (!state.Fechadeingreso) e.Fechadeingreso = "Requerido";
-    if (!state.Fechadesalida) e.Fechadesalida = "Requerido";
-    if (!state.Jefe) e.Jefe = "Requerido";
-    if (!state.Nombre) e.Nombre = "Requerido";
-    setErrors(e);
-    return Object.keys(e).length === 0;
-  };
+    const validate = () => {
+        const e: PazSalvos = {};
+        if (!state.CO) e.CO = "Requerido";
+        if (!state.Cargo) e.Cargo = "Requerido";
+        if (state.Cedula) e.Cedula = "Requerido";
+        if (!state.Empresa) e.Empresa = "Requerido";
+        if (!state.Fechadeingreso) e.Fechadeingreso = "Requerido";
+        if (!state.Fechadesalida) e.Fechadesalida = "Requerido";
+        if (!state.Jefe) e.Jefe = "Requerido";
+        if (!state.Nombre) e.Nombre = "Requerido";
+        setErrors(e);
+        return Object.keys(e).length === 0;
+    };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.table(state)
     if (!validate()) return;
 
     setSubmitting(true);

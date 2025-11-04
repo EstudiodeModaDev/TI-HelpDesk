@@ -68,15 +68,6 @@ export default function FormularioPazSalvo() {
     });
   }, [setField, toCorreosConcat]);
 
-  const clearAprobadores = React.useCallback(() => {
-    setColCorreosSeleccionado([]);
-    setField("Correos", "");
-  }, [setField]);
-
-  const onChangeCorreos = React.useCallback((val: string) => {
-    setField("Correos", val);
-  }, [setField]);
-
   const Option = (props: OptionProps<UserOptionEx, false>) => {
     const email = props.data.email ?? props.data.value;
     const name = (props.data as any).name ?? props.data.label;
@@ -115,7 +106,7 @@ export default function FormularioPazSalvo() {
           </label>
 
           {/* Input con EXACTO resultado de Concat(...) */}
-          <input className="cr-input" placeholder="Ej: ana@estudiodemoda.com.co; " value={state.Correos ?? ""} onChange={(e) => onChangeCorreos(e.target.value)}/>
+          <input className="cr-input" placeholder="Ej: ana@estudiodemoda.com.co; " value={state.Correos ?? ""}/>
 
           {/* Chips (visual y edición rápida) */}
           {colCorreosSeleccionado.length > 0 && (
@@ -128,9 +119,6 @@ export default function FormularioPazSalvo() {
                   </button>
                 </span>
               ))}
-              <button type="button" className="cr-chip-clear" onClick={clearAprobadores}>
-                Limpiar
-              </button>
             </div>
           )}
         </div>
