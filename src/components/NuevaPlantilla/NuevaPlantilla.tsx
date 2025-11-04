@@ -9,7 +9,6 @@ export default function CrearPlantilla() {
     const { Plantillas: PlantillasSvc} = useGraphServices() as ReturnType<typeof useGraphServices> & {Plantillas: PlantillasService; };
     const {createPlantilla, submiting, state, setField} = usePlantillas(PlantillasSvc)
 
-
   return (
     <section className="tpl-page" aria-label="Crear una plantilla">
 

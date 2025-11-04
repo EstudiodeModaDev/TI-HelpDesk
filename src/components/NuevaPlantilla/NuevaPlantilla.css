@@ -246,7 +246,7 @@
 /* ===== Formulario más ancho y visualmente “card” ===== */
 .tpl-form{
   /* ancho amplio pero fluido */
-  max-width: 700px;
+  max-width: 1200px;
   min-width: 0px;
   max-height: calc(100dvh - 2 * clamp(12px, 2vw, 24px));
   overflow: auto;

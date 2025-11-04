@@ -1,6 +1,5 @@
 import * as React from "react";
 import "./App.css";
-import Home from "./components/Home/Home";
 import NuevoTicketForm from "./components/NuevoTicket/NuevoTicketForm";
 import NuevoTicketUsuarioForm from "./components/NuevoTicketUsuario/NuevoTicketFormUsuario";
 import TablaTickets from "./components/Tickets/Tickets";
@@ -29,6 +28,7 @@ import settingsIcon from "./assets/settings.svg"
 import templateIcon from "./assets/template.svg"
 import PazySalvosMode from "./components/PazSalvos/PazYSalvo";
 import WelcomeSolvi from "./components/Welcome/Welcome";
+import DashBoardPage from "./components/Dashboard/DashboardPage";
 
 /* ============================================================
    Tipos de navegación y contexto de visibilidad
@@ -64,7 +64,7 @@ export type NavContext = {
    ============================================================ */
 
 const NAV: MenuItem[] = [
-  {id: "home", label: "Home", icon: <img src={HomeIcon} alt="" className="sb-icon" />, to: <Home />, roles: ["Administrador", "Tecnico"], autocollapse: true },
+  {id: "home", label: "Home", icon: <img src={HomeIcon} alt="" className="sb-icon" />, to: <DashBoardPage />, roles: ["Administrador", "Tecnico"], autocollapse: true },
   {id: "ticketform", label: "Nuevo Ticket", icon: <img src={addIcon} alt="" className="sb-icon" />, to: () => <NuevoTicketForm />, roles: ["Administrador", "Tecnico"],},
   {id: "ticketform_user", label: "Nuevo Ticket", icon: <img src={addIcon} alt="" className="sb-icon" />, to: <NuevoTicketUsuarioForm />, roles: ["Usuario"],},
   {id: "ticketTable", label: "Ver Tickets", icon: <img src={seeTickets} alt="" className="sb-icon" />, to: <TablaTickets />, autocollapse: true},
@@ -277,7 +277,6 @@ function Sidebar(props: {navs: readonly MenuItem[]; selected: string; onSelect: 
     </aside>
   );
 }
-
 
 /* ============================================================
    Shell: controla autenticación básica y muestra LoggedApp
