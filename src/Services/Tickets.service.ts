@@ -170,6 +170,55 @@ export class TicketsService {
     return { items, nextLink };
   }
 
+  async getAllPlane(opts?: GetAllOpts) {
+    await this.ensureIds()
+
+    const normalizeFieldTokens = (s: string) =>
+      s
+        .replace(/\bID\b/g, 'id')
+        .replace(/(^|[^/])\bTitle\b/g, '$1fields/Title');
+
+    const escapeODataLiteral = (v: string) => v.replace(/'/g, "''");
+
+    // Normaliza expresiones del $filter (minimiza 404 por sintaxis)
+    const normalizeFilter = (raw: string) => {
+      let out = normalizeFieldTokens(raw.trim());
+      // escapa todo literal '...'
+      out = out.replace(/'(.*?)'/g, (_m, p1) => `'${escapeODataLiteral(p1)}'`);
+      return out;
+    };
+
+    const normalizeOrderby = (raw: string) => normalizeFieldTokens(raw.trim());
+
+    const qs = new URLSearchParams();
+    qs.set('$expand', 'fields');        // necesario si filtras por fields/*
+    qs.set('$select', 'id,webUrl');     // opcional; añade fields(...) si quieres
+    if (opts?.orderby) qs.set('$orderby', normalizeOrderby(opts.orderby));
+    if (opts?.top != null) qs.set('$top', String(opts.top));
+    if (opts?.filter) qs.set('$filter', normalizeFilter(String(opts.filter)));
+
+    // Evita '+' por espacios (algunos proxies se quejan)
+    const query = qs.toString().replace(/\+/g, '%20');
+
+    const url = `/sites/${encodeURIComponent(this.siteId!)}/lists/${encodeURIComponent(this.listId!)}/items?${query}`;
+
+    try {
+      const res = await this.graph.get<any>(url);
+      return (res.value ?? []).map((x: any) => this.toModel(x));
+    } catch (e: any) {
+      // Si la ruta es válida pero el $filter rompe, reintenta sin $filter para diagnóstico
+      const code = e?.error?.code ?? e?.code;
+      if (code === 'itemNotFound' && opts?.filter) {
+        const qs2 = new URLSearchParams(qs);
+        qs2.delete('$filter');
+        const url2 = `/sites/${encodeURIComponent(this.siteId!)}/lists/${encodeURIComponent(this.listId!)}/items?${qs2.toString()}`;
+        const res2 = await this.graph.get<any>(url2);
+        return (res2.value ?? []).map((x: any) => this.toModel(x));
+      }
+      throw e;
+    }
+  }
+
 }
 
 

@@ -1,3 +1,7 @@
+import React from "react";
+import { useDashboard } from "../../../Funcionalidades/Dashboard";
+import { useGraphServices } from "../../../graph/GrapServicesContext";
+import type { TicketsService } from "../../../Services/Tickets.service";
 import "./Dashboard.css"
 
 type Resolutor = { nombre: string; porcentaje: number; total: number };
@@ -22,7 +26,13 @@ const fuentes: Fuente[] = [
 
 export default function DashboardResumen() {
   //const totalCasos = 0;
-  const cumplimiento = 0; // 0..1
+  const cumplimiento = 0; 
+  const { Tickets } = useGraphServices() as ReturnType<typeof useGraphServices> & {TicketService: TicketsService;};
+  const {totalCasos, obtenerTotal} = useDashboard(Tickets);
+  
+  React.useEffect(() => {                           
+    obtenerTotal("resumen");
+  }, []);    
 
   return (
     <section className="dash">
@@ -87,7 +97,7 @@ export default function DashboardResumen() {
                   </div>
                 </div>
                 <div className="res-right">
-                  <div className="res-total">(En blanco)</div>
+                  <div className="res-total">{totalCasos}</div>
                   <div className="res-caption">Total Casos</div>
                 </div>
               </li>
