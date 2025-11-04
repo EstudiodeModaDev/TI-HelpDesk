@@ -1,7 +1,4 @@
 import * as React from 'react';
-
-
-
 import { useAuth } from '../auth/authContext'; // asegúrate del case correcto
 import { GraphRest } from './GraphRest';
 import { SociedadesService } from '../Services/Sociedades.service';
