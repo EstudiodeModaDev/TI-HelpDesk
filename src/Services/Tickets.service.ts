@@ -15,7 +15,6 @@ export class TicketsService {
   constructor(
     graph: GraphRest,
     hostname = 'estudiodemoda.sharepoint.com',
-    // ⚠️ SIN barra final
     sitePath = '/sites/TransformacionDigital/IN/HD',
     listName = 'Tickets'
   ) {
@@ -171,8 +170,9 @@ export class TicketsService {
   }
 
   async getAllPlane(opts?: GetAllOpts) {
-    await this.ensureIds()
+    await this.ensureIds();
 
+    // ID -> id, Title -> fields/Title (cuando NO está prefijado con '/')
     const normalizeFieldTokens = (s: string) =>
       s
         .replace(/\bID\b/g, 'id')
@@ -204,7 +204,9 @@ export class TicketsService {
 
     try {
       const res = await this.graph.get<any>(url);
-      return (res.value ?? []).map((x: any) => this.toModel(x));
+      const mapped = (res.value ?? []).map((x: any) => this.toModel(x));
+      return mapped
+
     } catch (e: any) {
       // Si la ruta es válida pero el $filter rompe, reintenta sin $filter para diagnóstico
       const code = e?.error?.code ?? e?.code;
