@@ -183,7 +183,7 @@ export function usePazSalvos(services: Svc) {
         if (filterMode === "En espera") {
           filters.push(`(fields/Title eq 'En espera')`);
         } else {
-          filters.push(`(fields/Title eq 'En Finalizado')`);
+          filters.push(`(fields/Title eq 'Finalizado')`);
         }
     
         if (range.from && range.to && (range.from < range.to)) {
