@@ -65,6 +65,7 @@
   display: grid;
   gap: max(14px, 1.2vw);
   font-family: var(--font);
+  min-width: 400px
 }
 
 /* =========================
@@ -226,6 +227,10 @@
   .tpl-form{ padding: 14px; gap: 12px; }
   .tpl-actions{ justify-content: stretch; }
   .tpl-primary{ width: 100%; }
+}
+
+.tpl-form, .tpl-form *{
+  min-width: 0;                  /* grid/flex items no crecen por defecto */
 }
 
 /* ===== Hacer que la sección ocupe todo el alto y centre el contenido ===== */
