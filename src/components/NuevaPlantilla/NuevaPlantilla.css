@@ -227,3 +227,84 @@
   .tpl-actions{ justify-content: stretch; }
   .tpl-primary{ width: 100%; }
 }
+
+/* ===== Hacer que la sección ocupe todo el alto y centre el contenido ===== */
+.tpl-page{
+  /* ocupa todo el alto disponible del viewport */
+  min-height: 100dvh;
+
+  /* centrado perfecto */
+  display: grid;
+  place-items: center;
+
+  /* respiración sin generar “marcos” enormes */
+  padding: clamp(12px, 2vw, 24px);
+  background: var(--bg);
+  color: var(--ink);
+}
+
+/* ===== Formulario más ancho y visualmente “card” ===== */
+.tpl-form{
+  /* ancho amplio pero fluido */
+  width: min(1200px, 96vw);
+  /* deja que el contenido crezca; no fuerzas altura fija del form */
+  max-height: calc(100dvh - 2 * clamp(12px, 2vw, 24px));
+  overflow: auto;
+
+  margin: 0;                          /* evita que el auto-centering se desplace */
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius) + 2px);
+  box-shadow: var(--shadow);
+  padding: clamp(16px, 2.2vw, 28px);
+  display: grid;
+  gap: max(14px, 1.2vw);
+}
+
+/* Título un poco más presente en un form más ancho */
+.tpl-title{
+  margin: 0;
+  font-size: clamp(1.6rem, 2.4vw, 2.1rem);
+  line-height: 1.15;
+}
+
+/* Campos e inputs mantienen proporciones cómodas en ancho grande */
+.tpl-field{ display: grid; gap: 8px; }
+.tpl-input{ height: 44px; }
+
+/* Editor ocupa altura razonable sin empujar todo hacia abajo */
+.tpl-editorWrapper{
+  min-height: 280px;
+  max-height: 50vh;   /* no tapes el botón al crecer mucho contenido */
+  overflow: auto;
+}
+
+/* Barra de acciones pegada a la derecha pero dentro del ancho */
+.tpl-actions{
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+/* Botón primario como antes */
+.tpl-primary{
+  background: var(--primary);
+  color: var(--primary-ink);
+  border: 1px solid var(--primary-hover);
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  font-weight: 700;
+  box-shadow: var(--shadow);
+  transition: background .15s, border-color .15s, box-shadow .15s, transform .04s;
+}
+.tpl-primary:hover{ background: var(--primary-hover); }
+.tpl-primary:active{ transform: translateY(1px); }
+.tpl-primary:focus-visible{ outline: none; box-shadow: 0 0 0 4px var(--ring); }
+
+/* ===== Responsive ===== */
+@media (max-width: 640px){
+  .tpl-form{ width: min(100%, 96vw); padding: 14px; }
+  .tpl-actions{ justify-content: stretch; }
+  .tpl-primary{ width: 100%; }
+}
+
