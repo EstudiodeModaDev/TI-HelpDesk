@@ -251,6 +251,7 @@ function Sidebar(props: {navs: readonly MenuItem[]; selected: string; onSelect: 
             <>
               <span className="sb-logo" aria-hidden="true">🛠️</span>
               <span className="sb-title">Soporte Técnico</span>
+              <br />
               <span className="sb-subtitle">Tu solución empieza aquí</span>
             </>
           )}
