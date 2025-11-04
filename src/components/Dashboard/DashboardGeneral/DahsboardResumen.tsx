@@ -41,7 +41,7 @@ export default function DashboardResumen() {
         <div className="kpi-total">
           <Donut value={0} size={180} stroke={10} ring="#2563eb" />
           <div className="kpi-total__text">
-            <div className="big">(En blanco)</div>
+            <div className="big">{totalCasos}</div>
             <div className="sub">Casos en total</div>
           </div>
         </div>
