@@ -180,9 +180,11 @@ export function usePazSalvos(services: Svc) {
     const buildFilter = React.useCallback((): GetAllOpts => {
         const filters: string[] = [];
     
-        if (filterMode === "En espera") {
+        if (filterMode === "espera") {
           filters.push(`(fields/Title eq 'En espera')`);
-        } else {
+        } else if (filterMode === "todos"){
+
+        }else {
           filters.push(`(fields/Title eq 'Finalizado')`);
         }
     
