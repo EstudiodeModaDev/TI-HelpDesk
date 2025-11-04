@@ -230,16 +230,11 @@
 
 /* ===== Hacer que la sección ocupe todo el alto y centre el contenido ===== */
 .tpl-page{
-  /* ocupa todo el alto disponible del viewport */
   min-height: 100dvh;
-
-  /* centrado perfecto */
   display: grid;
   place-items: center;
-
-  /* respiración sin generar “marcos” enormes */
   padding: clamp(12px, 2vw, 24px);
-  background: var(--bg);
+  background: transparent;
   color: var(--ink);
 }
 
