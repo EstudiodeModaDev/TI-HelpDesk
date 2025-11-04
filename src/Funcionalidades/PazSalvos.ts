@@ -193,7 +193,7 @@ export function usePazSalvos(services: Svc) {
     
         return {
           filter: filters.join(" and "),
-          orderby: "created desc",
+          orderby: "fields/Created desc",
           top: pageSize,
         };
       }, [filterMode, range.from, range.to, pageSize,]); 
