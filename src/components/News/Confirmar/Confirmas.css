@@ -1,0 +1,48 @@
+/* El CONTENEDOR PADRE (donde usas este componente) debe tener:
+   position: relative;
+   aspect-ratio: 9/16;        (o una altura fija equivalente)
+   background: url('/src/assets/FondoNews.png') center/cover no-repeat;  (ya lo tienes)
+*/
+
+:root{
+  --edm-radius: 10px;
+  --edm-shadow: 0 0 15px rgba(0,0,0,.25);
+  --edm-font: 'Segoe UI', Inter, ui-sans-serif, system-ui, -apple-system, Roboto, Arial, sans-serif;
+}
+
+/* Cuadro blanco central (posicionado dentro del poster) */
+.edm-content-box{
+  position: absolute;         /* clave para calzar dentro del marco */
+  background: #fff;
+  border-radius: var(--edm-radius);
+  box-shadow: var(--edm-shadow);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;           /* el scroll vive en el contenido interior */
+  font-family: var(--edm-font);
+}
+
+/* Título centrado arriba */
+.edm-content-title{
+  margin: 0 0 8px 0;
+  text-align: center;
+  font-weight: 700;
+  font-size: 18px;
+  color: #111;
+}
+
+/* HTML con scroll si se excede el alto disponible */
+.edm-content-html{
+  overflow: auto;
+  font-size: 14px;
+  line-height: 1.45;
+  color: #222;
+  padding-right: 6px;         /* evita que el scroll tape texto */
+}
+
+/* Ajustes finos en pantallas pequeñas */
+@media (max-width: 360px){
+  .edm-content-title{ font-size: 16px; }
+  .edm-content-html{ font-size: 13px; }
+}

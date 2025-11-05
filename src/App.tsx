@@ -30,6 +30,7 @@ import PazySalvosMode from "./components/PazSalvos/PazYSalvo";
 import WelcomeSolvi from "./components/Welcome/Welcome";
 import DashBoardPage from "./components/Dashboard/DashboardPage";
 import CrearAnuncio from "./components/News/News";
+import newsIcon from "./assets/news.svg"
 
 /* ============================================================
    Tipos de navegación y contexto de visibilidad
@@ -71,7 +72,7 @@ const NAV: MenuItem[] = [
   {id: "formatos", label: "Formatos", icon: <img src={filesIcon} alt="" className="sb-icon" />, to: <Formatos />, roles: ["Administrador"] },
   {id: "info", label: "Información", icon: <img src={infoIcon} alt="" className="sb-icon" />, to: <InfoPage />, roles: ["Administrador", "Tecnico"]  },
   {id: "admin", label: "Administración", icon: <img src={settingsIcon} className="sb-icon"/>, roles: ["Administrador", "Tecnico"], children: [
-      { id: "anuncios", label: "Anuncios", to: <CrearAnuncio />, roles: ["Administrador", "Tecnico"]},
+      { id: "anuncios", label: "Anuncios", to: <CrearAnuncio />, roles: ["Administrador", "Tecnico"], icon: <img src={newsIcon} className="sb-icon"/>},
       { id: "plantillas", label: "Plantillas", icon: <img src={templateIcon} className="sb-icon"/>,to: <CrearPlantilla />, roles: ["Administrador", "Tecnico"] },
       { id: "usuarios", label: "Usuarios", to: <UsuariosPanel />, roles: ["Administrador"] },
     ],
