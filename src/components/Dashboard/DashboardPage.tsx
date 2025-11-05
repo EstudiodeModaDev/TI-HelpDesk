@@ -22,7 +22,7 @@ export default function DashBoardPage() {
           {Items.map((it) => {
             const isActive = mode === it.id;
             return (
-              <button key={it.id} type="button" className={`msb-item ${isActive ? "is-active" : ""}`} onClick={() => setMode(it.id)} aria-current={isActive ? "page" : undefined}
+              <button key={it.id} type="button" className={`msb-item ${isActive ? "is-active" : ""}`} onClick={() => {setMode(it.id); alert(it.id)}} aria-current={isActive ? "page" : undefined}
                 aria-pressed={isActive} title={it.label}>
                 <div className="msb-item__inner">
                   <div className="msb-icon" aria-hidden="true">{it.icon}</div>
