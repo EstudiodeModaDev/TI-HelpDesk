@@ -21,6 +21,8 @@ export function useDashboard(TicketsSvc: TicketsService) {
     const [totalCategorias, setTotalCateogria] = React.useState<TopCategoria[]>([]);
     const [casosPorDia, setCasosPorDia] = React.useState<DailyPoint[]>([]);
     const [Fuentes, setFuentes] = React.useState<Fuente[]>([]);
+    const [start, setStart] = React.useState<string>("");
+    const [final, setFinal] = React.useState<string>("");
    
     const { account } = useAuth();
 
@@ -46,6 +48,9 @@ export function useDashboard(TicketsSvc: TicketsService) {
         const monthEnd   = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 0, 23, 59, 59, 999));
         const fromIso = toGraphDateTime(monthStart);
         const toIso   = toGraphDateTime(monthEnd);
+        setStart(fromIso ?? "")
+        setFinal(toIso ?? "")
+
         // toGraphDateTime debería devolver ISO con Z (ej. 2025-11-01T00:00:00Z)
         filters.push(`fields/FechaApertura ge '${fromIso}'`);
         filters.push(`fields/FechaApertura le '${toIso}'`);
@@ -347,7 +352,7 @@ export function useDashboard(TicketsSvc: TicketsService) {
 
   return {
     obtenerTotal, setRange, obtenerTop5, obtenerTotalCategoria, obtenerTotalResolutor, obtenerFuentes, obtenerCasosPorDia,
-    totalCasos, error, loading, totalEnCurso, totalFinalizados, totalFueraTiempo, porcentajeCumplimiento, topCategorias, range, totalCategorias, resolutores, Fuentes, casosPorDia,
+    totalCasos, error, loading, totalEnCurso, totalFinalizados, totalFueraTiempo, porcentajeCumplimiento, topCategorias, range, totalCategorias, resolutores, Fuentes, casosPorDia, start, final
   };
 }
 

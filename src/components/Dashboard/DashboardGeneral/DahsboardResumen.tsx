@@ -35,7 +35,7 @@ export default function DashboardResumen() {
   const { Tickets } = useGraphServices() as ReturnType<typeof useGraphServices> & {
     TicketService: TicketsService;
   };
-  const { totalCasos, totalEnCurso, totalFinalizados, totalFueraTiempo, porcentajeCumplimiento, topCategorias, range, totalCategorias, resolutores, Fuentes, casosPorDia, loading,
+  const { totalCasos, totalEnCurso, totalFinalizados, totalFueraTiempo, porcentajeCumplimiento, topCategorias, range, totalCategorias, resolutores, Fuentes, casosPorDia, loading, start, final,
     obtenerTotal, obtenerTop5, setRange, obtenerTotalCategoria, obtenerTotalResolutor, obtenerFuentes,obtenerCasosPorDia, } = useDashboard(Tickets);
 
   // carga inicial
@@ -92,8 +92,8 @@ export default function DashboardResumen() {
       <main className="dash-center">
         <header className="center-head">
           <div className="filters">
-            <input className="date" type="date" value={range.from} onChange={(e) => setRange({ ...range, from: e.target.value })}/>
-            <input className="date" type="date" value={range.to} onChange={(e) => setRange({ ...range, to: e.target.value })}/>
+            <input className="date" type="date" value={range.from} onChange={(e) => setRange({ ...range, from: e.target.value })} min={start} max={final}/>
+            <input className="date" type="date" value={range.to} onChange={(e) => setRange({ ...range, to: e.target.value })} min={start} max={final}/>
           </div>
         </header>
         <h4 className="cats__title">Total Casos por Categoria</h4>  
