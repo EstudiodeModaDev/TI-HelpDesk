@@ -74,19 +74,19 @@ export function useDashboard(TicketsSvc: TicketsService) {
         try {
         const filter = buildFilterTickets(mode)
         //Todos los casos
-        const casos = await TicketsSvc.getAllPlane(filter);
+        const casos = (await TicketsSvc.getAll(filter)).items;
          const total = Array.isArray(casos) ? casos.length : Array.isArray((casos as any)?.value) ? (casos as any).value.length : 0;
 
         //Casos finalizados
-        const casosFinalizados = await TicketsSvc.getAllPlane({filter: filter.filter + " and fields/Estado eq 'Cerrado'" });
+        const casosFinalizados = (await TicketsSvc.getAll({filter: filter.filter + " and fields/Estado eq 'Cerrado'", top:12000})).items;
         const totalFinalizados = Array.isArray(casosFinalizados) ? casosFinalizados.length : Array.isArray((casosFinalizados as any)?.value) ? (casosFinalizados as any).value.length : 0;
 
         //Casos fuera de tiempo
-        const casosVencidos = await TicketsSvc.getAllPlane({filter: filter.filter + "or (fields/Estado eq 'Fuera de tiempo' or fields/Estado 'Cerrado fuera de tiempo')" });
+        const casosVencidos = (await TicketsSvc.getAll({filter: filter.filter + "or (fields/Estado eq 'Fuera de tiempo' or fields/Estado 'Cerrado fuera de tiempo')", top: 12000 })).items;
         const totalVencidos = Array.isArray(casosVencidos) ? casos.length : Array.isArray((casosVencidos as any)?.value) ? (casosVencidos as any).value.length : 0;
         
         //Casos en curso
-        const casosEnCurso = await TicketsSvc.getAllPlane({filter: filter.filter + " and fields/Estado eq 'En curso'" });
+        const casosEnCurso = (await TicketsSvc.getAll({filter: filter.filter + " and fields/Estado eq 'En curso'" })).items;
         const totalEnCurso = Array.isArray(casosEnCurso) ? casosEnCurso.length : Array.isArray((casosEnCurso as any)?.value) ? (casosEnCurso as any).value.length : 0;
             
         setTotalCasos(total);
