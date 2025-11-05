@@ -311,7 +311,9 @@ function Shell() {
     return (
       <div className="page layout">
         <HeaderBar onPrimaryAction={{ label: actionLabel, onClick: handleAuthClick, disabled: !ready || loadingAuth }}/>
-        <WelcomeSolvi/>
+        <section className="page-view">
+          <WelcomeSolvi/>
+        </section>
       </div>
     );
   }
