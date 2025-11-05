@@ -100,9 +100,6 @@ export function useDetallado(TicketsSvc: TicketsService) {
           porcentaje: v.total ? v.at / v.total : 0,
         })).sort((a,b)=>b.total-a.total);
 
-        // 5) Fuentes
-        const fuentes = countBy(t => String((t as any).Fuente || "").trim());
-
         // 6) Casos por día
         const dayKey = (d: any) => {
           const dd = new Date((d?.FechaApertura ?? d?.fields?.FechaApertura) as string);
@@ -122,7 +119,6 @@ export function useDetallado(TicketsSvc: TicketsService) {
         setTopCategorias(top5);
         setTotalCateogria(allCats);
         setResolutores(resols);
-        setFuentes(fuentes as any);
         setCasosPorDia(series);
       } catch (e:any) {
         setError(e?.message ?? "Error al cargar dashboard");
