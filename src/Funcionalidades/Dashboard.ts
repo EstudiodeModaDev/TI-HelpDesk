@@ -4,11 +4,13 @@ import type { TicketsService } from "../Services/Tickets.service";
 import type { GetAllOpts } from "../Models/Commons";
 import type { DateRange } from "../Models/Filtros";
 import { toGraphDateTime, toISODateFlex } from "../utils/Date";
-import type { TopCategoria } from "../Models/Dashboard";
+import type { ResolutorAgg, TopCategoria } from "../Models/Dashboard";
 import type { Ticket } from "../Models/Tickets";
 
+
+
 export function useDashboard(TicketsSvc: TicketsService) {
-   // const [resolutures, setResolutores] = React.useState<Usuario[]>([])
+    const [resolutores, setResolutores] = React.useState<ResolutorAgg[]>([])
     const [totalCasos, setTotalCasos] = React.useState<number>(0)
     const [totalEnCurso, setTotalencurso] = React.useState<number>(0)
     const [totalFueraTiempo, setTotalFueraTiempo] = React.useState<number>(0)
@@ -19,6 +21,7 @@ export function useDashboard(TicketsSvc: TicketsService) {
     const today = React.useMemo(() => toISODateFlex(new Date()), []);
     const [range, setRange] = React.useState<DateRange>({ from: today, to: today });
     const [topCategorias, setTopCategorias] = React.useState<TopCategoria[]>([]);
+    const [totalCategorias, setTotalCateogria] = React.useState<TopCategoria[]>([]);
    
    
    // const [pageSize, setPageSize] = React.useState<number>(15); // = $top
@@ -148,10 +151,110 @@ export function useDashboard(TicketsSvc: TicketsService) {
       }
     }, [TicketsSvc, buildFilterTickets]);
 
+    const obtenerTotalCategoria = React.useCallback(async (mode: string) => {
+      setLoading(true);
+      setError(null);
+      try {
+        const { filter } = buildFilterTickets(mode);
+        const res = await TicketsSvc.getAll({ filter, top: 12000 });
+
+        const tickets: Ticket[] = Array.isArray(res?.items)
+          ? res.items
+          : Array.isArray((res as any)?.value)
+          ? (res as any).value
+          : [];
+
+        // nada que contar
+        if (!tickets.length) {
+          setTotalCateogria([]);            
+          return;
+        }
+
+        // contar por SubCategoria (ajusta el campo si quieres otra agrupación)
+        const counts = new Map<string, number>();
+        for (const t of tickets) {
+          const key = String(t?.SubCategoria || "(En blanco)").trim();
+          counts.set(key, (counts.get(key) ?? 0) + 1);
+        }
+
+        // convertir a array y ordenar DESC
+        const allCats: TopCategoria[] = Array.from(counts, ([nombre, total]) => ({ nombre, total }))
+          .sort((a, b) => b.total - a.total);
+
+        setTotalCateogria(allCats);         
+      } catch (e: any) {
+        setError(e?.message ?? "Error al obtener categorías");
+      } finally {
+        setLoading(false);
+      }
+    }, [TicketsSvc, buildFilterTickets]);
+
+    const obtenerTotalResolutor = React.useCallback(
+      async (mode: string): Promise<ResolutorAgg[]> => {
+        setLoading(true);
+        setError(null);
+        try {
+          const { filter } = buildFilterTickets(mode);
+          const res = await TicketsSvc.getAll({ filter, top: 12000 });
+
+          const tickets: any[] = Array.isArray(res?.items)
+            ? res.items
+            : Array.isArray((res as any)?.value)
+            ? (res as any).value
+            : [];
+
+          if (!tickets.length) {
+            setResolutores([]);
+            return [];
+          }
+
+          const totalTickets = tickets.length;
+
+          // agregamos por correo; guardamos mejor display name
+          const counts = new Map<string, number>();
+          const nombrePorCorreo = new Map<string, string>();
+
+          for (const t of tickets) {
+            const correo = (t?.Correoresolutor ?? "").trim().toLowerCase() || "(en blanco)";
+            const nombre = (t?.Nombreresolutor ?? "").trim();
+
+            counts.set(correo, (counts.get(correo) ?? 0) + 1);
+            if (nombre && !nombrePorCorreo.get(correo)) {
+              nombrePorCorreo.set(correo, nombre);
+            }
+          }
+
+          const data: ResolutorAgg[] = Array.from(counts.entries())
+            .map(([correo, total]) => {
+              const displayNombre =
+                nombrePorCorreo.get(correo) ||
+                (correo && correo.includes("@") ? correo.split("@")[0] : "(En blanco)");
+              const porcentaje = totalTickets > 0 ? total / totalTickets : 0; // 0..1
+              return {
+                correo: correo === "(en blanco)" ? "" : correo,
+                nombre: displayNombre,
+                total,
+                porcentaje,
+              };
+            })
+            .sort((a, b) => b.total - a.total);
+
+          setResolutores(data);
+          return data;
+        } catch (e: any) {
+          setError(e?.message ?? "Error al obtener resolutores");
+          return [];
+        } finally {
+          setLoading(false);
+        }
+      },
+      [TicketsSvc, buildFilterTickets]
+    );
+
 
   return {
-    obtenerTotal, setRange, obtenerTop5,
-    totalCasos, error, loading, totalEnCurso, totalFinalizados, totalFueraTiempo, porcentajeCumplimiento, topCategorias
+    obtenerTotal, setRange, obtenerTop5, obtenerTotalCategoria, obtenerTotalResolutor,
+    totalCasos, error, loading, totalEnCurso, totalFinalizados, totalFueraTiempo, porcentajeCumplimiento, topCategorias, range, totalCategorias, resolutores
   };
 }
 

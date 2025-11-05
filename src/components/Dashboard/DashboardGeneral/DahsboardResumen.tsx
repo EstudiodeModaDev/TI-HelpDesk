@@ -5,17 +5,7 @@ import type { TicketsService } from "../../../Services/Tickets.service";
 import "./Dashboard.css";
 import type { TopCategoria } from "../../../Models/Dashboard";
 
-type Resolutor = { nombre: string; porcentaje: number; total: number };
 type Fuente = { label: string; total: number };
-
-
-const resolutores: Resolutor[] = [
-  { nombre: "Andres Godoy", porcentaje: 0, total: 0 },
-  { nombre: "Cesar Sanchez", porcentaje: 0, total: 0 },
-  { nombre: "Elizabeth Tapias", porcentaje: 0, total: 0 },
-  { nombre: "Juan David Chavarria", porcentaje: 0, total: 0 },
-  { nombre: "Linea Interna de servicios", porcentaje: 0, total: 0 },
-];
 
 const fuentes: Fuente[] = [
   { label: "Aplicativo", total: 0 },
@@ -116,7 +106,7 @@ function CategoriasChart({data, maxBars = 18, height = 160,}: {data: TopCategori
                 <div className="cats__val" aria-hidden="true">
                   {d.total.toLocaleString("es-CO")}
                 </div>
-                <div className="cats__bar" style={{ height: h }} />
+                <div className="cats__bar" style={{ height: h }} title={d.nombre}/>
                 <div className="cats__lbl" title={d.nombre}>
                   {shorten(d.nombre)}
                 </div>
@@ -130,19 +120,20 @@ function CategoriasChart({data, maxBars = 18, height = 160,}: {data: TopCategori
   );
 }
 
-
 export default function DashboardResumen() {
   const { Tickets } = useGraphServices() as ReturnType<typeof useGraphServices> & {
     TicketService: TicketsService;
   };
-  const { totalCasos, totalEnCurso, totalFinalizados, totalFueraTiempo, porcentajeCumplimiento, topCategorias,
-    obtenerTotal, obtenerTop5 } = useDashboard(Tickets);
+  const { totalCasos, totalEnCurso, totalFinalizados, totalFueraTiempo, porcentajeCumplimiento, topCategorias, range, totalCategorias, resolutores,
+    obtenerTotal, obtenerTop5, setRange, obtenerTotalCategoria, obtenerTotalResolutor} = useDashboard(Tickets);
 
   // carga inicial
   React.useEffect(() => {
     obtenerTotal("resumen");
     obtenerTop5("resumen");
-  }, []); 
+    obtenerTotalCategoria("resumen");
+    obtenerTotalResolutor("resumen");
+  }, [range.from, range.to]); 
 
   return (
     <section className="dash">
@@ -178,20 +169,13 @@ export default function DashboardResumen() {
 
       {/* Columna central */}
       <main className="dash-center">
-      <header className="center-head">
-        <h3>Total Casos por Categoria</h3>
-        <div className="filters">
-          <input className="date" type="date" />
-          <select className="mini">
-            <option>ID</option>
-            <option>Asunto</option>
-          </select>
-        </div>
-      </header>
-      <CategoriasChart data={topCategorias} />
-
-
-        <div className="chart-area placeholder" />
+        <header className="center-head">
+          <div className="filters">
+            <input className="date" type="date" value={range.from} onChange={(e) => setRange({ ...range, from: e.target.value })}/>
+            <input className="date" type="date" value={range.to} onChange={(e) => setRange({ ...range, to: e.target.value })}/>
+          </div>
+        </header>
+        <CategoriasChart data={totalCategorias} />
 
         <section className="resolutores">
           <h4>Resolutores</h4>
