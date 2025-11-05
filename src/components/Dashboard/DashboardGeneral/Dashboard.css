@@ -251,3 +251,71 @@ html, body, #root {
   margin-left: 50%;
   transform: translateX(-50%);
 }
+
+/* =========================
+   Dashboard: 3 columnas dentro de .msb-content
+   ========================= */
+.dash{
+  width: 100%;
+  display: grid;
+  grid-template-columns: 320px minmax(0,1fr) 360px; /* ← izquierda / centro / derecha */
+  column-gap: 14px;
+  row-gap: 0;
+
+  /* bloque único con fondo/borde */
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  padding: 14px;
+  box-sizing: border-box;
+  overflow: clip;
+}
+
+/* columnas internas: SIN fondo propio (ya lo tiene .dash) */
+.dash-left,
+.dash-center,
+.dash-right{
+  min-width: 0;
+  padding: 12px 14px;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+
+/* separadores sutiles entre columnas */
+.dash-center{ border-left: 1px solid var(--border); }
+.dash-right{  border-left: 1px solid var(--border); }
+
+/* paneles dentro de cada columna */
+.panel{
+  margin-top: 12px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: color-mix(in oklab, var(--bg-elev) 94%, transparent);
+}
+
+/* ===== Responsivo ===== */
+@media (max-width: 1200px){
+  .dash{
+    grid-template-columns: 300px minmax(0,1fr);
+  }
+  .dash-right{
+    border-left: 0;
+    border-top: 1px solid var(--border);
+    grid-column: 1 / -1; /* baja a segunda fila */
+  }
+}
+
+@media (max-width: 880px){
+  .dash{
+    grid-template-columns: 1fr;
+    padding: 12px;
+  }
+  .dash-center,
+  .dash-right{
+    border-left: 0;
+    border-top: 1px solid var(--border);
+  }
+}
