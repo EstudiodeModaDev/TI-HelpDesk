@@ -144,32 +144,24 @@ function findById(nodes: readonly MenuItem[], id: string): MenuItem | undefined 
    Header superior simple
    ============================================================ */
 
-function HeaderBar(props: {user: User; role: string; onPrimaryAction?: { label: string; onClick: () => void; disabled?: boolean } | null}) {
-  const { user, role, onPrimaryAction } = props;
-  const isLogged = Boolean(user);
+function HeaderBar(props: {onPrimaryAction?: { label: string; onClick: () => void; disabled?: boolean } | null}) {
+  const {onPrimaryAction } = props;
   return (
-    <div className="headerRow">
-      <div className="brand">
-        <h1>Helpdesk EDM</h1>
-      </div>
-      <div className="userCluster">
-        <div className="avatar">{user?.displayName ? user.displayName[0] : "?"}</div>
-        <div className="userInfo">
-          <div className="userName">{isLogged ? user?.displayName : "Invitado"}</div>
-          <div className="userMail">{isLogged ? role : "–"}</div>
+    <header className="headerRow">
+      <div className="header-inner">
+        <div className="brand"><h1>SOLVI - Tu solución empieza aqui</h1></div>
+        <div className="userCluster">
+          <div className="avatar">?</div>
+          <div className="userInfo">
+            <div className="userName">Invitado</div>
+            <div className="userMail">—</div>
+          </div>
+          {onPrimaryAction && ( <button className="btn-logout" onClick={onPrimaryAction.onClick} disabled={onPrimaryAction.disabled} aria-busy={onPrimaryAction.disabled}>
+              {onPrimaryAction.label}
+            </button>)}
         </div>
-        {onPrimaryAction && (
-          <button
-            className="btn-logout"
-            onClick={onPrimaryAction.onClick}
-            disabled={onPrimaryAction.disabled}
-            aria-busy={onPrimaryAction.disabled}
-          >
-            {onPrimaryAction.label}
-          </button>
-        )}
       </div>
-    </div>
+    </header>
   );
 }
 
@@ -318,7 +310,7 @@ function Shell() {
   if (!ready || !isLogged) {
     return (
       <div className="page layout">
-        <HeaderBar user={user} role={"Usuario"} onPrimaryAction={{ label: actionLabel, onClick: handleAuthClick, disabled: !ready || loadingAuth }}/>
+        <HeaderBar onPrimaryAction={{ label: actionLabel, onClick: handleAuthClick, disabled: !ready || loadingAuth }}/>
         <WelcomeSolvi/>
       </div>
     );
