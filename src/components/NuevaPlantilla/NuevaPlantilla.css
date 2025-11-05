@@ -1,8 +1,11 @@
 /* =========================
-   Tokens (Light / Dark)
+   Scope: fuerza tema claro local
    ========================= */
-:root{
-  color-scheme: light dark;
+.tpl-scope{
+  /* controles nativos (inputs, scrollbars) en claro */
+  color-scheme: light;
+
+  /* tokens SOLO dentro del scope (no afectan a la app) */
   --bg: #f8fafc;              /* page */
   --bg-elev: #ffffff;         /* cards/forms */
   --ink: #0f172a;             /* text */
@@ -22,41 +25,32 @@
   --font: system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif;
 }
 
-@media (prefers-color-scheme: dark){
-  :root{
-    color-scheme: light dark;
-    --bg: #f8fafc;              /* page */
-    --bg-elev: #ffffff;         /* cards/forms */
-    --ink: #0f172a;             /* text */
-    --muted: #64748b;           /* secondary text */
-    --border: #e2e8f0;          /* strokes */
-    --shadow: 0 8px 24px rgba(2,6,23,.06);
-
-    --primary: #4f46e5;         /* indigo-600 */
-    --primary-ink: #ffffff;
-    --primary-hover: #4338ca;   /* indigo-700 */
-    --ring: rgba(79,70,229,.35);
-
-    --radius: 14px;
-    --pad: 16px;
-    --gap: 14px;
-    --input-h: 44px;
-    --font: system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif;
-  }
+/* Si tu app aplica .dark global, evita herencias extra */
+.tpl-scope *{
+  /* no tocamos colores, sólo evitamos estilos globales agresivos */
+  min-width: 0;
 }
 
 /* =========================
    Layout base
    ========================= */
 .tpl-page{
-  background: transparent;
-  color: var(--ink);
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
   padding: clamp(12px, 2vw, 24px);
+  background: transparent;     /* deja ver el fondo de tu app */
+  color: var(--ink);
+  font-family: var(--font);
 }
 
 .tpl-form{
-  max-width: 980px;
-  margin: 0 auto;
+  /* ancho amplio pero fluido */
+  width: min(1200px, 96vw);
+  max-height: calc(100dvh - 2 * clamp(12px, 2vw, 24px));
+  overflow: auto;
+
+  margin: 0;
   background: var(--bg-elev);
   border: 1px solid var(--border);
   border-radius: calc(var(--radius) + 2px);
@@ -64,8 +58,6 @@
   padding: clamp(16px, 2.2vw, 28px);
   display: grid;
   gap: max(14px, 1.2vw);
-  font-family: var(--font);
-  min-width: 400px
 }
 
 /* =========================
@@ -73,9 +65,10 @@
    ========================= */
 .tpl-title{
   margin: 0;
-  font-size: clamp(1.4rem, 2vw, 1.9rem);
+  font-size: clamp(1.6rem, 2.4vw, 2.1rem);
   line-height: 1.15;
   letter-spacing: -0.015em;
+  color: var(--ink);
 }
 
 /* =========================
@@ -87,7 +80,7 @@
 }
 
 .tpl-label{
-  font-weight: 600;
+  font-weight: 700;
   color: var(--ink);
   line-height: 1.2;
 }
@@ -112,41 +105,6 @@
 }
 
 /* =========================
-   Toolbar (placeholder)
-   ========================= */
-.tpl-toolbar{
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  padding: 8px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: color-mix(in oklab, var(--bg-elev) 92%, transparent);
-}
-
-/* Si agregas botones en la toolbar, estos estilos ayudan */
-.tpl-toolbar button{
-  appearance: none;
-  border: 1px solid var(--border);
-  background: var(--bg);
-  color: var(--ink);
-  border-radius: 10px;
-  padding: 6px 10px;
-  font-weight: 600;
-  font-size: .9rem;
-  cursor: pointer;
-  transition: background .15s, border-color .15s, box-shadow .15s;
-}
-.tpl-toolbar button:hover{
-  background: color-mix(in oklab, var(--bg-elev) 85%, transparent);
-}
-.tpl-toolbar button:focus-visible{
-  outline: none;
-  box-shadow: 0 0 0 3px var(--ring);
-  border-color: var(--primary);
-}
-
-/* =========================
    Editor
    ========================= */
 .tpl-editorWrapper{
@@ -154,17 +112,18 @@
   border-radius: var(--radius);
   overflow: clip;
   background: var(--bg-elev);
-  min-height: 260px; /* por si el editor tarda en cargar */
+  min-height: 280px;
+  max-height: 50vh;           /* no tapes el botón con editores largos */
+  display: grid;
 }
-
-/* Si el editor usa un iframe o contenteditable, esto ayuda */
+.tpl-editorWrapper,
 .tpl-editorWrapper *{
-  color-scheme: light dark;
+  color-scheme: light !important; /* fuerza UI del editor en claro */
 }
 .tpl-editorWrapper [contenteditable="true"],
 .tpl-editorWrapper iframe{
-  background: var(--bg-elev);
-  color: var(--ink);
+  background: var(--bg-elev) !important;
+  color: var(--ink) !important;
 }
 
 /* =========================
@@ -174,7 +133,6 @@
   display: flex;
   justify-content: flex-end;
   gap: 10px;
-  margin-top: 4px;
 }
 
 .tpl-primary{
@@ -204,107 +162,23 @@
 }
 
 /* =========================
-   Estados / feedback (opcionales)
+   Feedback
    ========================= */
 .tpl-hint{
   color: var(--muted);
   font-size: .85rem;
 }
-
 .tpl-error{
   color: #b91c1c;
   font-weight: 600;
   font-size: .9rem;
-}
-@media (prefers-color-scheme: dark){
-  .tpl-error{ color: #fecaca; }
 }
 
 /* =========================
    Responsive
    ========================= */
 @media (max-width: 640px){
-  .tpl-form{ padding: 14px; gap: 12px; }
+  .tpl-form{ width: min(100%, 96vw); padding: 14px; gap: 12px; }
   .tpl-actions{ justify-content: stretch; }
   .tpl-primary{ width: 100%; }
 }
-
-.tpl-form, .tpl-form *{
-  min-width: 0;                  /* grid/flex items no crecen por defecto */
-}
-
-/* ===== Hacer que la sección ocupe todo el alto y centre el contenido ===== */
-.tpl-page{
-  min-height: 100dvh;
-  display: grid;
-  place-items: center;
-  padding: clamp(12px, 2vw, 24px);
-  background: transparent;
-  color: var(--ink);
-}
-
-/* ===== Formulario más ancho y visualmente “card” ===== */
-.tpl-form{
-  /* ancho amplio pero fluido */
-  max-width: 1200px;
-  min-width: 0px;
-  max-height: calc(100dvh - 2 * clamp(12px, 2vw, 24px));
-  overflow: auto;
-
-  margin: 0;                          /* evita que el auto-centering se desplace */
-  background: var(--bg-elev);
-  border: 1px solid var(--border);
-  border-radius: calc(var(--radius) + 2px);
-  box-shadow: var(--shadow);
-  padding: clamp(16px, 2.2vw, 28px);
-  display: grid;
-  gap: max(14px, 1.2vw);
-}
-
-/* Título un poco más presente en un form más ancho */
-.tpl-title{
-  margin: 0;
-  font-size: clamp(1.6rem, 2.4vw, 2.1rem);
-  line-height: 1.15;
-}
-
-/* Campos e inputs mantienen proporciones cómodas en ancho grande */
-.tpl-field{ display: grid; gap: 8px; }
-.tpl-input{ height: 44px; }
-
-/* Editor ocupa altura razonable sin empujar todo hacia abajo */
-.tpl-editorWrapper{
-  min-height: 280px;
-  max-height: 50vh;   /* no tapes el botón al crecer mucho contenido */
-  overflow: auto;
-}
-
-/* Barra de acciones pegada a la derecha pero dentro del ancho */
-.tpl-actions{
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-}
-
-/* Botón primario como antes */
-.tpl-primary{
-  background: var(--primary);
-  color: var(--primary-ink);
-  border: 1px solid var(--primary-hover);
-  border-radius: var(--radius);
-  padding: 10px 14px;
-  font-weight: 700;
-  box-shadow: var(--shadow);
-  transition: background .15s, border-color .15s, box-shadow .15s, transform .04s;
-}
-.tpl-primary:hover{ background: var(--primary-hover); }
-.tpl-primary:active{ transform: translateY(1px); }
-.tpl-primary:focus-visible{ outline: none; box-shadow: 0 0 0 4px var(--ring); }
-
-/* ===== Responsive ===== */
-@media (max-width: 640px){
-  .tpl-form{ width: min(100%, 96vw); padding: 14px; }
-  .tpl-actions{ justify-content: stretch; }
-  .tpl-primary{ width: 100%; }
-}
-

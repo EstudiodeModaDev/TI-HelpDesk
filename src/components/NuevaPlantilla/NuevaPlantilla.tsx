@@ -4,15 +4,18 @@ import type { PlantillasService } from "../../Services/Plantillas.service";
 import { usePlantillas } from "../../Funcionalidades/Plantillas";
 import RichTextBase64 from "../RichTextBase64/RichTextBase64";
 
-
 export default function CrearPlantilla() {
-    const { Plantillas: PlantillasSvc} = useGraphServices() as ReturnType<typeof useGraphServices> & {Plantillas: PlantillasService; };
-    const {createPlantilla, submiting, state, setField} = usePlantillas(PlantillasSvc)
+  const { Plantillas: PlantillasSvc } =
+    useGraphServices() as ReturnType<typeof useGraphServices> & {
+      Plantillas: PlantillasService;
+    };
+
+  const { createPlantilla, submiting, state, setField } =
+    usePlantillas(PlantillasSvc);
 
   return (
-    <section className="tpl-page" aria-label="Crear una plantilla">
-
-      <form className="tpl-form" onSubmit={(e) => {e.preventDefault(); createPlantilla()}} noValidate>
+    <section className="tpl-page tpl-scope" aria-label="Crear una plantilla">
+      <form className="tpl-form" onSubmit={(e) => {e.preventDefault(); createPlantilla();}}>
         <h1 className="tpl-title">Crear Una Plantilla</h1>
 
         <div className="tpl-field">
@@ -25,13 +28,19 @@ export default function CrearPlantilla() {
 
           {/* Editor */}
           <div className="tpl-editorWrapper">
-             <RichTextBase64 value={state.HTLM} onChange={(html) => setField("HTLM", html)} placeholder="Cree su plantilla..."/>
+            <RichTextBase64 value={state.HTLM} onChange={(html) => setField("HTLM", html)} placeholder="Cree su plantilla..."/>
           </div>
+
+          {/* hint opcional */}
+          <small className="tpl-hint">
+            Puedes usar negrilla, listas y adjuntar imágenes. El contenido se
+            guardará en HTML.
+          </small>
         </div>
 
         <footer className="tpl-actions">
           <button type="submit" className="tpl-primary" disabled={submiting}>
-            Guardar plantilla
+            {submiting ? "Guardando…" : "Guardar plantilla"}
           </button>
         </footer>
       </form>
