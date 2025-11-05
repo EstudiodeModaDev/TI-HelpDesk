@@ -1,5 +1,5 @@
 import * as React from "react";
-import "./EdmNewsContent.css";
+import "./Confirmas.css";
 import { useGraphServices } from "../../../graph/GrapServicesContext";
 import type { AnunciosService } from "../../../Services/Anuncios.service";
 import { useAnuncio } from "../../../Funcionalidades/News";
