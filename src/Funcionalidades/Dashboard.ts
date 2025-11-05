@@ -11,6 +11,7 @@ export function useDashboard(TicketsSvc: TicketsService) {
     const [totalEnCurso, setTotalencurso] = React.useState<number>(0)
     const [totalFueraTiempo, setTotalFueraTiempo] = React.useState<number>(0)
     const [totalFinalizados, setTotalFinalizados] = React.useState<number>(0)
+    const [porcentajeCumplimiento, setPorcentajeCumplimiento] = React.useState<number>(0)
     const [loading, setLoading] = React.useState(false);
     const [error, setError] = React.useState<string | null>(null);
     const today = React.useMemo(() => toISODateFlex(new Date()), []);
@@ -74,11 +75,11 @@ export function useDashboard(TicketsSvc: TicketsService) {
         try {
         const filter = buildFilterTickets(mode)
         //Todos los casos
-        const casos = (await TicketsSvc.getAll(filter)).items;
+        const casos = (await TicketsSvc.getAll({filter: filter.filter, top: 12000})).items;
          const total = Array.isArray(casos) ? casos.length : Array.isArray((casos as any)?.value) ? (casos as any).value.length : 0;
 
         //Casos finalizados
-        const casosFinalizados = (await TicketsSvc.getAll({filter: filter.filter + " and fields/Estadodesolicitud eq 'Cerrado'", top:1000})).items;
+        const casosFinalizados = (await TicketsSvc.getAll({filter: filter.filter + " and fields/Estadodesolicitud eq 'Cerrado'", top:12000})).items;
         const totalFinalizados = Array.isArray(casosFinalizados) ? casosFinalizados.length : Array.isArray((casosFinalizados as any)?.value) ? (casosFinalizados as any).value.length : 0;
 
         //Casos fuera de tiempo
@@ -86,11 +87,13 @@ export function useDashboard(TicketsSvc: TicketsService) {
         const totalVencidos = Array.isArray(casosVencidos) ? casos.length : Array.isArray((casosVencidos as any)?.value) ? (casosVencidos as any).value.length : 0;
         
         //Casos en curso
-        const casosEnCurso = (await TicketsSvc.getAll({filter: filter.filter + " and fields/Estadodesolicitud eq 'En curso'" })).items;
+        const casosEnCurso = (await TicketsSvc.getAll({filter: filter.filter + " and fields/Estadodesolicitud eq 'En curso'", top: 12000})).items;
         const totalEnCurso = Array.isArray(casosEnCurso) ? casosEnCurso.length : Array.isArray((casosEnCurso as any)?.value) ? (casosEnCurso as any).value.length : 0;
         
+        //Porcentaje de cumplimiento
+        const porcentajeCumplimiento = total > 0 ? ((totalFinalizados) / total) : 0;
 
-        console.warn("total casos:", total, " total finalizados:", totalFinalizados, " total vencidos:", totalVencidos, " total en curso:", totalEnCurso);
+        setPorcentajeCumplimiento(porcentajeCumplimiento);
         setTotalCasos(total);
         setTotalFinalizados(totalFinalizados);
         setTotalFueraTiempo(totalVencidos);
@@ -104,40 +107,9 @@ export function useDashboard(TicketsSvc: TicketsService) {
     [TicketsSvc, account?.username]
     );
 
-   /* const obtenerTotalSegmentado = React.useCallback(async (mode: string) => {
-        setLoading(true);
-        setError(null);
-        try {
-        // construye el filtro solo cuando aplique
-        const filter =
-            mode === "resumen" && account?.username
-            ? `fields/CorreoResolutor eq '${account.username}'`
-            : undefined;
-
-        // pasa el filtro al servicio (ajusta la firma si tu svc usa otra shape)
-        const casos = await TicketsSvc.getAllPlane({ filter });
-
-        const total = Array.isArray(casos)
-            ? casos.length
-            : Array.isArray((casos as any)?.value)
-            ? (casos as any).value.length
-            : 0;
-
-        setTotalCasos(total);
-        } catch (e: any) {
-        setError(e?.message ?? "Error al inicializar escalamiento");
-        } finally {
-        setLoading(false);
-        }
-    },
-    [TicketsSvc, account?.username]
-    );*/
-
-
-
   return {
     obtenerTotal, setRange,
-    totalCasos, error, loading, totalEnCurso, totalFinalizados, totalFueraTiempo,
+    totalCasos, error, loading, totalEnCurso, totalFinalizados, totalFueraTiempo, porcentajeCumplimiento
   };
 }
 

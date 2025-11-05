@@ -63,51 +63,13 @@ export default function DashboardResumen() {
   const { Tickets } = useGraphServices() as ReturnType<typeof useGraphServices> & {
     TicketService: TicketsService;
   };
-  const { totalCasos, totalEnCurso, totalFinalizados, totalFueraTiempo, obtenerTotal } = useDashboard(Tickets);
-  const [cumplimiento, setCumplimiento] = React.useState(0);
+  const { totalCasos, totalEnCurso, totalFinalizados, totalFueraTiempo, porcentajeCumplimiento, obtenerTotal } = useDashboard(Tickets);
 
   // carga inicial
   React.useEffect(() => {
     obtenerTotal("resumen");
-    void cargarDistribucion();
   }, []); 
 
-  // ===== carga distribución por estado
-  const cargarDistribucion = React.useCallback(async () => {
-    try {
-      // Ideal: si tu Tickets service tiene un método de conteo por filtro, úsalo.
-      // Aquí hacemos un getAllPlane() y “mapeamos” el estado.
-      const all = await (Tickets as any).getAllPlane?.() ?? [];
-      // Detecta el campo de estado más probable
-      const getEstado = (it: any): string => {
-        return (
-          it?.EstadoANS ||
-          it?.Estadodesolicitud ||
-          it?.Estado ||
-          it?.fields?.EstadoANS ||
-          it?.fields?.Estadodesolicitud ||
-          ""
-        );
-      };
-
-      let at = 0, late = 0, prog = 0;
-      for (const it of all) {
-        const e = (getEstado(it) || "").toString().toLowerCase().trim();
-        if (e.includes("tiempo") && e.includes("fuera")) late++;
-        else if (e.includes("curso") || e.includes("proceso") || e.includes("abierto")) prog++;
-        else if (e.includes("tiempo") || e.includes("cumplido") || e.includes("dentro")) at++;
-        // si no calza en nada, puedes decidir sumarlo a "En curso" o ignorarlo
-      }
-
-      // “cumplimiento” sencillo: a_tiempo / (a_tiempo + fuera_de_tiempo)
-      const denom = at + late;
-      const comp = denom > 0 ? at / denom : 0;
-      setCumplimiento(comp);
-    } catch (e) {
-      console.error("Error cargando distribución:", e);
-      setCumplimiento(0);
-    }
-  }, [Tickets]);
 
   return (
     <section className="dash">
@@ -127,7 +89,7 @@ export default function DashboardResumen() {
         <div className="panel">
           <h4>Porcentaje de cumplimiento</h4>
           <div className="gauge">
-            <Gauge value={cumplimiento} />
+            <Gauge value={porcentajeCumplimiento} />
             <div className="gauge__labels">
               <span>0,00%</span>
               <span>100,00%</span>
