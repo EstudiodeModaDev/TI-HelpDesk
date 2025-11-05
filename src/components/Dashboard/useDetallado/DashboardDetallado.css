@@ -1,5 +1,5 @@
 /* =========================
-   Tokens base (light/dark)
+   Tokens base (mantén consistencia)
    ========================= */
 :root{
   --bg: #0f141a;
@@ -10,18 +10,6 @@
   --shadow: 0 6px 20px rgba(0,0,0,.25);
 
   --accent: #22c55e;
-  --good:   #10b981;
-  --bad:    #ef4444;
-  --info:   #06b6d4;
-
-  --fs-aplicativo: #ffffff;
-  --fs-correo:     #1e64b7;
-  --fs-disp:       #56a6ff;
-  --fs-persona:    #ef4444;
-  --fs-llamada:    #3b82f6;
-  --fs-teams:      #7c3aed;
-  --fs-whatsapp:   #22c55e;
-
   --radius: 14px;
   --gap: 14px;
   --pad: 16px;
@@ -29,264 +17,191 @@
 }
 
 /* =========================
-   DASHBOARD: bloque único full-width
+   Layout general
    ========================= */
-.dash{
+.msb-layout{
   width: 100%;
   display: grid;
-  grid-template-columns: 320px minmax(0,1fr) 360px;
-  column-gap: 0;               /* sin gap: usaremos separadores */
-  row-gap: 0;
-  padding: calc(var(--pad) + 4px);
+  grid-template-columns: 260px minmax(0,1fr);
+  gap: var(--gap);
   color: var(--ink);
   font-family: var(--font);
-
-  /* Bloque único con fondo y borde */
+  /* bloque único con fondo y borde suave */
   background: var(--bg-elev);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
-
-  /* Para que nada sobresalga del radio */
-  overflow: clip;
+  padding: var(--pad);
   box-sizing: border-box;
+  overflow: clip;
 }
-
-/* Las columnas pasan a ser "secciones internas" del mismo bloque */
-.dash-left,
-.dash-center,
-.dash-right{
-  min-width: 0;
-  padding: 16px;
-  background: transparent;     /* <- antes tenían fondo propio */
-  border: 0;                   /* <- quitamos borde propio */
-  box-shadow: none;            /* <- sin sombra individual */
-}
-
-/* Separadores verticales sutiles entre columnas */
-.dash-center{ border-left: 1px solid var(--border); }
-.dash-right{  border-left: 1px solid var(--border); }
 
 /* =========================
-   Panel / tarjeta
+   Sidebar (msb)
    ========================= */
-.panel{
-  margin-top: 16px;
-  padding: 12px;
+.msb{
+  position: sticky;   /* se queda visible al hacer scroll del contenido */
+  top: var(--pad);
+  align-self: start;
+
+  background: color-mix(in oklab, var(--bg-elev) 98%, transparent);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.02);
+}
+
+.msb-track{
+  display: grid;
+  gap: 8px;
+  max-height: calc(100vh - (var(--pad) * 2));
+  overflow: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #334155 transparent;
+}
+.msb-track::-webkit-scrollbar{ width: 8px; }
+.msb-track::-webkit-scrollbar-thumb{
+  background: #334155;
+  border-radius: 999px;
+}
+
+/* Item del menú */
+.msb-item{
+  width: 100%;
+  text-align: left;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px;
+  background: #0f141a;
+  color: var(--ink);
+  cursor: pointer;
+  transition: transform .16s ease, background .16s ease, border-color .16s ease, box-shadow .16s ease;
+}
+.msb-item:hover{
+  background: #0d1218;
+  border-color: #253445;
+}
+.msb-item:active{
+  transform: translateY(1px);
+}
+.msb-item:focus-visible{
+  outline: 2px solid color-mix(in oklab, var(--accent) 55%, #ffffff 0%);
+  outline-offset: 2px;
+}
+
+/* Contenido interno del item */
+.msb-item__inner{
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  align-items: center;
+  gap: 10px;
+}
+
+.msb-icon{
+  width: 28px; height: 28px;
+  display: grid; place-items: center;
+}
+.sb-icon{
+  display: block; width: 22px; height: 22px; object-fit: contain;
+  filter: drop-shadow(0 0 0 rgba(0,0,0,0)); /* limpia halos raros */
+}
+
+.msb-label{
+  font-weight: 700;
+  font-size: .98rem;
+  letter-spacing: .2px;
+}
+
+/* Estado activo */
+.msb-item.is-active{
+  background: linear-gradient(0deg, rgba(34,197,94,.10), rgba(34,197,94,.10)), #0f141a;
+  border-color: color-mix(in oklab, var(--accent) 55%, var(--border) 45%);
+  box-shadow: 0 0 0 1px color-mix(in oklab, var(--accent) 35%, transparent);
+}
+
+/* Espaciador final para que no quede el último item pegado al borde */
+.msb-spacer{
+  height: 2px; background: transparent;
+}
+
+/* =========================
+   Contenido principal
+   ========================= */
+.msb-content{
+  min-width: 0;
+  background: color-mix(in oklab, var(--bg-elev) 96%, transparent);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+}
+
+/* Si tu DashboardResumen / DashboardDetallado usan contenedores internos,
+   puedes darles un poco de separación vertical entre “paneles” genéricos */
+.msb-content .panel{
+  margin-top: 12px;
   border: 1px solid var(--border);
   border-radius: 12px;
   background: color-mix(in oklab, var(--bg-elev) 92%, transparent);
 }
-.hint{ color: var(--muted); font-size: .92rem; }
-
-/* =========================
-   KPI total (donut grande)
-   ========================= */
-.kpi-total{
-  position: relative;
-  display: grid;
-  place-items: center;
-  margin-bottom: 14px;
-}
-.kpi-total__text{
-  position: absolute;
-  display: grid;
-  place-items: center;
-}
-.kpi-total .big{ font-size: 1.8rem; font-weight: 800; line-height: 1; }
-.kpi-total .sub{ color: var(--muted); font-weight: 600; }
-.donut{ display:block; }
-
-/* =========================
-   Gauge semicircular
-   ========================= */
-.gauge{ display: grid; gap: 8px; }
-.gauge__labels{
-  display: flex; justify-content: space-between;
-  font-size: .9rem; color: var(--muted);
-}
-.gauge-txt{ fill: var(--ink); font-weight: 700; }
-
-/* =========================
-   Barras de estado
-   ========================= */
-.bullets{ list-style: none; margin: 0 0 8px; padding: 0; }
-.bullets--barred .bullet-row{
-  display: grid;
-  grid-template-columns: 12px auto 1fr auto;
-  align-items: center;
-  gap: 10px;
-  padding: 6px 0;
-}
-.bullet-dot{
-  width: 10px; height: 10px; border-radius: 2px;
-  display: inline-block;
-}
-.bullet-label{ color: var(--ink); font-weight: 600; font-size: .95rem; }
-.bullet-bar{
-  height: 8px; border-radius: 999px; overflow: hidden;
-  background: #1f2b38;
-}
-.bullet-fill{ height: 100%; border-radius: inherit; }
-.bullet-val{ color: var(--muted); font-weight: 700; }
-
-/* =========================
-   Encabezado centro + filtros
-   ========================= */
-.center-head{
-  display: flex; align-items: center; justify-content: flex-end;
-  gap: 10px; margin-bottom: 6px;
-}
-.filters .date{
-  background: #0f141a; color: var(--ink);
-  border: 1px solid var(--border);
-  border-radius: 10px; padding: 6px 8px; height: 34px;
-}
-
-/* =========================
-   Resolutores (lista)
-   ========================= */
-.res-list{ list-style:none; margin:0; padding:0; display:grid; gap:10px; }
-.res-item{
-  display:flex; justify-content:space-between; align-items:center;
-  padding:10px; border:1px solid var(--border); border-radius:12px;
-  background: color-mix(in oklab, var(--bg-elev) 96%, transparent);
-}
-.res-left{ display:flex; align-items:center; gap:10px; }
-.res-meta{ display:grid; }
-.res-name{ font-weight:700; }
-.res-sub{ color:var(--muted); font-size:.85rem; }
-.res-right{ text-align:right; }
-.res-total{ font-weight:800; }
-.res-caption{ color:var(--muted); font-size:.85rem; }
-
-/* =========================
-   Top 5 categorías (lista)
-   ========================= */
-.topcats{ list-style:none; margin:8px 0 0; padding:0; display:grid; gap:10px; }
-.topcats-row{
-  display:grid;
-  grid-template-columns: minmax(0, 160px) 1fr auto;
-  align-items:center; gap:12px;
-}
-.topcats-left{ min-width: 0; }
-.topcats-name{ font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.topcats-bar{
-  width:100%; height:10px; border-radius:999px; background:#1f2b38; overflow:hidden;
-}
-.topcats-fill{ height:100%; background:#2aa198; }
-.topcats-count{ font-weight:800; }
-
-/* =========================
-   Barras verticales
-   ========================= */
-.cats__title{ margin: 8px 0 4px; }
-.cats__plot{
-  position: relative;
-  padding: 8px 6px 4px;
-  background: color-mix(in oklab, var(--bg-elev) 96%, transparent);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-}
-.cats__bars{
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: minmax(28px, 1fr);
-  align-items: end;
-  gap: 10px;
-  height: 100%;
-}
-.cats__col{ display:grid; grid-template-rows: auto 1fr auto; align-items:end; gap:6px; }
-.cats__val{
-  text-align:center; font-weight:800; font-size:.85rem;
-  color: var(--ink);
-}
-.cats__bar{
-  background: #1b8a96;
-  border-radius: 6px 6px 2px 2px;
-  box-shadow: inset 0 -2px 0 rgba(255,255,255,.08);
-}
-.cats__lbl{
-  text-align:center; font-size:.8rem; color: var(--muted);
-  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-}
-.cats__baseline{
-  position:absolute; left:8px; right:8px; bottom:6px; height:2px;
-  background:#17707a;
-  opacity:.55; border-radius:2px;
-}
-
-/* =========================
-   Fuentes de solicitud
-   ========================= */
-.fs-title{ margin: 0 0 8px; }
-.fs-hint{ color: var(--muted); }
-
-.fs-legend{
-  display:flex; flex-wrap:wrap; gap:10px 16px;
-  list-style:none; margin:0 0 10px; padding:0;
-}
-.fs-legend__item{ display:flex; align-items:center; gap:8px; font-weight:600; }
-.fs-legend__dot{
-  width:10px; height:10px; border-radius:2px; display:inline-block;
-}
-.fs-legend__label{ color: var(--ink); }
-
-.fs-stack{
-  display:flex; width:100%; height:18px; border-radius:999px; overflow:hidden;
-  background:#19232d; border:1px solid var(--border);
-}
-.fs-stack__seg{ height:100%; }
-
-.fs-grid{
-  display:grid; grid-template-columns: repeat(3, 1fr);
-  gap: 10px; margin-top: 12px;
-}
-.fs-card{
-  border:1px solid var(--border); border-radius:12px; padding:10px;
-  background: color-mix(in oklab, var(--bg-elev) 96%, transparent);
-  display:grid; place-items:center;
-}
-.fs-card__value{ font-weight:900; font-size:1.2rem; }
-.fs-card__label{ color: var(--muted); font-weight:600; }
-
-/* Colores de fuentes */
-.fs-legend__item[title="Aplicativo"] .fs-legend__dot{ background: var(--fs-aplicativo); }
-.fs-legend__item[title="Correo"] .fs-legend__dot{ background: var(--fs-correo); }
-.fs-legend__item[title="Disponibilidad"] .fs-legend__dot{ background: var(--fs-disp); }
-.fs-legend__item[title="En persona"] .fs-legend__dot{ background: var(--fs-persona); }
-.fs-legend__item[title="Llamada"] .fs-legend__dot{ background: var(--fs-llamada); }
-.fs-legend__item[title="Teams"] .fs-legend__dot{ background: var(--fs-teams); }
-.fs-legend__item[title="WhatsApp"] .fs-legend__dot{ background: var(--fs-whatsapp); }
 
 /* =========================
    Responsivo
    ========================= */
-@media (max-width: 1200px){
-  .dash{
-    grid-template-columns: 300px minmax(0,1fr);
-  }
-  .dash-right{
-    border-left: 0;                 /* última columna cae abajo: sin separador */
-    border-top: 1px solid var(--border);
-    grid-column: 1 / -1;
+@media (max-width: 1080px){
+  .msb-layout{
+    grid-template-columns: 220px minmax(0,1fr);
   }
 }
 
-@media (max-width: 880px){
-  .dash{
+@media (max-width: 860px){
+  /* El sidebar se convierte en “tabs” arriba */
+  .msb-layout{
     grid-template-columns: 1fr;
+    gap: 10px;
+    padding: calc(var(--pad) - 4px);
   }
-  .dash-center,
-  .dash-right{
-    border-left: 0;
-    border-top: 1px solid var(--border);
+  .msb{
+    position: static;
+    border-radius: 10px;
+    padding: 8px;
   }
-  .fs-grid{ grid-template-columns: repeat(2, 1fr); }
+  .msb-track{
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(140px, 1fr);
+    gap: 8px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-bottom: 2px;
+  }
+  .msb-item{
+    text-align: center;
+    padding: 10px 12px;
+  }
+  .msb-item__inner{
+    grid-template-columns: 1fr;   /* icono arriba, label abajo en móviles */
+    justify-items: center;
+    gap: 6px;
+  }
+  .msb-label{ font-size: .95rem; }
+  .msb-content{
+    padding: 12px;
+  }
 }
 
-@media (max-width: 540px){
-  .fs-grid{ grid-template-columns: 1fr; }
-  .cats__bars{ grid-auto-columns: minmax(24px, 1fr); gap: 8px; }
-  .topcats-row{ grid-template-columns: minmax(0, 120px) 1fr auto; }
+/* =========================
+   Accesibilidad y motion
+   ========================= */
+@media (prefers-reduced-motion: reduce){
+  .msb-item{
+    transition: none;
+  }
 }
+
+/* =========================
+   Utilidades opcionales
+   ========================= */
+/* Compacta el sidebar si necesitas más densidad */
+.msb--compact .msb-item{ padding: 8px; }
+.msb--compact .msb-item__inner{ grid-template-columns: 24px 1fr; gap: 8px; }
+.msb--compact .sb-icon{ width: 20px; height: 20px; }
