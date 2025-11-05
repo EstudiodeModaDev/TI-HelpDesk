@@ -3,6 +3,7 @@
   display:grid;
   grid-template-columns: 86px 1fr;  /* rail + contenido */
   min-height: 100dvh;
+  gap: 12px
 }
 
 /* Sidebar */
@@ -12,7 +13,8 @@
   align-self: start;
   background: #0b61ff;            /* azul del mock */
   border-right: 2px solid #0a54db;
-  width: 60px;
+  width: 86px;
+  box-sizing: border-box;
 }
 .msb-track{
   display:flex;
@@ -72,9 +74,19 @@
   min-width: 0;                    /* evita overflow en grid */
 }
 
+.msb-content * { min-width:0; }
+img, svg, canvas { max-width:100%; height:auto; display:block; }
+
 /* Responsive: colapsar rail en móviles si quieres */
 @media (max-width: 640px){
   .msb-layout{ grid-template-columns: 72px 1fr; }
   .msb-icon{ width:40px; height:40px; font-size:20px; }
   .msb-label{ font-size: 11px; }
+}
+
+@media (max-width: 900px){
+  .msb-layout{ grid-template-columns: 1fr; }
+  /* opcional: convertir el rail a una tirilla horizontal */
+  .msb{ position: static; width:auto; border-right:0; }
+  .msb-track{ display:flex; overflow-x:auto; }
 }
