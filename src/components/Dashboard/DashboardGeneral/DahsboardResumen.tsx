@@ -102,11 +102,12 @@ export default function DashboardResumen() {
     TicketService: TicketsService;
   };
   const { totalCasos, totalEnCurso, totalFinalizados, totalFueraTiempo, porcentajeCumplimiento, topCategorias,
-    obtenerTotal } = useDashboard(Tickets);
+    obtenerTotal, obtenerTop5 } = useDashboard(Tickets);
 
   // carga inicial
   React.useEffect(() => {
     obtenerTotal("resumen");
+    obtenerTop5("resumen");
   }, []); 
 
 
