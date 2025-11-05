@@ -3,7 +3,7 @@ import { useAuth } from "../auth/authContext";
 import type { TicketsService } from "../Services/Tickets.service";
 import type { GetAllOpts } from "../Models/Commons";
 import type { DateRange } from "../Models/Filtros";
-import { toGraphDateTime, toISODateFlex } from "../utils/Date";
+import { toGraphDateTime } from "../utils/Date";
 import type { DailyPoint, Fuente, ResolutorAgg, TopCategoria } from "../Models/Dashboard";
 import type { Ticket } from "../Models/Tickets";
 
@@ -16,8 +16,7 @@ export function useDashboard(TicketsSvc: TicketsService) {
     const [porcentajeCumplimiento, setPorcentajeCumplimiento] = React.useState<number>(0)
     const [loading, setLoading] = React.useState(false);
     const [error, setError] = React.useState<string | null>(null);
-    const today = React.useMemo(() => toISODateFlex(new Date()), []);
-    const [range, setRange] = React.useState<DateRange>({ from: today, to: today });
+    const [range, setRange] = React.useState<DateRange>({ from: "", to: "" });
     const [topCategorias, setTopCategorias] = React.useState<TopCategoria[]>([]);
     const [totalCategorias, setTotalCateogria] = React.useState<TopCategoria[]>([]);
     const [casosPorDia, setCasosPorDia] = React.useState<DailyPoint[]>([]);
@@ -54,11 +53,8 @@ export function useDashboard(TicketsSvc: TicketsService) {
 
       // Rango manual (si ambos están y son consistentes)
       if (range.from && range.to && range.from <= range.to) {
-        // Evita duplicar el filtro del mes en curso si ya aplicaste "resumen"
-        if (mode !== "resumen") {
           filters.push(`fields/FechaApertura ge '${dayStartIso(range.from)}'`);
           filters.push(`fields/FechaApertura le '${dayEndIso(range.to)}'`);
-        }
       }
 
       return {
