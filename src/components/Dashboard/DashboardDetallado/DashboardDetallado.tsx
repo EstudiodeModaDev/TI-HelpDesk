@@ -47,7 +47,6 @@ export default function DashboardDetallado() {
     <section className="dash">
       {/* Columna izquierda */}
       <aside className="dash-left">
-        DETALLADO
         <div className="kpi-total">
           <Donut value={1} size={180} stroke={10} ring="#22c55e" />
           <div className="kpi-total__text">
@@ -114,7 +113,7 @@ export default function DashboardDetallado() {
         <FuentesSolicitud data={Fuentes} />
         
         <section className="panel">
-          <h4>Casos diarios</h4>
+          <h4>Casos mensuales</h4>
           <CasosPorDiaChart data={casosPorDia} height={200} maxBars={31}/>
           <div className="linechart placeholder" />
         </section>
