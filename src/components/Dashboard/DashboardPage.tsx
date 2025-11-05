@@ -36,6 +36,7 @@ export default function DashBoardPage() {
       </aside>
 
       <div className="msb-content">
+        {mode}
         {mode === "resumen" ? <DashboardResumen /> : <DashboardDetallado />}
       </div>
     </section>
