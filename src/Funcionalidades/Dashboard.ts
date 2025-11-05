@@ -3,7 +3,7 @@ import { useAuth } from "../auth/authContext";
 import type { TicketsService } from "../Services/Tickets.service";
 import type { GetAllOpts } from "../Models/Commons";
 import type { DateRange } from "../Models/Filtros";
-import { toGraphDateTime, toISODateFlex } from "../utils/Date";
+import {  toISODateFlex } from "../utils/Date";
 
 export function useDashboard(TicketsSvc: TicketsService) {
    // const [resolutures, setResolutores] = React.useState<Usuario[]>([])
@@ -42,7 +42,7 @@ export function useDashboard(TicketsSvc: TicketsService) {
         filters.push(`fields/Correoresolutor eq '${user}'`);
 
         // Mes en curso [1..último día]
-        const now = new Date();
+       /* const now = new Date();
         const monthStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1, 0, 0, 0, 0));
         const monthEnd   = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 0, 23, 59, 59, 999));
         // toGraphDateTime debería devolver ISO con Z (ej. 2025-11-01T00:00:00Z)
@@ -50,7 +50,7 @@ export function useDashboard(TicketsSvc: TicketsService) {
         const toIso   = toGraphDateTime(monthEnd);
 
         filters.push(`fields/FechaApertura ge ${fromIso}`);
-        filters.push(`fields/FechaApertura le ${toIso}`);
+        filters.push(`fields/FechaApertura le ${toIso}`);*/
       }
 
       // Rango manual (si ambos están y son consistentes)
