@@ -35,17 +35,12 @@ export default function DashboardDetallado() {
   const { Tickets } = useGraphServices() as ReturnType<typeof useGraphServices> & {
     TicketService: TicketsService;
   };
-  const { totalCasos, totalEnCurso, totalFinalizados, totalFueraTiempo, porcentajeCumplimiento, topCategorias, range, totalCategorias, resolutores, Fuentes, obtenerCasosPorDia,
-    obtenerTotal, obtenerTop5, setRange, obtenerTotalCategoria, obtenerTotalResolutor, obtenerFuentes, casosPorDia} = useDetallado(Tickets);
+  const { totalCasos, totalEnCurso, totalFinalizados, totalFueraTiempo, porcentajeCumplimiento, topCategorias, range, totalCategorias, resolutores, Fuentes,
+    obtenerTotal, setRange, casosPorDia} = useDetallado(Tickets);
 
   // carga inicial
   React.useEffect(() => {
     obtenerTotal();
-    obtenerTop5();
-    obtenerTotalCategoria();
-    obtenerTotalResolutor();
-    obtenerFuentes();
-    obtenerCasosPorDia(true, );
   }, [range.from, range.to]); 
 
   return (
