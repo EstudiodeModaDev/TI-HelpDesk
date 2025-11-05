@@ -266,6 +266,122 @@
   line-height: 1;
 }
 
+/* =========================
+   Sidebar plegable (sin tocar tu paleta)
+   ========================= */
+:root{
+  --sb-w-open: 280px;   /* coincide con tu grid actual */
+  --sb-w-closed: 72px;  /* ancho compacto: solo iconos */
+}
+
+/* Base actual (ya la tienes), la adaptamos a variable */
+.layout--withSidebar{
+  grid-template-columns: var(--sb-w, var(--sb-w-open)) minmax(0, 1fr) !important;
+  transition: grid-template-columns .22s ease;
+}
+
+/* Estado colapsado (se aplica a la raíz del layout) */
+.layout--withSidebar.is-collapsed{
+  --sb-w: var(--sb-w-closed);
+}
+
+/* Sidebar visual en colapsado: compacta paddings y oculta labels */
+.layout--withSidebar.is-collapsed .sidebar{
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.layout--withSidebar.is-collapsed .sideItem{
+  gap: 0;
+  padding-left: 10px;
+  padding-right: 10px;
+  justify-content: center;
+}
+
+.layout--withSidebar.is-collapsed .sideItem__label,
+.layout--withSidebar.is-collapsed .sidebar__header .sb-title,
+.layout--withSidebar.is-collapsed .sb-prof__info,
+.layout--withSidebar.is-collapsed .caret{
+  display: none !important;
+}
+
+.layout--withSidebar.is-collapsed .sb-icon-wrap{
+  margin-right: 0;
+}
+
+/* Footer compacto mantiene avatar */
+.layout--withSidebar.is-collapsed .sidebar__footer{
+  justify-content: center;
+  padding-left: 8px;
+  padding-right: 8px;
+}
+
+/* Scroll suave y sin saltos al colapsar */
+.sidebar{
+  transition: padding .22s ease;
+}
+
+/* Botón de toggle en el header del sidebar */
+.sb-toggle{
+  border: 0;
+  background: var(--sb-pill);
+  color: var(--sb-text);
+  padding: 8px 10px;
+  border-radius: 10px;
+  cursor: pointer;
+  box-shadow: var(--sb-shadow);
+  transition: transform .06s ease, background .2s ease;
+}
+.sb-toggle:hover{ background: var(--sb-hover); }
+.sb-toggle:active{ transform: translateY(1px); }
+
+/* Encabezado del sidebar: coloca marca y toggle */
+.sidebar__header{
+  display: grid;
+  grid-template-columns: 1fr auto;  /* título + botón */
+  align-items: center;
+  gap: 8px;
+}
+
+/* Marca compacta: emoji/logo + texto (texto ya se oculta en colapsado) */
+.sb-brand{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.sb-logo{ font-size: 18px; }
+.sb-title{
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--sb-text);
+  opacity: .9;
+}
+
+.sb-subtitle{
+  font-size: 12px;
+  line-height: 1.25;
+  font-weight: 500;
+  color: var(--sb-text, #94a3b8); /* usa un tono más tenue */
+  opacity: .8;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sb-title,
+.sb-subtitle{
+  display:block;          /* fuerza salto de línea */
+}
+
+/* Mantén el estilo activo/hover con tus colores */
+.sideItem--active{
+  background: var(--sb-pill);
+  outline: 2px solid rgba(255,255,255,0.08);
+}
+.sideItem:hover{ background: var(--sb-hover); }
+
 /* ==========================================================================
    Header (usa los tokens globales que ya definiste)
    ========================================================================== */
@@ -406,122 +522,6 @@
     padding: 6px 10px;
   }
 }
-
-/* =========================
-   Sidebar plegable (sin tocar tu paleta)
-   ========================= */
-:root{
-  --sb-w-open: 280px;   /* coincide con tu grid actual */
-  --sb-w-closed: 72px;  /* ancho compacto: solo iconos */
-}
-
-/* Base actual (ya la tienes), la adaptamos a variable */
-.layout--withSidebar{
-  grid-template-columns: var(--sb-w, var(--sb-w-open)) minmax(0, 1fr) !important;
-  transition: grid-template-columns .22s ease;
-}
-
-/* Estado colapsado (se aplica a la raíz del layout) */
-.layout--withSidebar.is-collapsed{
-  --sb-w: var(--sb-w-closed);
-}
-
-/* Sidebar visual en colapsado: compacta paddings y oculta labels */
-.layout--withSidebar.is-collapsed .sidebar{
-  padding-left: 10px;
-  padding-right: 10px;
-}
-
-.layout--withSidebar.is-collapsed .sideItem{
-  gap: 0;
-  padding-left: 10px;
-  padding-right: 10px;
-  justify-content: center;
-}
-
-.layout--withSidebar.is-collapsed .sideItem__label,
-.layout--withSidebar.is-collapsed .sidebar__header .sb-title,
-.layout--withSidebar.is-collapsed .sb-prof__info,
-.layout--withSidebar.is-collapsed .caret{
-  display: none !important;
-}
-
-.layout--withSidebar.is-collapsed .sb-icon-wrap{
-  margin-right: 0;
-}
-
-/* Footer compacto mantiene avatar */
-.layout--withSidebar.is-collapsed .sidebar__footer{
-  justify-content: center;
-  padding-left: 8px;
-  padding-right: 8px;
-}
-
-/* Scroll suave y sin saltos al colapsar */
-.sidebar{
-  transition: padding .22s ease;
-}
-
-/* Botón de toggle en el header del sidebar */
-.sb-toggle{
-  border: 0;
-  background: var(--sb-pill);
-  color: var(--sb-text);
-  padding: 8px 10px;
-  border-radius: 10px;
-  cursor: pointer;
-  box-shadow: var(--sb-shadow);
-  transition: transform .06s ease, background .2s ease;
-}
-.sb-toggle:hover{ background: var(--sb-hover); }
-.sb-toggle:active{ transform: translateY(1px); }
-
-/* Encabezado del sidebar: coloca marca y toggle */
-.sidebar__header{
-  display: grid;
-  grid-template-columns: 1fr auto;  /* título + botón */
-  align-items: center;
-  gap: 8px;
-}
-
-/* Marca compacta: emoji/logo + texto (texto ya se oculta en colapsado) */
-.sb-brand{
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-width: 0;
-}
-.sb-logo{ font-size: 18px; }
-.sb-title{
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  color: var(--sb-text);
-  opacity: .9;
-}
-
-.sb-subtitle{
-  font-size: 12px;
-  line-height: 1.25;
-  font-weight: 500;
-  color: var(--sb-text, #94a3b8); /* usa un tono más tenue */
-  opacity: .8;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.sb-title,
-.sb-subtitle{
-  display:block;          /* fuerza salto de línea */
-}
-
-/* Mantén el estilo activo/hover con tus colores */
-.sideItem--active{
-  background: var(--sb-pill);
-  outline: 2px solid rgba(255,255,255,0.08);
-}
-.sideItem:hover{ background: var(--sb-hover); }
 
 
 
