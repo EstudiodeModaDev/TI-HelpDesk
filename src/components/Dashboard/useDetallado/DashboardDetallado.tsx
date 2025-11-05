@@ -2,7 +2,7 @@ import React from "react";
 import { useDetallado } from "../../../Funcionalidades/Dashboard";
 import { useGraphServices } from "../../../graph/GrapServicesContext";
 import type { TicketsService } from "../../../Services/Tickets.service";
-import "./Dashboard.css";
+import "./DashboardDetallado.css";
 import type { DailyPoint, Fuente, TopCategoria } from "../../../Models/Dashboard";
 
 // ===== util: formatea "2,1 mil" / "0,2 mil" =====

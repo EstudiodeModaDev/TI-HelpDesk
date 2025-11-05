@@ -167,6 +167,7 @@
 /* =========================
    Barras verticales (categorías y casos por día)
    ========================= */
+.cats{}
 .cats__title{ margin: 8px 0 4px; }
 .cats__plot{
   position: relative;
@@ -206,6 +207,7 @@
 /* =========================
    Fuentes de solicitud
    ========================= */
+.fs{}
 .fs-title{ margin: 0 0 8px; }
 .fs-hint{ color: var(--muted); }
 
