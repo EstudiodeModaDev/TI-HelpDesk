@@ -82,7 +82,7 @@ export function useDashboard(TicketsSvc: TicketsService) {
         const totalFinalizados = Array.isArray(casosFinalizados) ? casosFinalizados.length : Array.isArray((casosFinalizados as any)?.value) ? (casosFinalizados as any).value.length : 0;
 
         //Casos fuera de tiempo
-        const casosVencidos = (await TicketsSvc.getAll({filter: filter.filter + "or (fields/Estadodesolicitud eq 'Fuera de tiempo' or fields/Estado 'Cerrado fuera de tiempo')", top: 12000 })).items;
+        const casosVencidos = (await TicketsSvc.getAll({filter: filter.filter + " or (fields/Estadodesolicitud eq 'Fuera de tiempo' or fields/Estado eq 'Cerrado fuera de tiempo')", top: 12000 })).items;
         const totalVencidos = Array.isArray(casosVencidos) ? casos.length : Array.isArray((casosVencidos as any)?.value) ? (casosVencidos as any).value.length : 0;
         
         //Casos en curso
