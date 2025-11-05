@@ -29,7 +29,6 @@ import templateIcon from "./assets/template.svg"
 import PazySalvosMode from "./components/PazSalvos/PazYSalvo";
 import WelcomeSolvi from "./components/Welcome/Welcome";
 import DashBoardPage from "./components/Dashboard/DashboardPage";
-import HomeDashboard from "./components/Home/Home";
 
 /* ============================================================
    Tipos de navegación y contexto de visibilidad
@@ -65,8 +64,7 @@ export type NavContext = {
    ============================================================ */
 
 const NAV: MenuItem[] = [
-  {id: "home", label: "Home", icon: <img src={HomeIcon} alt="" className="sb-icon" />, to: <HomeDashboard />, roles: ["Administrador", "Tecnico"], autocollapse: true },
-  {id: "homePrueba", label: "Prueba", icon: <img src={HomeIcon} alt="" className="sb-icon" />, to: <DashBoardPage />, roles: ["Administrador", "Tecnico"], autocollapse: true },
+  {id: "home", label: "Home", icon: <img src={HomeIcon} alt="" className="sb-icon" />, to: <DashBoardPage />, roles: ["Administrador", "Tecnico"], autocollapse: true },
   {id: "ticketform", label: "Nuevo Ticket", icon: <img src={addIcon} alt="" className="sb-icon" />, to: () => <NuevoTicketForm />, roles: ["Administrador", "Tecnico"],},
   {id: "ticketform_user", label: "Nuevo Ticket", icon: <img src={addIcon} alt="" className="sb-icon" />, to: <NuevoTicketUsuarioForm />, roles: ["Usuario"],},
   {id: "ticketTable", label: "Ver Tickets", icon: <img src={seeTickets} alt="" className="sb-icon" />, to: <TablaTickets />, autocollapse: true},
