@@ -75,15 +75,17 @@
   display:grid;
   place-items: stretch;
   min-width: 0;
+  padding: 16px; 
 }
 
 /* Componente de página: ocupa 100% y permite scroll interno */
 .page{
   display: grid;
   grid-template-rows: auto 1fr;   /* header auto, resto ocupa */
-  height: 100dvh;                 /* lleno de viewport */
+  height: auto;  
+  min-height: 100dvh;               /* lleno de viewport */
   place-items: stretch;
-  overflow: hidden; 
+  overflow: auto; 
 }
 
 /* Los hijos directos de .page deben ocupar todo el panel */
