@@ -281,7 +281,6 @@
   border-bottom: 1px solid var(--border);
   padding-block: 12px;
   padding-inline: 16px;
-  height: 20px;
 }
 
 /* contenedor interno centrado con ancho máximo */
@@ -389,7 +388,7 @@
 
 .headerRow,
 .headerRow > .header-inner{
-  height: 150px !important;      /* anula cualquier height anterior */
+  height: 100px !important;      /* anula cualquier height anterior */
   min-height: 52px;             /* tu altura objetivo */
   padding-block: 8px;           /* ajusta si quieres más compacto */
 }
