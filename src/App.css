@@ -75,7 +75,7 @@
   display:grid;
   place-items: stretch;
   min-width: 0;
-  padding: 16px; 
+  padding: 20px; 
 }
 
 /* Componente de página: ocupa 100% y permite scroll interno */
