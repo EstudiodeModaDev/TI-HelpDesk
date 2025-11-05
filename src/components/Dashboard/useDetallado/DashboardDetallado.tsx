@@ -97,7 +97,7 @@ export default function DashboardDetallado() {
             {resolutores.map((r) => (
               <li key={r.nombre} className="res-item">
                 <div className="res-left">
-                  <SmallDonut value={porcentajeCumplimiento} />
+                  <SmallDonut value={r.porcentaje} />
                   <div className="res-meta">
                     <div className="res-name">{r.nombre}</div>
                     <div className="res-sub">0.00%</div>

@@ -1,8 +1,8 @@
 import React from "react";
-import InfoProveedores from "../Info/InfoProveedores/InfoProveedores";
 import DashboardResumen from "./DashboardGeneral/DahsboardResumen";
 import DashBoardIcon from "../../assets/dashboard.svg";
 import Detalle from "../../assets/Detalle.svg"
+import DashboardDetallado from "./useDetallado/DashboardDetallado";
 
 type Mode = "resumen" | "dashboard"; // ajusta
 type Item = { id: Mode; label: string; icon?: React.ReactNode; active?: boolean };
@@ -35,7 +35,7 @@ export default function DashBoardPage() {
       </aside>
 
       <div className="msb-content">
-        {mode === "resumen" ? <DashboardResumen /> : <InfoProveedores />}
+        {mode === "resumen" ? <DashboardResumen /> : <DashboardDetallado />}
       </div>
     </section>
   );

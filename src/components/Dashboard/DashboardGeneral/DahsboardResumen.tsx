@@ -120,7 +120,6 @@ export default function DashboardResumen() {
         <section className="panel">
           <h4>Casos diarios</h4>
           <CasosPorDiaChart data={casosPorDia} height={200} maxBars={31}/>
-          <div className="linechart placeholder" />
         </section>
       </aside>
     </section>
