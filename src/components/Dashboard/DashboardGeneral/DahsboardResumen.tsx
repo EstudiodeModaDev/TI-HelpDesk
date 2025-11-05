@@ -8,6 +8,7 @@ import type { TopCategoria } from "../../../Models/Dashboard";
 type Resolutor = { nombre: string; porcentaje: number; total: number };
 type Fuente = { label: string; total: number };
 
+
 const resolutores: Resolutor[] = [
   { nombre: "Andres Godoy", porcentaje: 0, total: 0 },
   { nombre: "Cesar Sanchez", porcentaje: 0, total: 0 },
@@ -32,6 +33,12 @@ function formatShort(n: number) {
     return `${k.toLocaleString("es-CO")} mil`;
   }
   return n.toLocaleString("es-CO");
+}
+
+// “Siesa Seguridad …” -> “Sies…”, “Seg…” estilo de tu imagen
+function shorten(s: string, max = 5) {
+  if (!s) return "";
+  return s.length <= max ? s : s.slice(0, max - 1) + "…";
 }
 
 // ======= leyenda con barras dinámicas =======
@@ -60,16 +67,12 @@ function StatusBars({total, at, late, inprog,}: {total: number; at: number; late
   );
 }
 
-/* ====== Dentro del mismo archivo (DashboardResumen.tsx) ====== */
-
-
 // Barras Top 5 categorías
 function TopCategorias({data,}: {data: TopCategoria[]; total: number;}) {
   if (!data?.length) {
     return <div className="hint">Sin datos para el período seleccionado</div>;
   }
 
-  // Para barras proporcionales respecto al mayor
   const max = Math.max(...data.map((d) => d.total), 1);
 
   return (
@@ -96,6 +99,37 @@ function TopCategorias({data,}: {data: TopCategoria[]; total: number;}) {
   );
 }
 
+function CategoriasChart({data, maxBars = 18, height = 160,}: {data: TopCategoria[]; maxBars?: number; height?: number;}) {
+  const items = (data ?? []).slice(0, maxBars);
+  const max = Math.max(...items.map((d) => d.total), 1);
+
+  return (
+    <div className="cats">
+      <h4 className="cats__title">Total Casos por Categoria</h4>
+
+      <div className="cats__plot" style={{ height }}>
+        <div className="cats__bars" role="list">
+          {items.map((d) => {
+            const h = Math.max(2, Math.round((d.total / max) * (height - 36))); // deja espacio para label superior
+            return (
+              <div key={d.nombre} className="cats__col" role="listitem">
+                <div className="cats__val" aria-hidden="true">
+                  {d.total.toLocaleString("es-CO")}
+                </div>
+                <div className="cats__bar" style={{ height: h }} />
+                <div className="cats__lbl" title={d.nombre}>
+                  {shorten(d.nombre)}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        <div className="cats__baseline" />
+      </div>
+    </div>
+  );
+}
+
 
 export default function DashboardResumen() {
   const { Tickets } = useGraphServices() as ReturnType<typeof useGraphServices> & {
@@ -109,7 +143,6 @@ export default function DashboardResumen() {
     obtenerTotal("resumen");
     obtenerTop5("resumen");
   }, []); 
-
 
   return (
     <section className="dash">
@@ -145,16 +178,18 @@ export default function DashboardResumen() {
 
       {/* Columna central */}
       <main className="dash-center">
-        <header className="center-head">
-          <h3>Total Casos por Categoria</h3>
-          <div className="filters">
-            <input className="date" type="date" />
-            <select className="mini">
-              <option>ID</option>
-              <option>Asunto</option>
-            </select>
-          </div>
-        </header>
+      <header className="center-head">
+        <h3>Total Casos por Categoria</h3>
+        <div className="filters">
+          <input className="date" type="date" />
+          <select className="mini">
+            <option>ID</option>
+            <option>Asunto</option>
+          </select>
+        </div>
+      </header>
+      <CategoriasChart data={topCategorias} />
+
 
         <div className="chart-area placeholder" />
 
@@ -209,13 +244,8 @@ export default function DashboardResumen() {
 }
 
 /* ====== Mini componentes SVG ====== */
-function Donut({
-  value,
-  size = 160,
-  stroke = 12,
-  ring = "#0ea5e9",
-}: {
-  value: number; // 0..1
+function Donut({value, size = 160, stroke = 12, ring = "#0ea5e9",}: {
+  value: number; 
   size?: number;
   stroke?: number;
   ring?: string;
@@ -227,17 +257,7 @@ function Donut({
   return (
     <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="donut">
       <circle cx={size / 2} cy={size / 2} r={R} stroke="#1f2937" strokeWidth={stroke} fill="none" />
-      <circle
-        cx={size / 2}
-        cy={size / 2}
-        r={R}
-        stroke={ring}
-        strokeWidth={stroke}
-        fill="none"
-        strokeDasharray={C}
-        strokeDashoffset={off}
-        transform={`rotate(-90 ${size / 2} ${size / 2})`}
-      />
+      <circle cx={size / 2} cy={size / 2} r={R} stroke={ring} strokeWidth={stroke} fill="none" strokeDasharray={C} strokeDashoffset={off} transform={`rotate(-90 ${size / 2} ${size / 2})`}/>
     </svg>
   );
 }
@@ -245,24 +265,14 @@ function Donut({
 function SmallDonut({ value }: { value: number }) {
   const v = Math.max(0, Math.min(1, value));
   const size = 64,
-    stroke = 8;
+  stroke = 8;
   const R = (size - stroke) / 2;
   const C = 2 * Math.PI * R;
   const off = C * (1 - v);
   return (
     <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="donut small">
       <circle cx={size / 2} cy={size / 2} r={R} stroke="#374151" strokeWidth={stroke} fill="none" />
-      <circle
-        cx={size / 2}
-        cy={size / 2}
-        r={R}
-        stroke="#ef4444"
-        strokeWidth={stroke}
-        fill="none"
-        strokeDasharray={C}
-        strokeDashoffset={off}
-        transform={`rotate(-90 ${size / 2} ${size / 2})`}
-      />
+      <circle cx={size / 2} cy={size / 2} r={R} stroke="#ef4444" strokeWidth={stroke} fill="none" strokeDasharray={C} strokeDashoffset={off} transform={`rotate(-90 ${size / 2} ${size / 2})`}/>
       <text x="50%" y="50%" dy="4" textAnchor="middle" className="donut-txt">
         {(v * 100).toFixed(2)}%
       </text>
@@ -271,29 +281,16 @@ function SmallDonut({ value }: { value: number }) {
 }
 
 function Gauge({ value }: { value: number }) {
-  // Semicírculo 180°
   const v = Math.max(0, Math.min(1, value));
   const size = 200,
-    stroke = 20;
+  stroke = 20;
   const R = (size - stroke) / 2;
   const C = Math.PI * R;
   const off = C * (1 - v);
   return (
     <svg width={size} height={size / 2} viewBox={`0 0 ${size} ${size / 2}`} className="gauge-svg">
-      <path
-        d={`M ${stroke / 2} ${size / 2} A ${R} ${R} 0 0 1 ${size - stroke / 2} ${size / 2}`}
-        stroke="#374151"
-        strokeWidth={stroke}
-        fill="none"
-      />
-      <path
-        d={`M ${stroke / 2} ${size / 2} A ${R} ${R} 0 0 1 ${size - stroke / 2} ${size / 2}`}
-        stroke="#22c55e"
-        strokeWidth={stroke}
-        fill="none"
-        strokeDasharray={C}
-        strokeDashoffset={off}
-      />
+      <path d={`M ${stroke / 2} ${size / 2} A ${R} ${R} 0 0 1 ${size - stroke / 2} ${size / 2}`} stroke="#374151" strokeWidth={stroke} fill="none"/>
+      <path d={`M ${stroke / 2} ${size / 2} A ${R} ${R} 0 0 1 ${size - stroke / 2} ${size / 2}`} stroke="#22c55e" strokeWidth={stroke} fill="none" strokeDasharray={C} strokeDashoffset={off}/>
       <text x="50%" y="70%" textAnchor="middle" className="gauge-txt">
         {(v * 100).toFixed(2)}%
       </text>

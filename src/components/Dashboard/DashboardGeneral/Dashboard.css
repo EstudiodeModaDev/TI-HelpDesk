@@ -327,3 +327,75 @@
 .topcats-right { display:flex; gap:8px; align-items:center; font-variant-numeric: tabular-nums; }
 .topcats-count { font-weight:700; }
 .topcats-pct { color:#6b7280; font-size:.9rem; }
+
+/* ===== Total Casos por Categoria ===== */
+.cats { display: grid; gap: 8px; }
+.cats__title { margin: 0 0 4px; font-weight: 700; }
+
+.cats__plot {
+  position: relative;
+  /* fondo oscuro ya lo tienes en tu layout */
+}
+
+.cats__bars{
+  /* CENTRADO: flex con justify-center */
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;       /* <- centra las columnas */
+  gap: 12px;
+  height: 100%;
+  padding: 4px 8px 0;
+}
+
+.cats__col{
+  width: 26px;                   /* barra angosta como en la captura */
+  display: grid;
+  grid-template-rows: auto 1fr auto;  /* número / barra / etiqueta */
+  align-items: end;
+  text-align: center;
+  color: #e5e7eb;
+}
+
+.cats__val{
+  font-size: 12px;
+  font-weight: 700;
+  opacity: .95;
+  transform: translateY(2px);    /* separa un poco del borde superior */
+}
+
+.cats__bar{
+  background: #0ea5b7;           /* cian verdoso */
+  border-radius: 3px 3px 0 0;
+  box-shadow: inset 0 -2px 0 rgba(255,255,255,.15);
+}
+
+.cats__lbl{
+  margin-top: 6px;
+  font-size: 11px;
+  transform: rotate(-18deg);     /* inclinada como tu ejemplo */
+  transform-origin: top center;
+  color: #cbd5e1;
+  white-space: nowrap;
+}
+
+/* línea base (turquesa) bajo las barras */
+.cats__baseline{
+  position: absolute;
+  left: 12px; right: 12px; bottom: -2px;
+  height: 3px;
+  background: #0ea5b7;
+  border-radius: 2px;
+  opacity: .85;
+}
+
+/* Responsive: más estrechas si hay muchas */
+@media (max-width: 900px){
+  .cats__col{ width: 22px; }
+  .cats__bars{ gap: 10px; }
+}
+@media (max-width: 640px){
+  .cats__col{ width: 18px; }
+  .cats__bars{ gap: 8px; }
+  .cats__lbl{ font-size: 10px; transform: rotate(-20deg); }
+}
+
