@@ -1,5 +1,5 @@
 import { GraphRest } from '../graph/GraphRest';
-import type { Anuncios } from '../Models/Anuncio';
+import type { Anuncio } from '../Models/Anuncio';
 import type { GetAllOpts } from '../Models/Commons';
 import { ensureIds } from '../utils/Commons';
 
@@ -25,20 +25,20 @@ export class AnunciosService {
   }
 
   // ---------- mapping ----------
-  private toModel(item: any): Anuncios {
+  private toModel(item: any): Anuncio {
     const f = item?.fields ?? {};
     return {
         Id: String(item?.id ?? ''),
-        FechaInicio: f.FechaInicio,
-        FechaFinal: f.FechaFinal,
-        Tipodeanuncio: f.Tipodeanuncio,
+        Fechadeinicio: f.Fechadeinicio,
+        Fechafinal: f.Fechafinal,
         TituloAnuncio: f.TituloAnuncio,
-        Cuerpo: f.Cuerpo
+        Cuerpo: f.Cuerpo,
+        Title: f.Title
     };
   }
 
   // ---------- CRUD ----------
-  async create(record: Omit<Anuncios, 'ID'>) {
+  async create(record: Omit<Anuncio, 'ID'>) {
     await ensureIds(this.siteId, this.listId, this.graph, this.hostname, this.sitePath, this.listName);
     const res = await this.graph.post<any>(
       `/sites/${this.siteId}/lists/${this.listId}/items`,
@@ -47,7 +47,7 @@ export class AnunciosService {
     return this.toModel(res);
   }
 
-  async update(id: string, changed: Partial<Omit<Anuncios, 'ID'>>) {
+  async update(id: string, changed: Partial<Omit<Anuncio, 'ID'>>) {
     await ensureIds(this.siteId, this.listId, this.graph, this.hostname, this.sitePath, this.listName);;
     await this.graph.patch<any>(
       `/sites/${this.siteId}/lists/${this.listId}/items/${id}/fields`,
