@@ -315,3 +315,32 @@ main {
   box-shadow: none !important;
 }
 
+/* ——— Single value sólido ——— */
+.ticket-form .rs__single-value {
+  color: var(--tf-fg) !important;
+  opacity: 1 !important;            /* evita el fade que aplica react-select */
+  filter: none !important;
+}
+
+/* El input “oculto” que queda encima no te cambie el color */
+.ticket-form .rs__input,
+.ticket-form .rs__input input {
+  color: var(--tf-fg) !important;
+  opacity: 1 !important;
+}
+
+/* Asegura el fondo del control (sin velo gris) */
+.ticket-form .rs__control {
+  background: #fff !important;
+  border-color: var(--tf-border) !important;
+}
+
+/* Si llega disabled, no opaques todo el control */
+.ticket-form .rs__control--is-disabled {
+  opacity: 1 !important;
+}
+
+/* Evita que el placeholder se confunda con el valor */
+.ticket-form .rs__placeholder {
+  color: var(--tf-muted) !important;
+}
