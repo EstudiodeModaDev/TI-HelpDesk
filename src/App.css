@@ -79,21 +79,23 @@
 
 /* Componente de página: ocupa 100% y permite scroll interno */
 .page{
-  width: 100%;
-  height: 100%;
   display: grid;
-  place-items: stretch;     /* ya NO centramos aquí */
-  min-width: 0;
-  min-height: 0;
-  overflow: auto;           /* scroll si el contenido lo requiere */
+  grid-template-rows: auto 1fr;   /* header auto, resto ocupa */
+  height: 100dvh;                 /* lleno de viewport */
+  place-items: stretch;
+  overflow: hidden; 
 }
 
 /* Los hijos directos de .page deben ocupar todo el panel */
 .page > *{
   width: 100% !important;
-  height: 100% !important;
   min-width: 0 !important;
   min-height: 0 !important;
+}
+
+.page > .page-view{
+  min-height: 0;       
+  overflow: auto;     
 }
 
 /* Limpieza de wrappers antiguos que limitaban ancho/centraban */
