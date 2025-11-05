@@ -84,8 +84,8 @@ export default function DashboardDetallado() {
       <main className="dash-center">
         <header className="center-head">
           <div className="filters">
-            <input className="date" type="date" value={range.from} onChange={(e) => setRange({ ...range, from: e.target.value })}/>
-            <input className="date" type="date" value={range.to} onChange={(e) => setRange({ ...range, to: e.target.value })}/>
+            <input className="date" type="date" onChange={(e) => setRange({ ...range, from: e.target.value })}/>
+            <input className="date" type="date" onChange={(e) => setRange({ ...range, to: e.target.value })}/>
           </div>
         </header>
         <h4 className="cats__title">Total Casos por Categoria</h4>  
