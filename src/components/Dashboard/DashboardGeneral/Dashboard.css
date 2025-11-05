@@ -399,3 +399,63 @@
   .cats__lbl{ font-size: 10px; transform: rotate(-20deg); }
 }
 
+/* ====== Fuentes de solicitud ====== */
+.fs { display: grid; gap: 10px; }
+.fs-title { margin: 0 0 2px; font-weight: 700; }
+.fs-hint { color: var(--muted, #94a3b8); font-size: .9rem; }
+
+/* Leyenda */
+.fs-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  align-items: center;
+  margin: 0; padding: 0; list-style: none;
+  user-select: none;
+}
+.fs-legend__item { display: inline-flex; align-items: center; gap: 6px; opacity: .95; }
+.fs-legend__dot {
+  width: 10px; height: 10px; border-radius: 999px;
+  outline: 1px solid rgba(0,0,0,.25);
+}
+.fs-legend__label { font-size: .9rem; }
+
+/* Barra apilada */
+.fs-stack {
+  display: flex;
+  height: 18px;
+  background: rgba(255,255,255,.08);
+  border-radius: 6px;
+  overflow: hidden;
+  outline: 1px solid rgba(255,255,255,.06);
+}
+.fs-stack__seg {
+  height: 100%;
+  transition: width .25s ease;
+}
+
+/* Grid de totales */
+.fs-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0,1fr));
+  gap: 10px;
+}
+.fs-card { text-align: center; padding: 6px 4px; }
+.fs-card__value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 2px;
+}
+.fs-card__label {
+  font-size: .9rem;
+  opacity: .85;
+}
+
+/* Responsive */
+@media (max-width: 900px){
+  .fs-grid { grid-template-columns: repeat(3, minmax(0,1fr)); }
+}
+@media (max-width: 520px){
+  .fs-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+}
