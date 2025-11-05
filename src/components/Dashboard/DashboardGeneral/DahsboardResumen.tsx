@@ -35,8 +35,8 @@ export default function DashboardResumen() {
   const { Tickets } = useGraphServices() as ReturnType<typeof useGraphServices> & {
     TicketService: TicketsService;
   };
-  const { totalCasos, totalEnCurso, totalFinalizados, totalFueraTiempo, porcentajeCumplimiento, topCategorias, range, totalCategorias, resolutores, Fuentes, obtenerCasosPorDia,
-    obtenerTotal, obtenerTop5, setRange, obtenerTotalCategoria, obtenerTotalResolutor, obtenerFuentes, casosPorDia} = useDashboard(Tickets);
+  const { totalCasos, totalEnCurso, totalFinalizados, totalFueraTiempo, porcentajeCumplimiento, topCategorias, range, totalCategorias, resolutores, Fuentes, casosPorDia, loading,
+    obtenerTotal, obtenerTop5, setRange, obtenerTotalCategoria, obtenerTotalResolutor, obtenerFuentes,obtenerCasosPorDia, } = useDashboard(Tickets);
 
   // carga inicial
   React.useEffect(() => {
@@ -47,6 +47,14 @@ export default function DashboardResumen() {
     obtenerFuentes("resumen");
     obtenerCasosPorDia("resumen", true, );
   }, [range.from, range.to]); 
+
+  if (loading) {
+    return (
+      <section className="dash">
+        <div className="dash-loading" role="status" aria-live="polite">Cargando…</div>
+      </section>
+    );
+  }
 
   return (
     <section className="dash">

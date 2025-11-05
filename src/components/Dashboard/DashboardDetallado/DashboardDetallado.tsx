@@ -35,7 +35,7 @@ export default function DashboardDetallado() {
   const { Tickets } = useGraphServices() as ReturnType<typeof useGraphServices> & {
     TicketService: TicketsService;
   };
-  const { totalCasos, totalEnCurso, totalFinalizados, totalFueraTiempo, porcentajeCumplimiento, topCategorias, range, totalCategorias, resolutores, Fuentes,
+  const { totalCasos, totalEnCurso, totalFinalizados, totalFueraTiempo, porcentajeCumplimiento, topCategorias, range, totalCategorias, resolutores, Fuentes, loading,
     obtenerTotal, setRange, obtenerFuentes, casosPorDia} = useDetallado(Tickets);
 
   // carga inicial
@@ -43,6 +43,14 @@ export default function DashboardDetallado() {
     obtenerTotal();
     obtenerFuentes();
   }, [range.from, range.to]); 
+
+  if (loading) {
+    return (
+      <section className="dash">
+        <div className="dash-loading" role="status" aria-live="polite">Cargando…</div>
+      </section>
+    );
+  }
 
   return (
     <section className="dash">
