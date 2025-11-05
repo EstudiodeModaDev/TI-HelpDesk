@@ -13,7 +13,7 @@ import ComprasPage from "./components/Compras/ComprasPage";
 import RegistroFactura from "./components/RegistroFactura/RegistroFactura";
 import type { User } from "./Models/User";
 import { AuthProvider, useAuth } from "./auth/authContext";
-import { useUserRoleFromSP } from "./Funcionalidades/Usuarios";
+import { useUserRole } from "./Funcionalidades/Usuarios";
 import { GraphServicesProvider, useGraphServices } from "./graph/GrapServicesContext";
 import type { TicketsService } from "./Services/Tickets.service";
 import type { UsuariosSPService } from "./Services/Usuarios.Service";
@@ -34,8 +34,6 @@ import DashBoardPage from "./components/Dashboard/DashboardPage";
    Tipos de navegación y contexto de visibilidad
    ============================================================ */
 
-type Role = "Administrador" | "Tecnico" | "Usuario";
-
 type RenderCtx = {services?: { Tickets: TicketsService; Usuarios: UsuariosSPService; Logs: LogService }};
 
 type Services = {Tickets: TicketsService; Usuarios: UsuariosSPService; Logs: LogService;};
@@ -46,7 +44,7 @@ export type MenuItem = {
   icon?: React.ReactNode;
   to?: React.ReactNode | ((ctx: RenderCtx) => React.ReactNode);
   children?: MenuItem[];
-  roles?: Role[];
+  roles?: string[];
   flags?: string[];
   when?: (ctx: NavContext) => boolean;
   /** Si true, al seleccionarlo el sidebar se colapsa automáticamente */
@@ -54,7 +52,7 @@ export type MenuItem = {
 };
 
 export type NavContext = {
-  role: Role;
+  role: string;
   flags?: Set<string>;
   hasService?: (k: keyof Services) => boolean;   // ya no es never
 };
@@ -77,8 +75,8 @@ const NAV: MenuItem[] = [
       { id: "usuarios", label: "Usuarios", to: <UsuariosPanel />, roles: ["Administrador"] },
     ],
   },
-  {id: "acciones", label: "Acciones", roles: ["Administrador", "Tecnico"], children: [
-      {id: "siesa", label: "Siesa", children: [{id: "cajpos", label: "Cajeros POS", to: (rctx: RenderCtx) =>
+  {id: "acciones", label: "Acciones", roles: ["Administrador", "Tecnico", "Jefe de zona"], children: [
+      {id: "siesa", label: "Siesa", roles: ["Administrador", "Tecnico", "Jefe de zona"], children: [{id: "cajpos", label: "Cajeros POS", to: (rctx: RenderCtx) =>
                                                                                       rctx.services ? (
                                                                                         <CajerosPOSForm services={{ Tickets: rctx.services.Tickets, Logs: rctx.services.Logs }} />
                                                                                       ) : (
@@ -87,10 +85,10 @@ const NAV: MenuItem[] = [
           },
         ],
       },
-      {id: "cesar", label: "Cesar", children: [
-          { id: "compras", label: "Compras", to: <ComprasPage />},
-          { id: "facturas", label: "Facturas", to: <RegistroFactura /> },
-          { id: "paz", label: "Paz y Salvos", to: <PazySalvosMode /> },
+      {id: "cesar", label: "Cesar", roles: ["Administrador"], children: [
+          { id: "compras", label: "Compras", to: <ComprasPage />, roles: ["Administrador"]},
+          { id: "facturas", label: "Facturas", to: <RegistroFactura />, roles: ["Administrador"] },
+          { id: "paz", label: "Paz y Salvos", to: <PazySalvosMode />, roles: ["Administrador"] },
         ],
       },
     ],
@@ -327,11 +325,11 @@ function Shell() {
    ============================================================ */
 
 function LoggedApp({ user }: { user: User }) {
-  const { role } = useUserRoleFromSP(user!.mail);
+  const { role } = useUserRole(user!.mail);
   const services = useGraphServices() as {Tickets: TicketsService; Usuarios: UsuariosSPService; Logs: LogService;};
 
   const navCtx = React.useMemo<NavContext>(() => {
-    const safeRole: Role = role === "Administrador" || role === "Tecnico" || role === "Usuario" ? (role as Role) : "Usuario";
+    const safeRole: string = role === "Administrador" || role === "Tecnico" || role === "Usuario" ? (role as string) : "Usuario";
     return {
       role: safeRole,
       flags: new Set<string>([]),
