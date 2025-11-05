@@ -183,3 +183,7 @@
 .table-wrap td.sticky, .table-wrap th.sticky { background: var(--tbl-head) !important; }
 
 .table-wrap td.sticky, .table-wrap th.sticky { background: var(--tbl-head) !important; }
+
+.paginacion{
+  background: var(--tbl-head);
+}

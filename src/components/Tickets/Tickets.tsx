@@ -126,7 +126,7 @@ export default function TablaTickets() {
 
           {/* Paginación servidor: Anterior = volver a primera página (loadFirstPage), Siguiente = nextLink */}
           {filtered.length > 0 && (
-            <div>
+            <div className="paginacion">
               <button onClick={reloadAll} disabled={loading || pageIndex <= 1}>
                 Anterior
               </button>
