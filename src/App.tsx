@@ -78,10 +78,10 @@ const NAV: MenuItem[] = [
   {id: "acciones", label: "Acciones", roles: ["Administrador", "Tecnico", "Jefe de zona"], children: [
       {id: "siesa", label: "Siesa", roles: ["Administrador", "Tecnico", "Jefe de zona"], children: [{id: "cajpos", label: "Cajeros POS", to: (rctx: RenderCtx) =>
                                                                                       rctx.services ? (
-                                                                                        <CajerosPOSForm services={{ Tickets: rctx.services.Tickets, Logs: rctx.services.Logs }} />
+                                                                                        <CajerosPOSForm services={{ Tickets: rctx.services.Tickets, Logs: rctx.services.Logs }}/>
                                                                                       ) : (
                                                                                         <div>Cargando servicios…</div>
-                                                                                      ),
+                                                                                      ), roles: ["Administrador", "Tecnico", "Jefe de zona"]
           },
         ],
       },
