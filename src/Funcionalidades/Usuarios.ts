@@ -87,7 +87,6 @@ export function useIsAdmin(email?: string | null) {
   return { isAdmin, loading, error };
 }
 
-
 export function useUsuarios(usuariosSvc: UsuariosSPService) {
   const [usuarios, setUsuarios] = React.useState<UsuariosSP[]>([]);
   const [tecnicos, setTecnicos] = React.useState<UsuariosSP[]>([]);
