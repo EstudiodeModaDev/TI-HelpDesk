@@ -83,8 +83,6 @@ export function useDetallado(TicketsSvc: TicketsService) {
         const top5 = allCats.slice(0,5);
 
         const resolutores = buildResolutores(tickets);
-        console.table(resolutores)
-
         // 6) Casos por día
         const dayKey = (d: any) => {
           const dd = new Date((d?.FechaApertura ?? d?.fields?.FechaApertura) as string);
@@ -114,14 +112,6 @@ export function useDetallado(TicketsSvc: TicketsService) {
       setLoading(true);
       setError(null);
       try {
-        const { filter } = buildFilterTickets();
-        const res = await TicketsSvc.getAll({ filter, top: 12000 });
-
-        const tickets: any[] = Array.isArray(res?.items)
-          ? res.items
-          : Array.isArray((res as any)?.value)
-          ? (res as any).value
-          : [];
 
         if (!tickets.length) {
           setFuentes([]);
@@ -148,7 +138,7 @@ export function useDetallado(TicketsSvc: TicketsService) {
         setLoading(false);
       }
     },
-    [TicketsSvc, buildFilterTickets]);
+    [TicketsSvc, buildFilterTickets, tickets]);
 
     const buildResolutores = (tickets: Ticket[]): ResolutorAgg[] => {
       const isClosedOnTime = (st?: string) => ["cerrado", "cerrado a tiempo"].includes(norm(st));

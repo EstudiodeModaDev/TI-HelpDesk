@@ -212,6 +212,32 @@ main {
   white-space: nowrap;
 }
 
+.rs__single-value{
+  color: var(--tf-fg) !important;
+  opacity: 1 !important;                 /* evita transparencias en animaciones */
+}
+
+/* contenedor hereda bien el color */
+.rs__value-container{
+  color: var(--tf-fg) !important;
+}
+
+/* si usas multi, etiqueta del chip */
+.rs__multi-value__label{
+  color: var(--tf-fg) !important;
+}
+
+/* asegúrate del fondo y borde del control */
+.rs__control{
+  background: #fff !important;
+  border-color: var(--tf-border) !important;
+}
+
+/* si por error llega la clase de disabled, no lo opaques */
+.rs__control--is-disabled{
+  opacity: 1 !important;
+}
+
 /* =========================================================
 = ACCESIBILIDAD Y PREFERENCIAS DE MOVIMIENTO
 ========================================================= */
