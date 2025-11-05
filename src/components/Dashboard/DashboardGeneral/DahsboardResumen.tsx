@@ -155,8 +155,8 @@ function Donut({value, size = 160, stroke = 12, ring = "#0ea5e9",}: {
 
 function SmallDonut({ value }: { value: number }) {
   const v = Math.max(0, Math.min(1, value));
-  const size = 45,
-  stroke = 8;
+  const size = 68,
+  stroke = 5;
   const R = (size - stroke) / 2;
   const C = 2 * Math.PI * R;
   const off = C * (1 - v);

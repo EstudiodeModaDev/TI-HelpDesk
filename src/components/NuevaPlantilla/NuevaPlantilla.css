@@ -46,7 +46,7 @@
 
 .tpl-form{
   /* ancho amplio pero fluido */
-  width: min(1200px, 96vw);
+  inline-size: clamp(320px, 92vw, 1200px);
   max-height: calc(100dvh - 2 * clamp(12px, 2vw, 24px));
   overflow: auto;
 
@@ -181,4 +181,10 @@
   .tpl-form{ width: min(100%, 96vw); padding: 14px; gap: 12px; }
   .tpl-actions{ justify-content: stretch; }
   .tpl-primary{ width: 100%; }
+}
+@media (min-width: 768px){
+  .tpl-form{ inline-size: clamp(560px, 80vw, 1200px); }
+}
+@media (min-width: 1280px){
+  .tpl-form{ inline-size: clamp(720px, 70vw, 1280px); }
 }
