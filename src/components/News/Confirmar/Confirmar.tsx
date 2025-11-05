@@ -1,5 +1,5 @@
 import * as React from "react";
-import bg from "../assets/FondoNews.png"; // ajusta el relativo si este archivo está en otra carpeta
+import bg from "../../../assets/FondoNews.png"; // ajusta el relativo si este archivo está en otra carpeta
 
 type EdmNewsContentProps = {
   title?: string;
