@@ -2,7 +2,7 @@ import React from "react";
 import DashboardResumen from "./DashboardGeneral/DahsboardResumen";
 import DashBoardIcon from "../../assets/dashboard.svg";
 import Detalle from "../../assets/Detalle.svg"
-import DashboardDetallado from "./useDetallado/DashboardDetallado";
+import DashboardDetallado from "./DashboardGeneral/DahsboardResumen"
 import "./Dashboard.css"
 
 type Mode = "resumen" | "dashboard"; // ajusta

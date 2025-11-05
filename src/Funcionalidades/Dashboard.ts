@@ -67,43 +67,94 @@ export function useDashboard(TicketsSvc: TicketsService) {
       // deps: usa lo que lees adentro
     }, [account?.username, range.from, range.to]);
 
-    const obtenerTotal = React.useCallback(async (mode: string, ) => {
-        setLoading(true);
-        setError(null);
-        try {
-        const filter = buildFilterTickets(mode)
-        //Todos los casos
-        const casos = (await TicketsSvc.getAll({filter: filter.filter, top: 12000})).items;
-         const total = Array.isArray(casos) ? casos.length : Array.isArray((casos as any)?.value) ? (casos as any).value.length : 0;
+    const obtenerTotal = React.useCallback(async (mode: string) => {
+      setLoading(true); setError(null);
+      try {
+        const { filter } = buildFilterTickets(mode);
+        const res = await TicketsSvc.getAll({ filter, top: 12000 });
 
-        //Casos finalizados
-        const casosFinalizados = (await TicketsSvc.getAll({filter: filter.filter + " and fields/Estadodesolicitud eq 'Cerrado'", top:12000})).items;
-        const totalFinalizados = Array.isArray(casosFinalizados) ? casosFinalizados.length : Array.isArray((casosFinalizados as any)?.value) ? (casosFinalizados as any).value.length : 0;
+        const tickets: Ticket[] = Array.isArray(res?.items)
+          ? res.items
+          : Array.isArray((res as any)?.value) ? (res as any).value : [];
 
-        //Casos fuera de tiempo
-        const casosVencidos = (await TicketsSvc.getAll({filter: filter.filter + " and (fields/Estadodesolicitud eq 'Fuera de tiempo' or fields/Estadodesolicitud eq 'Cerrado fuera de tiempo')", top: 12000 })).items;
-        const totalVencidos = Array.isArray(casosVencidos) ? casosVencidos.length : Array.isArray((casosVencidos as any)?.value) ? (casosVencidos as any).value.length : 0;
-        
-        //Casos en curso
-        const casosEnCurso = (await TicketsSvc.getAll({filter: filter.filter + " and fields/Estadodesolicitud eq 'En Atención'", top: 12000})).items;
-        const totalEnCurso = Array.isArray(casosEnCurso) ? casosEnCurso.length : Array.isArray((casosEnCurso as any)?.value) ? (casosEnCurso as any).value.length : 0;
-        
-        //Porcentaje de cumplimiento
-        const porcentajeCumplimiento = total > 0 ? ((totalFinalizados) / total) : 0;
+        // 1) Totales
+        const total = tickets.length;
 
-        setPorcentajeCumplimiento(porcentajeCumplimiento);
-        setTotalCasos(total);
-        setTotalFinalizados(totalFinalizados);
-        setTotalFueraTiempo(totalVencidos);
-        setTotalencurso(totalEnCurso);
-        } catch (e: any) {
-        setError(e?.message ?? "Error al inicializar escalamiento");
-        } finally {
-        setLoading(false);
+        // Mapea todos los estados a buckets
+        const norm = (s: string) => (s || "").trim().toLowerCase();
+        const buckets = { at: 0, late: 0, inprog: 0, otros: 0 };
+        for (const t of tickets) {
+          const st = norm((t as any)?.Estadodesolicitud || (t as any)?.fields?.Estadodesolicitud);
+          if (st === "cerrado") buckets.at++;
+          else if (st === "fuera de tiempo" || st === "cerrado fuera de tiempo") buckets.late++;
+          else if (st === "en atención" || st === "en atencion") buckets.inprog++;
+          else buckets.otros++;
         }
-    },
-    [TicketsSvc, account?.username]
-    );
+
+        // 2) % cumplimiento (cerrados a tiempo / total)
+        const pct = total ? buckets.at / total : 0;
+
+        // 3) Top 5 categorías y todas las categorías
+        const countBy = (key: (t: Ticket)=>string) => {
+          const m = new Map<string, number>();
+          for (const t of tickets) {
+            const k = key(t) || "(En blanco)";
+            m.set(k, (m.get(k) ?? 0) + 1);
+          }
+          return Array.from(m, ([nombre, total]) => ({ nombre, total }))
+            .sort((a,b)=>b.total-a.total);
+        };
+        const allCats = countBy(t => String((t as any).SubCategoria).trim());
+        const top5 = allCats.slice(0,5);
+
+        // 4) Resolutores (porcentaje por resolutor)
+        const byRes = new Map<string, {nombre:string; total:number; at:number;}>();
+        for (const t of tickets) {
+          const correo = String((t as any)?.Correoresolutor || "").trim().toLowerCase() || "(en blanco)";
+          const nombre = String((t as any)?.Nombreresolutor || correo.split("@")[0] || "(En blanco)");
+          const st = norm((t as any)?.Estadodesolicitud || "");
+          const rec = byRes.get(correo) ?? { nombre, total:0, at:0 };
+          rec.total++;
+          if (st === "cerrado") rec.at++;
+          byRes.set(correo, rec);
+        }
+        const resols = Array.from(byRes, ([correo, v]) => ({
+          correo: correo === "(en blanco)" ? "" : correo,
+          nombre: v.nombre,
+          total: v.total,
+          porcentaje: v.total ? v.at / v.total : 0,
+        })).sort((a,b)=>b.total-a.total);
+
+        // 5) Fuentes
+        const fuentes = countBy(t => String((t as any).Fuente || "").trim());
+
+        // 6) Casos por día
+        const dayKey = (d: any) => {
+          const dd = new Date((d?.FechaApertura ?? d?.fields?.FechaApertura) as string);
+          const y = dd.getUTCFullYear(), m = String(dd.getUTCMonth()+1).padStart(2,"0"), da = String(dd.getUTCDate()).padStart(2,"0");
+          return `${y}-${m}-${da}`; // normalizado a UTC; ajusta si usas local
+        };
+        const mapDay = new Map<string, number>();
+        for (const t of tickets) mapDay.set(dayKey(t), (mapDay.get(dayKey(t)) ?? 0)+1);
+        const series = Array.from(mapDay, ([fecha,total])=>({fecha,total})).sort((a,b)=>a.fecha.localeCompare(b.fecha));
+
+        console.warn("Totales: ", total, " En progreso: ", buckets.inprog, " Finalizados: ", buckets.at, " Vencidos: ", buckets.late)
+        setTotalCasos(total);
+        setTotalencurso(buckets.inprog);
+        setTotalFinalizados(buckets.at);
+        setTotalFueraTiempo(buckets.late);
+        setPorcentajeCumplimiento(pct);
+        setTopCategorias(top5);
+        setTotalCateogria(allCats);
+        setResolutores(resols);
+        setFuentes(fuentes as any);
+        setCasosPorDia(series);
+      } catch (e:any) {
+        setError(e?.message ?? "Error al cargar dashboard");
+      } finally {
+        setLoading(false);
+      }
+    }, [TicketsSvc, buildFilterTickets]);
 
     const obtenerTop5 = React.useCallback(async (mode: string) => {
       setLoading(true);
