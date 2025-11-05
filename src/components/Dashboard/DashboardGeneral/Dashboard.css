@@ -205,3 +205,49 @@
 .msb--compact .msb-item{ padding: 8px; }
 .msb--compact .msb-item__inner{ grid-template-columns: 24px 1fr; gap: 8px; }
 .msb--compact .sb-icon{ width: 20px; height: 20px; }
+/* === 1) Full-bleed desde la raíz === */
+html, body, #root {
+  height: 100%;
+  width: 100%;
+}
+
+#root, .app, .page, .content, .container {
+  max-width: none !important;   /* quita límites heredados */
+  width: 100% !important;
+  margin: 0 !important;         /* evita centrados */
+  padding: 0;                   /* deja que tu layout mande */
+  box-sizing: border-box;
+}
+
+/* === 2) Layout de tu página (sidebar + contenido) siempre a 100% === */
+.msb-layout{
+  width: 100% !important;
+  max-width: 100vw !important;
+  margin: 0;
+  /* si quieres un “respiro” lateral uniforme: */
+  padding: 16px;                /* ajústalo si usas otro padding */
+}
+
+/* === 3) El área de contenido no puede encoger ni recortar === */
+.msb-content{
+  min-width: 0;                 /* evita overflow/encogimiento del grid */
+  width: 100%;
+}
+
+/* Si el .dash vive dentro de .msb-content, hazlo full-width del contenedor */
+.msb-content > .dash{
+  width: 100%;
+}
+
+/* === 4) Evitar que algún wrapper de tus paneles tenga ancho fijo === */
+.dash, .dash-left, .dash-center, .dash-right,
+.panel, .card, .section {
+  max-width: none;
+}
+
+/* === 5) (Opcional) utilidad por si tu shell usa contenedores “centrados” === */
+.full-bleed{
+  width: 100vw;
+  margin-left: 50%;
+  transform: translateX(-50%);
+}
