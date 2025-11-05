@@ -4,10 +4,8 @@ import type { TicketsService } from "../Services/Tickets.service";
 import type { GetAllOpts } from "../Models/Commons";
 import type { DateRange } from "../Models/Filtros";
 import { toGraphDateTime, toISODateFlex } from "../utils/Date";
-import type { ResolutorAgg, TopCategoria } from "../Models/Dashboard";
+import type { Fuente, ResolutorAgg, TopCategoria } from "../Models/Dashboard";
 import type { Ticket } from "../Models/Tickets";
-
-
 
 export function useDashboard(TicketsSvc: TicketsService) {
     const [resolutores, setResolutores] = React.useState<ResolutorAgg[]>([])
@@ -22,13 +20,8 @@ export function useDashboard(TicketsSvc: TicketsService) {
     const [range, setRange] = React.useState<DateRange>({ from: today, to: today });
     const [topCategorias, setTopCategorias] = React.useState<TopCategoria[]>([]);
     const [totalCategorias, setTotalCateogria] = React.useState<TopCategoria[]>([]);
+    const [Fuentes, setFuentes] = React.useState<Fuente[]>([]);
    
-   
-   // const [pageSize, setPageSize] = React.useState<number>(15); // = $top
-   // const [pageIndex, setPageIndex] = React.useState<number>(1); // 1-based
-   // const [nextLink, setNextLink] = React.useState<string | null>(null);
-   // const [sorts, setSorts] = React.useState<Array<{field: SortField; dir: SortDir}>>([{ field: 'id', dir: 'desc' }]);
-   // const [state, setState] = React.useState<RelacionadorState>({TicketRelacionar: null});
     const { account } = useAuth();
 
     const buildFilterTickets = React.useCallback((mode: string): GetAllOpts => {
@@ -229,7 +222,7 @@ export function useDashboard(TicketsSvc: TicketsService) {
               const displayNombre =
                 nombrePorCorreo.get(correo) ||
                 (correo && correo.includes("@") ? correo.split("@")[0] : "(En blanco)");
-              const porcentaje = totalTickets > 0 ? total / totalTickets : 0; // 0..1
+              const porcentaje = totalTickets > 0 ? totalFinalizados / totalTickets : 0; // 0..1
               return {
                 correo: correo === "(en blanco)" ? "" : correo,
                 nombre: displayNombre,
@@ -248,13 +241,53 @@ export function useDashboard(TicketsSvc: TicketsService) {
           setLoading(false);
         }
       },
-      [TicketsSvc, buildFilterTickets]
+      [TicketsSvc, buildFilterTickets, totalCasos, totalFinalizados]
     );
 
+    const obtenerFuentes = React.useCallback( async (mode: string): Promise<Fuente[]> => {
+      setLoading(true);
+      setError(null);
+      try {
+        const { filter } = buildFilterTickets(mode);
+        const res = await TicketsSvc.getAll({ filter, top: 12000 });
+
+        const tickets: any[] = Array.isArray(res?.items)
+          ? res.items
+          : Array.isArray((res as any)?.value)
+          ? (res as any).value
+          : [];
+
+        if (!tickets.length) {
+          setFuentes([]);
+          return [];
+        }
+
+        // Contar por campo Fuente
+        const counts = new Map<string, number>();
+        for (const t of tickets) {
+          const key = String(t?.Fuente || "(En blanco)").trim();
+          counts.set(key, (counts.get(key) ?? 0) + 1);
+        }
+
+        // A arreglo + ordenar DESC
+        const data: Fuente[] = Array.from(counts, ([label, total]) => ({ label, total }))
+          .sort((a, b) => b.total - a.total);
+
+        setFuentes(data);
+        return data;
+      } catch (e: any) {
+        setError(e?.message ?? "Error al obtener fuentes");
+        return [];
+      } finally {
+        setLoading(false);
+      }
+    },
+    [TicketsSvc, buildFilterTickets]
+  );
 
   return {
-    obtenerTotal, setRange, obtenerTop5, obtenerTotalCategoria, obtenerTotalResolutor,
-    totalCasos, error, loading, totalEnCurso, totalFinalizados, totalFueraTiempo, porcentajeCumplimiento, topCategorias, range, totalCategorias, resolutores
+    obtenerTotal, setRange, obtenerTop5, obtenerTotalCategoria, obtenerTotalResolutor, obtenerFuentes,
+    totalCasos, error, loading, totalEnCurso, totalFinalizados, totalFueraTiempo, porcentajeCumplimiento, topCategorias, range, totalCategorias, resolutores, Fuentes
   };
 }
 

@@ -5,17 +5,6 @@ import type { TicketsService } from "../../../Services/Tickets.service";
 import "./Dashboard.css";
 import type { TopCategoria } from "../../../Models/Dashboard";
 
-type Fuente = { label: string; total: number };
-
-const fuentes: Fuente[] = [
-  { label: "Aplicativo", total: 0 },
-  { label: "Correo", total: 0 },
-  { label: "Disponibilidad", total: 0 },
-  { label: "Teams", total: 0 },
-  { label: "En persona", total: 0 },
-  { label: "WhatsApp", total: 0 },
-];
-
 // ===== util: formatea "2,1 mil" / "0,2 mil" =====
 function formatShort(n: number) {
   if (n >= 1000) {
@@ -124,8 +113,8 @@ export default function DashboardResumen() {
   const { Tickets } = useGraphServices() as ReturnType<typeof useGraphServices> & {
     TicketService: TicketsService;
   };
-  const { totalCasos, totalEnCurso, totalFinalizados, totalFueraTiempo, porcentajeCumplimiento, topCategorias, range, totalCategorias, resolutores,
-    obtenerTotal, obtenerTop5, setRange, obtenerTotalCategoria, obtenerTotalResolutor} = useDashboard(Tickets);
+  const { totalCasos, totalEnCurso, totalFinalizados, totalFueraTiempo, porcentajeCumplimiento, topCategorias, range, totalCategorias, resolutores, Fuentes,
+    obtenerTotal, obtenerTop5, setRange, obtenerTotalCategoria, obtenerTotalResolutor, obtenerFuentes} = useDashboard(Tickets);
 
   // carga inicial
   React.useEffect(() => {
@@ -133,6 +122,7 @@ export default function DashboardResumen() {
     obtenerTop5("resumen");
     obtenerTotalCategoria("resumen");
     obtenerTotalResolutor("resumen");
+    obtenerFuentes("resumen");
   }, [range.from, range.to]); 
 
   return (
@@ -203,7 +193,7 @@ export default function DashboardResumen() {
       <aside className="dash-right">
         <h4>Fuentes de solicitud</h4>
         <div className="fuentes-row">
-          {fuentes.map((f) => (
+          {Fuentes.map((f) => (
             <div key={f.label} className="fuente">
               <div className="fuente-count">(En blanco)</div>
               <div className="fuente-label">{f.label}</div>
