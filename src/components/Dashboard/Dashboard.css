@@ -205,3 +205,74 @@ img, svg, canvas { max-width:100%; height:auto; display:block; }
   .msb-icon{ inline-size: 40px; block-size: 40px; border-radius: 8px; }
   .msb-label{ font-size: 11px; }
 }
+
+/* ====== Vars para anchos del rail ====== */
+:root{
+  --rail: 132px;        /* antes ~86px */
+  --rail-sm: 112px;     /* tablets */
+  --rail-xs: 88px;      /* móviles (cuando lo conviertes en tira) */
+}
+
+/* Layout: usa la var */
+.msb-layout{
+  display:grid;
+  grid-template-columns: var(--rail) 1fr;
+  gap: var(--gap, 12px);
+  min-height: 100dvh;
+}
+
+/* Rail */
+.msb{
+  inline-size: var(--rail);
+  box-sizing: border-box;
+}
+
+/* Pista interna ocupa exactamente el rail */
+.msb-track{
+  inline-size: 100%;
+  max-inline-size: 100%;
+  overflow-y: auto;
+}
+
+/* Botón ocupa todo el ancho disponible del rail */
+.msb-item{ inline-size: 100%; max-inline-size: 100%; }
+
+/* Icono un poco más grande, acorde al nuevo ancho */
+.msb-icon{
+  inline-size: 56px;    /* era 46px */
+  block-size: 56px;
+  border-radius: 12px;
+}
+
+/* Etiqueta: permite 2 líneas y evita corte feo */
+.msb-label{
+  font-size: 12.5px;
+  line-height: 1.1;
+  max-inline-size: 100%;
+  white-space: normal;         /* permite salto de línea */
+  overflow: hidden;
+  text-overflow: ellipsis;     /* por si acaso */
+}
+
+/* ====== Responsivo ====== */
+@media (max-width: 1100px){
+  :root{ --rail: var(--rail-sm); }
+  .msb{ inline-size: var(--rail-sm); }
+}
+
+@media (max-width: 900px){
+  /* en móvil lo conviertes en tira horizontal */
+  .msb-layout{ grid-template-columns: 1fr; }
+  .msb{
+    position: static;
+    inline-size: auto;
+  }
+  .msb-track{
+    flex-direction: row;
+    overflow-x: auto; overflow-y: hidden;
+    gap: 8px;
+  }
+  .msb-item{ min-width: var(--rail-xs); }   /* cada botón como “chip ancho” */
+  .msb-icon{ inline-size: 44px; block-size: 44px; }
+  .msb-label{ font-size: 11.5px; }
+}
