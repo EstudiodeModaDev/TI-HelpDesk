@@ -318,3 +318,12 @@
     grid-template-columns: 10px 1fr minmax(100px, 1fr) auto;
   }
 }
+.topcats { display:grid; gap:10px; margin:10px 0 0; padding:0; list-style:none; }
+.topcats-row { display:grid; grid-template-columns: 1fr 1.6fr auto; align-items:center; gap:10px; }
+.topcats-left { min-width:0; }
+.topcats-name { display:inline-block; max-width:100%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-weight:600; }
+.topcats-bar { height:10px; background:#e5e7eb; border-radius:999px; overflow:hidden; }
+.topcats-fill { height:100%; background:#4f46e5; }
+.topcats-right { display:flex; gap:8px; align-items:center; font-variant-numeric: tabular-nums; }
+.topcats-count { font-weight:700; }
+.topcats-pct { color:#6b7280; font-size:.9rem; }

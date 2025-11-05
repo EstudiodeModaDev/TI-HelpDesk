@@ -5,6 +5,7 @@ import type { GetAllOpts } from "../Models/Commons";
 import type { DateRange } from "../Models/Filtros";
 import { toGraphDateTime, toISODateFlex } from "../utils/Date";
 import type { TopCategoria } from "../Models/Dashboard";
+import type { Ticket } from "../Models/Tickets";
 
 export function useDashboard(TicketsSvc: TicketsService) {
    // const [resolutures, setResolutores] = React.useState<Usuario[]>([])
@@ -87,7 +88,7 @@ export function useDashboard(TicketsSvc: TicketsService) {
         const totalVencidos = Array.isArray(casosVencidos) ? casosVencidos.length : Array.isArray((casosVencidos as any)?.value) ? (casosVencidos as any).value.length : 0;
         
         //Casos en curso
-        const casosEnCurso = (await TicketsSvc.getAll({filter: filter.filter + " and fields/Estadodesolicitud eq 'En curso'", top: 12000})).items;
+        const casosEnCurso = (await TicketsSvc.getAll({filter: filter.filter + " and fields/Estadodesolicitud eq 'En Atención'", top: 12000})).items;
         const totalEnCurso = Array.isArray(casosEnCurso) ? casosEnCurso.length : Array.isArray((casosEnCurso as any)?.value) ? (casosEnCurso as any).value.length : 0;
         
         //Porcentaje de cumplimiento
@@ -113,7 +114,7 @@ export function useDashboard(TicketsSvc: TicketsService) {
       try {
         const filter = buildFilterTickets(mode);
         const res = await TicketsSvc.getAll({ filter: filter.filter, top: 12000 });
-        const tickets: any[] =
+        const tickets: Ticket[] =
           Array.isArray(res?.items) ? res.items :
           Array.isArray((res as any)?.value) ? (res as any).value : [];
 
@@ -121,12 +122,14 @@ export function useDashboard(TicketsSvc: TicketsService) {
           setTopCategorias([]);
           return;
         }
-        
+      
+        console.table(tickets)
         const counts = new Map<string, number>();
         for (const t of tickets) {
-          const cat = String(t?.fields?.Categoria || "(En blanco)").trim();
+          const cat = String(t?.SubCategoria || "(En blanco)").trim();
           counts.set(cat, (counts.get(cat) ?? 0) + 1);
         }
+
 
         // Calcular top 5
         const top = Array.from(counts.entries())
