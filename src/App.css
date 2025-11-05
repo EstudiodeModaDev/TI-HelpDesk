@@ -386,3 +386,15 @@
   .brand h1{ font-size: 16px; }
   .btn-logout{ padding: 6px 10px; }
 }
+
+.headerRow,
+.headerRow > .header-inner{
+  height: auto !important;      /* anula cualquier height anterior */
+  min-height: 52px;             /* tu altura objetivo */
+  padding-block: 8px;           /* ajusta si quieres más compacto */
+}
+
+/* 2) Asegura que nada interno la estire de nuevo */
+.headerRow .avatar{ width:30px; height:30px; }
+.headerRow .btn-logout{ padding:6px 10px; }
+.headerRow .brand h1{ font-size:16px; line-height:1.2; }
