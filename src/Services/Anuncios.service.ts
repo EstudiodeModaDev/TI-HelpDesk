@@ -1,7 +1,7 @@
 import { GraphRest } from '../graph/GraphRest';
 import type { Anuncio } from '../Models/Anuncio';
 import type { GetAllOpts } from '../Models/Commons';
-import { ensureIds } from '../utils/Commons';
+import { esc } from '../utils/Commons';
 
 export class AnunciosService {
   private graph!: GraphRest;
@@ -39,7 +39,7 @@ export class AnunciosService {
 
   // ---------- CRUD ----------
   async create(record: Omit<Anuncio, 'ID'>) {
-    await ensureIds(this.siteId, this.listId, this.graph, this.hostname, this.sitePath, this.listName);
+    await this.ensureIds();
     const res = await this.graph.post<any>(
       `/sites/${this.siteId}/lists/${this.listId}/items`,
       { fields: record }
@@ -48,7 +48,7 @@ export class AnunciosService {
   }
 
   async update(id: string, changed: Partial<Omit<Anuncio, 'ID'>>) {
-    await ensureIds(this.siteId, this.listId, this.graph, this.hostname, this.sitePath, this.listName);;
+    await this.ensureIds();
     await this.graph.patch<any>(
       `/sites/${this.siteId}/lists/${this.listId}/items/${id}/fields`,
       changed
@@ -59,13 +59,54 @@ export class AnunciosService {
     return this.toModel(res);
   }
 
+    private loadCache() {
+        try {
+        const k = `sp:${this.hostname}${this.sitePath}:${this.listName}`;
+        const raw = localStorage.getItem(k);
+        if (raw) {
+            const { siteId, listId } = JSON.parse(raw);
+            this.siteId = siteId || this.siteId;
+            this.listId = listId || this.listId;
+        }
+        } catch {}
+    }
+  
+    private saveCache() {
+        try {
+        const k = `sp:${this.hostname}${this.sitePath}:${this.listName}`;
+        localStorage.setItem(k, JSON.stringify({ siteId: this.siteId, listId: this.listId }));
+        } catch {}
+    }
+  
+    private async ensureIds() {
+        if (!this.siteId || !this.listId) this.loadCache();
+  
+        if (!this.siteId) {
+        const site = await this.graph.get<any>(`/sites/${this.hostname}:${this.sitePath}`);
+        this.siteId = site?.id;
+        if (!this.siteId) throw new Error('No se pudo resolver siteId');
+        this.saveCache();
+        }
+  
+        if (!this.listId) {
+        const lists = await this.graph.get<any>(
+            `/sites/${this.siteId}/lists?$filter=displayName eq '${esc(this.listName)}'`
+        );
+        const list = lists?.value?.[0];
+        if (!list?.id) throw new Error(`Lista no encontrada: ${this.listName}`);
+        this.listId = list.id;
+        this.saveCache();
+        }
+    }
+  
+
   async delete(id: string) {
-    await ensureIds(this.siteId, this.listId, this.graph, this.hostname, this.sitePath, this.listName);
+    await this.ensureIds();
     await this.graph.delete(`/sites/${this.siteId}/lists/${this.listId}/items/${id}`);
   }
 
   async get(id: string) {
-    await ensureIds(this.siteId, this.listId, this.graph, this.hostname, this.sitePath, this.listName);
+    await this.ensureIds();
     const res = await this.graph.get<any>(
       `/sites/${this.siteId}/lists/${this.listId}/items/${id}?$expand=fields`
     );
@@ -73,7 +114,7 @@ export class AnunciosService {
   }
 
   async getAll(opts?: GetAllOpts) {
-    await ensureIds(this.siteId, this.listId, this.graph, this.hostname, this.sitePath, this.listName);
+    await this.ensureIds();
 
     // ID -> id, Title -> fields/Title (cuando NO está prefijado con '/')
     const normalizeFieldTokens = (s: string) =>

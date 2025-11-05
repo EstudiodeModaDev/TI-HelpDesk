@@ -1,6 +1,7 @@
 import { GraphRest } from '../graph/GraphRest';
 import type { Articulos } from '../Models/Articulos';
 import type { GetAllOpts } from '../Models/Commons';
+import { esc } from '../utils/Commons';
 
 export class ArticulosService {
   private graph!: GraphRest;
@@ -33,7 +34,6 @@ export class ArticulosService {
     };
   }
 
-  private esc(s: string) { return String(s).replace(/'/g, "''"); }
   
   private loadCache() {
       try {
@@ -66,7 +66,7 @@ export class ArticulosService {
 
       if (!this.listId) {
       const lists = await this.graph.get<any>(
-          `/sites/${this.siteId}/lists?$filter=displayName eq '${this.esc(this.listName)}'`
+          `/sites/${this.siteId}/lists?$filter=displayName eq '${esc(this.listName)}'`
       );
       const list = lists?.value?.[0];
       if (!list?.id) throw new Error(`Lista no encontrada: ${this.listName}`);
