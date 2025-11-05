@@ -277,25 +277,19 @@
    ========================================================================== */
 
 .headerRow{
-  /* fondo a todo lo ancho */
   background: var(--surface);
-  color: var(--ink);
   border-bottom: 1px solid var(--border);
-  box-shadow: 0 2px 10px rgba(2, 6, 23, .04);
-
-  /* espaciado */
   padding-block: 12px;
   padding-inline: 16px;
+  height: 150px;
 }
 
 /* contenedor interno centrado con ancho máximo */
 .header-inner{
-  --header-max: 1200px;                  /* AJUSTA tu máximo visual */
-  width: min(100%, var(--header-max));
-  margin-inline: auto;
-
+  width: min(100%, var(--content-max));
+  margin-inline: auto;           
   display: grid;
-  grid-template-columns: 1fr auto;       /* título + usuario */
+  grid-template-columns: 1fr auto;
   align-items: center;
   gap: 16px;
 }
