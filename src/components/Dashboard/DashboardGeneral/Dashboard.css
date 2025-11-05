@@ -9,7 +9,7 @@
   --border: #1f2a36;
   --shadow: 0 6px 20px rgba(0,0,0,.25);
 
-  --accent: #22c55e;    /* verde para KPIs */
+  --accent: #22c55e;
   --good:   #10b981;
   --bad:    #ef4444;
   --info:   #06b6d4;
@@ -29,28 +29,43 @@
 }
 
 /* =========================
-   Layout principal
+   DASHBOARD: bloque único full-width
    ========================= */
 .dash{
+  width: 100%;
   display: grid;
   grid-template-columns: 320px minmax(0,1fr) 360px;
-  gap: var(--gap);
-  padding: var(--pad);
+  column-gap: 0;               /* sin gap: usaremos separadores */
+  row-gap: 0;
+  padding: calc(var(--pad) + 4px);
   color: var(--ink);
   font-family: var(--font);
-  background: transparent;
-}
 
-.dash-left,
-.dash-center,
-.dash-right{
+  /* Bloque único con fondo y borde */
   background: var(--bg-elev);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
-  padding: 16px;
-  min-width: 0;
+
+  /* Para que nada sobresalga del radio */
+  overflow: clip;
+  box-sizing: border-box;
 }
+
+/* Las columnas pasan a ser "secciones internas" del mismo bloque */
+.dash-left,
+.dash-center,
+.dash-right{
+  min-width: 0;
+  padding: 16px;
+  background: transparent;     /* <- antes tenían fondo propio */
+  border: 0;                   /* <- quitamos borde propio */
+  box-shadow: none;            /* <- sin sombra individual */
+}
+
+/* Separadores verticales sutiles entre columnas */
+.dash-center{ border-left: 1px solid var(--border); }
+.dash-right{  border-left: 1px solid var(--border); }
 
 /* =========================
    Panel / tarjeta
@@ -62,7 +77,6 @@
   border-radius: 12px;
   background: color-mix(in oklab, var(--bg-elev) 92%, transparent);
 }
-
 .hint{ color: var(--muted); font-size: .92rem; }
 
 /* =========================
@@ -81,7 +95,6 @@
 }
 .kpi-total .big{ font-size: 1.8rem; font-weight: 800; line-height: 1; }
 .kpi-total .sub{ color: var(--muted); font-weight: 600; }
-
 .donut{ display:block; }
 
 /* =========================
@@ -95,7 +108,7 @@
 .gauge-txt{ fill: var(--ink); font-weight: 700; }
 
 /* =========================
-   Barras de estado (A tiempo / Fuera de tiempo / En curso)
+   Barras de estado
    ========================= */
 .bullets{ list-style: none; margin: 0 0 8px; padding: 0; }
 .bullets--barred .bullet-row{
@@ -165,7 +178,7 @@
 .topcats-count{ font-weight:800; }
 
 /* =========================
-   Barras verticales (categorías y casos por día)
+   Barras verticales
    ========================= */
 .cats__title{ margin: 8px 0 4px; }
 .cats__plot{
@@ -237,7 +250,7 @@
 .fs-card__value{ font-weight:900; font-size:1.2rem; }
 .fs-card__label{ color: var(--muted); font-weight:600; }
 
-/* Colores de fuentes (respaldo a los tokens) */
+/* Colores de fuentes */
 .fs-legend__item[title="Aplicativo"] .fs-legend__dot{ background: var(--fs-aplicativo); }
 .fs-legend__item[title="Correo"] .fs-legend__dot{ background: var(--fs-correo); }
 .fs-legend__item[title="Disponibilidad"] .fs-legend__dot{ background: var(--fs-disp); }
@@ -250,13 +263,28 @@
    Responsivo
    ========================= */
 @media (max-width: 1200px){
-  .dash{ grid-template-columns: 300px minmax(0,1fr); }
-  .dash-right{ grid-column: 1 / -1; }
+  .dash{
+    grid-template-columns: 300px minmax(0,1fr);
+  }
+  .dash-right{
+    border-left: 0;                 /* última columna cae abajo: sin separador */
+    border-top: 1px solid var(--border);
+    grid-column: 1 / -1;
+  }
 }
+
 @media (max-width: 880px){
-  .dash{ grid-template-columns: 1fr; }
+  .dash{
+    grid-template-columns: 1fr;
+  }
+  .dash-center,
+  .dash-right{
+    border-left: 0;
+    border-top: 1px solid var(--border);
+  }
   .fs-grid{ grid-template-columns: repeat(2, 1fr); }
 }
+
 @media (max-width: 540px){
   .fs-grid{ grid-template-columns: 1fr; }
   .cats__bars{ grid-auto-columns: minmax(24px, 1fr); gap: 8px; }
