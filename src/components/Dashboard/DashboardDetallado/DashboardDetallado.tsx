@@ -100,7 +100,7 @@ export default function DashboardDetallado() {
                   </div>
                 </div>
                 <div className="res-right">
-                  <div className="res-total">{totalCasos}</div>
+                  <div className="res-total">{r.total}</div>
                   <div className="res-caption">Total Casos</div>
                 </div>
               </li>

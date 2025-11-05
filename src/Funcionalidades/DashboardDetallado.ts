@@ -1,14 +1,15 @@
 import React from "react"
 import type { DailyPoint, Fuente, ResolutorAgg, TopCategoria } from "../Models/Dashboard"
 import type { TicketsService } from "../Services/Tickets.service"
-import { toISODateFlex } from "../utils/Date"
 import type { DateRange } from "../Models/Filtros"
 import { useAuth } from "../auth/authContext"
 import type { GetAllOpts } from "../Models/Commons"
 import type { Ticket } from "../Models/Tickets"
+import { norm } from "../utils/Commons"
 
 export function useDetallado(TicketsSvc: TicketsService) {
     const [resolutores, setResolutores] = React.useState<ResolutorAgg[]>([])
+    const [tickets, setTickets] = React.useState<Ticket[]>([])
     const [totalCasos, setTotalCasos] = React.useState<number>(0)
     const [totalEnCurso, setTotalencurso] = React.useState<number>(0)
     const [totalFueraTiempo, setTotalFueraTiempo] = React.useState<number>(0)
@@ -16,8 +17,7 @@ export function useDetallado(TicketsSvc: TicketsService) {
     const [porcentajeCumplimiento, setPorcentajeCumplimiento] = React.useState<number>(0)
     const [loading, setLoading] = React.useState(false);
     const [error, setError] = React.useState<string | null>(null);
-    const today = React.useMemo(() => toISODateFlex(new Date()), []);
-    const [range, setRange] = React.useState<DateRange>({ from: today, to: today });
+    const [range, setRange] = React.useState<DateRange>({ from: "", to: "" });
     const [topCategorias, setTopCategorias] = React.useState<TopCategoria[]>([]);
     const [totalCategorias, setTotalCateogria] = React.useState<TopCategoria[]>([]);
     const [casosPorDia, setCasosPorDia] = React.useState<DailyPoint[]>([]);
@@ -52,7 +52,7 @@ export function useDetallado(TicketsSvc: TicketsService) {
           ? res.items
           : Array.isArray((res as any)?.value) ? (res as any).value : [];
 
-        // 1) Totales
+        setTickets(tickets)
         const total = tickets.length;
 
         // Mapea todos los estados a buckets
@@ -82,23 +82,8 @@ export function useDetallado(TicketsSvc: TicketsService) {
         const allCats = countBy(t => String((t as any).SubCategoria).trim());
         const top5 = allCats.slice(0,5);
 
-        // 4) Resolutores (porcentaje por resolutor)
-        const byRes = new Map<string, {nombre:string; total:number; at:number;}>();
-        for (const t of tickets) {
-          const correo = String((t as any)?.Correoresolutor || "").trim().toLowerCase() || "(en blanco)";
-          const nombre = String((t as any)?.Nombreresolutor || correo.split("@")[0] || "(En blanco)");
-          const st = norm((t as any)?.Estadodesolicitud || "");
-          const rec = byRes.get(correo) ?? { nombre, total:0, at:0 };
-          rec.total++;
-          if (st === "cerrado") rec.at++;
-          byRes.set(correo, rec);
-        }
-        const resols = Array.from(byRes, ([correo, v]) => ({
-          correo: correo === "(en blanco)" ? "" : correo,
-          nombre: v.nombre,
-          total: v.total,
-          porcentaje: v.total ? v.at / v.total : 0,
-        })).sort((a,b)=>b.total-a.total);
+        const resolutores = buildResolutores(tickets);
+        console.table(resolutores)
 
         // 6) Casos por día
         const dayKey = (d: any) => {
@@ -109,8 +94,6 @@ export function useDetallado(TicketsSvc: TicketsService) {
         const mapDay = new Map<string, number>();
         for (const t of tickets) mapDay.set(dayKey(t), (mapDay.get(dayKey(t)) ?? 0)+1);
         const series = Array.from(mapDay, ([fecha,total])=>({fecha,total})).sort((a,b)=>a.fecha.localeCompare(b.fecha));
-
-        console.log("Totales: ", total, " En progreso: ", buckets.inprog, " Finalizados: ", buckets.at, " Vencidos: ", buckets.inprog)
         setTotalCasos(total);
         setTotalencurso(buckets.inprog);
         setTotalFinalizados(buckets.at);
@@ -118,14 +101,14 @@ export function useDetallado(TicketsSvc: TicketsService) {
         setPorcentajeCumplimiento(pct);
         setTopCategorias(top5);
         setTotalCateogria(allCats);
-        setResolutores(resols);
         setCasosPorDia(series);
+        setResolutores(resolutores)
       } catch (e:any) {
         setError(e?.message ?? "Error al cargar dashboard");
       } finally {
         setLoading(false);
       }
-    }, [TicketsSvc, buildFilterTickets]);
+    }, [TicketsSvc, buildFilterTickets, tickets]);
 
     const obtenerFuentes = React.useCallback( async (): Promise<Fuente[]> => {
       setLoading(true);
@@ -167,8 +150,76 @@ export function useDetallado(TicketsSvc: TicketsService) {
     },
     [TicketsSvc, buildFilterTickets]);
 
+    const buildResolutores = (tickets: Ticket[]): ResolutorAgg[] => {
+      const isClosedOnTime = (st?: string) => ["cerrado", "cerrado a tiempo"].includes(norm(st));
+      
+      const getResolvers = (t: Ticket): Array<{ email: string; name: string }> => {
+        const out: Array<{ email: string; name: string }> = [];
+
+        const direct = t?.CorreoResolutor; // <- ; importante
+        if (direct) {
+          const parts = String(direct)
+            .split(/[;,]/)
+            .map((s) => s.trim())
+            .filter(Boolean);
+
+          for (const p of parts) {
+            // soporta "Nombre <mail@dom.com>" o "mail@dom.com"
+            const m = p.match(/<?([\w.+-]+@[\w.-]+\.\w+)>?/);
+            const email = (m ? m[1] : "").toLowerCase();
+            const name =
+              t?.Nombreresolutor ||
+              p.replace(/<.*?>/, "").trim() ||
+              (email ? email.split("@")[0] : "") ||
+              "(En blanco)";
+            out.push({ email, name });
+          }
+        }
+
+        // fallback: solo nombre
+        if (!out.length) {
+          const name = t?.Nombreresolutor || "(En blanco)";
+          out.push({ email: "", name });
+        }
+
+        // dedup dentro del ticket
+        const seen = new Set<string>();
+        return out.filter((r) => {
+          const k = r.email || r.name.toLowerCase();
+          if (seen.has(k)) return false;
+          seen.add(k);
+          return true;
+        });
+      };
+
+      // --- agregación por resolutor ---
+      const byRes = new Map<string, { nombre: string; email: string; total: number; at: number }>();
+
+      for (const t of tickets) {
+        const st = t?.Estadodesolicitud;
+
+        for (const r of getResolvers(t)) {
+          const key = r.email || r.name.toLowerCase();
+          const rec = byRes.get(key) ?? { nombre: r.name, email: r.email, total: 0, at: 0 };
+          rec.total++;
+          if (isClosedOnTime(st)) rec.at++;
+          byRes.set(key, rec);
+        }
+      }
+
+      return Array.from(byRes.values())
+        .map((v) => ({
+          correo: v.email,
+          nombre: v.nombre,
+          total: v.total,
+          at: v.at,
+          porcentaje: v.total ? v.at / v.total : 0,
+        }))
+        .sort((a, b) => b.total - a.total);
+    };
+
   return {
-    obtenerTotal, setRange, obtenerFuentes,
+    obtenerTotal, setRange, obtenerFuentes, buildResolutores,
     totalCasos, error, loading, totalEnCurso, totalFinalizados, totalFueraTiempo, porcentajeCumplimiento, topCategorias, range, totalCategorias, resolutores, Fuentes, casosPorDia
   };
 }

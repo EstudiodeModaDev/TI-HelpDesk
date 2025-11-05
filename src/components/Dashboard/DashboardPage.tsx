@@ -10,7 +10,7 @@ type Item = { id: Mode; label: string; icon?: React.ReactNode; active?: boolean 
 
 export default function DashBoardPage() {
 
-  const [mode, setMode] = React.useState<string>("");
+  const [mode, setMode] = React.useState<string>("resumen");
   const Items: Item[] = [
     {id: "resumen", label: "Dashboard", active: true, icon: <img src={DashBoardIcon} alt="" className="sb-icon" />}, 
     {id: "dashboard", label: "Detallado", active: true, icon: <img src={Detalle} alt="" className="sb-icon" />}]
