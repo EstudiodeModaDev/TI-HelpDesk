@@ -12,3 +12,5 @@ export type TopCategoria = {
 };
 
 export type Fuente = { label: string; total: number };
+
+export type DailyPoint = { fecha: string; total: number };

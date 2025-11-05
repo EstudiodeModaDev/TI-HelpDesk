@@ -3,7 +3,7 @@ import { useDashboard } from "../../../Funcionalidades/Dashboard";
 import { useGraphServices } from "../../../graph/GrapServicesContext";
 import type { TicketsService } from "../../../Services/Tickets.service";
 import "./Dashboard.css";
-import type { Fuente, TopCategoria } from "../../../Models/Dashboard";
+import type { DailyPoint, Fuente, TopCategoria } from "../../../Models/Dashboard";
 
 // ===== util: formatea "2,1 mil" / "0,2 mil" =====
 function formatShort(n: number) {
@@ -35,8 +35,8 @@ export default function DashboardResumen() {
   const { Tickets } = useGraphServices() as ReturnType<typeof useGraphServices> & {
     TicketService: TicketsService;
   };
-  const { totalCasos, totalEnCurso, totalFinalizados, totalFueraTiempo, porcentajeCumplimiento, topCategorias, range, totalCategorias, resolutores, Fuentes,
-    obtenerTotal, obtenerTop5, setRange, obtenerTotalCategoria, obtenerTotalResolutor, obtenerFuentes} = useDashboard(Tickets);
+  const { totalCasos, totalEnCurso, totalFinalizados, totalFueraTiempo, porcentajeCumplimiento, topCategorias, range, totalCategorias, resolutores, Fuentes, obtenerCasosPorDia,
+    obtenerTotal, obtenerTop5, setRange, obtenerTotalCategoria, obtenerTotalResolutor, obtenerFuentes, casosPorDia} = useDashboard(Tickets);
 
   // carga inicial
   React.useEffect(() => {
@@ -45,6 +45,7 @@ export default function DashboardResumen() {
     obtenerTotalCategoria("resumen");
     obtenerTotalResolutor("resumen");
     obtenerFuentes("resumen");
+    obtenerCasosPorDia("resumen", true, );
   }, [range.from, range.to]); 
 
   return (
@@ -87,6 +88,7 @@ export default function DashboardResumen() {
             <input className="date" type="date" value={range.to} onChange={(e) => setRange({ ...range, to: e.target.value })}/>
           </div>
         </header>
+        <h4 className="cats__title">Total Casos por Categoria</h4>  
         <CategoriasChart data={totalCategorias} />
 
         <section className="resolutores">
@@ -95,7 +97,7 @@ export default function DashboardResumen() {
             {resolutores.map((r) => (
               <li key={r.nombre} className="res-item">
                 <div className="res-left">
-                  <SmallDonut value={r.porcentaje} />
+                  <SmallDonut value={porcentajeCumplimiento} />
                   <div className="res-meta">
                     <div className="res-name">{r.nombre}</div>
                     <div className="res-sub">0.00%</div>
@@ -116,14 +118,8 @@ export default function DashboardResumen() {
         <FuentesSolicitud data={Fuentes} />
         
         <section className="panel">
-          <h4>Cumplimiento diario</h4>
-          <div className="y-scale">
-            <span>1,0</span>
-            <span>0,9</span>
-            <span>0,8</span>
-            <span>0,7</span>
-            <span>0,6</span>
-          </div>
+          <h4>Casos diarios</h4>
+          <CasosPorDiaChart data={casosPorDia} height={200} maxBars={31}/>
           <div className="linechart placeholder" />
         </section>
       </aside>
@@ -318,8 +314,6 @@ function CategoriasChart({data, maxBars = 18, height = 160,}: {data: TopCategori
 
   return (
     <div className="cats">
-      <h4 className="cats__title">Total Casos por Categoria</h4>
-
       <div className="cats__plot" style={{ height }}>
         <div className="cats__bars" role="list">
           {items.map((d) => {
@@ -332,6 +326,35 @@ function CategoriasChart({data, maxBars = 18, height = 160,}: {data: TopCategori
                 <div className="cats__bar" style={{ height: h }} title={d.nombre}/>
                 <div className="cats__lbl" title={d.nombre}>
                   {shorten(d.nombre)}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        <div className="cats__baseline" />
+      </div>
+    </div>
+  );
+}
+
+function CasosPorDiaChart({data, maxBars = 18, height = 160,}: {data: DailyPoint[]; maxBars?: number; height?: number;}) {
+  const items = (data ?? []).slice(0, maxBars);
+  const max = Math.max(...items.map((d) => d.total), 1);
+
+  return (
+    <div className="cats">
+      <div className="cats__plot" style={{ height }}>
+        <div className="cats__bars" role="list">
+          {items.map((d) => {
+            const h = Math.max(2, Math.round((d.total / max) * (height - 36))); // deja espacio para label superior
+            return (
+              <div key={d.fecha} className="cats__col" role="listitem">
+                <div className="cats__val" aria-hidden="true">
+                  {d.total.toLocaleString("es-CO")}
+                </div>
+                <div className="cats__bar" style={{ height: h }} title={d.fecha}/>
+                <div className="cats__lbl" title={d.fecha}>
+                  {shorten(d.fecha)}
                 </div>
               </div>
             );

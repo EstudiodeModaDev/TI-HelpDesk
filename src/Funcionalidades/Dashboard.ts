@@ -4,7 +4,7 @@ import type { TicketsService } from "../Services/Tickets.service";
 import type { GetAllOpts } from "../Models/Commons";
 import type { DateRange } from "../Models/Filtros";
 import { toGraphDateTime, toISODateFlex } from "../utils/Date";
-import type { Fuente, ResolutorAgg, TopCategoria } from "../Models/Dashboard";
+import type { DailyPoint, Fuente, ResolutorAgg, TopCategoria } from "../Models/Dashboard";
 import type { Ticket } from "../Models/Tickets";
 
 export function useDashboard(TicketsSvc: TicketsService) {
@@ -20,6 +20,7 @@ export function useDashboard(TicketsSvc: TicketsService) {
     const [range, setRange] = React.useState<DateRange>({ from: today, to: today });
     const [topCategorias, setTopCategorias] = React.useState<TopCategoria[]>([]);
     const [totalCategorias, setTotalCateogria] = React.useState<TopCategoria[]>([]);
+    const [casosPorDia, setCasosPorDia] = React.useState<DailyPoint[]>([]);
     const [Fuentes, setFuentes] = React.useState<Fuente[]>([]);
    
     const { account } = useAuth();
@@ -283,11 +284,74 @@ export function useDashboard(TicketsSvc: TicketsService) {
       }
     },
     [TicketsSvc, buildFilterTickets]
-  );
+    );
+
+    const obtenerCasosPorDia = React.useCallback(async (mode: string, fillGaps: boolean = true): Promise<DailyPoint[]> => {
+        setLoading(true);
+        setError(null);
+        try {
+          const { filter } = buildFilterTickets(mode);
+          const res = await TicketsSvc.getAll({ filter, top: 12000 });
+
+          const tickets: any[] = Array.isArray(res?.items)
+            ? res.items
+            : Array.isArray((res as any)?.value)
+            ? (res as any).value
+            : [];
+
+          if (!tickets.length) {
+            // setCasosPorDia?.([]);
+            return [];
+          }
+
+          // Helper: toma YYYY-MM-DD en UTC (sin hora)
+          const toDay = (v: string | Date) => {
+            const d = typeof v === "string" ? new Date(v) : v;
+            // normaliza a UTC -> YYYY-MM-DD
+            const y = d.getUTCFullYear();
+            const m = String(d.getUTCMonth() + 1).padStart(2, "0");
+            const day = String(d.getUTCDate()).padStart(2, "0");
+            return `${y}-${m}-${day}`;
+          };
+
+          // Conteo por día usando el campo FechaApertura
+          const counts = new Map<string, number>();
+          for (const t of tickets) {
+            const key = toDay(t?.FechaApertura ?? t?.fields?.FechaApertura ?? new Date());
+            counts.set(key, (counts.get(key) ?? 0) + 1);
+          }
+
+          let series: DailyPoint[] = Array.from(counts, ([fecha, total]) => ({ fecha, total }))
+            .sort((a, b) => (a.fecha < b.fecha ? -1 : a.fecha > b.fecha ? 1 : 0));
+
+          if (fillGaps && range?.from && range?.to && range.from <= range.to) {
+            const start = new Date(`${range.from}T00:00:00Z`);
+            const end = new Date(`${range.to}T00:00:00Z`);
+            const full: DailyPoint[] = [];
+            for (let d = new Date(start); d <= end; d.setUTCDate(d.getUTCDate() + 1)) {
+              const key = toDay(d);
+              full.push({ fecha: key, total: counts.get(key) ?? 0 });
+            }
+            series = full;
+          }
+
+          setCasosPorDia(series);
+          return series;
+        } catch (e: any) {
+          setError(e?.message ?? "Error al obtener casos por día");
+          setCasosPorDia([]);
+          return [];
+        } finally {
+          setLoading(false);
+        }
+      },
+      [TicketsSvc, buildFilterTickets, range.from, range.to]
+    );
+
 
   return {
-    obtenerTotal, setRange, obtenerTop5, obtenerTotalCategoria, obtenerTotalResolutor, obtenerFuentes,
-    totalCasos, error, loading, totalEnCurso, totalFinalizados, totalFueraTiempo, porcentajeCumplimiento, topCategorias, range, totalCategorias, resolutores, Fuentes
+    obtenerTotal, setRange, obtenerTop5, obtenerTotalCategoria, obtenerTotalResolutor, obtenerFuentes, obtenerCasosPorDia,
+    totalCasos, error, loading, totalEnCurso, totalFinalizados, totalFueraTiempo, porcentajeCumplimiento, topCategorias, range, totalCategorias, resolutores, Fuentes, casosPorDia
   };
 }
 
