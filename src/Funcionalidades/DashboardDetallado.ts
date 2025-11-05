@@ -131,11 +131,48 @@ export function useDetallado(TicketsSvc: TicketsService) {
       }
     }, [TicketsSvc, buildFilterTickets]);
 
+    const obtenerFuentes = React.useCallback( async (): Promise<Fuente[]> => {
+      setLoading(true);
+      setError(null);
+      try {
+        const { filter } = buildFilterTickets();
+        const res = await TicketsSvc.getAll({ filter, top: 12000 });
 
+        const tickets: any[] = Array.isArray(res?.items)
+          ? res.items
+          : Array.isArray((res as any)?.value)
+          ? (res as any).value
+          : [];
 
+        if (!tickets.length) {
+          setFuentes([]);
+          return [];
+        }
+
+        // Contar por campo Fuente
+        const counts = new Map<string, number>();
+        for (const t of tickets) {
+          const key = String(t?.Fuente || "(En blanco)").trim();
+          counts.set(key, (counts.get(key) ?? 0) + 1);
+        }
+
+        // A arreglo + ordenar DESC
+        const data: Fuente[] = Array.from(counts, ([label, total]) => ({ label, total }))
+          .sort((a, b) => b.total - a.total);
+
+        setFuentes(data);
+        return data;
+      } catch (e: any) {
+        setError(e?.message ?? "Error al obtener fuentes");
+        return [];
+      } finally {
+        setLoading(false);
+      }
+    },
+    [TicketsSvc, buildFilterTickets]);
 
   return {
-    obtenerTotal, setRange, 
+    obtenerTotal, setRange, obtenerFuentes,
     totalCasos, error, loading, totalEnCurso, totalFinalizados, totalFueraTiempo, porcentajeCumplimiento, topCategorias, range, totalCategorias, resolutores, Fuentes, casosPorDia
   };
 }

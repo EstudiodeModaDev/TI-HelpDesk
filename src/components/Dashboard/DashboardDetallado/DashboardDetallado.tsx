@@ -36,11 +36,12 @@ export default function DashboardDetallado() {
     TicketService: TicketsService;
   };
   const { totalCasos, totalEnCurso, totalFinalizados, totalFueraTiempo, porcentajeCumplimiento, topCategorias, range, totalCategorias, resolutores, Fuentes,
-    obtenerTotal, setRange, casosPorDia} = useDetallado(Tickets);
+    obtenerTotal, setRange, obtenerFuentes, casosPorDia} = useDetallado(Tickets);
 
   // carga inicial
   React.useEffect(() => {
     obtenerTotal();
+    obtenerFuentes();
   }, [range.from, range.to]); 
 
   return (
