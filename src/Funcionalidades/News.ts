@@ -41,8 +41,7 @@ export function useAnuncio(services: Svc) {
         setConfirm(true)
     }
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
+    const handleSubmit = async () => {
         setSubmitting(true);
         try{
             const Payload: Anuncio = {
@@ -64,7 +63,7 @@ export function useAnuncio(services: Svc) {
 
     return {
         state, errors, submitting, confirm,
-        handleSubmit, setField, showConfirm
+        handleSubmit, setField, showConfirm, setConfirm
     };
 }
 

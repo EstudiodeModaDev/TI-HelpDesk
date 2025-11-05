@@ -3,11 +3,11 @@ import { useGraphServices } from "../../graph/GrapServicesContext";
 import RichTextBase64 from "../RichTextBase64/RichTextBase64";
 import type { AnunciosService } from "../../Services/Anuncios.service";
 import { useAnuncio } from "../../Funcionalidades/News";
-import PosterEdmNews from "./Confirmar/Confirmar";
+import EdmNewsModal from "./Confirmar/Confirmar";
 
 export default function CrearAnuncio() {
   const { Anuncios } = useGraphServices() as { Anuncios: AnunciosService };
-  const { state, errors, confirm, showConfirm, setField, submitting } = useAnuncio({AnunciosSvc: Anuncios})
+  const { state, errors, confirm, showConfirm, setField, submitting, handleSubmit, setConfirm} = useAnuncio({AnunciosSvc: Anuncios})
 
   return (
     <section className="an-page an-scope" data-theme="light" aria-label="Crear un Anuncio">
@@ -53,7 +53,7 @@ export default function CrearAnuncio() {
         </footer>
       </form>
 
-      {confirm && <PosterEdmNews title={state.TituloAnuncio} html={state.Cuerpo} />}
+      {confirm && <EdmNewsModal title={state.TituloAnuncio} html={state.Cuerpo} open={confirm} onConfirm={handleSubmit} onCancel={()  => setConfirm(false)} />}
     </section>
   );
 }
