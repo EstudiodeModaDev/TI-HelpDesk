@@ -6,7 +6,7 @@ import type { Ticket } from "../../../Models/Tickets";
 import "./TicketsAsociados.css";
 import type { TicketLite } from "./RelacionarTickets/Relacionador";
 import RelacionadorInline from "./RelacionarTickets/Relacionador";
-import { useUserRoleFromSP } from "../../../Funcionalidades/Usuarios";
+import { useUserRole } from "../../../Funcionalidades/Usuarios";
 import { useAuth } from "../../../auth/authContext";
 
 type Props = {
@@ -21,7 +21,7 @@ type Props = {
 export default function TicketsAsociados({title = "Tickets Asociados", ticket, emptyChildrenText = "No es hijo de ningun caso", onSelect, buildHref}: Props) {
   const { Tickets } = useGraphServices();
   const {account} = useAuth()
-  const userRole = useUserRoleFromSP(account?.username)
+  const userRole = useUserRole(account?.username)
   const isPrivileged = userRole.role === "Administrador" || userRole.role === "Tecnico" || userRole.role === "Técnico";
   const { padre, hijos, loading, error, loadRelateds } = useTicketsRelacionados(Tickets, ticket);
 
