@@ -24,21 +24,24 @@ import seeTickets from "./assets/tickets.svg";
 import tareasIcon from "./assets/tareas.svg";
 import filesIcon from "./assets/file.svg";
 import infoIcon from "./assets/info.svg";
-import settingsIcon from "./assets/settings.svg"
-import templateIcon from "./assets/template.svg"
+import settingsIcon from "./assets/settings.svg";
+import templateIcon from "./assets/template.svg";
 import PazySalvosMode from "./components/PazSalvos/PazYSalvo";
 import WelcomeSolvi from "./components/Welcome/Welcome";
 import DashBoardPage from "./components/Dashboard/DashboardPage";
 import CrearAnuncio from "./components/News/News";
-import newsIcon from "./assets/news.svg"
+import newsIcon from "./assets/news.svg";
+
+// ⬇️ IMPORTA EL MODAL DEL ANUNCIO (ajusta ruta si cambia)
+import EdmNewsModal from "./components/News/Confirmar/Confirmar";
 
 /* ============================================================
    Tipos de navegación y contexto de visibilidad
    ============================================================ */
 
-type RenderCtx = {services?: { Tickets: TicketsService; Usuarios: UsuariosSPService; Logs: LogService }};
+type RenderCtx = { services?: { Tickets: TicketsService; Usuarios: UsuariosSPService; Logs: LogService } };
 
-type Services = {Tickets: TicketsService; Usuarios: UsuariosSPService; Logs: LogService;};
+type Services = { Tickets: TicketsService; Usuarios: UsuariosSPService; Logs: LogService };
 
 export type MenuItem = {
   id: string;
@@ -56,7 +59,7 @@ export type MenuItem = {
 export type NavContext = {
   role: string;
   flags?: Set<string>;
-  hasService?: (k: keyof Services) => boolean;   // ya no es never
+  hasService?: (k: keyof Services) => boolean;
 };
 
 /* ============================================================
@@ -64,31 +67,49 @@ export type NavContext = {
    ============================================================ */
 
 const NAV: MenuItem[] = [
-  {id: "home", label: "Home", icon: <img src={HomeIcon} alt="" className="sb-icon" />, to: <DashBoardPage />, roles: ["Administrador", "Tecnico"], autocollapse: true },
-  {id: "ticketform", label: "Nuevo Ticket", icon: <img src={addIcon} alt="" className="sb-icon" />, to: () => <NuevoTicketForm />, roles: ["Administrador", "Tecnico"],},
-  {id: "ticketform_user", label: "Nuevo Ticket", icon: <img src={addIcon} alt="" className="sb-icon" />, to: <NuevoTicketUsuarioForm />, roles: ["Usuario"],},
-  {id: "ticketTable", label: "Ver Tickets", icon: <img src={seeTickets} alt="" className="sb-icon" />, to: <TablaTickets />, autocollapse: true},
-  {id: "task", label: "Tareas", icon: <img src={tareasIcon} alt="" className="sb-icon" />, to: <TareasPage />, roles: ["Administrador", "Tecnico"], autocollapse: true },
-  {id: "formatos", label: "Formatos", icon: <img src={filesIcon} alt="" className="sb-icon" />, to: <Formatos />, roles: ["Administrador"] },
-  {id: "info", label: "Información", icon: <img src={infoIcon} alt="" className="sb-icon" />, to: <InfoPage />, roles: ["Administrador", "Tecnico"]  },
-  {id: "admin", label: "Administración", icon: <img src={settingsIcon} className="sb-icon"/>, roles: ["Administrador", "Tecnico"], children: [
-      { id: "anuncios", label: "Anuncios", to: <CrearAnuncio />, roles: ["Administrador", "Tecnico"], icon: <img src={newsIcon} className="sb-icon"/>},
-      { id: "plantillas", label: "Plantillas", icon: <img src={templateIcon} className="sb-icon"/>,to: <CrearPlantilla />, roles: ["Administrador", "Tecnico"] },
+  { id: "home", label: "Home", icon: <img src={HomeIcon} alt="" className="sb-icon" />, to: <DashBoardPage />, roles: ["Administrador", "Tecnico"], autocollapse: true },
+  { id: "ticketform", label: "Nuevo Ticket", icon: <img src={addIcon} alt="" className="sb-icon" />, to: () => <NuevoTicketForm />, roles: ["Administrador", "Tecnico"] },
+  { id: "ticketform_user", label: "Nuevo Ticket", icon: <img src={addIcon} alt="" className="sb-icon" />, to: <NuevoTicketUsuarioForm />, roles: ["Usuario"] },
+  { id: "ticketTable", label: "Ver Tickets", icon: <img src={seeTickets} alt="" className="sb-icon" />, to: <TablaTickets />, autocollapse: true },
+  { id: "task", label: "Tareas", icon: <img src={tareasIcon} alt="" className="sb-icon" />, to: <TareasPage />, roles: ["Administrador", "Tecnico"], autocollapse: true },
+  { id: "formatos", label: "Formatos", icon: <img src={filesIcon} alt="" className="sb-icon" />, to: <Formatos />, roles: ["Administrador"] },
+  { id: "info", label: "Información", icon: <img src={infoIcon} alt="" className="sb-icon" />, to: <InfoPage />, roles: ["Administrador", "Tecnico"] },
+  {
+    id: "admin",
+    label: "Administración",
+    icon: <img src={settingsIcon} className="sb-icon" />,
+    roles: ["Administrador", "Tecnico"],
+    children: [
+      { id: "anuncios", label: "Anuncios", to: <CrearAnuncio />, roles: ["Administrador", "Tecnico"], icon: <img src={newsIcon} className="sb-icon" /> },
+      { id: "plantillas", label: "Plantillas", icon: <img src={templateIcon} className="sb-icon" />, to: <CrearPlantilla />, roles: ["Administrador", "Tecnico"] },
       { id: "usuarios", label: "Usuarios", to: <UsuariosPanel />, roles: ["Administrador"] },
     ],
   },
-  {id: "acciones", label: "Acciones", roles: ["Administrador", "Tecnico", "Jefe de zona"], children: [
-      {id: "siesa", label: "Siesa", roles: ["Administrador", "Tecnico", "Jefe de zona"], children: [{id: "cajpos", label: "Cajeros POS", to: (rctx: RenderCtx) =>
-                                                                                      rctx.services ? (
-                                                                                        <CajerosPOSForm services={{ Tickets: rctx.services.Tickets, Logs: rctx.services.Logs }}/>
-                                                                                      ) : (
-                                                                                        <div>Cargando servicios…</div>
-                                                                                      ), roles: ["Administrador", "Tecnico", "Jefe de zona"]
+  {
+    id: "acciones",
+    label: "Acciones",
+    roles: ["Administrador", "Tecnico", "Jefe de zona"],
+    children: [
+      {
+        id: "siesa",
+        label: "Siesa",
+        roles: ["Administrador", "Tecnico", "Jefe de zona"],
+        children: [
+          {
+            id: "cajpos",
+            label: "Cajeros POS",
+            to: (rctx: RenderCtx) =>
+              rctx.services ? <CajerosPOSForm services={{ Tickets: rctx.services.Tickets, Logs: rctx.services.Logs }} /> : <div>Cargando servicios…</div>,
+            roles: ["Administrador", "Tecnico", "Jefe de zona"],
           },
         ],
       },
-      {id: "cesar", label: "Cesar", roles: ["Administrador"], children: [
-          { id: "compras", label: "Compras", to: <ComprasPage />, roles: ["Administrador"]},
+      {
+        id: "cesar",
+        label: "Cesar",
+        roles: ["Administrador"],
+        children: [
+          { id: "compras", label: "Compras", to: <ComprasPage />, roles: ["Administrador"] },
           { id: "facturas", label: "Facturas", to: <RegistroFactura />, roles: ["Administrador"] },
           { id: "paz", label: "Paz y Salvos", to: <PazySalvosMode />, roles: ["Administrador"] },
         ],
@@ -144,21 +165,25 @@ function findById(nodes: readonly MenuItem[], id: string): MenuItem | undefined 
    Header superior simple
    ============================================================ */
 
-function HeaderBar(props: {onPrimaryAction?: { label: string; onClick: () => void; disabled?: boolean } | null}) {
-  const {onPrimaryAction } = props;
+function HeaderBar(props: { onPrimaryAction?: { label: string; onClick: () => void; disabled?: boolean } | null }) {
+  const { onPrimaryAction } = props;
   return (
     <header className="headerRow">
       <div className="header-inner">
-        <div className="brand"><h1>SOLVI - Tu solución empieza aqui</h1></div>
+        <div className="brand">
+          <h1>SOLVI - Tu solución empieza aqui</h1>
+        </div>
         <div className="userCluster">
           <div className="avatar">?</div>
           <div className="userInfo">
             <div className="userName">Invitado</div>
             <div className="userMail">—</div>
           </div>
-          {onPrimaryAction && ( <button className="btn-logout" onClick={onPrimaryAction.onClick} disabled={onPrimaryAction.disabled} aria-busy={onPrimaryAction.disabled}>
+          {onPrimaryAction && (
+            <button className="btn-logout" onClick={onPrimaryAction.onClick} disabled={onPrimaryAction.disabled} aria-busy={onPrimaryAction.disabled}>
               {onPrimaryAction.label}
-            </button>)}
+            </button>
+          )}
         </div>
       </div>
     </header>
@@ -169,7 +194,15 @@ function HeaderBar(props: {onPrimaryAction?: { label: string; onClick: () => voi
    Sidebar con árbol recursivo y apertura de carpetas
    ============================================================ */
 
-function Sidebar(props: {navs: readonly MenuItem[]; selected: string; onSelect: (k: string) => void; user: User; role: string; collapsed?: boolean; onToggle?: () => void;}) {
+function Sidebar(props: {
+  navs: readonly MenuItem[];
+  selected: string;
+  onSelect: (k: string) => void;
+  user: User;
+  role: string;
+  collapsed?: boolean;
+  onToggle?: () => void;
+}) {
   const { navs, selected, onSelect, user, role, collapsed = false, onToggle } = props;
   const [open, setOpen] = React.useState<Record<string, boolean>>({});
 
@@ -226,7 +259,9 @@ function Sidebar(props: {navs: readonly MenuItem[]; selected: string; onSelect: 
               aria-current={active ? "page" : undefined}
               title={n.label}
             >
-              <span className="sideItem__icon" aria-hidden="true">{n.icon ?? "•"}</span>
+              <span className="sideItem__icon" aria-hidden="true">
+                {n.icon ?? "•"}
+              </span>
               {!collapsed && <span className="sideItem__label">{n.label}</span>}
             </button>
           </li>
@@ -241,7 +276,9 @@ function Sidebar(props: {navs: readonly MenuItem[]; selected: string; onSelect: 
         <div className="sb-brand">
           {!collapsed && (
             <>
-              <span className="sb-logo" aria-hidden="true">🛠️</span>
+              <span className="sb-logo" aria-hidden="true">
+                🛠️
+              </span>
               <span className="sb-title">Soporte Técnico</span>
             </>
           )}
@@ -262,7 +299,9 @@ function Sidebar(props: {navs: readonly MenuItem[]; selected: string; onSelect: 
         {!collapsed && (
           <div className="sb-prof__info">
             <div className="sb-prof__mail">{user?.mail || "usuario@empresa.com"}</div>
-            <div className="sb-prof__mail" aria-hidden="true">{role}</div>
+            <div className="sb-prof__mail" aria-hidden="true">
+              {role}
+            </div>
           </div>
         )}
       </div>
@@ -279,9 +318,7 @@ function Shell() {
   const [loadingAuth, setLoadingAuth] = React.useState(false);
 
   // mapea la cuenta MSAL a tipo User para el header
-  const user: User = account
-    ? { displayName: account.name ?? account.username ?? "Usuario", mail: account.username ?? "", jobTitle: "" }
-    : null;
+  const user: User = account ? { displayName: account.name ?? account.username ?? "Usuario", mail: account.username ?? "", jobTitle: "" } : null;
 
   const isLogged = Boolean(account);
 
@@ -296,23 +333,15 @@ function Shell() {
     }
   };
 
-  const actionLabel = !ready
-    ? "Cargando…"
-    : loadingAuth
-    ? isLogged
-      ? "Cerrando…"
-      : "Abriendo Microsoft…"
-    : isLogged
-    ? "Cerrar sesión"
-    : "Iniciar sesión";
+  const actionLabel = !ready ? "Cargando…" : loadingAuth ? (isLogged ? "Cerrando…" : "Abriendo Microsoft…") : isLogged ? "Cerrar sesión" : "Iniciar sesión";
 
   // estado no logueado: solo header con botón de acción
   if (!ready || !isLogged) {
     return (
       <div className="page layout">
-        <HeaderBar onPrimaryAction={{ label: actionLabel, onClick: handleAuthClick, disabled: !ready || loadingAuth }}/>
+        <HeaderBar onPrimaryAction={{ label: actionLabel, onClick: handleAuthClick, disabled: !ready || loadingAuth }} />
         <section className="page-view">
-          <WelcomeSolvi/>
+          <WelcomeSolvi />
         </section>
       </div>
     );
@@ -328,7 +357,7 @@ function Shell() {
 
 function LoggedApp({ user }: { user: User }) {
   const { role } = useUserRole(user!.mail);
-  const services = useGraphServices() as {Tickets: TicketsService; Usuarios: UsuariosSPService; Logs: LogService;};
+  const services = useGraphServices() as { Tickets: TicketsService; Usuarios: UsuariosSPService; Logs: LogService } & Record<string, any>;
 
   const navCtx = React.useMemo<NavContext>(() => {
     const safeRole: string = role === "Administrador" || role === "Tecnico" || role === "Usuario" ? (role as string) : "Usuario";
@@ -362,40 +391,144 @@ function LoggedApp({ user }: { user: User }) {
 
   // === NEW: sidebar plegable (con persistencia simple)
   const [collapsed, setCollapsed] = React.useState<boolean>(() => {
-    try { return localStorage.getItem("sb-collapsed") === "1"; } catch { return false; }
+    try {
+      return localStorage.getItem("sb-collapsed") === "1";
+    } catch {
+      return false;
+    }
   });
 
   const toggleCollapsed = React.useCallback(() => {
     setCollapsed((v) => {
       const next = !v;
-      try { localStorage.setItem("sb-collapsed", next ? "1" : "0"); } catch {}
+      try {
+        localStorage.setItem("sb-collapsed", next ? "1" : "0");
+      } catch {}
       return next;
     });
   }, []);
 
-  const handleSelect = React.useCallback((id: string) => {
-    setSelected(id);
-    const it = findById(navs, id);
-    if (!it) return;
+  const handleSelect = React.useCallback(
+    (id: string) => {
+      setSelected(id);
+      const it = findById(navs, id);
+      if (!it) return;
 
-    // regla: si el ítem tiene autocollapse, colapsa.
-    // (Opcional) Solo en pantallas pequeñas:
-    const isNarrow = typeof window !== "undefined" && window.innerWidth < 1100;
+      // regla: si el ítem tiene autocollapse, colapsa.
+      // (Opcional) Solo en pantallas pequeñas:
+      const isNarrow = typeof window !== "undefined" && window.innerWidth < 1100;
 
-    if (it.autocollapse && (isNarrow || true /* quita esto si quieres sólo en móvil */)) {
-      setCollapsed(true);
-      try { localStorage.setItem("sb-collapsed", "1"); } catch {}
-    }
-  }, [navs]);
+      if (it.autocollapse && (isNarrow || true /* quita esto si quieres sólo en móvil */)) {
+        setCollapsed(true);
+        try {
+          localStorage.setItem("sb-collapsed", "1");
+        } catch {}
+      }
+    },
+    [navs]
+  );
+
+  /* ============================================================
+     ANUNCIO DEL DÍA (consulta + modal)
+     ============================================================ */
+
+  const [adOpen, setAdOpen] = React.useState(false);
+  const [adItem, setAdItem] = React.useState<any>(null);
+
+  // Servicio de anuncios si existe en GraphServicesProvider
+  const anunciosSvc = (services as any)?.AnunciosSvc as
+    | { getAll: (q: any) => Promise<any> }
+    | undefined;
+
+  // key por día para no repetir el modal en la sesión actual
+  const getTodayKey = () => {
+    const t = new Date();
+    const y = t.getFullYear();
+    const m = String(t.getMonth() + 1).padStart(2, "0");
+    const d = String(t.getDate()).padStart(2, "0");
+    return `ad-shown-${y}-${m}-${d}`;
+  };
+
+  // pickers de campos comunes
+  const pickHtml = (row: any): string => {
+    const f = row?.fields ?? row ?? {};
+    return f.HtmlText ?? f.ContenidoHtml ?? f.Contenido ?? f.Descripcion ?? f.Description ?? "";
+  };
+  const pickTitle = (row: any): string => {
+    const f = row?.fields ?? row ?? {};
+    return f.Title ?? f.Titulo ?? f.Heading ?? "Anuncio";
+  };
+
+  React.useEffect(() => {
+    let cancel = false;
+    (async () => {
+      try {
+        if (!anunciosSvc) return;
+
+        // ¿ya se mostró hoy? (no repetir en esta sesión del día)
+        const key = getTodayKey();
+        if (sessionStorage.getItem(key) === "1") return;
+
+        // Ventana del día de hoy en UTC (cubre columnas date-only y DateTime)
+        const t = new Date();
+        const y = t.getUTCFullYear();
+        const m = String(t.getUTCMonth() + 1).padStart(2, "0");
+        const d = String(t.getUTCDate()).padStart(2, "0");
+        const startIso = `${y}-${m}-${d}T00:00:00Z`;
+        const endIso = `${y}-${m}-${d}T23:59:59Z`;
+
+        // Hoy ∈ [fechaInicio, fechaFinal]
+        const filter = `(fields/fechaInicio le ${endIso}) and (fields/fechaFinal ge ${startIso})`;
+
+        // Pide el MÁS ANTIGUO (fechaInicio asc)
+        const res = await anunciosSvc.getAll({
+          filter,
+          orderby: "fields/fechaInicio asc",
+          top: 1,
+          select: "id,fields/Title,fields/Titulo,fields/HtmlText,fields/ContenidoHtml,fields/Contenido,fields/Descripcion,fields/fechaInicio,fields/fechaFinal",
+        });
+
+        const items: any[] = Array.isArray(res) ? res : res?.items ?? [];
+        if (!items.length) return;
+
+        const winner = items[0];
+        if (!cancel && winner) {
+          setAdItem(winner);
+          setAdOpen(true);
+          sessionStorage.setItem(key, "1");
+        }
+      } catch {
+        // silencioso
+      }
+    })();
+    return () => {
+      cancel = true;
+    };
+  }, [anunciosSvc]);
 
   return (
     <div className={`page layout layout--withSidebar ${collapsed ? "is-collapsed" : ""}`}>
-      <Sidebar navs={navs} selected={selected} onSelect={handleSelect} user={user} role={role} collapsed={collapsed} onToggle={toggleCollapsed}/>
+      <Sidebar navs={navs} selected={selected} onSelect={handleSelect} user={user} role={role} collapsed={collapsed} onToggle={toggleCollapsed} />
       <main className="content content--withSidebar">
         <div className="page-viewport">
           <div className="page page--fluid center-all">{element}</div>
         </div>
       </main>
+
+      {/* Modal de anuncio del día */}
+      {adOpen && adItem && (
+        <EdmNewsModal
+          open={adOpen}
+          title={pickTitle(adItem)}
+          html={pickHtml(adItem)}
+          inset={{ top: 120, right: 16, bottom: 72, left: 16 }} // ajusta para tu PNG
+          width={360}
+          confirmText="Entendido"
+          cancelText="Cerrar"
+          onConfirm={() => setAdOpen(false)}
+          onCancel={() => setAdOpen(false)} // tu handler puede ignorar parámetros
+        />
+      )}
     </div>
   );
 }

@@ -61,9 +61,64 @@ export function useAnuncio(services: Svc) {
         }
     }
 
+    const theresAdToday = async () => {
+        try {
+            // Ventana del día de hoy en UTC (cubre columnas date-only y DateTime)
+            const t = new Date();
+            const y = t.getUTCFullYear();
+            const m = String(t.getUTCMonth() + 1).padStart(2, "0");
+            const d = String(t.getUTCDate()).padStart(2, "0");
+            const startIso = `${y}-${m}-${d}T00:00:00Z`;
+            const endIso   = `${y}-${m}-${d}T23:59:59Z`;
+
+            // Hoy ∈ [fechaInicio, fechaFinal]
+            const filter = `(fields/fechaInicio le ${endIso}) and (fields/fechaFinal ge ${startIso})`;
+
+            // 1) Intento eficiente: que el servidor ya envíe el más antiguo
+            const res = await services.AnunciosSvc.getAll({
+            filter,
+            orderby: "fields/fechaInicio asc",
+            top: 1,
+            });
+
+            let items: any[] = Array.isArray(res) ? res : (res?.items ?? []);
+
+            // 2) Fallback: si por alguna razón no vino nada (o el orderby no se aplicó),
+            // traemos varios y ordenamos en cliente.
+            if (!items.length) {
+            const res2 = await services.AnunciosSvc.getAll({
+                filter,
+                top: 50,
+            });
+            items = Array.isArray(res2) ? res2 : (res2?.items ?? []);
+
+            const getStart = (row: any) => {
+                const f = row?.fields ?? row ?? {};
+                // si no hay fechaInicio válida, empuja al final
+                const t = Date.parse(f.fechaInicio ?? "");
+                return Number.isFinite(t) ? t : Number.POSITIVE_INFINITY;
+            };
+            const getCreated = (row: any) => Date.parse((row?.Created ?? row?.fields?.Created) ?? "") || Number.POSITIVE_INFINITY;
+
+            // Orden final: más antiguo por fechaInicio; desempate por Created
+            items.sort((a, b) => {
+                const da = getStart(a), db = getStart(b);
+                if (da !== db) return da - db;
+                return getCreated(a) - getCreated(b);
+            });
+            }
+
+            const winner = items[0] ?? null;
+            return { hasToday: !!winner, item: winner };
+        } catch (e) {
+            console.error(e);
+            return { hasToday: false, item: null };
+        }
+    };
+
     return {
         state, errors, submitting, confirm,
-        handleSubmit, setField, showConfirm, setConfirm
+        handleSubmit, setField, showConfirm, setConfirm, theresAdToday
     };
 }
 
