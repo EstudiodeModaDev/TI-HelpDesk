@@ -12,7 +12,7 @@ export default function CrearPlantilla() {
   return (
     <section className="tpl-page" aria-label="Crear una plantilla">
 
-      <form className="tpl-form" onSubmit={createPlantilla} noValidate>
+      <form className="tpl-form" onSubmit={(e) => {e.preventDefault(); createPlantilla()}} noValidate>
         <h1 className="tpl-title">Crear Una Plantilla</h1>
 
         <div className="tpl-field">
