@@ -379,14 +379,9 @@ export function useDetallado(TicketsSvc: TicketsService) {
       const dayStartIso = (d: string) => `${d}T00:00:00Z`;
       const dayEndIso   = (d: string) => `${d}T23:59:59Z`;
 
-
-      // Rango manual (si ambos están y son consistentes)
       if (range.from && range.to && range.from <= range.to) {
-        // Evita duplicar el filtro del mes en curso si ya aplicaste "resumen"
-
           filters.push(`fields/FechaApertura ge '${dayStartIso(range.from)}'`);
           filters.push(`fields/FechaApertura le '${dayEndIso(range.to)}'`);
-        
       }
 
       return {

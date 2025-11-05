@@ -1,5 +1,5 @@
 import React from "react";
-import { useDetallado } from "../../../Funcionalidades/Dashboard";
+import { useDetallado } from "../../../Funcionalidades/DashboardDetallado";
 import { useGraphServices } from "../../../graph/GrapServicesContext";
 import type { TicketsService } from "../../../Services/Tickets.service";
 import "./DashboardDetallado.css";
