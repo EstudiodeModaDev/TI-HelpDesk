@@ -3,6 +3,7 @@ import DashboardResumen from "./DashboardGeneral/DahsboardResumen";
 import DashBoardIcon from "../../assets/dashboard.svg";
 import Detalle from "../../assets/Detalle.svg"
 import DashboardDetallado from "./useDetallado/DashboardDetallado";
+import "./Dashboard.css"
 
 type Mode = "resumen" | "dashboard"; // ajusta
 type Item = { id: Mode; label: string; icon?: React.ReactNode; active?: boolean };
