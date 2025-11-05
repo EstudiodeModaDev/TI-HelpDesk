@@ -90,3 +90,118 @@ img, svg, canvas { max-width:100%; height:auto; display:block; }
   .msb{ position: static; width:auto; border-right:0; }
   .msb-track{ display:flex; overflow-x:auto; }
 }
+
+/* ==== Sidebar acorde al tablero (usa tus tokens) ==== */
+
+/* Rail */
+.msb{
+  position: sticky;
+  top: 0;
+  align-self: start;
+  inline-size: 86px;
+  box-sizing: border-box;
+
+  background: color-mix(in oklab, var(--bg-elev) 96%, transparent);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 8px;
+}
+
+/* Separación con el contenido (ya tienes gap en el grid) */
+.msb-layout{ gap: var(--gap); }
+
+/* Pista interna */
+.msb-track{
+  display:flex;
+  flex-direction:column;
+  gap: 10px;
+  inline-size: 100%;
+  max-inline-size: 100%;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #334155 transparent;
+}
+.msb-track::-webkit-scrollbar{ width: 8px; }
+.msb-track::-webkit-scrollbar-thumb{
+  background: #334155; border-radius: 999px;
+}
+
+/* Botón del rail */
+.msb-item{
+  appearance: none;
+  inline-size: 100%;
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius) - 4px);
+  padding: 8px 6px;
+  background: color-mix(in oklab, var(--bg-elev) 92%, transparent);
+  color: var(--ink);
+  cursor: pointer;
+  transition: transform .12s ease, background .16s ease, border-color .16s ease, box-shadow .16s ease;
+}
+.msb-item:hover{
+  background: color-mix(in oklab, var(--bg-elev) 88%, transparent);
+  border-color: color-mix(in oklab, var(--border) 75%, var(--ink) 25%);
+}
+.msb-item:active{ transform: translateY(1px); }
+.msb-item:focus-visible{
+  outline: 2px solid color-mix(in oklab, var(--accent) 55%, #ffffff 0%);
+  outline-offset: 2px;
+}
+
+/* Estado activo con el acento del dashboard */
+.msb-item.is-active{
+  background: linear-gradient(0deg, color-mix(in oklab, var(--accent) 14%, transparent), color-mix(in oklab, var(--accent) 14%, transparent)),
+              color-mix(in oklab, var(--bg-elev) 90%, transparent);
+  border-color: color-mix(in oklab, var(--accent) 60%, var(--border) 40%);
+  box-shadow: 0 0 0 1px color-mix(in oklab, var(--accent) 35%, transparent);
+}
+
+/* Contenido del botón */
+.msb-item__inner{
+  display:flex; flex-direction:column; align-items:center; gap: 8px;
+}
+.msb-icon{
+  inline-size: 46px; block-size: 46px;
+  display:grid; place-items:center;
+  border-radius: 10px;
+  background: color-mix(in oklab, var(--bg-elev) 80%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--border) 70%, transparent);
+}
+.msb-icon img, .msb-icon svg{ max-width:100%; height:auto; display:block; }
+
+.msb-label{
+  font-size: 12px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .03em; text-align:center; color: var(--muted);
+}
+
+/* Flecha/handler opcional al pie (como en tu captura) */
+.msb-footer{
+  margin-top: 6px;
+  display:grid; place-items:center;
+  color: var(--muted);
+  font-size: 12px;
+  user-select:none;
+}
+
+/* Seguridad: nada expande el ancho del rail */
+.msb, .msb *{ box-sizing: border-box; min-width: 0; }
+
+/* ==== Responsivo coherente con el resto ==== */
+@media (max-width: 900px){
+  .msb-layout{ grid-template-columns: 1fr; }
+  .msb{ position: static; inline-size: auto; border-radius: calc(var(--radius) - 2px); }
+  .msb-track{
+    flex-direction: row; overflow-x: auto; overflow-y: hidden;
+    gap: 8px; padding-block: 4px;
+  }
+  .msb-item{ min-width: 120px; }
+  .msb-item__inner{ gap: 6px; }
+}
+
+/* Más compacto en teléfonos pequeños */
+@media (max-width: 640px){
+  .msb-item{ padding: 8px; }
+  .msb-icon{ inline-size: 40px; block-size: 40px; border-radius: 8px; }
+  .msb-label{ font-size: 11px; }
+}
