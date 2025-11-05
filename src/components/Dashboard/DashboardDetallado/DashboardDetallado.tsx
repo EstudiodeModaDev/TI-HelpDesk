@@ -47,6 +47,7 @@ export default function DashboardDetallado() {
     <section className="dash">
       {/* Columna izquierda */}
       <aside className="dash-left">
+        DETALLADO
         <div className="kpi-total">
           <Donut value={1} size={180} stroke={10} ring="#22c55e" />
           <div className="kpi-total__text">
