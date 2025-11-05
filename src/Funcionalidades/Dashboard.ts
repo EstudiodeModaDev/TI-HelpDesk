@@ -78,7 +78,7 @@ export function useDashboard(TicketsSvc: TicketsService) {
          const total = Array.isArray(casos) ? casos.length : Array.isArray((casos as any)?.value) ? (casos as any).value.length : 0;
 
         //Casos finalizados
-        const casosFinalizados = (await TicketsSvc.getAll({filter: filter.filter + " and fields/Estado eq 'Cerrado'", top:12000})).items;
+        const casosFinalizados = (await TicketsSvc.getAll({filter: filter.filter + " and fields/Estado eq 'Cerrado'", top:1000})).items;
         const totalFinalizados = Array.isArray(casosFinalizados) ? casosFinalizados.length : Array.isArray((casosFinalizados as any)?.value) ? (casosFinalizados as any).value.length : 0;
 
         //Casos fuera de tiempo
