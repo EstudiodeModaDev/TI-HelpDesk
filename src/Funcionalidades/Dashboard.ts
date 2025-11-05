@@ -4,6 +4,7 @@ import type { TicketsService } from "../Services/Tickets.service";
 import type { GetAllOpts } from "../Models/Commons";
 import type { DateRange } from "../Models/Filtros";
 import { toGraphDateTime, toISODateFlex } from "../utils/Date";
+import type { TopCategoria } from "../Models/Dashboard";
 
 export function useDashboard(TicketsSvc: TicketsService) {
    // const [resolutures, setResolutores] = React.useState<Usuario[]>([])
@@ -16,7 +17,7 @@ export function useDashboard(TicketsSvc: TicketsService) {
     const [error, setError] = React.useState<string | null>(null);
     const today = React.useMemo(() => toISODateFlex(new Date()), []);
     const [range, setRange] = React.useState<DateRange>({ from: today, to: today });
-   // const [filterMode, setFilterMode] = React.useState<FilterMode>("En curso");
+    const [topCategorias, setTopCategorias] = React.useState<TopCategoria[]>([]);
    
    
    // const [pageSize, setPageSize] = React.useState<number>(15); // = $top
@@ -82,7 +83,7 @@ export function useDashboard(TicketsSvc: TicketsService) {
         const totalFinalizados = Array.isArray(casosFinalizados) ? casosFinalizados.length : Array.isArray((casosFinalizados as any)?.value) ? (casosFinalizados as any).value.length : 0;
 
         //Casos fuera de tiempo
-        const casosVencidos = (await TicketsSvc.getAll({filter: filter.filter + " or (fields/Estadodesolicitud eq 'Fuera de tiempo' or fields/Estadodesolicitud eq 'Cerrado fuera de tiempo')", top: 12000 })).items;
+        const casosVencidos = (await TicketsSvc.getAll({filter: filter.filter + " and (fields/Estadodesolicitud eq 'Fuera de tiempo' or fields/Estadodesolicitud eq 'Cerrado fuera de tiempo')", top: 12000 })).items;
         const totalVencidos = Array.isArray(casosVencidos) ? casosVencidos.length : Array.isArray((casosVencidos as any)?.value) ? (casosVencidos as any).value.length : 0;
         
         //Casos en curso
@@ -106,9 +107,48 @@ export function useDashboard(TicketsSvc: TicketsService) {
     [TicketsSvc, account?.username]
     );
 
+    const obtenerTop5 = React.useCallback(async (mode: string) => {
+      setLoading(true);
+      setError(null);
+      try {
+        const filter = buildFilterTickets(mode);
+        const res = await TicketsSvc.getAll({ filter: filter.filter, top: 12000 });
+        const tickets: any[] =
+          Array.isArray(res?.items) ? res.items :
+          Array.isArray((res as any)?.value) ? (res as any).value : [];
+
+        if (!tickets.length) {
+          setTopCategorias([]);
+          return;
+        }
+        
+        const counts = new Map<string, number>();
+        for (const t of tickets) {
+          const cat = String(t?.fields?.Categoria || "(En blanco)").trim();
+          counts.set(cat, (counts.get(cat) ?? 0) + 1);
+        }
+
+        // Calcular top 5
+        const top = Array.from(counts.entries())
+          .map(([nombre, totalCat]) => ({
+            nombre,
+            total: totalCat,
+          }))
+          .sort((a, b) => b.total - a.total)
+          .slice(0, 5);
+
+        setTopCategorias(top);
+      } catch (e: any) {
+        setError(e?.message ?? "Error al obtener top 5 de categorías");
+      } finally {
+        setLoading(false);
+      }
+    }, [TicketsSvc, buildFilterTickets]);
+
+
   return {
-    obtenerTotal, setRange,
-    totalCasos, error, loading, totalEnCurso, totalFinalizados, totalFueraTiempo, porcentajeCumplimiento
+    obtenerTotal, setRange, obtenerTop5,
+    totalCasos, error, loading, totalEnCurso, totalFinalizados, totalFueraTiempo, porcentajeCumplimiento, topCategorias
   };
 }
 

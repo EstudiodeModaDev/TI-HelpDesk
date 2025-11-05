@@ -3,6 +3,7 @@ import { useDashboard } from "../../../Funcionalidades/Dashboard";
 import { useGraphServices } from "../../../graph/GrapServicesContext";
 import type { TicketsService } from "../../../Services/Tickets.service";
 import "./Dashboard.css";
+import type { TopCategoria } from "../../../Models/Dashboard";
 
 type Resolutor = { nombre: string; porcentaje: number; total: number };
 type Fuente = { label: string; total: number };
@@ -59,11 +60,49 @@ function StatusBars({total, at, late, inprog,}: {total: number; at: number; late
   );
 }
 
+/* ====== Dentro del mismo archivo (DashboardResumen.tsx) ====== */
+
+
+// Barras Top 5 categorías
+function TopCategorias({data,}: {data: TopCategoria[]; total: number;}) {
+  if (!data?.length) {
+    return <div className="hint">Sin datos para el período seleccionado</div>;
+  }
+
+  // Para barras proporcionales respecto al mayor
+  const max = Math.max(...data.map((d) => d.total), 1);
+
+  return (
+    <ul className="topcats">
+      {data.map((c) => {
+        const w = Math.max(4, Math.round((c.total / max) * 100)); // ancho 4–100%
+        return (
+          <li key={c.nombre} className="topcats-row">
+            <div className="topcats-left">
+              <span className="topcats-name" title={c.nombre}>{c.nombre}</span>
+            </div>
+            <div className="topcats-bar">
+              <div className="topcats-fill" style={{ width: `${w}%` }} />
+            </div>
+            <div className="topcats-right">
+              <span className="topcats-count" title={`${c.total} casos`}>
+                {c.total.toLocaleString("es-CO")}
+              </span>
+            </div>
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
+
 export default function DashboardResumen() {
   const { Tickets } = useGraphServices() as ReturnType<typeof useGraphServices> & {
     TicketService: TicketsService;
   };
-  const { totalCasos, totalEnCurso, totalFinalizados, totalFueraTiempo, porcentajeCumplimiento, obtenerTotal } = useDashboard(Tickets);
+  const { totalCasos, totalEnCurso, totalFinalizados, totalFueraTiempo, porcentajeCumplimiento, topCategorias,
+    obtenerTotal } = useDashboard(Tickets);
 
   // carga inicial
   React.useEffect(() => {
@@ -98,8 +137,8 @@ export default function DashboardResumen() {
         </div>
 
         <div className="panel">
-          <div className="hint">Top 5 categorías</div>
-          <div className="placeholder" />
+          <h4>Top 5 categorías</h4>
+          <TopCategorias data={topCategorias} total={totalCasos} />
         </div>
       </aside>
 
