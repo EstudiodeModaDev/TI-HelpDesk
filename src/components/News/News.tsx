@@ -3,7 +3,7 @@ import { useGraphServices } from "../../graph/GrapServicesContext";
 import RichTextBase64 from "../RichTextBase64/RichTextBase64";
 import type { AnunciosService } from "../../Services/Anuncios.service";
 import { useAnuncio } from "../../Funcionalidades/News";
-import EdmNewsContent from "./Confirmar/Confirmar";
+import PosterEdmNews from "./Confirmar/Confirmar";
 
 export default function CrearAnuncio() {
   const { Anuncios } = useGraphServices() as { Anuncios: AnunciosService };
@@ -53,7 +53,7 @@ export default function CrearAnuncio() {
         </footer>
       </form>
 
-      {confirm && <EdmNewsContent title={state.TituloAnuncio} html={state.Cuerpo} />}
+      {confirm && <PosterEdmNews title={state.TituloAnuncio} html={state.Cuerpo} />}
     </section>
   );
 }
