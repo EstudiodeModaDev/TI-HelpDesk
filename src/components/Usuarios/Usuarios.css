@@ -10,7 +10,7 @@
   --radius:14px;
   --shadow:0 12px 28px rgba(2,6,23,.08);
 
-  background: var(--bg);
+  background: transparent;
   padding: 16px;
   color: var(--ink);
 }
