@@ -3,44 +3,59 @@ import { useGraphServices } from "../graph/GrapServicesContext";
 import type { UsuariosSPService } from "../Services/Usuarios.Service";
 import type { FormNewUserErrors, UsuariosSP } from "../Models/Usuarios";
 import type { UserOption } from "../Models/Commons";
+import { resolveUserRole, type GroupRule, type RoleDecision } from "../utils/roles";
 
-export function useUserRoleFromSP(email?: string | null) {
-  const { Usuarios } = useGraphServices(); // ajusta el nombre si tu service se llama distinto
-  const [role, setRole] = React.useState<string>("usuario");
+type UseRoleOpts = { singleGroup: { groupId: string; role: string }; groupRules?: never } | { groupRules: GroupRule[]; singleGroup?: never } | { singleGroup?: never; groupRules?: never };
+
+export function useUserRole(email?: string | null) {
+
+  const opts: UseRoleOpts = {
+    groupRules: [{groupId: "ca8b6719-431a-498a-ba9f-2c58242b1403", role: "Jefe de zona"}],
+  }
+
+  const { Usuarios, Graph } = useGraphServices() as { Usuarios: UsuariosSPService; Graph?: any };
+  const defaultRole = "Usuario";
+
+  const [role, setRole] = React.useState<string>(defaultRole);
+  const [source, setSource] = React.useState<RoleDecision["source"]>("default");
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     let cancel = false;
+
     (async () => {
-      if (!email) { setRole("usuario"); return; }
+      const safeEmail = String(email ?? "").trim().toLowerCase();
+      if (!safeEmail) { if (!cancel) { setRole(defaultRole); setSource("default"); } return; }
 
       setLoading(true); setError(null);
       try {
-        // IMPORTANTE: normaliza y escapa comillas
-        const safe = String(email).toLowerCase().replace(/'/g, "''");
-        const resp = await Usuarios.getAll({
-          filter: `fields/Correo eq '${safe}'`,  
-          top: 1,
-        });
+        const decision = await resolveUserRole({graph: Graph, usuariosSvc: Usuarios, email: safeEmail, defaultRole, ...(opts.groupRules ? { groupRules: opts.groupRules } : {}), });
 
-        const items = Array.isArray(resp) ? resp : resp?.items ?? [];
-        const rolSP = items?.[0]?.Rol as string | undefined;
         if (!cancel) {
-          setRole(rolSP ?? "No encontrado");
+          setRole(decision.role);
+          setSource(decision.source);
         }
       } catch (e: any) {
-        if (!cancel) setError(e?.message ?? "No se pudo obtener el rol");
-        if (!cancel) setRole("usuario");
+        if (!cancel) {
+          setRole(defaultRole);
+          setSource("default");
+          setError(e?.message ?? "No fue posible determinar el rol");
+        }
       } finally {
         if (!cancel) setLoading(false);
       }
     })();
-    return () => { cancel = true; };
-  }, [email, Usuarios]);
 
-  return { role, loading, error };
+    // deps: serializa opts minimalmente
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [email, Usuarios, Graph, defaultRole, JSON.stringify(opts)]);
+
+  return { role, source, loading, error };
 }
+
+
+
 
 export function useIsAdmin(email?: string | null) {
   const { Usuarios } = useGraphServices(); // tu service
