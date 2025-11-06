@@ -442,3 +442,34 @@ main {
   background: var(--tf-bg);
   padding-top: clamp(6px, 1vh, 10px);
 }
+
+/* El área que scrollea necesita espacio para el footer sticky */
+.tf-grid{
+  overflow: auto;
+  padding-right: 2px;
+  padding-bottom: 96px;             /* reserva ≈ altura del footer */
+  gap: clamp(8px, 1.4vh, 16px);
+}
+
+/* Footer de acciones visible siempre */
+.tf-actions{
+  position: sticky;
+  bottom: 0;
+  background: var(--tf-bg);
+  padding: 10px 0 12px;
+  margin-top: var(--tf-gap);
+  box-shadow: 0 -6px 14px rgba(2,6,23,.06);
+  z-index: 2;                        /* por encima del contenido */
+}
+
+/* Botón cómodo en desktop sin salirse */
+.tf-submit{
+  min-width: 180px;
+  padding: 10px 18px;
+}
+
+/* Por si el form tiene bordes redondeados y el sticky quedaba tapado */
+.ticket-form{
+  overflow: hidden;                  /* OK */
+  /* asegura que no tape el sticky: nada más que esto */
+}
