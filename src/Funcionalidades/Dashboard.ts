@@ -6,6 +6,7 @@ import type { DateRange } from "../Models/Filtros";
 import { toGraphDateTime } from "../utils/Date";
 import type { DailyPoint, Fuente, ResolutorAgg, TopCategoria } from "../Models/Dashboard";
 import type { Ticket } from "../Models/Tickets";
+import { esc } from "../utils/Commons";
 
 export function useDashboard(TicketsSvc: TicketsService) {
     const [resolutores, setResolutores] = React.useState<ResolutorAgg[]>([])
@@ -29,10 +30,6 @@ export function useDashboard(TicketsSvc: TicketsService) {
     const buildFilterTickets = React.useCallback((mode: string): GetAllOpts => {
       const filters: string[] = [];
 
-      // Helper: escapa comillas simples por seguridad en OData
-      const esc = (s: string) => (s ?? "").replace(/'/g, "''");
-
-      // Helper: construye límites día en Z
       const dayStartIso = (d: string) => `${d}T00:00:00Z`;
       const dayEndIso   = (d: string) => `${d}T23:59:59Z`;
 

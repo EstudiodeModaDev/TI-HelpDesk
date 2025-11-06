@@ -6,6 +6,7 @@ import { useAuth } from "../auth/authContext"
 import type { GetAllOpts } from "../Models/Commons"
 import type { Ticket } from "../Models/Tickets"
 import { norm } from "../utils/Commons"
+import { toGraphDateTime } from "../utils/Date"
 
 export function useDetallado(TicketsSvc: TicketsService) {
     const [resolutores, setResolutores] = React.useState<ResolutorAgg[]>([])
@@ -27,9 +28,18 @@ export function useDetallado(TicketsSvc: TicketsService) {
 
     const buildFilterTickets = React.useCallback((): GetAllOpts => {
       const filters: string[] = [];
-      // Helper: construye límites día en Z
+      const now = new Date();
       const dayStartIso = (d: string) => `${d}T00:00:00Z`;
       const dayEndIso   = (d: string) => `${d}T23:59:59Z`;
+      const monthStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1, 0, 0, 0, 0));
+      const monthEnd   = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 0, 23, 59, 59, 999));
+      const fromIso = toGraphDateTime(monthStart);
+      const toIso   = toGraphDateTime(monthEnd);
+
+      if (!range.from || !range.to || range.from <= range.to) {
+          filters.push(`fields/FechaApertura ge '${fromIso}'`);
+          filters.push(`fields/FechaApertura le '${toIso}'`);
+      }
 
       if (range.from && range.to && range.from <= range.to) {
           filters.push(`fields/FechaApertura ge '${dayStartIso(range.from)}'`);
