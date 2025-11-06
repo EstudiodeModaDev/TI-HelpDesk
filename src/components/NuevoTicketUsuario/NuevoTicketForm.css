@@ -312,3 +312,39 @@
   .tf-input{ transition:none; }
   .rs__control{ transition:none !important; }
 }
+
+/* 1) Quita el padding inferior del card: ya no lo necesitamos */
+.ticket-form{
+  padding-bottom: 0;        /* antes 12px */
+}
+
+/* 2) Define una altura “real” del footer y úsala como reserva justa */
+:root{
+  --footer-h: 56px;         /* alto aprox. del footer/botón */
+}
+
+/* 3) Footer sticky con altura explícita (la misma que reservas) */
+.tf-actions{
+  position: sticky;
+  bottom: env(safe-area-inset-bottom, 0); /* por si hay notch en móviles */
+  min-height: var(--footer-h);
+  padding: 10px 0 12px;
+  margin-top: 12px;         /* si aún lo ves alto, baja a 8px o 0 */
+  background: var(--tf-bg);
+  box-shadow: 0 -6px 14px rgba(2,6,23,.06);
+  z-index: 2;
+}
+
+/* 4) La ÚNICA reserva para que no tape contenido: igual al footer */
+.tf-grid{
+  padding-bottom: calc(var(--footer-h) + 8px);
+  /* elimina la reserva anterior grande */
+}
+
+/* 5) Evita márgenes perdidos del último campo empujando el final */
+.tf-grid > :last-child{ margin-bottom: 0; }
+
+/* 6) (opcional) Si todavía ves 1–2 px, recorta un poco más */
+@media (min-height: 700px){
+  .tf-grid{ padding-bottom: calc(var(--footer-h) + 4px); }
+}
