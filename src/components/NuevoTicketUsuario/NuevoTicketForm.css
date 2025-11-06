@@ -135,9 +135,9 @@
   padding: 8px;
   min-height: var(--rtb-min-h);
   max-height: var(--rtb-max-h);   /* acorta antes de forzar scroll global */
-  overflow: scroll;
+  overflow-y: scroll;
   transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
-  max-height: 150px;
+  max-height: 250px;
 }
 .rtb-box:focus-within{
   border-color: var(--primary);
