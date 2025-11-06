@@ -82,6 +82,7 @@
 
 /* Campos */
 .tf-field{ display:flex; flex-direction:column; gap:2px; min-width:0; }
+.tf-field{ gap: 6px; }
 .tf-label{ font-size:13px; color:var(--tf-muted); }
 
 .tf-input{
@@ -137,8 +138,8 @@
   position:sticky;
   bottom:0;
   background:var(--tf-bg);
-  padding:10px 0 12px;
-  margin-top:var(--tf-gap);
+  padding:8px 0;
+  margin-top:6px;
   box-shadow:0 -6px 14px rgba(2,6,23,.06);
   z-index:2;
   display:flex; justify-content:flex-end; gap:8px;
