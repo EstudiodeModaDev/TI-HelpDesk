@@ -9,13 +9,7 @@ type Props = {
   className?: string;
 };
 
-export default function RichTextBase64({
-  value,
-  onChange,
-  placeholder = "Escribe aquí…",
-  readOnly,
-  className = "",
-}: Props) {
+export default function RichTextBase64({value, onChange, placeholder = "Escribe aquí…", readOnly, className = "",}: Props) {
   const editorRef = useRef<HTMLDivElement>(null);
   const [hasFocus, setHasFocus] = useState(false);
 
@@ -121,15 +115,14 @@ export default function RichTextBase64({
   const Toolbar = useMemo(
     () => (
       <div className="rte-toolbar" aria-disabled={!hasFocus || !!readOnly}>
-        <button type="button" disabled={!hasFocus || !!readOnly} onClick={() => cmd("bold")} title="Negrita">B</button>
-        <button type="button" disabled={!hasFocus || !!readOnly} onClick={() => cmd("italic")} title="Cursiva"><i>I</i></button>
-        <button type="button" disabled={!hasFocus || !!readOnly} onClick={() => cmd("underline")} title="Subrayado"><u>U</u></button>
+        <button type="button" disabled={!hasFocus || !!readOnly} onClick={() => cmd("bold")} title="Negrita" onFocus={() => setHasFocus(true) } onBlur={() => setHasFocus(false)}>B</button>
+        <button type="button" disabled={!hasFocus || !!readOnly} onClick={() => cmd("italic")} onFocus={() => setHasFocus(true) } onBlur={() => setHasFocus(false)} title="Cursiva"><i>I</i></button>
+        <button type="button" disabled={!hasFocus || !!readOnly} onClick={() => cmd("underline")}  onFocus={() => setHasFocus(true) } onBlur={() => setHasFocus(false)}title="Subrayado"><u>U</u></button>
         <span className="rte-sep" />
-        <button type="button" disabled={!hasFocus || !!readOnly} onClick={() => cmd("insertUnorderedList")} title="Viñetas">• List</button>
-        <button type="button" disabled={!hasFocus || !!readOnly} onClick={() => cmd("insertOrderedList")} title="Numerada">1. List</button>
+        <button type="button" disabled={!hasFocus || !!readOnly} onClick={() => cmd("insertUnorderedList")} onFocus={() => setHasFocus(true) } onBlur={() => setHasFocus(false)} title="Viñetas">• List</button>
+        <button type="button" disabled={!hasFocus || !!readOnly} onClick={() => cmd("insertOrderedList")} onFocus={() => setHasFocus(true) } onBlur={() => setHasFocus(false)} title="Numerada">1. List</button>
         <span className="rte-sep" />
-        <button
-          type="button"
+        <button type="button" onFocus={() => setHasFocus(true) } onBlur={() => setHasFocus(false)}
           disabled={!hasFocus || !!readOnly}
           onClick={() => {
             const el = editorRef.current;
@@ -171,9 +164,7 @@ export default function RichTextBase64({
   return (
     <div className={`rte ${className}`}>
       {!readOnly && Toolbar}
-      <div
-        ref={editorRef}
-        className="rte-editor"
+      <div ref={editorRef} className="rte-editor"
         contentEditable={!readOnly}
         onInput={handleInput}
         onPaste={handlePaste}
