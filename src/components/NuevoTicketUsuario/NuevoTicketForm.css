@@ -357,3 +357,36 @@ main {
 #asunto {
   width: 200px !important;
 }
+
+/* 1) Haz el viewport más fluido */
+.content--withSidebar .page-viewport{
+  padding-inline: clamp(16px, 3.5vw, 56px);
+  padding-block: clamp(12px, 2.5vh, 28px);
+}
+
+/* 2) El formulario: ancho cómodo y centrado en desktop */
+.ticket-form{
+  inline-size: min(1400px, 100%);   /* antes 1280px */
+  margin-inline: auto;
+}
+
+/* 3) En pantallas grandes puedes dar un poquito más */
+@media (min-width: 1600px){
+  .ticket-form{ inline-size: min(1520px, 100%); }
+}
+
+/* 4) Asegura que NINGÚN wrapper limite el ancho */
+.content, .page, .page-viewport, .content__inner, .center-all, .page > *{
+  max-width: none !important;
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
+/* 5) Ese #asunto estaba forzando un ancho y no aporta: quítalo o neutralízalo */
+#asunto{ width: auto !important; }
+
+/* 6) Título centrado y responsivo (opcional) */
+.tf-title{
+  text-align: center;
+  font-size: clamp(22px, 2.2vw, 36px);
+}
