@@ -25,7 +25,7 @@
   --font-lg: clamp(18px, 1.2vw + 12px, 22px);
   --field-h: clamp(36px, 5.5dvh, 44px);
   --rtb-min-h: clamp(140px, 24dvh, 220px);
-  --rtb-max-h: clamp(220px, 36dvh, 360px);
+  --rtb-max-h: clamp(220px, 36dvh, 380px);
 }
 
 /* Modo oscuro global (si tu app ya lo maneja, puedes quitar este bloque) */
@@ -137,7 +137,6 @@
   max-height: var(--rtb-max-h);   /* acorta antes de forzar scroll global */
   overflow-y: scroll;
   transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
-  max-height: 300px;
 }
 .rtb-box:focus-within{
   border-color: var(--primary);
