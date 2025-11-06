@@ -71,7 +71,7 @@
 /* Viewport contenedor de páginas (evita shrink) */
 .page-viewport{
   width: 100%;
-  min-height:calc(100dvh - 32px);
+  min-height:calc(90dvh - 32px);
   display:grid;
   place-items: stretch;
   min-width: 0;
@@ -83,7 +83,7 @@
   display: grid;
   grid-template-rows: auto 1fr;   /* header auto, resto ocupa */
   height: auto;  
-  min-height: 100dvh;               /* lleno de viewport */
+  min-height: 90dvh;               /* lleno de viewport */
   place-items: stretch;
   overflow: auto; 
 }
