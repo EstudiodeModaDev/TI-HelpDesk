@@ -344,3 +344,7 @@ main {
 .ticket-form .rs__placeholder {
   color: var(--tf-muted) !important;
 }
+
+#asunto {
+  width: 40%;
+}

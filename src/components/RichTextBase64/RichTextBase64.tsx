@@ -1,8 +1,8 @@
-import React, {useEffect, useMemo, useRef} from "react";
-import "./RichTextBase64.css"
+import React, {useEffect, useMemo, useRef, useState} from "react";
+import "./RichTextBase64.css";
 
 type Props = {
-  value: string;                          // HTML
+  value: string;
   onChange: (html: string) => void;
   placeholder?: string;
   readOnly?: boolean;
@@ -17,6 +17,7 @@ export default function RichTextBase64({
   className = "",
 }: Props) {
   const editorRef = useRef<HTMLDivElement>(null);
+  const [hasFocus, setHasFocus] = useState(false);
 
   // Sincroniza HTML externo → editor
   useEffect(() => {
@@ -25,26 +26,49 @@ export default function RichTextBase64({
     if (el.innerHTML !== value) el.innerHTML = value || "";
   }, [value]);
 
-  // onInput: emite HTML
   const handleInput = () => {
     if (!editorRef.current) return;
     onChange(editorRef.current.innerHTML);
   };
 
-  // Inserta HTML en el caret actual
+  // Utilidades de selección
+  const isSelectionInsideEditor = () => {
+    const el = editorRef.current;
+    const sel = window.getSelection();
+    if (!el || !sel || sel.rangeCount === 0) return false;
+    const anchor = sel.anchorNode;
+    return !!anchor && el.contains(anchor);
+  };
+
+  const placeCaretAtEnd = (el: HTMLElement) => {
+    const range = document.createRange();
+    range.selectNodeContents(el);
+    range.collapse(false);
+    const sel = window.getSelection();
+    sel?.removeAllRanges();
+    sel?.addRange(range);
+  };
+
+  // Inserta HTML sólo si el foco/selección están en el editor
   const insertHTMLAtCursor = (html: string) => {
+    const el = editorRef.current;
+    if (!el) return;
+    if (!isSelectionInsideEditor()) {
+      if (!hasFocus) return;             // bloquea si no hay foco
+      el.focus();                         // si hay foco pero la selección se fue, corrige
+      placeCaretAtEnd(el);
+    }
     const sel = window.getSelection();
     if (!sel || sel.rangeCount === 0) return;
     const range = sel.getRangeAt(0);
     range.deleteContents();
     const frag = range.createContextualFragment(html);
     range.insertNode(frag);
-    // Mueve el caret al final del nodo insertado
     sel.collapseToEnd();
     handleInput();
   };
 
-  // Convierte File → dataURL
+  // File → dataURL
   const fileToDataURL = (file: File): Promise<string> =>
     new Promise((resolve, reject) => {
       const fr = new FileReader();
@@ -53,8 +77,9 @@ export default function RichTextBase64({
       fr.readAsDataURL(file);
     });
 
-  // Pegar imágenes (Ctrl+V desde portapapeles)
+  // Pegar imágenes (sólo si el foco está en el editor)
   const handlePaste: React.ClipboardEventHandler<HTMLDivElement> = async (e) => {
+    if (!hasFocus || !isSelectionInsideEditor()) return;
     if (!e.clipboardData) return;
     const files: File[] = [];
     for (const item of e.clipboardData.items) {
@@ -65,46 +90,50 @@ export default function RichTextBase64({
     }
     if (files.length === 0) return;
 
-    e.preventDefault(); // evitamos que el navegador pegue otra cosa
-
+    e.preventDefault();
     for (const file of files) {
       const dataUrl = await fileToDataURL(file);
       insertHTMLAtCursor(`<img src="${dataUrl}" style="max-width:100%;height:auto;" />`);
     }
   };
 
-  // Arrastrar & soltar imágenes
+  // Drag & drop (sólo si hay foco)
   const handleDrop: React.DragEventHandler<HTMLDivElement> = async (e) => {
+    if (!hasFocus || !isSelectionInsideEditor()) return;
     e.preventDefault();
-    if (!e.dataTransfer?.files?.length) return;
-    const imgs = Array.from(e.dataTransfer.files).filter((f) => f.type.startsWith("image/"));
+    const files = Array.from(e.dataTransfer?.files ?? []);
+    const imgs = files.filter((f) => f.type.startsWith("image/"));
     for (const f of imgs) {
       const dataUrl = await fileToDataURL(f);
       insertHTMLAtCursor(`<img src="${dataUrl}" style="max-width:100%;height:auto;" />`);
     }
   };
-
   const preventDefault: React.DragEventHandler<HTMLDivElement> = (e) => e.preventDefault();
 
-  // Comandos simples (usa execCommand: sigue funcionando en la práctica)
+  // execCommand: bloquea si no está enfocado / selección fuera
   const cmd = (command: string, value?: string) => {
+    const el = editorRef.current;
+    if (!el || !hasFocus || !isSelectionInsideEditor()) return;
     document.execCommand(command, false, value);
     handleInput();
   };
 
   const Toolbar = useMemo(
     () => (
-      <div className="rte-toolbar">
-        <button type="button" onClick={() => cmd("bold")} title="Negrita">B</button>
-        <button type="button" onClick={() => cmd("italic")} title="Cursiva"><i>I</i></button>
-        <button type="button" onClick={() => cmd("underline")} title="Subrayado"><u>U</u></button>
+      <div className="rte-toolbar" aria-disabled={!hasFocus || !!readOnly}>
+        <button type="button" disabled={!hasFocus || !!readOnly} onClick={() => cmd("bold")} title="Negrita">B</button>
+        <button type="button" disabled={!hasFocus || !!readOnly} onClick={() => cmd("italic")} title="Cursiva"><i>I</i></button>
+        <button type="button" disabled={!hasFocus || !!readOnly} onClick={() => cmd("underline")} title="Subrayado"><u>U</u></button>
         <span className="rte-sep" />
-        <button type="button" onClick={() => cmd("insertUnorderedList")} title="Viñetas">• List</button>
-        <button type="button" onClick={() => cmd("insertOrderedList")} title="Numerada">1. List</button>
+        <button type="button" disabled={!hasFocus || !!readOnly} onClick={() => cmd("insertUnorderedList")} title="Viñetas">• List</button>
+        <button type="button" disabled={!hasFocus || !!readOnly} onClick={() => cmd("insertOrderedList")} title="Numerada">1. List</button>
         <span className="rte-sep" />
         <button
           type="button"
+          disabled={!hasFocus || !!readOnly}
           onClick={() => {
+            const el = editorRef.current;
+            if (!el || !hasFocus || !isSelectionInsideEditor()) return;
             const url = prompt("URL del enlace:");
             if (url) cmd("createLink", url);
           }}
@@ -114,7 +143,10 @@ export default function RichTextBase64({
         </button>
         <button
           type="button"
+          disabled={!hasFocus || !!readOnly}
           onClick={async () => {
+            const el = editorRef.current;
+            if (!el || !hasFocus || !isSelectionInsideEditor()) return;
             const input = document.createElement("input");
             input.type = "file";
             input.accept = "image/*";
@@ -130,10 +162,10 @@ export default function RichTextBase64({
         >
           🖼️
         </button>
-        <button type="button" onClick={() => cmd("removeFormat")} title="Limpiar">⨂</button>
+        <button type="button" disabled={!hasFocus || !!readOnly} onClick={() => cmd("removeFormat")} title="Limpiar">⨂</button>
       </div>
     ),
-    []
+    [hasFocus, readOnly]
   );
 
   return (
@@ -149,6 +181,8 @@ export default function RichTextBase64({
         onDragOver={preventDefault}
         onDragEnter={preventDefault}
         onDragLeave={preventDefault}
+        onFocus={() => setHasFocus(true)}
+        onBlur={() => setHasFocus(false)}
         data-placeholder={placeholder}
         suppressContentEditableWarning
       />
