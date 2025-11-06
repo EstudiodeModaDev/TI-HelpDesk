@@ -49,7 +49,7 @@
   block-size:100%;
   display:grid;
   grid-template-rows:auto 1fr;   /* título + contenido */
-  overflow:scroll;               /* el scroll va en .tf-grid */
+  overflow:scroll;              
   min-height:0;                  /* permite encoger dentro de su contenedor */
 }
 
@@ -165,7 +165,7 @@
   bottom:env(safe-area-inset-bottom);
   background:var(--tf-bg);
   padding:8px 0 12px;
-  margin-top:var(--tf-gap);
+  margin-top: 0;
   box-shadow:0 -6px 14px rgba(2,6,23,.06);
   z-index:2;
 
@@ -271,10 +271,12 @@
 }
 
 /* Evita que estilos legados limiten el ancho */
-.content, .page, .page-viewport, .content__inner, .center-all, .page > *{
-  max-width:none !important;
-  width:100% !important;
-  min-width:0 !important;
+.content, .page > *, .content__inner, .center-all{
+  max-width: none !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  min-block-size: 0 !important;
+  overflow: hidden;
 }
 
 /* Si en estilos previos había un width forzado en #asunto, neutralízalo */
