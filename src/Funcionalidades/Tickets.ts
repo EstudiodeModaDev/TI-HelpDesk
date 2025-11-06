@@ -1,7 +1,7 @@
 import React from "react";
 import type { SortDir, SortField, Ticket, ticketOption } from "../Models/Tickets";
 import { TicketsService } from "../Services/Tickets.service";
-import type { DateRange, FilterMode } from "../Models/Filtros";
+import type { DateRange,  } from "../Models/Filtros";
 import { toISODateFlex } from "../utils/Date";
 import type { GetAllOpts } from "../Models/Commons";
 import type { RelacionadorState } from "../Models/nuevoTicket";
@@ -86,7 +86,7 @@ export function useTickets(TicketsSvc: TicketsService, userMail: string, isAdmin
   const [rows, setRows] = React.useState<Ticket[]>([]);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
-  const [filterMode, setFilterMode] = React.useState<FilterMode>("En curso");
+  const [filterMode, setFilterMode] = React.useState<string>("En curso");
   const today = React.useMemo(() => toISODateFlex(new Date()), []);
   const [range, setRange] = React.useState<DateRange>({ from: today, to: today });
   const [pageSize, setPageSize] = React.useState<number>(15); // = $top
@@ -111,6 +111,8 @@ export function useTickets(TicketsSvc: TicketsService, userMail: string, isAdmin
 
     if (filterMode === "En curso") {
       filters.push(`(fields/Estadodesolicitud eq 'En atención' or fields/Estadodesolicitud eq 'Fuera de tiempo')`);
+    } else if (filterMode === "Todos") {
+
     } else {
       filters.push(`startswith(fields/Estadodesolicitud,'Cerrado')`);
     }

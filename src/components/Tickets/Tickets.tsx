@@ -52,6 +52,7 @@ export default function TablaTickets() {
           <select value={filterMode} onChange={(e) => setFilterMode(e.target.value as any)} title="Estado">
             <option value="En curso">En curso</option>
             <option value="Cerrados">Cerrados</option>
+            <option value="Todos">Todos</option>
           </select>
 
           <input type="date" value={range.from} onChange={(e) => setRange({ ...range, from: e.target.value })} title="Desde"/>
