@@ -252,11 +252,24 @@
 /* =========================================================
    5) MICROAJUSTES PARA EL <input type="file">
    ========================================================= */
-input[type="file"].tf-input{
-  padding: 6px 10px;
-  display: flex;
-  align-items: center;
-}
+  input[type="file"].tf-input{
+    /* que se adapte pero sin romper la alineación del grid */
+    box-sizing: border-box;
+    display: inline-flex;             /* para alinear botón + label de nombre */
+    align-items: center;
+    gap: 10px;
+
+    width: 100%;
+    min-height: var(--field-h);       /* asegura altura mínima coherente */
+    height: auto;                     /* deja crecer si el botón interno lo requiere */
+    padding: 6px 8px;                 /* padding suave (no 0, para respiración) */
+
+    border: 1px solid var(--bd);
+    background: color-mix(in oklab, var(--card) 92%, transparent);
+    color: var(--ink);
+    border-radius: 10px;
+    line-height: 1.2;                 /* evita texto demasiado alto */
+  }
 
 /* contenedor más angosto, alineado a la izquierda */
 .tf-narrow{
@@ -272,4 +285,75 @@ input[type="file"].tf-input{
 /* en mobile, deja que use todo el ancho */
 @media (max-width: 980px){
   .tf-narrow{ max-width: 100%; }
+}
+/* 1) El file input NO debe heredar exactamente la misma altura rígida */
+input[type="file"].tf-input{
+  /* que se adapte pero sin romper la alineación del grid */
+  box-sizing: border-box;
+  display: inline-flex;             /* para alinear botón + label de nombre */
+  align-items: center;
+  gap: 10px;
+
+  width: 100%;
+  min-height: var(--field-h);       /* asegura altura mínima coherente */
+  height: auto;                     /* deja crecer si el botón interno lo requiere */
+  padding: 6px 8px;                 /* padding suave (no 0, para respiración) */
+
+  border: 1px solid var(--bd);
+  background: color-mix(in oklab, var(--card) 92%, transparent);
+  color: var(--ink);
+  border-radius: 10px;
+  line-height: 1.2;                 /* evita texto demasiado alto */
+}
+
+/* 2) Botón nativo estilizado (Chromium/Firefox) */
+input[type="file"].tf-input::file-selector-button{
+  margin: 0;                        /* quita margen raro del nativo */
+  padding: 0 14px;
+  height: calc(var(--field-h) - 12px); /* encaja visualmente dentro del contenedor */
+  border: 1px solid var(--bd);
+  border-radius: 8px;
+  background: var(--card);
+  color: var(--ink);
+  font: inherit;                    /* escala con tu tipografía */
+  cursor: pointer;
+  transition: filter .15s ease, box-shadow .15s ease, border-color .15s ease;
+}
+input[type="file"].tf-input::file-selector-button:hover{
+  border-color: var(--bd-strong);
+  box-shadow: 0 4px 10px rgba(0,0,0,.06);
+}
+
+/* 3) Fallback Safari/WebKit viejo */
+input[type="file"].tf-input::-webkit-file-upload-button{
+  margin: 0;
+  padding: 0 14px;
+  height: calc(var(--field-h) - 12px);
+  border: 1px solid var(--bd);
+  border-radius: 8px;
+  background: var(--card);
+  color: var(--ink);
+  font: inherit;
+  cursor: pointer;
+}
+
+/* 4) En pantallas muy pequeñas: compacta un poco el botón */
+@media (max-width: 420px){
+  input[type="file"].tf-input{
+    padding: 6px;
+  }
+  input[type="file"].tf-input::file-selector-button,
+  input[type="file"].tf-input::-webkit-file-upload-button{
+    height: calc(var(--field-h) - 14px);
+    padding: 0 12px;
+  }
+}
+
+/* 5) Ajusta el contenedor angosto: evita width fijo duro */
+.tf-narrow{
+  width: min(100%, 460px);          /* en vez de 400px rígidos */
+  justify-self: start;
+}
+@media (max-width: 980px){
+  .tf-narrow{ width: 100%; }
 }
