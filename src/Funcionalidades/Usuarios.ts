@@ -10,7 +10,7 @@ type UseRoleOpts = { singleGroup: { groupId: string; role: string }; groupRules?
 export function useUserRole(email?: string | null) {
 
   const opts: UseRoleOpts = {
-    groupRules: [{groupId: "ca8b6719-431a-498a-ba9f-2c58242b1403", role: "Jefe de zona"}],
+    groupRules: [{groupId: "ca8b6719-431a-498a-ba9f-2c58242b1403", role: "Jefe"}],
   }
 
   const { Usuarios, Graph } = useGraphServices() as { Usuarios: UsuariosSPService; Graph?: any };
@@ -46,15 +46,10 @@ export function useUserRole(email?: string | null) {
         if (!cancel) setLoading(false);
       }
     })();
-
-    // deps: serializa opts minimalmente
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [email, Usuarios, Graph, defaultRole, JSON.stringify(opts)]);
 
   return { role, source, loading, error };
 }
-
-
 
 
 export function useIsAdmin(email?: string | null) {

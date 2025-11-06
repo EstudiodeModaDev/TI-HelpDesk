@@ -83,9 +83,9 @@ const NAV: MenuItem[] = [
       { id: "usuarios", label: "Usuarios", icon: <img src={usersIcon} className="sb-icon" />, to: <UsuariosPanel />, roles: ["Administrador"] },
     ],
   },
-  {id: "acciones", label: "Acciones", icon: <img src={ActionsIcon} className="sb-icon" />, roles: ["Administrador", "Tecnico", "Jefe de zona"], children: [
-      {id: "siesa", label: "Siesa", roles: ["Administrador", "Tecnico", "Jefe de zona"], icon: <img src={siesaIcon} className="sb-icon" />, children: [
-          {id: "cajpos", label: "Cajeros POS", icon: <img src={cajerosIcon} className="sb-icon" />, to: (rctx: RenderCtx) => rctx.services ? <CajerosPOSForm services={{ Tickets: rctx.services.Tickets, Logs: rctx.services.Logs }} /> : <div>Cargando servicios…</div>, roles: ["Administrador", "Tecnico", "Jefe de zona"],},
+  {id: "acciones", label: "Acciones", icon: <img src={ActionsIcon} className="sb-icon" />, roles: ["Administrador", "Tecnico", "JefeZona"], children: [
+      {id: "siesa", label: "Siesa", roles: ["Administrador", "Tecnico", "JefeZona"], icon: <img src={siesaIcon} className="sb-icon" />, children: [
+          {id: "cajpos", label: "Cajeros POS", icon: <img src={cajerosIcon} className="sb-icon" />, to: (rctx: RenderCtx) => rctx.services ? <CajerosPOSForm services={{ Tickets: rctx.services.Tickets, Logs: rctx.services.Logs }} /> : <div>Cargando servicios…</div>, roles: ["Administrador", "Tecnico", "JefeZona"],},
         ],
       },
       {id: "cesar", label: "Cesar", roles: ["Administrador"], children: [
