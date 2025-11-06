@@ -1,3 +1,6 @@
+@import url('https://fonts.googleapis.com/css2?family=Boogaloo&display=swap');
+
+
 /* =========================================================
    0) TOKENS (claro/oscuro) + escalas fluidas
    ========================================================= */
@@ -73,8 +76,11 @@
 .tf-title{
   margin: 0;
   font-size: var(--font-lg);
-  font-weight: 700;
   letter-spacing: .2px;
+  font-family: "Boogaloo", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 27px;
 }
 
 /* Tarjeta del formulario con sombra suave y radios grandes */
