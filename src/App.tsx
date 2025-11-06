@@ -154,7 +154,6 @@ function HeaderBar(props: { onPrimaryAction?: { label: string; onClick: () => vo
           <h1>SOLVI - Tu solución empieza aqui</h1>
         </div>
         <div className="userCluster">
-          <div className="avatar">?</div>
           {onPrimaryAction && (
             <button className="btn-logout" onClick={onPrimaryAction.onClick} disabled={onPrimaryAction.disabled} aria-busy={onPrimaryAction.disabled}>
               {onPrimaryAction.label}
