@@ -469,7 +469,7 @@ function LoggedApp({ user }: { user: User }) {
 
       {/* Modal de anuncio del día */}
       {adOpen && adItem && (
-        <EdmNewsModal open={adOpen} title={pickTitle(adItem)} html={pickHtml(adItem)} inset={{ top: 120, right: 16, bottom: 72, left: 16 }} width={360} confirmText="Entendido" cancelText="Cerrar" onConfirm={() => setAdOpen(false)} onCancel={() => setAdOpen(false)}/>
+        <EdmNewsModal open={adOpen} title={pickTitle(adItem)} html={pickHtml(adItem)} inset={{ top: 120, right: 16, bottom: 72, left: 16 }} width={360} confirmText="Entendido" onConfirm={() => setAdOpen(false)} onCancel={() => setAdOpen(false)}/>
       )}
     </div>
   );
