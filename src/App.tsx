@@ -32,6 +32,7 @@ import DashBoardPage from "./components/Dashboard/DashboardPage";
 import CrearAnuncio from "./components/News/News";
 import newsIcon from "./assets/news.svg";
 import EdmNewsModal from "./components/News/Confirmar/Confirmar";
+import usersIcon from "./assets/users.svg"
 import type { AnunciosService } from "./Services/Anuncios.service";
 
 /* ============================================================
@@ -81,7 +82,7 @@ const NAV: MenuItem[] = [
     children: [
       { id: "anuncios", label: "Anuncios", to: <CrearAnuncio />, roles: ["Administrador", "Tecnico"], icon: <img src={newsIcon} className="sb-icon" /> },
       { id: "plantillas", label: "Plantillas", icon: <img src={templateIcon} className="sb-icon" />, to: <CrearPlantilla />, roles: ["Administrador", "Tecnico"] },
-      { id: "usuarios", label: "Usuarios", to: <UsuariosPanel />, roles: ["Administrador"] },
+      { id: "usuarios", label: "Usuarios", icon: <img src={usersIcon} className="sb-icon" />, to: <UsuariosPanel />, roles: ["Administrador"] },
     ],
   },
   {
