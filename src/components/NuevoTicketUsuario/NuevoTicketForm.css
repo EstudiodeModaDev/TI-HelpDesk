@@ -80,7 +80,7 @@
 /* Tarjeta del formulario con sombra suave y radios grandes */
 .tf-grid{
   background: var(--card);
-  border: 1px solid var(--bd);
+  border: 1px transparent;
   border-radius: var(--radius);
   box-shadow: var(--shadow);
   padding: calc(var(--pad) + 4px);
@@ -130,7 +130,7 @@
 
 /* RichText contenedor */
 .rtb-box{
-  border: 1px solid var(--bd);
+  border: transparent;
   border-radius: 10px;
   background: color-mix(in oklab, var(--card) 92%, transparent);
   padding: 8px;
