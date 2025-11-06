@@ -31,7 +31,7 @@ export default function CajerosPOSForm({ services }: Props) {
         <div className="fila">
           <div className="campo">
             <label>Solicitante</label>
-            <input type="text" value={state.solicitante!} onChange={(e) => setField("solicitante", e.target.value)}/>
+            <input type="text" value={state.solicitante} onChange={(e) => setField("solicitante", e.target.value)}/>
           </div>
           <div className="campo">
             <label>Correo solicitante</label>
@@ -51,12 +51,7 @@ export default function CajerosPOSForm({ services }: Props) {
 
           <div className="campo">
             <label>CO</label>
-            <input
-              type="text"
-              value={state.CO}
-              onChange={(e) => setField("CO", e.target.value)}
-              placeholder="Centro Operativo / Código"
-            />
+            <input type="text" value={state.CO} onChange={(e) => setField("CO", e.target.value)} placeholder="Centro Operativo / Código"/>
             { (errors as any).CO && (
               <small style={{ color: "#b91c1c" }}>{(errors as any).CO}</small>
             )}
@@ -72,7 +67,6 @@ export default function CajerosPOSForm({ services }: Props) {
               classNamePrefix="rs"
               placeholder="Selecciona compañía…"
               options={companiaOptions}
-              // state.Compañia es string; mapeamos al option correspondiente
               value={companiaOptions.find(o => o.value === state.Compañia) ?? null}
               onChange={(opt: SingleValue<Option>) =>
                 setField("Compañia", opt?.value ?? "")
@@ -95,7 +89,7 @@ export default function CajerosPOSForm({ services }: Props) {
         {/* Acción */}
         <div style={{ marginTop: 10 }}>
           <button type="submit" className="btn-volver" disabled={submitting}>
-            {submitting ? "Procesando…" : "Crear usuario POS y ticket"}
+            {submitting ? "Procesando…" : "Crear usuario POS"}
           </button>
         </div>
       </form>
