@@ -7,15 +7,10 @@ type Props = {
   placeholder?: string;
   readOnly?: boolean;
   className?: string;
+  imageSize?: { width: number; height?: number; fit?: "contain" | "cover" };
 };
 
-export default function RichTextBase64({
-  value,
-  onChange,
-  placeholder = "Escribe aquí…",
-  readOnly,
-  className = "",
-}: Props) {
+export default function RichTextBase64({value, onChange, placeholder = "Escribe aquí…", readOnly, className = "", imageSize = { width: 480 }}: Props) {
   const editorRef = useRef<HTMLDivElement>(null);
   const [hasFocus, setHasFocus] = useState(false);
 
@@ -47,6 +42,19 @@ export default function RichTextBase64({
     const sel = window.getSelection();
     sel?.removeAllRanges();
     sel?.addRange(range);
+  };
+
+  const buildImgHTML = (src: string) => {
+    const w = imageSize.width;
+    const h = imageSize.height;
+    const fit = imageSize.fit ?? "contain";
+
+    // width/height por atributo aseguran el tamaño, y style controla el ajuste/overflow
+    // max-width:100% evita derrames si el contenedor es más pequeño
+    if (h) {
+      return `<img src="${src}" width="${w}" height="${h}" style="display:block; object-fit:${fit}; max-width:100%; width:${w}px; height:${h}px;" />`;
+    }
+    return `<img src="${src}" width="${w}" style="display:block; object-fit:${fit}; max-width:100%; width:${w}px; height:auto;" />`;
   };
 
   // Inserta HTML solo si el foco/selección están en el editor
@@ -97,7 +105,7 @@ export default function RichTextBase64({
     e.preventDefault();
     for (const file of files) {
       const dataUrl = await fileToDataURL(file);
-      insertHTMLAtCursor(`<img src="${dataUrl}" style="max-width:100%;height:auto;" />`);
+      insertHTMLAtCursor(buildImgHTML(dataUrl));
     }
   };
 
@@ -109,7 +117,7 @@ export default function RichTextBase64({
     const imgs = files.filter((f) => f.type.startsWith("image/"));
     for (const f of imgs) {
       const dataUrl = await fileToDataURL(f);
-      insertHTMLAtCursor(`<img src="${dataUrl}" style="max-width:100%;height:auto;" />`);
+      insertHTMLAtCursor(buildImgHTML(dataUrl));
     }
   };
 
@@ -166,24 +174,19 @@ export default function RichTextBase64({
           🔗
         </button>
 
-        <button
-          type="button"
-          {...btnBase}
-          onClick={async () => {
-            if (!isSelectionInsideEditor()) return;
-            const input = document.createElement("input");
-            input.type = "file";
-            input.accept = "image/*";
-            input.onchange = async () => {
-              const f = input.files?.[0];
-              if (!f) return;
-              const dataUrl = await fileToDataURL(f);
-              insertHTMLAtCursor(`<img src="${dataUrl}" style="max-width:100%;height:auto;" />`);
-            };
-            input.click();
-          }}
-          title="Insertar imagen"
-        >
+        <button type="button" {...btnBase} title="Insertar imagen" onClick={async () => {
+                                                      if (!isSelectionInsideEditor()) return;
+                                                      const input = document.createElement("input");
+                                                      input.type = "file";
+                                                      input.accept = "image/*";
+                                                      input.onchange = async () => {
+                                                        const f = input.files?.[0];
+                                                        if (!f) return;
+                                                        const dataUrl = await fileToDataURL(f);
+                                                        insertHTMLAtCursor(buildImgHTML(dataUrl));
+                                                      };
+                                                      input.click();
+                                                    }}>
           🖼️
         </button>
 
