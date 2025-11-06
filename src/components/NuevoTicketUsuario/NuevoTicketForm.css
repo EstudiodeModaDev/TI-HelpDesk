@@ -380,6 +380,8 @@
   .rte-toolbar{ padding: 4px 6px; }
 }
 
+
+
 /* 3) Footer sticky realmente pegado abajo y sin sumar alto extra */
 .tf-actions{
   position: sticky;
@@ -397,4 +399,46 @@
 }
 
 /* 5) Por si alguna regla previa dejó margen extra al final del form */
+.ticket-form form{ margin-bottom: 0; }
+
+/* ===== Ajustes específicos para 1200×1080 (y menores) ===== */
+@media (max-width: 1280px){
+  /* 1) Editor más bajo para que quepa todo */
+  .rtb-box .rte-editor{
+    /* antes podía llegar hasta 44–50vh; aquí lo recortamos */
+    block-size: clamp(140px, 30vh, 36vh);
+    overflow: auto;
+  }
+
+  /* 2) El único scroll vertical sigue siendo el del formulario */
+  .tf-grid{
+    /* colchoncito para el footer sticky: justo lo necesario */
+    padding-bottom: 72px; /* 64–72px suele ser perfecto para el alto del botón */
+    overflow: auto;
+    padding-right: 2px;
+    gap: 12px;            /* un pelín más compacto */
+  }
+
+  /* 3) Footer pegado y sin “comerse” alto extra */
+  .tf-actions{
+    position: sticky;
+    bottom: 0;
+    padding: 8px 0 10px;  /* compacto */
+    background: var(--tf-bg);
+    box-shadow: 0 -6px 14px rgba(2,6,23,.06);
+    z-index: 2;
+  }
+
+  /* 4) Reduce respiración de contenedores para ganar vertical */
+  .ticket-form{ padding-block: 16px; }
+  .page-viewport{ padding: 12px 16px; }
+}
+
+/* Aseguramos que el scroll exterior no aparezca (solo scrollea .tf-grid) */
+html, body, .layout, .content--withSidebar, .page-viewport, .page{
+  height: 100%;
+  overflow: hidden;
+}
+
+/* Evita márgenes “fantasma” al final del form */
 .ticket-form form{ margin-bottom: 0; }
