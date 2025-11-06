@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo, useRef, useState} from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import "./RichTextBase64.css";
 
 type Props = {
@@ -9,7 +9,13 @@ type Props = {
   className?: string;
 };
 
-export default function RichTextBase64({value, onChange, placeholder = "Escribe aquí…", readOnly, className = "",}: Props) {
+export default function RichTextBase64({
+  value,
+  onChange,
+  placeholder = "Escribe aquí…",
+  readOnly,
+  className = "",
+}: Props) {
   const editorRef = useRef<HTMLDivElement>(null);
   const [hasFocus, setHasFocus] = useState(false);
 
@@ -21,17 +27,17 @@ export default function RichTextBase64({value, onChange, placeholder = "Escribe 
   }, [value]);
 
   const handleInput = () => {
-    if (!editorRef.current) return;
-    onChange(editorRef.current.innerHTML);
+    const el = editorRef.current;
+    if (!el) return;
+    onChange(el.innerHTML);
   };
 
-  // Utilidades de selección
+  // ¿La selección/caret está dentro del editor?
   const isSelectionInsideEditor = () => {
     const el = editorRef.current;
     const sel = window.getSelection();
     if (!el || !sel || sel.rangeCount === 0) return false;
-    const anchor = sel.anchorNode;
-    return !!anchor && el.contains(anchor);
+    return el.contains(sel.anchorNode);
   };
 
   const placeCaretAtEnd = (el: HTMLElement) => {
@@ -43,17 +49,20 @@ export default function RichTextBase64({value, onChange, placeholder = "Escribe 
     sel?.addRange(range);
   };
 
-  // Inserta HTML sólo si el foco/selección están en el editor
+  // Inserta HTML solo si el foco/selección están en el editor
   const insertHTMLAtCursor = (html: string) => {
     const el = editorRef.current;
     if (!el) return;
+
     if (!isSelectionInsideEditor()) {
-      if (!hasFocus) return;             // bloquea si no hay foco
-      el.focus();                         // si hay foco pero la selección se fue, corrige
+      if (!hasFocus) return; // bloquea si no hay foco en el editor
+      el.focus();
       placeCaretAtEnd(el);
     }
+
     const sel = window.getSelection();
     if (!sel || sel.rangeCount === 0) return;
+
     const range = sel.getRangeAt(0);
     range.deleteContents();
     const frag = range.createContextualFragment(html);
@@ -71,10 +80,11 @@ export default function RichTextBase64({value, onChange, placeholder = "Escribe 
       fr.readAsDataURL(file);
     });
 
-  // Pegar imágenes (sólo si el foco está en el editor)
+  // Pegar imágenes (solo si la selección está en el editor)
   const handlePaste: React.ClipboardEventHandler<HTMLDivElement> = async (e) => {
     if (!isSelectionInsideEditor()) return;
     if (!e.clipboardData) return;
+
     const files: File[] = [];
     for (const item of e.clipboardData.items) {
       if (item.kind === "file") {
@@ -91,7 +101,7 @@ export default function RichTextBase64({value, onChange, placeholder = "Escribe 
     }
   };
 
-  // Drag & drop (sólo si hay foco)
+  // Drag & drop (solo si la selección está en el editor)
   const handleDrop: React.DragEventHandler<HTMLDivElement> = async (e) => {
     if (!isSelectionInsideEditor()) return;
     e.preventDefault();
@@ -102,31 +112,52 @@ export default function RichTextBase64({value, onChange, placeholder = "Escribe 
       insertHTMLAtCursor(`<img src="${dataUrl}" style="max-width:100%;height:auto;" />`);
     }
   };
+
   const preventDefault: React.DragEventHandler<HTMLDivElement> = (e) => e.preventDefault();
 
-  // execCommand: bloquea si no está enfocado / selección fuera
+  // execCommand: bloquea si selección está fuera
   const cmd = (command: string, value?: string) => {
-    const el = editorRef.current;
-    if (!el || !isSelectionInsideEditor()) return;
+    if (!isSelectionInsideEditor()) return;
     document.execCommand(command, false, value);
     handleInput();
   };
 
-  const Toolbar = useMemo(
-    () => (
+  const Toolbar = useMemo(() => {
+    // No permitir que los botones roben el foco al editor
+    const btnBase = {
+      disabled: !hasFocus || !!readOnly,
+      onMouseDown: (e: React.MouseEvent) => e.preventDefault(),
+      onPointerDown: (e: React.PointerEvent) => e.preventDefault(),
+    };
+
+    return (
       <div className="rte-toolbar" aria-disabled={!hasFocus || !!readOnly}>
-        <button type="button" disabled={!hasFocus || !!readOnly} onClick={() => cmd("bold")} title="Negrita" onFocus={() => setHasFocus(true) } onBlur={() => setHasFocus(false)}>B</button>
-        <button type="button" disabled={!hasFocus || !!readOnly} onClick={() => cmd("italic")} onFocus={() => setHasFocus(true) } onBlur={() => setHasFocus(false)} title="Cursiva"><i>I</i></button>
-        <button type="button" disabled={!hasFocus || !!readOnly} onClick={() => cmd("underline")}  onFocus={() => setHasFocus(true) } onBlur={() => setHasFocus(false)}title="Subrayado"><u>U</u></button>
+        <button type="button" {...btnBase} onClick={() => cmd("bold")} title="Negrita">
+          B
+        </button>
+        <button type="button" {...btnBase} onClick={() => cmd("italic")} title="Cursiva">
+          <i>I</i>
+        </button>
+        <button type="button" {...btnBase} onClick={() => cmd("underline")} title="Subrayado">
+          <u>U</u>
+        </button>
+
         <span className="rte-sep" />
-        <button type="button" disabled={!hasFocus || !!readOnly} onClick={() => cmd("insertUnorderedList")} onFocus={() => setHasFocus(true) } onBlur={() => setHasFocus(false)} title="Viñetas">• List</button>
-        <button type="button" disabled={!hasFocus || !!readOnly} onClick={() => cmd("insertOrderedList")} onFocus={() => setHasFocus(true) } onBlur={() => setHasFocus(false)} title="Numerada">1. List</button>
+
+        <button type="button" {...btnBase} onClick={() => cmd("insertUnorderedList")} title="Viñetas">
+          • List
+        </button>
+        <button type="button" {...btnBase} onClick={() => cmd("insertOrderedList")} title="Numerada">
+          1. List
+        </button>
+
         <span className="rte-sep" />
-        <button type="button" onFocus={() => setHasFocus(true) } onBlur={() => setHasFocus(false)}
-          disabled={!hasFocus || !!readOnly}
+
+        <button
+          type="button"
+          {...btnBase}
           onClick={() => {
-            const el = editorRef.current;
-            if (!el || !hasFocus || !isSelectionInsideEditor()) return;
+            if (!isSelectionInsideEditor()) return;
             const url = prompt("URL del enlace:");
             if (url) cmd("createLink", url);
           }}
@@ -134,12 +165,12 @@ export default function RichTextBase64({value, onChange, placeholder = "Escribe 
         >
           🔗
         </button>
+
         <button
           type="button"
-          disabled={!hasFocus || !!readOnly}
+          {...btnBase}
           onClick={async () => {
-            const el = editorRef.current;
-            if (!el || !hasFocus || !isSelectionInsideEditor()) return;
+            if (!isSelectionInsideEditor()) return;
             const input = document.createElement("input");
             input.type = "file";
             input.accept = "image/*";
@@ -155,16 +186,21 @@ export default function RichTextBase64({value, onChange, placeholder = "Escribe 
         >
           🖼️
         </button>
-        <button type="button" disabled={!hasFocus || !!readOnly} onClick={() => cmd("removeFormat")} title="Limpiar">⨂</button>
+
+        <button type="button" {...btnBase} onClick={() => cmd("removeFormat")} title="Limpiar">
+          ⨂
+        </button>
       </div>
-    ),
-    [hasFocus, readOnly]
-  );
+    );
+  }, [hasFocus, readOnly]);
 
   return (
     <div className={`rte ${className}`}>
       {!readOnly && Toolbar}
-      <div ref={editorRef} className="rte-editor"
+
+      <div
+        ref={editorRef}
+        className="rte-editor"
         contentEditable={!readOnly}
         onInput={handleInput}
         onPaste={handlePaste}
