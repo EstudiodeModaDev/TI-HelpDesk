@@ -46,6 +46,15 @@ export default function NuevoTicketUsuarioForm() {
         <div className="tf-field tf-col-2">
           <label className="tf-label" htmlFor="archivo">Adjuntar archivo</label>
           <input id="archivo" type="file" multiple onChange={(e) =>  setField("archivo", Array.from(e.target.files ?? []))} disabled={submitting} className="tf-input"/>
+
+          {Array.isArray(state.archivo) && state.archivo.length > 0 && (
+            <ul className="tf-files">
+              {state.archivo.map((f, i) => (
+                <li key={i}>
+                  {f.name} ({Math.round(f.size / 1024)} KB)
+                </li>
+              ))}
+            </ul>)}
         </div>
 
         {/* Submit */}

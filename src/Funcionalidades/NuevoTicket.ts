@@ -235,14 +235,7 @@ export function useNuevoTicketForm(services: Svc) {
         const resolutorEmail = state.resolutor?.email || state.resolutor?.value || "";
 
         //Crear Log
-        Logs.create({
-            Actor: "Sitema", 
-            Descripcion:  `Se ha creado un nuevo ticket para el siguiente requerimiento: ${idTexto}`, 
-            CorreoActor: "", 
-            Tipo_de_accion: 
-            "Creacion", 
-            Title: idTexto
-          })
+        Logs.create({Actor: "Sitema", Descripcion:  `Se ha creado un nuevo ticket para el siguiente requerimiento: ${idTexto}`, CorreoActor: "", Tipo_de_accion:"Creacion", Title: idTexto})
       
           // Notificar solicitante
         if (solicitanteEmail) {
@@ -298,21 +291,7 @@ export function useNuevoTicketForm(services: Svc) {
         }
 
         //Limpiar formularior
-        setState( 
-          {
-            solicitante: null,
-            resolutor: null,
-            usarFechaApertura: false,
-            fechaApertura: null,
-            fuente: "",
-            motivo: "",
-            descripcion: "",
-            categoria: "",   
-            subcategoria: "", 
-            articulo: "",     
-            ANS: "",
-            archivo: null,
-          })
+        setState({solicitante: null, resolutor: null, usarFechaApertura: false, fechaApertura: null, fuente: "", motivo: "", descripcion: "", categoria: "", subcategoria: "", articulo: "",  ANS: "", archivo: null,})
         setErrors({})
       }
       } finally {
@@ -321,34 +300,15 @@ export function useNuevoTicketForm(services: Svc) {
     };
 
   return {
-    // estado de formulario
-    state,
-    setField,
-    errors,
-    submitting,
-    fechaSolucion,
-
-    // catálogos y derivados
-    categorias,
-    subcategoriasAll: subcategorias,
-    articulosAll,
-    loadingCatalogos,
-    errorCatalogos,
-    // acciones
-    handleSubmit,
+    state, errors, submitting, fechaSolucion, categorias, subcategoriasAll: subcategorias, articulosAll, loadingCatalogos, errorCatalogos,
+    handleSubmit, setField
   };
 }
 
 export function useNuevoUsuarioTicketForm(services: Svc) {
   const { Usuarios, Tickets, Logs} = services;
   const { account, } = useAuth();
-  const [state, setState] = useState<UserFormState>({
-    archivo: null,
-    Correosolicitante: account?.username ?? "",
-    descripcion: "",
-    motivo: "",
-    solicitante: ""
-  });
+  const [state, setState] = useState<UserFormState>({archivo: null, Correosolicitante: account?.username ?? "", descripcion: "", motivo: "", solicitante: ""});
   const [errors, setErrors] = useState<FormUserErrors>({});
   const [submitting, setSubmitting] = useState(false);
   const [holidays, setHolidays] = useState<Holiday[]>([]);
@@ -380,8 +340,6 @@ export function useNuevoUsuarioTicketForm(services: Svc) {
     setErrors(e);
     return Object.keys(e).length === 0;
   };
-
-
 
   const handleSubmit = async () => {
     if (!validate()) return;
@@ -478,14 +436,8 @@ export function useNuevoUsuarioTicketForm(services: Svc) {
   };
 
   return {
-    // estado de formulario
-    state,
-    setField,
-    errors,
-    submitting,
-    fechaSolucion,
-    // acciones
-    handleSubmit,
+    state, errors, submitting, fechaSolucion,
+    handleSubmit, setField
   };
 }
 
