@@ -11,7 +11,7 @@
   --sb-muted:#bfe4e4;
   --sb-shadow:0 10px 30px rgba(0,0,0,.15);
 
-  /* Header / superficie general (ajústalos a tu tema) */
+  /* Superficie general */
   --surface:#0d1117;
   --ink:#e5eef9;
   --muted:#9fb0c7;
@@ -26,7 +26,7 @@
   --radius:16px;
   --radius-3xl:28px;
 
-  /* Dimensiones del sidebar (para colapsado) */
+  /* Dimensiones del sidebar */
   --sb-w-open: 280px;
   --sb-w-closed: 72px;
 }
@@ -41,27 +41,29 @@
    1) LAYOUT CON SIDEBAR (GRID) + CONTENIDO
    ========================================================================== */
 
-/* Grid principal con dos columnas: sidebar + contenido */
+/* Grid principal */
 .layout--withSidebar{
   display:grid;
-  grid-template-columns: var(--sb-w, var(--sb-w-open)) minmax(0, 1fr) !important;
-  grid-template-rows:1fr;
+  grid-template-columns: var(--sb-w, var(--sb-w-open)) minmax(0, 1fr);
   grid-template-areas:"sidebar content";
   gap:16px;
-  padding:16px;
-  min-height:0;
-  align-items:stretch;
-  transition: grid-template-columns .22s ease;
+
+  /* Aire contra los bordes del viewport */
+  box-sizing:border-box;
   padding-inline: var(--page-pad);
-  padding-block: var(--page-pad); 
+  padding-block:  var(--page-pad);
+
+  min-height:100dvh;
+  align-items:stretch;
+  transition:grid-template-columns .22s ease;
 }
 
-/* Estado colapsado (aplica en el nodo .layout--withSidebar) */
+/* Estado colapsado del sidebar */
 .layout--withSidebar.is-collapsed{
   --sb-w: var(--sb-w-closed);
 }
 
-/* Área de contenido: ocupa todo, sin centrar (stretched) */
+/* Área de contenido */
 .content--withSidebar{
   grid-area: content;
   display: grid;
@@ -70,39 +72,38 @@
   min-width: 0;
 }
 
-/* Viewport contenedor de páginas (evita shrink) */
+/* Viewport contenedor de páginas */
 .page-viewport{
   width: 100%;
-  min-height:calc(90dvh - 32px);
-  display:grid;
+  min-height: calc(90dvh - 32px);
+  display: grid;
   place-items: stretch;
   min-width: 0;
-  padding: 20px; 
+  padding: 20px;
 }
 
-/* Componente de página: ocupa 100% y permite scroll interno */
+/* Componente de página */
 .page{
   display: grid;
-  grid-template-rows: auto 1fr;   /* header auto, resto ocupa */
-  height: auto;  
-  min-height: 90dvh;               /* lleno de viewport */
+  grid-template-rows: auto 1fr;
+  height: auto;
+  min-height: 90dvh;
   place-items: stretch;
-  overflow: auto; 
+  overflow: auto;
 }
 
-/* Los hijos directos de .page deben ocupar todo el panel */
+/* Los hijos directos de .page ocupan todo el panel */
 .page > *{
   width: 100% !important;
   min-width: 0 !important;
   min-height: 0 !important;
 }
-
 .page > .page-view{
-  min-height: 0;       
-  overflow: auto;     
+  min-height: 0;
+  overflow: auto;
 }
 
-/* Limpieza de wrappers antiguos que limitaban ancho/centraban */
+/* Limpieza de wrappers antiguos que centraban/limitaban */
 .content__inner, .center-all{
   width: 100% !important;
   max-width: none !important;
@@ -111,8 +112,10 @@
 }
 .center-all > *{ place-items:center; }
 
-/* Inputs estándar del layout (si los usas dentro del contenido) */
-.content--withSidebar input, .content--withSidebar select, .content--withSidebar textarea{
+/* Inputs estándar dentro del contenido */
+.content--withSidebar input,
+.content--withSidebar select,
+.content--withSidebar textarea{
   background:#ffffff;
   border:1px solid #e6eef0;
   border-radius:12px;
@@ -123,27 +126,33 @@
    ========================================================================== */
 
 .sidebar{
-  grid-area:sidebar;
+  grid-area: sidebar;
   display:flex;
   flex-direction:column;
   background:var(--sb-bg);
   border-radius:var(--radius-3xl);
   box-shadow:var(--sb-shadow);
   color:var(--sb-text);
-  padding:14px;
-  padding-bottom: 5px;
-  position:sticky;
-  top:var(--page-pad);
-  height:calc(100dvh - (var(--page-pad) * 2));
-  transition: padding .22s ease;            /* suaviza al colapsar */
+
+  /* Padding del panel */
+  padding:14px 14px 8px;
+
+  /* Sticky con aire alrededor */
+  position: sticky;
+  top: var(--page-pad);
+  margin-block-end: var(--page-pad);                 /* aire abajo */
+  justify-self: start;
+  height: calc(100dvh - (var(--page-pad) * 2) - var(--page-pad));  /* no toca abajo */
+
+  transition: padding .22s ease;
 }
 
-/* Header del sidebar: marca + botón de toggle */
+/* Header del sidebar */
 .sidebar__header{
-  display: grid;
-  grid-template-columns: 1fr auto; 
-  align-items: center;
-  gap: 8px;
+  display:grid;
+  grid-template-columns: 1fr auto;
+  align-items:center;
+  gap:8px;
   font-weight:700;
   letter-spacing:.3px;
   opacity:.9;
@@ -151,32 +160,19 @@
 }
 
 /* Marca */
-.sb-brand{
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-width: 0;
-}
-.sb-logo{ font-size: 18px; }
+.sb-brand{ display:flex; align-items:center; gap:8px; min-width:0; }
+.sb-logo{ font-size:18px; }
 .sb-title{
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  color: var(--sb-text);
-  opacity: .9;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  color:var(--sb-text); opacity:.9;
 }
 .sb-subtitle{
-  font-size: 12px;
-  line-height: 1.25;
-  font-weight: 500;
-  color: var(--sb-text, #94a3b8);
-  opacity: .8;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  font-size:12px; line-height:1.25; font-weight:500;
+  color:var(--sb-text, #94a3b8); opacity:.8;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
 }
 
-/* Nav del sidebar con scroll fino */
+/* Nav con scroll fino */
 .sidebar__nav{
   overflow:auto;
   padding:4px;
@@ -190,11 +186,10 @@
   border-radius:999px;
 }
 
-/* Lista de items */
+/* Lista e ítems */
 .sb-ul{ list-style:none; margin:0; padding:0; }
 .sb-li + .sb-li{ margin-top:2px; }
 
-/* Item base */
 .sideItem{
   width:100%;
   display:flex; align-items:center; gap:10px;
@@ -207,19 +202,13 @@
 .sideItem:hover{ background:var(--sb-hover); }
 .sideItem:active{ transform:translateY(1px); }
 .sideItem--leaf{ position:relative; }
-
-/* Icono y label del item */
 .sideItem__icon{ width:22px; display:inline-flex; justify-content:center; opacity:.92; }
 .sideItem__label{ font-size:15px; }
 .sideItem--folder{ font-weight:600; }
-
-/* Estado activo */
 .sideItem--active{
   background:var(--sb-pill);
   outline:2px solid rgba(255,255,255,0.08);
 }
-
-/* Caret para items con hijos */
 .caret{ margin-right:6px; opacity:.8; transition:transform .2s ease; }
 .caret.rot{ transform:rotate(90deg); }
 
@@ -240,15 +229,15 @@
 .sb-prof__name{ font-weight:700; color:var(--sb-text); font-size:14px; }
 .sb-prof__mail{ font-size:12px; opacity:.9; }
 
-/* Iconos compactos (por si mezclas SVG/emoji) */
+/* Iconos compactos */
 .sb-icon-wrap{
   display:inline-flex; align-items:center; justify-content:center;
-  width: 1.75rem; height: 1.75rem; margin-right:.5rem; flex-shrink:0;
+  width:1.75rem; height:1.75rem; margin-right:.5rem; flex-shrink:0;
 }
-.sb-icon{ width:1.25rem; height:1.25rem; } /* SVG */
-.sb-emoji{ font-size:1.1rem; line-height:1; } /* emoji */
+.sb-icon{ width:1.25rem; height:1.25rem; }
+.sb-emoji{ font-size:1.1rem; line-height:1; }
 
-/* --------- Sidebar: modo colapsado --------- */
+/* Sidebar colapsado */
 .layout--withSidebar.is-collapsed .sidebar{ padding-left:10px; padding-right:10px; }
 .layout--withSidebar.is-collapsed .sideItem{
   gap:0; padding-left:10px; padding-right:10px; justify-content:center;
@@ -256,15 +245,13 @@
 .layout--withSidebar.is-collapsed .sideItem__label,
 .layout--withSidebar.is-collapsed .sidebar__header .sb-title,
 .layout--withSidebar.is-collapsed .sb-prof__info,
-.layout--withSidebar.is-collapsed .caret{
-  display:none !important;
-}
+.layout--withSidebar.is-collapsed .caret{ display:none !important; }
 .layout--withSidebar.is-collapsed .sb-icon-wrap{ margin-right:0; }
 .layout--withSidebar.is-collapsed .sidebar__footer{
   justify-content:center; padding-left:8px; padding-right:8px;
 }
 
-/* Botón toggle del sidebar */
+/* Botón toggle */
 .sb-toggle{
   border:0;
   background:var(--sb-pill);
@@ -289,10 +276,10 @@
   padding-inline: 16px;
 }
 
-/* contenedor interno centrado con ancho máximo */
+/* Contenedor interno del header */
 .header-inner{
-  width: min(100%, var(--content-max));
-  margin-inline: auto;           
+  width: min(100%, var(--content-max, 1200px));
+  margin-inline: auto;
   display: grid;
   grid-template-columns: 1fr auto;
   align-items: center;
@@ -301,65 +288,58 @@
 }
 
 /* Marca / título */
-.brand{
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  min-width: 0;
-}
+.brand{ display:flex; align-items:center; gap:10px; min-width:0; }
 .brand h1{
-  margin: 0;
-  font-size: 18px;
-  font-weight: 800;
-  line-height: 1.1;
-  color: #0d1117;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  margin:0; font-size:18px; font-weight:800; line-height:1.1; color:#0d1117;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
 }
 
-/* Cluster de usuario (derecha) */
+/* Cluster de usuario */
 .userCluster{
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: max-content;
-  align-items: center;
-  gap: 12px;
+  display:grid; grid-auto-flow:column; grid-auto-columns:max-content;
+  align-items:center; gap:12px;
 }
 .avatar{
-  width: 36px; height: 36px; border-radius: 999px;
-  background: var(--field-bg); color: var(--ink);
-  border: 1px solid var(--border);
-  display: grid; place-items: center; font-weight: 700;
+  width:36px; height:36px; border-radius:999px;
+  background:var(--field-bg); color:var(--ink);
+  border:1px solid var(--border);
+  display:grid; place-items:center; font-weight:700;
 }
-.userInfo{
-  display: grid; align-content: center; line-height: 1.15;
-}
-.userName{ font-weight: 700; font-size: 14px; color: var(--ink); }
-.userMail{ font-size: 12px; color: var(--muted); }
+.userInfo{ display:grid; align-content:center; line-height:1.15; }
+.userName{ font-weight:700; font-size:14px; color:var(--ink); }
+.userMail{ font-size:12px; color:var(--muted); }
 
-/* Botón primario (login/logout) */
+/* Botón primario */
 .btn-logout{
-  appearance: none;
-  border: 1px solid var(--primary);
-  background: var(--primary);
-  color: var(--primary-ink);
-  padding: 8px 12px;
+  appearance:none;
+  border:1px solid var(--primary);
+  background:var(--primary);
+  color:var(--primary-ink);
+  padding:8px 12px;
   border-radius: calc(var(--radius) - 8px);
-  font-weight: 600;
-  cursor: pointer;
+  font-weight:600;
+  cursor:pointer;
   transition: transform .06s ease, box-shadow .15s ease, opacity .15s ease;
 }
-.btn-logout:hover{ box-shadow: 0 0 0 4px var(--ring); }
+.btn-logout:hover{ box-shadow:0 0 0 4px var(--ring); }
 .btn-logout:active{ transform: translateY(1px); }
 .btn-logout:disabled, .btn-logout[aria-busy="true"]{
-  opacity: .6; cursor: default; box-shadow: none;
+  opacity:.6; cursor:default; box-shadow:none;
 }
 
 /* Header sticky opcional */
-.headerRow.is-sticky{
-  position: sticky; top: 0; z-index: 40;
+.headerRow.is-sticky{ position:sticky; top:0; z-index:40; }
+
+/* Compactación final del header */
+.headerRow,
+.headerRow > .header-inner{
+  height:55px !important;
+  min-height:30px;
+  padding-block:8px;
 }
+.headerRow .avatar{ width:30px; height:30px; }
+.headerRow .btn-logout{ padding:6px 10px; }
+.headerRow .brand h1{ font-size:16px; line-height:1.2; }
 
 /* ==========================================================================
    4) RESPONSIVE
@@ -374,32 +354,18 @@
       "sidebar"
       "content";
   }
-  .sidebar{ position:relative; top:auto; height:auto; }
+  .sidebar{
+    position:relative;
+    top:auto;
+    height:auto;
+    margin-block-end: var(--page-pad); /* mantiene aire abajo */
+  }
   .page-viewport{ min-height:calc(100dvh - var(--page-pad)); }
 }
 
-@media (max-width: 640px){
-  /* Header compacto */
-  .headerRow{
-    padding-block:10px;
-    padding-inline:12px;
-  }
-  .header-inner{
-    grid-template-columns: 1fr;
-    gap: 8px;
-  }
-  .brand h1{ font-size: 16px; }
-  .btn-logout{ padding: 6px 10px; }
+@media (max-width:640px){
+  .headerRow{ padding-block:10px; padding-inline:12px; }
+  .header-inner{ grid-template-columns:1fr; gap:8px; }
+  .brand h1{ font-size:16px; }
+  .btn-logout{ padding:6px 10px; }
 }
-
-.headerRow,
-.headerRow > .header-inner{
-  height: 55px !important;      /* anula cualquier height anterior */
-  min-height: 30px;             /* tu altura objetivo */
-  padding-block: 8px;           /* ajusta si quieres más compacto */
-}
-
-/* 2) Asegura que nada interno la estire de nuevo */
-.headerRow .avatar{ width:30px; height:30px; }
-.headerRow .btn-logout{ padding:6px 10px; }
-.headerRow .brand h1{ font-size:16px; line-height:1.2; }
