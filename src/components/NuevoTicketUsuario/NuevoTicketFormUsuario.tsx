@@ -28,8 +28,8 @@ export default function NuevoTicketUsuarioForm() {
 
         {/* Motivo */}
         <div className="tf-field tf-col-2">
-          <label className="tf-label" htmlFor="motivo">Motivo de la solicitud</label>
-          <input id="motivo" type="text" placeholder="Ingrese el motivo" value={state.motivo} onChange={(e) => setField("motivo", e.target.value)} disabled={submitting} className="tf-input"/>
+          <label className="tf-label" htmlFor="motivo">Asunto de la solicitud</label>
+          <input id="motivo" type="text" placeholder="Ingrese el motivo" value={state.motivo} onChange={(e) => setField("motivo", e.target.value)} disabled={submitting} className="tf-input" maxLength={100}/>
           {errors.motivo && <small className="error">{errors.motivo}</small>}
         </div>
 
