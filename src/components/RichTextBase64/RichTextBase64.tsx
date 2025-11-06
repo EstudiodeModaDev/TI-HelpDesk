@@ -79,7 +79,7 @@ export default function RichTextBase64({
 
   // Pegar imágenes (sólo si el foco está en el editor)
   const handlePaste: React.ClipboardEventHandler<HTMLDivElement> = async (e) => {
-    if (!hasFocus || !isSelectionInsideEditor()) return;
+    if (!isSelectionInsideEditor()) return;
     if (!e.clipboardData) return;
     const files: File[] = [];
     for (const item of e.clipboardData.items) {
@@ -99,7 +99,7 @@ export default function RichTextBase64({
 
   // Drag & drop (sólo si hay foco)
   const handleDrop: React.DragEventHandler<HTMLDivElement> = async (e) => {
-    if (!hasFocus || !isSelectionInsideEditor()) return;
+    if (!isSelectionInsideEditor()) return;
     e.preventDefault();
     const files = Array.from(e.dataTransfer?.files ?? []);
     const imgs = files.filter((f) => f.type.startsWith("image/"));
@@ -113,7 +113,7 @@ export default function RichTextBase64({
   // execCommand: bloquea si no está enfocado / selección fuera
   const cmd = (command: string, value?: string) => {
     const el = editorRef.current;
-    if (!el || !hasFocus || !isSelectionInsideEditor()) return;
+    if (!el || !isSelectionInsideEditor()) return;
     document.execCommand(command, false, value);
     handleInput();
   };

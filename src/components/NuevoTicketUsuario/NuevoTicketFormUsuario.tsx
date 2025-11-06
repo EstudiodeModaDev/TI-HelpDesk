@@ -45,13 +45,7 @@ export default function NuevoTicketUsuarioForm() {
         {/* Archivo */}
         <div className="tf-field tf-col-2">
           <label className="tf-label" htmlFor="archivo">Adjuntar archivo</label>
-          <input
-            id="archivo"
-            type="file"
-            onChange={(e) => setField("archivo", e.target.files?.[0] ?? null)}
-            disabled={submitting}
-            className="tf-input"
-          />
+          <input id="archivo" type="file" onChange={(e) => setField("archivo", e.target.files?.[0] ?? null)} disabled={submitting} className="tf-input"/>
         </div>
 
         {/* Submit */}
