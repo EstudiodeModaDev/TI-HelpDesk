@@ -219,6 +219,7 @@
   padding:10px 12px;
   display:flex; align-items:center; gap:10px;
   color:var(--sb-muted);
+  margin-bottom: 10px;
 }
 .sb-prof__avatar{
   width:28px; height:28px; border-radius:999px;
