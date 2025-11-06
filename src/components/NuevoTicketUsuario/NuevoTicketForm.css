@@ -99,6 +99,8 @@
   display: grid;
   gap: 6px;
   min-width: 0;
+  max-width: 200px;
+  overflow: scroll;
 }
 .tf-col-2{ grid-column: 1 / -1; }
 

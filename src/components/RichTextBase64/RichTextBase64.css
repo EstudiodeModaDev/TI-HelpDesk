@@ -87,7 +87,6 @@
   padding: 14px 16px;
   min-height: 180px;                /* área visible */
   background: var(--rte-surface);
-  outline: none;
 }
 
 /* Borde visible del área de edición (como pediste) */
