@@ -137,7 +137,7 @@
   max-height: var(--rtb-max-h);   /* acorta antes de forzar scroll global */
   overflow-y: scroll;
   transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
-  max-height: 250px;
+  max-height: 300px;
 }
 .rtb-box:focus-within{
   border-color: var(--primary);
