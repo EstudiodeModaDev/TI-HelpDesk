@@ -99,7 +99,6 @@
   display: grid;
   gap: 6px;
   min-width: 0;
-  max-width: 200px;
 }
 .tf-col-2{ grid-column: 1 / -1; }
 
@@ -255,8 +254,7 @@ input[type="file"].tf-input{
 
 /* contenedor más angosto, alineado a la izquierda */
 .tf-narrow{
-  width: 100%;
-  max-width: clamp(420px, 60vw, 760px);
+  width: 300px;
   justify-self: start;   /* o center si lo quieres centrado */
 }
 
