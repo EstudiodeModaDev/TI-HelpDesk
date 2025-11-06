@@ -79,6 +79,7 @@
   place-items: stretch;
   min-width:0;
   padding:20px;
+  overflow: hidden;
 }
 
 /* Componente de página */
