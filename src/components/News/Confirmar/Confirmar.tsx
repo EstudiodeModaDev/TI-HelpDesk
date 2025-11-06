@@ -196,13 +196,8 @@ export default function EdmNewsModal({open, title = "", html = "", width = 360, 
               marginTop: 4,
               paddingTop: 8,
               paddingBottom: 6,
-              background: "linear-gradient(#ffffffcc, #ffffffcc)",
-              borderTop: "1px solid #e5e7eb",
               backdropFilter: "blur(2px)",
-              fontFamily:
-                "'Segoe UI', Inter, ui-sans-serif, system-ui, -apple-system, Roboto, Arial, sans-serif",
-              borderBottomLeftRadius: 8,
-              borderBottomRightRadius: 8,
+              fontFamily: "'Segoe UI', Inter, ui-sans-serif, system-ui, -apple-system, Roboto, Arial, sans-serif",
             }}>
 
           {cancelText ? <button type="button" onClick={() => onCancel(true)} style={{
