@@ -447,7 +447,6 @@ function LoggedApp({ user }: { user: User }) {
       try {
         if (!services.Anuncios) return;
 
-        // ¿ya se mostró hoy? (no repetir en esta sesión del día)
         const key = getTodayKey();
         if (sessionStorage.getItem(key) === "1") return;
 
@@ -460,7 +459,7 @@ function LoggedApp({ user }: { user: User }) {
         const endIso = `${y}-${m}-${d}T23:59:59Z`;
 
         // Hoy ∈ [fechaInicio, fechaFinal]
-        const filter = `(fields/fechaInicio le ${endIso}) and (fields/fechaFinal ge ${startIso})`;
+        const filter = `(fields/fechaInicio le '${endIso}') and (fields/fechaFinal ge '${startIso}')`;
 
         // Pide el MÁS ANTIGUO (fechaInicio asc)
         const res = await services.Anuncios.getAll({filter, orderby: "fields/fechaInicio asc", top: 1,});
