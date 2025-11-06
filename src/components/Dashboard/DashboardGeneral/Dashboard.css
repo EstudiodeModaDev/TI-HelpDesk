@@ -427,6 +427,7 @@ html, body, #root {
   align-items:end;
   gap:10px;
   height:100%;
+  overflow-x: scroll;
 }
 .cats__col{ display:grid; grid-template-rows:auto 1fr auto; align-items:end; gap:6px; }
 .cats__val{ text-align:center; font-weight:800; font-size:.85rem; color:var(--ink); }
