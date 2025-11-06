@@ -31,9 +31,8 @@ import WelcomeSolvi from "./components/Welcome/Welcome";
 import DashBoardPage from "./components/Dashboard/DashboardPage";
 import CrearAnuncio from "./components/News/News";
 import newsIcon from "./assets/news.svg";
-
-// ⬇️ IMPORTA EL MODAL DEL ANUNCIO (ajusta ruta si cambia)
 import EdmNewsModal from "./components/News/Confirmar/Confirmar";
+import type { AnunciosService } from "./Services/Anuncios.service";
 
 /* ============================================================
    Tipos de navegación y contexto de visibilidad
@@ -194,15 +193,7 @@ function HeaderBar(props: { onPrimaryAction?: { label: string; onClick: () => vo
    Sidebar con árbol recursivo y apertura de carpetas
    ============================================================ */
 
-function Sidebar(props: {
-  navs: readonly MenuItem[];
-  selected: string;
-  onSelect: (k: string) => void;
-  user: User;
-  role: string;
-  collapsed?: boolean;
-  onToggle?: () => void;
-}) {
+function Sidebar(props: {navs: readonly MenuItem[]; selected: string; onSelect: (k: string) => void; user: User; role: string; collapsed?: boolean; onToggle?: () => void;}) {
   const { navs, selected, onSelect, user, role, collapsed = false, onToggle } = props;
   const [open, setOpen] = React.useState<Record<string, boolean>>({});
 
@@ -357,7 +348,7 @@ function Shell() {
 
 function LoggedApp({ user }: { user: User }) {
   const { role } = useUserRole(user!.mail);
-  const services = useGraphServices() as { Tickets: TicketsService; Usuarios: UsuariosSPService; Logs: LogService } & Record<string, any>;
+  const services = useGraphServices() as { Tickets: TicketsService; Usuarios: UsuariosSPService; Logs: LogService, Anuncios: AnunciosService } & Record<string, any>;
 
   const navCtx = React.useMemo<NavContext>(() => {
     const safeRole: string = role === "Administrador" || role === "Tecnico" || role === "Usuario" ? (role as string) : "Usuario";
@@ -428,17 +419,8 @@ function LoggedApp({ user }: { user: User }) {
     [navs]
   );
 
-  /* ============================================================
-     ANUNCIO DEL DÍA (consulta + modal)
-     ============================================================ */
-
   const [adOpen, setAdOpen] = React.useState(false);
   const [adItem, setAdItem] = React.useState<any>(null);
-
-  // Servicio de anuncios si existe en GraphServicesProvider
-  const anunciosSvc = (services as any)?.AnunciosSvc as
-    | { getAll: (q: any) => Promise<any> }
-    | undefined;
 
   // key por día para no repetir el modal en la sesión actual
   const getTodayKey = () => {
@@ -452,18 +434,18 @@ function LoggedApp({ user }: { user: User }) {
   // pickers de campos comunes
   const pickHtml = (row: any): string => {
     const f = row?.fields ?? row ?? {};
-    return f.HtmlText ?? f.ContenidoHtml ?? f.Contenido ?? f.Descripcion ?? f.Description ?? "";
+    return f.Cuerpo ?? f.ContenidoHtml ?? f.Contenido ?? f.Descripcion ?? f.Description ?? "";
   };
   const pickTitle = (row: any): string => {
     const f = row?.fields ?? row ?? {};
-    return f.Title ?? f.Titulo ?? f.Heading ?? "Anuncio";
+    return f.TituloAnuncio ?? f.Titulo ?? f.Heading ?? "Anuncio";
   };
 
   React.useEffect(() => {
     let cancel = false;
     (async () => {
       try {
-        if (!anunciosSvc) return;
+        if (!services.Anuncios) return;
 
         // ¿ya se mostró hoy? (no repetir en esta sesión del día)
         const key = getTodayKey();
@@ -481,12 +463,7 @@ function LoggedApp({ user }: { user: User }) {
         const filter = `(fields/fechaInicio le ${endIso}) and (fields/fechaFinal ge ${startIso})`;
 
         // Pide el MÁS ANTIGUO (fechaInicio asc)
-        const res = await anunciosSvc.getAll({
-          filter,
-          orderby: "fields/fechaInicio asc",
-          top: 1,
-          select: "id,fields/Title,fields/Titulo,fields/HtmlText,fields/ContenidoHtml,fields/Contenido,fields/Descripcion,fields/fechaInicio,fields/fechaFinal",
-        });
+        const res = await services.Anuncios.getAll({filter, orderby: "fields/fechaInicio asc", top: 1,});
 
         const items: any[] = Array.isArray(res) ? res : res?.items ?? [];
         if (!items.length) return;
@@ -498,13 +475,13 @@ function LoggedApp({ user }: { user: User }) {
           sessionStorage.setItem(key, "1");
         }
       } catch {
-        // silencioso
+        alert("Error al obtener el anuncio")
       }
     })();
     return () => {
       cancel = true;
     };
-  }, [anunciosSvc]);
+  }, [services.Anuncios]);
 
   return (
     <div className={`page layout layout--withSidebar ${collapsed ? "is-collapsed" : ""}`}>
@@ -517,17 +494,7 @@ function LoggedApp({ user }: { user: User }) {
 
       {/* Modal de anuncio del día */}
       {adOpen && adItem && (
-        <EdmNewsModal
-          open={adOpen}
-          title={pickTitle(adItem)}
-          html={pickHtml(adItem)}
-          inset={{ top: 120, right: 16, bottom: 72, left: 16 }} // ajusta para tu PNG
-          width={360}
-          confirmText="Entendido"
-          cancelText="Cerrar"
-          onConfirm={() => setAdOpen(false)}
-          onCancel={() => setAdOpen(false)} // tu handler puede ignorar parámetros
-        />
+        <EdmNewsModal open={adOpen} title={pickTitle(adItem)} html={pickHtml(adItem)} inset={{ top: 120, right: 16, bottom: 72, left: 16 }} width={360} confirmText="Entendido" cancelText="Cerrar" onConfirm={() => setAdOpen(false)} onCancel={() => setAdOpen(false)}/>
       )}
     </div>
   );
