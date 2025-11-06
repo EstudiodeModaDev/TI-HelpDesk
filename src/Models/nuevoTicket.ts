@@ -27,7 +27,7 @@ export type UserFormState = {
   Correosolicitante: string;
   motivo: string;
   descripcion: string;
-  archivo: File | null;
+  archivo: File[] | null;
 };
 
 export type FormDocumentarState = {
