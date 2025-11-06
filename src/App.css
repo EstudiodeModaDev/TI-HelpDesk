@@ -33,7 +33,7 @@
 
 /* Fondo de página (opcional) */
 .layout{
-  min-height:100dvh;
+  min-height:90dvh;
   background:#8dc2c5;
 }
 
@@ -53,7 +53,7 @@
   padding-inline: var(--page-pad);
   padding-block:  var(--page-pad);
 
-  min-height:100dvh;
+  min-height:90dvh;
   align-items:stretch;
   transition:grid-template-columns .22s ease;
 }
