@@ -367,3 +367,8 @@
   .brand h1{ font-size:16px; }
   .btn-logout{ padding:6px 10px; }
 }
+
+html, body{
+  block-size: 100%;
+  overflow: hidden;            /* <- sin scroll exterior */
+}
