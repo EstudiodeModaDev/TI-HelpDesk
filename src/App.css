@@ -52,6 +52,8 @@
   min-height:0;
   align-items:stretch;
   transition: grid-template-columns .22s ease;
+  padding-inline: var(--page-pad);
+  padding-block: var(--page-pad); 
 }
 
 /* Estado colapsado (aplica en el nodo .layout--withSidebar) */
@@ -392,7 +394,7 @@
 
 .headerRow,
 .headerRow > .header-inner{
-  height: 45px !important;      /* anula cualquier height anterior */
+  height: 55px !important;      /* anula cualquier height anterior */
   min-height: 30px;             /* tu altura objetivo */
   padding-block: 8px;           /* ajusta si quieres más compacto */
 }
