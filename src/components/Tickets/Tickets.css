@@ -1,189 +1,321 @@
-/* === 1) Persistencia real del tema === */
-.tabla-tickets{
-  color-scheme: light !important;   /* <-- typo corregido */
-  isolation: isolate;
-}
-
-/* Scope "forzado" */
-.tabla-tickets[data-force-light], .tabla-tickets[data-force-light] *{
-  color-scheme: light !important;
-}
-
-.dark .tabla-tickets[data-force-light]{
-  --tbl-max: 1600px;
-  --tbl-text: #111827;
-  --tbl-muted: #cfcfcf;
-  --tbl-border: #e5e7eb;
-  --tbl-odd: #ffffff;
-  --tbl-even: #e6e6e6;
-  --tbl-hover: #eef2ff;
-  --tbl-head: #ffffff;
-  --tbl-focus: #2563eb;
-}
-
-/* === 2) Tokens === */
+/* =========================================================
+   0) TOKENS (Light/Dark) + escalas fluidas
+   ========================================================= */
 :root{
-  --tbl-text: #111827;
-  --tbl-muted: #cfcfcf;
-  --tbl-border: #e5e7eb;
-  --tbl-odd: #ffffff;
-  --tbl-even: #e6e6e6;
-  --tbl-hover: #eef2ff;
-  --tbl-head: #ffffff;
-  --tbl-focus: #2563eb;
+  /* Colores base (modo claro) */
+  --bg: #f6f8fb;
+  --card: #ffffff;
+  --ink: #0f172a;
+  --muted: #64748b;
+  --bd: #d7dce3;
+  --bd-strong: #b5bfcc;
+
+  --primary: #2563eb;
+  --primary-ink: #ffffff;
+  --danger: #b91c1c;
+
+  /* Filas alternadas (light) */
+  --row-odd: #ffffff;           /* blanco */
+  --row-even: #f1f5f9;          /* gris pastel */
+
+  /* Controles */
+  --input-bg: #f8fafc;
+  --input-bd: #d7dce3;
+  --input-ph: #8a99ad;
+
+  /* Otros */
+  --shadow: 0 10px 24px rgba(2,6,23,.06);
+  --radius: 12px;
+  --focus: 0 0 0 3px rgba(37,99,235,.25);
+
+  /* Escalas fluidas */
+  --pad: clamp(12px, 1.5vw, 18px);
+  --gap: clamp(10px, 1.2vw, 16px);
+  --font: clamp(13px, 0.9vw + 9px, 15px);
+  --font-lg: clamp(16px, 1.1vw + 10px, 20px);
+  --field-h: clamp(34px, 5dvh, 40px);
 }
 
-.tabla-tickets{ background: transparent; color: var(--tbl-text); line-height: 1.35; }
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg: #f6f8fb;
+    --card: #ffffff;
+    --ink: #0f172a;
+    --muted: #64748b;
+    --bd: #d7dce3;
+    --bd-strong: #b5bfcc;
+    --row-odd: #ffffff;
+    --row-even: #f1f5f9;
+    --input-bg: #f8fafc;
+    --input-bd: #d7dce3;
+    --input-ph: #8a99ad;
+    --shadow: 0 10px 24px rgba(2,6,23,.06);
+    --focus: 0 0 0 3px rgba(37,99,235,.25);
+  }
+}
 
+/* Forzar modo claro dentro del componente si lo necesitas */
+.tabla-tickets[data-force-light]{
+  --bg: #f6f8fb;
+  --card: #ffffff;
+  --ink: #0f172a;
+  --muted: #64748b;
+  --bd: #d7dce3;
+  --bd-strong: #b5bfcc;
+  --row-odd: #ffffff;
+  --row-even: #f1f5f9;
+  --input-bg: #f8fafc;
+  --input-bd: #d7dce3;
+  --input-ph: #8a99ad;
+  --shadow: 0 10px 24px rgba(2,6,23,.06);
+  --focus: 0 0 0 3px rgba(37,99,235,.25);
+}
+
+/* =========================================================
+   1) Layout del componente
+   ========================================================= */
 .tabla-tickets{
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: flex-start !important; 
-  align-items: stretch !important;
-  gap: 10px !important;                   
-}
-
-.tabla-tickets > .filtros,
-.tabla-tickets > .table-wrap,
-.tabla-tickets .table-wrap + div{
-  width: 100%;
-  max-width: none; /* por si algún estilo anterior pone un tope */
-}
-
-/* === 3) Barra de filtros === */
-.tabla-tickets > .filtros{
-  margin: 0 !important;
-  padding: 8px;
+  color: var(--ink);
+  background: transparent;
+  font-size: var(--font);
+  line-height: 1.45;
   display: grid;
-  gap: 8px;
-  grid-template-columns: 1fr repeat(6, auto);
+  gap: var(--gap);
+  padding: var(--pad);
+}
+
+.filtros{
+  background: var(--card);
+  border: 1px solid var(--bd);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: var(--pad);
+  display: grid;
+  grid-template-columns: 1fr max-content max-content max-content max-content max-content;
+  gap: var(--gap);
   align-items: center;
 }
 
-.tabla-tickets[data-force-light] > .filtros{
-  background: #ffffff !important;
-  border: 1px solid #e5e7eb !important;
-  border-radius: 12px !important;
-  box-shadow: 0 8px 24px rgba(0,0,0,.06) !important;
+.filtros input[type="text"],
+.filtros input[type="date"],
+.filtros select{
+  height: var(--field-h);
+  border: 1px solid var(--input-bd);
+  background: var(--input-bg);
+  color: var(--ink);
+  border-radius: 10px;
+  padding: 0 12px;
+  min-width: 0;
+  outline: none;
+  transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
+}
+.filtros input::placeholder{ color: var(--input-ph); }
+.filtros input:focus,
+.filtros select:focus{
+  border-color: var(--primary);
+  box-shadow: var(--focus);
 }
 
-.tabla-tickets input, .tabla-tickets select, .tabla-tickets button{
-  background-color: #ffffff !important;
-  color: #111827 !important;
-  border: 1px solid #e5e7eb !important;
-  box-shadow: none !important;
-  filter: none !important;
+.filtros button{
+  height: var(--field-h);
+  border-radius: 10px;
+  border: 1px solid var(--bd);
+  background: var(--card);
+  color: var(--ink);
+  padding: 0 14px;
+  cursor: pointer;
+  transition: transform .08s ease, filter .15s ease, box-shadow .15s ease, border-color .15s ease;
+}
+.filtros button:hover{
+  border-color: var(--bd-strong);
+  box-shadow: 0 4px 12px rgba(0,0,0,.06);
+}
+.filtros button:active{ transform: translateY(1px); }
+
+/* Separador "→" */
+.filtros span{
+  opacity: .7;
+  user-select: none;
 }
 
-.tabla-tickets input::placeholder{ color: var(--tbl-muted); }
-
-.tabla-tickets input:focus, .tabla-tickets select:focus, .tabla-tickets button:focus{
-  outline: 0; border-color: var(--tbl-focus);
-  box-shadow: 0 0 0 3px rgba(37,99,235,.25);
-}
-
+/* =========================================================
+   2) Tabla + zebra rows
+   ========================================================= */
 .table-wrap{
-  border: 1px solid var(--tbl-border);
-  border-radius: 12px;
-  overflow: hidden;
-  background: transparent;
-  overflow-x: auto;
-  margin-top: 10px;                    /* separados solo 10px */
+  background: var(--card);
+  border: 1px solid var(--bd);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: var(--pad);
+  overflow: auto;           /* horizontal scroll en pantallas angostas */
 }
 
-.table-wrap > table{
+.table-wrap table{
   width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
-  background: transparent;
-  font-size: 14px;
+  border-collapse: collapse;
+  font-size: 0.98em;
+  min-width: 720px;         /* evita que columnas se aplasten; scroll si es chico */
 }
 
 .table-wrap thead th{
-  position: sticky; top: 0; z-index: 1;
-  background: var(--tbl-head) !important;
-  color: var(--tbl-text) !important;
-  border-bottom: 1px solid var(--tbl-border);
-  text-align: left !important; padding: 10px 12px; white-space: nowrap; font-weight: 600;
+  text-align: left;
+  font-weight: 700;
+  color: var(--muted);
+  border-bottom: 1px solid var(--bd);
+  padding: 10px 12px;
+  position: sticky;         /* header pegajoso al hacer scroll */
+  top: 0;
+  background: var(--card);
+  z-index: 1;
 }
 
-.table-wrap tbody td{ padding: 10px 12px; border-bottom: 1px solid var(--tbl-border); vertical-align: middle; text-align: left !important; }
-
-.table-wrap tbody tr:nth-child(odd){  background: var(--tbl-odd) !important; }
-.table-wrap tbody tr:nth-child(even){ background: var(--tbl-even) !important; }
-.table-wrap tbody tr:hover{ background: var(--tbl-hover) !important; }
-.table-wrap tbody tr{ cursor: pointer; }
-
-.table-wrap thead th[role="button"]{ user-select: none; }
-.table-wrap thead th[role="button"]:focus{ outline: 0; box-shadow: inset 0 -2px 0 var(--tbl-focus); }
-
-.estado-circulo{ width: 12px; height: 12px; display: inline-block; border-radius: 999px; border: 1px solid rgba(0,0,0,.1); }
-
-/* === 5) Paginación en claro === */
-.tabla-tickets .table-wrap + div{
-  background: transparent !important;
-  color: #111827 !important;
-  box-shadow: none !important;
-  border: 0 !important;
+.table-wrap tbody td{
+  padding: 12px;
+  border-bottom: 1px solid var(--bd);
+  vertical-align: middle;
+  white-space: nowrap;
 }
 
-.tabla-tickets .table-wrap + div button,
-.tabla-tickets .table-wrap + div select{
-  height: 32px;
-  border: 1px solid var(--tbl-border);
-  background: #fff !important;
-  color: var(--tbl-text) !important;
+/* Filas alternadas blanco / gris pastel */
+.table-wrap tbody tr:nth-child(odd){  background: var(--row-odd); }
+.table-wrap tbody tr:nth-child(even){ background: var(--row-even); }
+
+/* Hover y focus de fila */
+.table-wrap tbody tr{
+  transition: background-color .12s ease, box-shadow .12s ease;
+}
+.table-wrap tbody tr:hover{
+  background: color-mix(in oklab, var(--row-even) 70%, var(--row-odd));
+}
+.table-wrap tbody tr:focus-within{
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--primary);
+}
+
+/* Columna Estado (circulito) */
+.estado-circulo{
+  display: inline-block;
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  border: 2px solid rgba(0,0,0,.06);
+  box-shadow: 0 0 0 1px rgba(0,0,0,.04) inset;
+}
+
+/* Celdas "clickables" accesibles */
+thead th[role="button"]{
+  cursor: pointer;
+  user-select: none;
+}
+thead th[role="button"]:focus{
+  outline: none;
+  box-shadow: var(--focus);
   border-radius: 8px;
-  padding: 0 10px;
 }
 
-/* === 6) Responsive === */
-@media (max-width: 980px){
-  .tabla-tickets > .filtros{ grid-template-columns: 1fr; }
-  .tabla-tickets > .filtros > *{ width: 100%; }
-  .table-wrap table{ min-width: 720px; }
+/* Filas clicables para abrir detalle */
+.table-wrap tbody tr{
+  cursor: pointer;
 }
-@media (max-width: 520px){
+.table-wrap tbody tr:active{
+  transform: translateY(1px);
+}
+
+/* =========================================================
+   3) Paginación
+   ========================================================= */
+.paginacion{
+  margin-top: var(--gap);
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+  align-items: center;
+  gap: 10px;
+  justify-content: start;
+}
+
+.paginacion button{
+  height: var(--field-h);
+  border-radius: 10px;
+  border: 1px solid var(--bd);
+  background: var(--card);
+  color: var(--ink);
+  padding: 0 14px;
+  cursor: pointer;
+  transition: filter .15s ease, box-shadow .15s ease, border-color .15s ease, transform .08s ease;
+}
+.paginacion button:hover{
+  border-color: var(--bd-strong);
+  box-shadow: 0 4px 12px rgba(0,0,0,.06);
+}
+.paginacion button:disabled{
+  opacity: .6;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.paginacion span{
+  color: var(--muted);
+  font-weight: 600;
+}
+
+/* Selector "Tickets por página" */
+.paginacion label{
+  color: var(--muted);
+  font-weight: 600;
+}
+.paginacion select{
+  height: var(--field-h);
+  border: 1px solid var(--input-bd);
+  background: var(--input-bg);
+  color: var(--ink);
+  border-radius: 10px;
+  padding: 0 10px;
+  outline: none;
+}
+.paginacion select:focus{
+  border-color: var(--primary);
+  box-shadow: var(--focus);
+}
+
+/* =========================================================
+   4) Responsive
+   ========================================================= */
+/* Filtros: en pantallas medianas/pequeñas apilar en filas */
+@media (max-width: 1100px){
+  .filtros{
+    grid-template-columns: 1fr 160px 1fr auto 1fr auto; /* texto, estado, desde, flecha, hasta, botones */
+  }
+}
+@media (max-width: 900px){
+  .filtros{
+    grid-template-columns: 1fr 1fr;  /* 2 columnas */
+  }
+  .filtros span{ display:none; }     /* oculta flecha para simplificar */
+}
+@media (max-width: 560px){
+  .filtros{
+    grid-template-columns: 1fr;      /* 1 columna */
+  }
+}
+
+/* Tabla: deja scroll horizontal en móviles */
+@media (max-width: 760px){
   .table-wrap table{ min-width: 640px; }
 }
 
-/* === 7) Prefers-color-scheme: solo una vez === */
-@media (prefers-color-scheme: dark){
-  .tabla-tickets,
-  .tabla-tickets[data-force-light]{ color-scheme: light !important; }
+/* Alturas bajas: compacta controles */
+@media (max-height: 700px){
+  :root{
+    --field-h: clamp(30px, 4.6dvh, 36px);
+    --pad: clamp(10px, 1.2vw, 16px);
+    --gap: clamp(8px, 1vw, 12px);
+  }
 }
 
-/* Extras de compatibilidad */
-.tabla-tickets input:-webkit-autofill{
-  -webkit-box-shadow: 0 0 0 1000px #ffffff inset !important;
-  -webkit-text-fill-color: #111827 !important;
-}
-.tabla-tickets[data-force-light] input[type="date"]::-webkit-calendar-picker-indicator{
-  filter: none !important; opacity: 1 !important;
+/* =========================================================
+   5) Mensajes de estado
+   ========================================================= */
+.tabla-tickets p{
+  margin: 0;
 }
 
-.tabla-tickets .table-wrap, .tabla-tickets table, .tabla-tickets thead, .tabla-tickets tbody, .tabla-tickets tr, .tabla-tickets th, .tabla-tickets td {
-  opacity: 1 !important;
-  filter: none !important;
-  mix-blend-mode: normal !important;
-  color: var(--tbl-text) !important;
-}
-
-.table-wrap tbody tr:nth-child(odd)  > * { background: var(--tbl-odd)  !important; }
-
-.table-wrap tbody tr:nth-child(even) > * { background: var(--tbl-even) !important; }
-
-.table-wrap tbody tr:hover > *{ background: var(--tbl-hover) !important; }
-
-.table-wrap thead th {
-  position: sticky; top: 0; z-index: 2;
-  box-shadow: 0 1px 0 var(--tbl-border), 0 2px 10px rgba(0,0,0,.05);
-}
-
-.table-wrap td.sticky, .table-wrap th.sticky { background: var(--tbl-head) !important; }
-
-.table-wrap td.sticky, .table-wrap th.sticky { background: var(--tbl-head) !important; }
-
-.paginacion{
-  background: var(--tbl-head);
-}
