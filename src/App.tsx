@@ -459,7 +459,7 @@ function LoggedApp({ user }: { user: User }) {
         const endIso = `${y}-${m}-${d}T23:59:59Z`;
 
         // Hoy ∈ [fechaInicio, fechaFinal]
-        const filter = `(fields/Fechadeinicio le '${endIso}') and (fields/fechaFinal ge '${startIso}')`;
+        const filter = `(fields/Fechadeinicio le '${endIso}') and (fields/Fechafinal ge '${startIso}')`;
 
         // Pide el MÁS ANTIGUO (fechaInicio asc)
         const res = await services.Anuncios.getAll({filter, orderby: "fields/Fechadeinicio asc", top: 1,});
