@@ -12,6 +12,7 @@
   --tf-error:#ef4444;
   --tf-radius:14px;
   --tf-gap:16px;
+  --actions-h: 60px;
 }
 
 /* Fuerza modo claro SOLO dentro del formulario */
@@ -65,10 +66,9 @@
   display:grid;
   grid-template-columns: repeat(auto-fit, minmax(var(--cell-min), 1fr));
   gap: clamp(8px, 1.4vh, 16px);
-
   overflow:auto;                     /* ÚNICO scroll vertical */
   padding-right:2px;
-  padding-bottom: clamp(64px, 8vh, 96px); /* reserva para footer sticky */
+  padding-bottom: var(--actions-h);
 }
 
 /* Utilidades de columnas */
@@ -81,7 +81,7 @@
 }
 
 /* Campos */
-.tf-field{ display:flex; flex-direction:column; gap:8px; min-width:0; }
+.tf-field{ display:flex; flex-direction:column; gap:2px; min-width:0; }
 .tf-label{ font-size:13px; color:var(--tf-muted); }
 
 .tf-input{
