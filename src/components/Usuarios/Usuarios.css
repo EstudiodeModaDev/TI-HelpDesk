@@ -5,7 +5,7 @@
   --card:#fff;
   --bd:#d1d5db;
   --bd-strong:#9ca3af;
-  --primary:#243b7a;                 /* azul del header de la tabla en tu captura */
+  --primary:#243b7a;                 
   --danger:#b91c1c;
   --radius:14px;
   --shadow:0 12px 28px rgba(2,6,23,.08);
@@ -22,6 +22,7 @@
   align-items: center;
   margin-bottom: 12px;
 }
+
 .users-header h2{
   margin: 0;
   font-size: 1.6rem;
@@ -36,8 +37,8 @@
 }
 
 .icon-btn{
-  width: 40px; height: 40px;
-  border-radius: 10px;
+  width: 28px; height: 28px;
+  border-radius: 8px;
   border: 1px solid var(--bd);
   background: #fff;
   color: var(--ink);
@@ -92,7 +93,7 @@
   border: 1px solid var(--bd);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
-  max-height: 62vh;     /* scroll aquí */
+  max-height: 80vh;     
   overflow: auto;
 }
 
@@ -114,18 +115,22 @@
 }
 
 .users-table tbody td{
-  border-top: 2px solid #2f2f2f;
-  padding: 14px 12px;
+  border-top: 1px solid #2f2f2f;
+  padding: 6px 6px;
   vertical-align: middle;
   text-align: center;
 }
+
+.users-table tbody tr{ height: auto; }
+
 .users-table tbody tr:nth-child(odd){
   background: #fff;
 }
 
 .cell-name{
-  line-height: 1.15;
-  white-space: pre-line;       /* soporta 2 líneas como en la captura */
+  white-space: normal;          
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .cell-mail{
   color: #0b3cae;

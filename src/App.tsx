@@ -33,6 +33,7 @@ import CrearAnuncio from "./components/News/News";
 import newsIcon from "./assets/news.svg";
 import EdmNewsModal from "./components/News/Confirmar/Confirmar";
 import usersIcon from "./assets/users.svg"
+import ActionsIcon from "./assets/actions.svg"
 import type { AnunciosService } from "./Services/Anuncios.service";
 
 /* ============================================================
@@ -74,41 +75,18 @@ const NAV: MenuItem[] = [
   { id: "task", label: "Tareas", icon: <img src={tareasIcon} alt="" className="sb-icon" />, to: <TareasPage />, roles: ["Administrador", "Tecnico"], autocollapse: true },
   { id: "formatos", label: "Formatos", icon: <img src={filesIcon} alt="" className="sb-icon" />, to: <Formatos />, roles: ["Administrador"] },
   { id: "info", label: "Información", icon: <img src={infoIcon} alt="" className="sb-icon" />, to: <InfoPage />, roles: ["Administrador", "Tecnico"] },
-  {
-    id: "admin",
-    label: "Administración",
-    icon: <img src={settingsIcon} className="sb-icon" />,
-    roles: ["Administrador", "Tecnico"],
-    children: [
+  { id: "admin", label: "Administración", icon: <img src={settingsIcon} className="sb-icon" />, roles: ["Administrador", "Tecnico"], children: [
       { id: "anuncios", label: "Anuncios", to: <CrearAnuncio />, roles: ["Administrador", "Tecnico"], icon: <img src={newsIcon} className="sb-icon" /> },
       { id: "plantillas", label: "Plantillas", icon: <img src={templateIcon} className="sb-icon" />, to: <CrearPlantilla />, roles: ["Administrador", "Tecnico"] },
       { id: "usuarios", label: "Usuarios", icon: <img src={usersIcon} className="sb-icon" />, to: <UsuariosPanel />, roles: ["Administrador"] },
     ],
   },
-  {
-    id: "acciones",
-    label: "Acciones",
-    roles: ["Administrador", "Tecnico", "Jefe de zona"],
-    children: [
-      {
-        id: "siesa",
-        label: "Siesa",
-        roles: ["Administrador", "Tecnico", "Jefe de zona"],
-        children: [
-          {
-            id: "cajpos",
-            label: "Cajeros POS",
-            to: (rctx: RenderCtx) =>
-              rctx.services ? <CajerosPOSForm services={{ Tickets: rctx.services.Tickets, Logs: rctx.services.Logs }} /> : <div>Cargando servicios…</div>,
-            roles: ["Administrador", "Tecnico", "Jefe de zona"],
-          },
+  {id: "acciones", label: "Acciones", icon: <img src={ActionsIcon} className="sb-icon" />, roles: ["Administrador", "Tecnico", "Jefe de zona"], children: [
+      {id: "siesa", label: "Siesa", roles: ["Administrador", "Tecnico", "Jefe de zona"], children: [
+          {id: "cajpos", label: "Cajeros POS", to: (rctx: RenderCtx) => rctx.services ? <CajerosPOSForm services={{ Tickets: rctx.services.Tickets, Logs: rctx.services.Logs }} /> : <div>Cargando servicios…</div>, roles: ["Administrador", "Tecnico", "Jefe de zona"],},
         ],
       },
-      {
-        id: "cesar",
-        label: "Cesar",
-        roles: ["Administrador"],
-        children: [
+      {id: "cesar", label: "Cesar", roles: ["Administrador"], children: [
           { id: "compras", label: "Compras", to: <ComprasPage />, roles: ["Administrador"] },
           { id: "facturas", label: "Facturas", to: <RegistroFactura />, roles: ["Administrador"] },
           { id: "paz", label: "Paz y Salvos", to: <PazySalvosMode />, roles: ["Administrador"] },
