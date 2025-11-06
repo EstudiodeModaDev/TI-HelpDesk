@@ -88,7 +88,7 @@
   background: var(--card);
   border: 1px transparent;
   border-radius: var(--radius);
-  box-shadow: var(--shadow);
+  box-shadow: transparent;
   padding: calc(var(--pad) + 4px);
   display: grid;
   grid-template-columns: 1fr 1fr;  /* 2 columnas inicialmente */
