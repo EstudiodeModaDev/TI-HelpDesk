@@ -348,3 +348,53 @@
 @media (min-height: 700px){
   .tf-grid{ padding-bottom: calc(var(--footer-h) + 4px); }
 }
+
+/* ====== FIX ESPACIO MUERTO + BOTÓN VISIBLE ====== */
+
+/* 1) Menos alto al editor para que quepa en móviles */
+.rtb-box .rte-editor{
+  /* antes: clamp(160px, 35vh, 50vh)  */
+  block-size: clamp(140px, 28vh, 44vh);
+  overflow: auto;
+}
+
+/* 2) Ajusta el “colchón” inferior del grid (lo mínimo para el footer) */
+:root{
+  /* altura estimada del footer/botón + un poco de respiro */
+  --tf-footer-space: 64px;            /* desktop */
+  --tf-footer-space-sm: 56px;         /* móviles */
+}
+
+/* antes: padding-bottom: clamp(64px, 8vh, 96px);  -> era lo que generaba el hueco */
+.tf-grid{
+  padding-bottom: var(--tf-footer-space);
+  /* seguimos scrolleando solo el formulario */
+  overflow: auto;
+  padding-right: 2px;
+}
+
+/* móviles: aún más compacto */
+@media (max-width: 720px){
+  .tf-grid{ padding-bottom: var(--tf-footer-space-sm); }
+  .tf-input{ padding-block: 9px; }
+  .rte-toolbar{ padding: 4px 6px; }
+}
+
+/* 3) Footer sticky realmente pegado abajo y sin sumar alto extra */
+.tf-actions{
+  position: sticky;
+  bottom: 0;
+  background: var(--tf-bg);
+  padding: 8px 0 10px;          /* compacto */
+  margin-top: var(--tf-gap);
+  box-shadow: 0 -6px 14px rgba(2,6,23,.06);
+  z-index: 2;
+}
+
+/* 4) Evita que algún wrapper exterior meta scroll y sume espacio */
+.layout, .content--withSidebar, .page-viewport, .page{
+  overflow: hidden;  /* el único scroll vertical debe ser .tf-grid */
+}
+
+/* 5) Por si alguna regla previa dejó margen extra al final del form */
+.ticket-form form{ margin-bottom: 0; }
