@@ -34,6 +34,8 @@
   --font: clamp(13px, 0.9vw + 9px, 15px);
   --font-lg: clamp(16px, 1.1vw + 10px, 20px);
   --field-h: clamp(34px, 5dvh, 40px);
+  --bd-soft: color-mix(in oklab, var(--bd) 55%, transparent);
+  --bd-row:  color-mix(in oklab, var(--bd) 45%, transparent);
 }
 
 @media (prefers-color-scheme: dark){
@@ -51,6 +53,8 @@
     --input-ph: #8a99ad;
     --shadow: 0 10px 24px rgba(2,6,23,.06);
     --focus: 0 0 0 3px rgba(37,99,235,.25);
+    --bd-soft: color-mix(in oklab, var(--bd) 40%, transparent);
+    --bd-row:  color-mix(in oklab, var(--bd) 30%, transparent);
   }
 }
 
@@ -69,6 +73,8 @@
   --input-ph: #8a99ad;
   --shadow: 0 10px 24px rgba(2,6,23,.06);
   --focus: 0 0 0 3px rgba(37,99,235,.25);
+  --bd-soft: color-mix(in oklab, var(--bd) 55%, transparent);
+  --bd-row:  color-mix(in oklab, var(--bd) 45%, transparent);
 }
 
 /* =========================================================
@@ -100,7 +106,6 @@
 .filtros input[type="date"],
 .filtros select{
   height: var(--field-h);
-  border: 1px solid var(--input-bd);
   background: var(--input-bg);
   color: var(--ink);
   border-radius: 10px;
