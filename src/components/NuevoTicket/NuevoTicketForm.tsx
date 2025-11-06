@@ -135,11 +135,10 @@ export default function NuevoTicketForm() {
   const disabledCats = submitting || loadingCatalogos;
 
   return (
-    <div>
-      <div className="ticket-form ticket-form--xl" data-force-light>
-        <h2 className="tf-title">Nuevo Ticket</h2>
+    <div className="ticket-form" data-force-light>
+      <h2 className="tf-title">Nuevo Ticket</h2>
 
-        <form onSubmit={handleSubmit} noValidate className="tf-grid">
+      <form onSubmit={(e) => {e.preventDefault(); handleSubmit}} noValidate className="tf-grid">
           {/* Solicitante */}
           <div className="tf-field">
             <label className="tf-label">Solicitante</label>
@@ -266,6 +265,5 @@ export default function NuevoTicketForm() {
           </div>
         </form>
       </div>
-    </div>
   );
 }
