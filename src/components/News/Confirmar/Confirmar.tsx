@@ -161,8 +161,7 @@ export default function EdmNewsModal({open, title = "", html = "", width = 360, 
             gap: 12,
             alignItems: "center",
             overflow: "auto", // si no cabe todo, este hace scroll
-            paddingBottom:
-              "calc(env(safe-area-inset-bottom, 0px) + 6px)", // respeta “notch”
+            paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 6px)", // respeta “notch”
           }}>
         {/* Texto superior opcional */}
         {rangeText ? (

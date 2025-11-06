@@ -13,7 +13,7 @@
 /* Cuadro blanco central (posicionado dentro del poster) */
 .edm-content-box{
   position: absolute;         /* clave para calzar dentro del marco */
-  background: #fff;
+  background: transparent;
   border-radius: var(--edm-radius);
   padding: 12px;
   display: flex;
