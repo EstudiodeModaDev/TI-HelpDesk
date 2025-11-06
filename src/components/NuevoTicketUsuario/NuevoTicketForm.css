@@ -49,7 +49,7 @@
   block-size:100%;
   display:grid;
   grid-template-rows:auto 1fr;   /* título + contenido */
-  overflow:hidden;               /* el scroll va en .tf-grid */
+  overflow:scroll;               /* el scroll va en .tf-grid */
   min-height:0;                  /* permite encoger dentro de su contenedor */
 }
 
@@ -72,7 +72,7 @@
   grid-template-columns: repeat(auto-fit, minmax(var(--cell-min), 1fr));
   gap:clamp(8px, 1.4vh, 16px);
 
-  overflow:auto;                      /* único scroll vertical */
+  overflow:hidden;                      /* único scroll vertical */
   padding-right:2px;
   padding-bottom:clamp(64px, 8vh, 96px); /* reserva para el footer sticky */
   min-height:0;                       /* puede encoger */
