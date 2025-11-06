@@ -33,7 +33,7 @@
 
 /* Fondo de página (opcional) */
 .layout{
-  min-height:90dvh;
+  min-height: 90dvh;
   background:#8dc2c5;
 }
 
@@ -48,7 +48,6 @@
   grid-template-areas:"sidebar content";
   gap:16px;
 
-  /* Aire contra los bordes del viewport */
   box-sizing:border-box;
   padding-inline: var(--page-pad);
   padding-block:  var(--page-pad);
@@ -66,49 +65,51 @@
 /* Área de contenido */
 .content--withSidebar{
   grid-area: content;
-  display: grid;
+  display:grid;
   place-items: stretch;
-  min-height: 0;
-  min-width: 0;
+  min-height:0;
+  min-width:0;
 }
 
 /* Viewport contenedor de páginas */
 .page-viewport{
-  width: 100%;
+  width:100%;
   min-height: calc(90dvh - 32px);
-  display: grid;
+  display:grid;
   place-items: stretch;
-  min-width: 0;
-  padding: 20px;
+  min-width:0;
+  padding:20px;
 }
 
 /* Componente de página */
 .page{
-  display: grid;
-  grid-template-rows: auto 1fr;
-  height: auto;
-  min-height: 90dvh;
-  place-items: stretch;
-  overflow: auto;
+  display:grid;
+  grid-template-rows:auto 1fr;
+  height:auto;
+  min-height:90dvh;
+  place-items:stretch;
+
+  /* Importante: sin scroll exterior; lo tendrá el formulario */
+  overflow:hidden;
 }
 
 /* Los hijos directos de .page ocupan todo el panel */
 .page > *{
-  width: 100% !important;
-  min-width: 0 !important;
-  min-height: 0 !important;
+  width:100% !important;
+  min-width:0 !important;
+  min-height:0 !important;
 }
 .page > .page-view{
-  min-height: 0;
-  overflow: auto;
+  min-height:0;
+  overflow:hidden; /* bloqueamos scroll aquí; lo maneja el form */
 }
 
 /* Limpieza de wrappers antiguos que centraban/limitaban */
 .content__inner, .center-all{
-  width: 100% !important;
-  max-width: none !important;
-  justify-self: stretch !important;
-  align-self: stretch !important;
+  width:100% !important;
+  max-width:none !important;
+  justify-self:stretch !important;
+  align-self:stretch !important;
 }
 .center-all > *{ place-items:center; }
 
@@ -126,7 +127,7 @@
    ========================================================================== */
 
 .sidebar{
-  grid-area: sidebar;
+  grid-area:sidebar;
   display:flex;
   flex-direction:column;
   background:var(--sb-bg);
@@ -134,15 +135,13 @@
   box-shadow:var(--sb-shadow);
   color:var(--sb-text);
 
-  /* Padding del panel */
   padding:14px 14px 8px;
 
-  /* Sticky con aire alrededor */
-  position: sticky;
+  position:sticky;
   top: var(--page-pad);
-  margin-block-end: var(--page-pad);                 /* aire abajo */
-  justify-self: start;
-  height: calc(100dvh - (var(--page-pad) * 2) - var(--page-pad));  /* no toca abajo */
+  margin-block-end: var(--page-pad);
+  justify-self:start;
+  height: calc(100dvh - (var(--page-pad) * 2) - var(--page-pad));
 
   transition: padding .22s ease;
 }
@@ -150,7 +149,7 @@
 /* Header del sidebar */
 .sidebar__header{
   display:grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns:1fr auto;
   align-items:center;
   gap:8px;
   font-weight:700;
@@ -219,7 +218,7 @@
   padding:10px 12px;
   display:flex; align-items:center; gap:10px;
   color:var(--sb-muted);
-  margin-bottom: 10px;
+  margin-bottom:10px;
 }
 .sb-prof__avatar{
   width:28px; height:28px; border-radius:999px;
@@ -277,15 +276,14 @@
   padding-inline: 16px;
 }
 
-/* Contenedor interno del header */
 .header-inner{
   width: min(100%, var(--content-max, 1200px));
-  margin-inline: auto;
-  display: grid;
-  grid-template-columns: 1fr auto;
-  align-items: center;
-  gap: 16px;
-  height: 20px;
+  margin-inline:auto;
+  display:grid;
+  grid-template-columns:1fr auto;
+  align-items:center;
+  gap:16px;
+  height:20px;
 }
 
 /* Marca / título */
@@ -345,9 +343,7 @@
 /* ==========================================================================
    4) RESPONSIVE
    ========================================================================== */
-
 @media (max-width:960px){
-  /* Sidebar arriba, contenido abajo */
   .layout--withSidebar{
     grid-template-columns:1fr;
     grid-template-rows:auto 1fr;
@@ -359,7 +355,7 @@
     position:relative;
     top:auto;
     height:auto;
-    margin-block-end: var(--page-pad); /* mantiene aire abajo */
+    margin-block-end: var(--page-pad);
   }
   .page-viewport{ min-height:calc(100dvh - var(--page-pad)); }
 }

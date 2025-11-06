@@ -1,531 +1,247 @@
 @import url('https://fonts.googleapis.com/css2?family=Boogaloo&display=swap');
 
-
-
-/* =========================================================
-= VARIABLES Y FORZAR TEMA CLARO DENTRO DEL FORMULARIO
-========================================================= */
+/* ==========================================================================
+   1) VARIABLES + TEMA CLARO LOCAL
+   ========================================================================== */
 :root {
-  --tf-bg: #ffffff;
-  --tf-fg: #1f2937;
-  --tf-muted: #6b7280;
-  --tf-border: #e5e7eb;
-  --tf-focus: #2563eb;
-  --tf-error: #ef4444;
-  --tf-radius: 14px;
-  --tf-gap: 16px;
+  --tf-bg:#fff;
+  --tf-fg:#1f2937;
+  --tf-muted:#6b7280;
+  --tf-border:#e5e7eb;
+  --tf-focus:#2563eb;
+  --tf-error:#ef4444;
+  --tf-radius:14px;
+  --tf-gap:16px;
 }
 
-/* Fuerza modo claro SOLO dentro del formulario, incluso en dark-mode global */
-.ticket-form[data-force-light] {
+/* Fuerza modo claro SOLO dentro del formulario */
+.ticket-form[data-force-light]{
   color-scheme: light;
-  isolation: isolate;
-  background: var(--tf-bg);
-  color: var(--tf-fg);
+  isolation:isolate;
+  background:var(--tf-bg);
+  color:var(--tf-fg);
 }
 .dark .ticket-form[data-force-light],
-.dark .ticket-form[data-force-light] * {
-  color-scheme: light !important;
+.dark .ticket-form[data-force-light] *{ color-scheme:light !important; }
+
+/* ==========================================================================
+   2) CONTENEDOR BASE
+   ========================================================================== */
+.ticket-form{
+  width:100%;
+  min-width:0;
+  inline-size:min(1400px, 100%);
+  margin:24px auto;
+  padding:20px 24px 12px;
+
+  background:var(--tf-bg);
+  color:var(--tf-fg);
+  border:1px solid var(--tf-border);
+  border-radius:var(--tf-radius);
+  box-shadow:0 8px 24px rgba(0,0,0,.06);
+
+  /* llenar alto del viewport del contenido y manejar scroll interno */
+  block-size:100%;
+  display:grid;
+  grid-template-rows:auto 1fr; /* título + contenido */
+  overflow:hidden;             /* NO scroll del card; lo tendrá .tf-grid */
 }
 
-/* =========================================================
-= CONTENEDOR BASE DEL FORMULARIO
-========================================================= */
-.ticket-form {
-  width: 100%;
-  min-width: 0;
-  margin: 24px auto;
-  padding: 20px 24px 12px;
-  background: var(--tf-bg);
-  color: var(--tf-fg);
-  border: 1px solid var(--tf-border);
-  border-radius: var(--tf-radius);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.06);
-  overflow: visible;  
-  inline-size: min(1280px, 100%); 
-  margin-inline: auto;       
+/* Título */
+.tf-title{
+  margin:0 0 clamp(8px, 1.2vh, 16px);
+  text-align:center;
+  font-family:"Boogaloo", sans-serif;
+  font-size: clamp(20px, 2vw, 32px);
+  letter-spacing:.2px;
+  font-weight:400;
 }
 
-/* Modificador ancho XL (actívalo con .ticket-form--xl en el contenedor) */
-.ticket-form.ticket-form--xl {
-  max-width: clamp(1200px, 84vw, 1400px); /* ancho grande, sensible al viewport */
-}
-
-/* Si tienes un <main> envolviendo todo, deja el scroll al documento, no al form */
-main {
-  overflow: auto; /* OK: scroll general de la página */
-}
-
-/* =========================================================
-= TITULOS Y TIPOGRAFÍA
-========================================================= */
-.tf-title {
-  margin: 0 0 16px;
-  font-size: 27px;
-  letter-spacing: 0.2px;
-  font-family: "Boogaloo", sans-serif;
-  font-weight: 400;
-  font-style: normal;
-}
-
-
-/* =========================================================
-= GRID LAYOUT DEL FORMULARIO
-  - 2 columnas fluidas por defecto, utilidades comunes
-========================================================= */
+/* ==========================================================================
+   3) GRID DEL FORMULARIO (SCROLL INTERNO)
+   ========================================================================== */
 .tf-grid{
-  --cell-min: 360px;
-  display: grid;
+  --cell-min:360px;
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(var(--cell-min), 1fr));
+  gap: clamp(8px, 1.4vh, 16px);
+
+  overflow:auto;                     /* ÚNICO scroll vertical */
+  padding-right:2px;
+  padding-bottom: clamp(64px, 8vh, 96px); /* reserva para footer sticky */
+}
+
+/* Utilidades de columnas */
+.tf-col-2{ grid-column:1 / -1; }
+.tf-row--cats{
+  --cell-min:280px;
+  display:grid;
   grid-template-columns: repeat(auto-fit, minmax(var(--cell-min), 1fr));
   gap: var(--tf-gap);
 }
 
-/* Campo que ocupa ambas columnas */
-.tf-col-2 { grid-column: 1 / -1; }
+/* Campos */
+.tf-field{ display:flex; flex-direction:column; gap:8px; min-width:0; }
+.tf-label{ font-size:13px; color:var(--tf-muted); }
 
-/* Fila especial de categorías (3 columnas) */
-.tf-row--cats {
-  --cell-min: 280px;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(var(--cell-min), 1fr));
-  gap: var(--tf-gap);
+.tf-input{
+  width:100%; min-width:0;
+  padding-block:10px; padding-inline:14px;
+  font-size:15px; background:#fff;
+  border:1px solid var(--tf-border); border-radius:10px;
+  outline:none;
+  transition: border-color .15s ease, box-shadow .15s ease;
 }
-
-/* =========================================================
-= CAMPOS: LABELS, INPUTS, CHECKBOXES
-========================================================= */
-.tf-field {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  min-width: 0; 
-}
-
-.tf-label {
-  font-size: 13px;
-  color: var(--tf-muted);
-}
-
-.tf-input {
-  width: 100%;
-  min-width: 0;
-  padding: 12px 14px;              /* un poco más alto para respiración */
-  font-size: 15px;
-  background: #fff;
-  border: 1px solid var(--tf-border);
-  border-radius: 10px;
-  outline: none;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
-}
-
 .tf-input:focus,
-.tf-input:focus-visible {
-  border-color: var(--tf-focus);
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+.tf-input:focus-visible{
+  border-color:var(--tf-focus);
+  box-shadow:0 0 0 3px rgba(37,99,235,.15);
 }
 
-/* Checkbox / toggles alineados con label */
-.tf-checkbox {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 14px;
-  color: var(--tf-fg);
+/* Estados */
+.error{ color:var(--tf-error); font-size:12px; }
+
+/* ==========================================================================
+   4) TOOLBAR / EDITOR
+   ========================================================================== */
+/* Caja contenedora del editor */
+.rtb-box{ border:1px solid #d9dde3; border-radius:10px; overflow:hidden; }
+
+/* Altura responsiva del área editable */
+.rtb-box .rte-editor{
+  block-size: clamp(160px, 35vh, 50vh);
+  overflow:auto;
 }
 
-/* =========================================================
-= ACCIONES Y BOTONES
-========================================================= */
-.tf-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-}
+/* Compacción de toolbar */
+.rte-toolbar{ padding:4px 6px; }
 
-.tf-submit {
-  min-width: 160px;
-  padding: 10px 16px;
-  font-size: 14px;
-  font-weight: 600;
-  color: #fff;
-  background: var(--tf-focus);
-  border: none;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: transform 0.06s ease, box-shadow 0.15s ease, background 0.15s ease;
-  box-shadow: 0 6px 16px rgba(37,99,235,0.25);
-}
-.tf-submit:hover { transform: translateY(-1px); }
-.tf-submit:disabled { background: #93c5fd; box-shadow: none; cursor: not-allowed; }
-
-/* =========================================================
-= ESTADOS Y MENSAJES
-========================================================= */
-.error {
-  color: var(--tf-error);
-  font-size: 12px;
-}
-
-/* =========================================================
-= REACT-SELECT (usar classNamePrefix="rs")
-========================================================= */
-.rs__control {
-  width: 100% !important;
-  min-width: 0 !important;
-  min-height: 44px;                      /* altura pareja con inputs */
-  font-size: 15px;
-  border: 1px solid var(--tf-border) !important;
-  border-radius: 10px !important;
-  box-shadow: none !important;
-}
-
-.rs__control--is-focused {
-  border-color: var(--tf-focus) !important;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15) !important;
-}
-
-.rs__placeholder { color: var(--tf-muted) !important; font-size: 15px !important; }
-.rs__single-value { font-size: 15px; }
-
-/* Menú con tema claro garantizado y sombra suave */
-.rs__menu {
-  border-radius: 12px !important;
-  overflow: hidden;
-  box-shadow: 0 12px 28px rgba(0,0,0,0.12) !important;
-}
-.rs__menu, .rs__menu * {
-  color-scheme: light !important;
-  background: #fff !important;
-  color: var(--tf-fg) !important;
-  border: none !important;
-}
-
-.rs__option { font-size: 14px; }
-
-/* Opción enriquecida (avatar + meta) */
-.rs-opt {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-}
-.rs-opt__text { display: flex; flex-direction: column; line-height: 1.2; }
-.rs-opt__title { font-weight: 600; }
-.rs-opt__meta { font-size: 12px; color: var(--tf-muted); }
-.rs-opt__tag {
-  font-size: 11px;
-  padding: 2px 6px;
-  border-radius: 999px;
-  border: 1px solid rgba(0,0,0,0.12);
-  color: var(--tf-muted);
-  white-space: nowrap;
-}
-
-.rs__single-value{
-  color: var(--tf-fg) !important;
-  opacity: 1 !important;                 /* evita transparencias en animaciones */
-}
-
-/* contenedor hereda bien el color */
-.rs__value-container{
-  color: var(--tf-fg) !important;
-}
-
-/* si usas multi, etiqueta del chip */
-.rs__multi-value__label{
-  color: var(--tf-fg) !important;
-}
-
-/* asegúrate del fondo y borde del control */
-.rs__control{
-  background: #fff !important;
-  border-color: var(--tf-border) !important;
-}
-
-/* si por error llega la clase de disabled, no lo opaques */
-.rs__control--is-disabled{
-  opacity: 1 !important;
-}
-
-/* =========================================================
-= ACCESIBILIDAD Y PREFERENCIAS DE MOVIMIENTO
-========================================================= */
-@media (prefers-reduced-motion: reduce) {
-  .tf-submit { transition: none; }
-  .tf-input { transition: none; }
-  .rs__control { transition: none !important; }
-}
-
-/* =========================================================
-= RESPONSIVE
-========================================================= */
-@media (max-width: 980px) {
-  .ticket-form.ticket-form--xl { max-width: 100%; }
-}
-
-@media (max-width: 900px) {
-  .tf-grid { grid-template-columns: 1fr; }
-  .tf-col-2 { grid-column: 1 / -1; }
-  .tf-row--cats { grid-template-columns: 1fr; }
-}
-
-/* Breakpoint adicional para asegurar ancho sensato en xl */
-@media (min-width: 1200px) {
-  .ticket-form.ticket-form--xl {
-    max-width: clamp(1200px, 84vw, 1400px);
-    margin: 0 auto;
-  }
-}
-
-.content:has(.ticket-form--xl),
-.page:has(.ticket-form--xl),
-.main:has(.ticket-form--xl) {
-  max-width: none;
-  width: 100%;
-}
-
-.layout-con-sidebar .content {
-  max-width: none;
-  width: 100%;
-}
-
-.full-bleed {
-  width: 100vw;
-  margin-left: calc(50% - 50vw);
-  margin-right: calc(50% - 50vw);
-  padding-left: max(24px, calc(50vw - 800px));  /* respiración + centrado visual */
-  padding-right: max(24px, calc(50vw - 800px));
-}
-
-.full-bleed > .ticket-form.ticket-form--xl {
-  width: 100%;
-  max-width: 1600px;   /* tope visual */
-  margin-inline: auto;
-}
-
-/* caja que hace de “borde del editor” */
-.rtb-box{
-  border: 1px solid #d9dde3;
-  border-radius: 10px;
-  overflow: hidden;           /* redondeo limpio si el editor tiene toolbar */
-}
-
-/* SOLO cuando hay error */
-.tf-field.has-error .rtb-box{
-  border-color: #dc2626 !important;
-  box-shadow: 0 0 0 3px rgba(220,38,38,.12);
-}
-
-/* quita el borde propio del editor para que no haya doble borde */
+/* Quitar bordes dobles si usas otro editor (quill/ck/prosemirror) */
 .rtb-box .ProseMirror,
 .rtb-box .ql-container,
-.rtb-box .ck-editor__main .ck-editor__editable {
-  border: 0 !important;
-  box-shadow: none !important;
+.rtb-box .ck-editor__main .ck-editor__editable{
+  border:0 !important;
+  box-shadow:none !important;
 }
 
-/* ——— Single value sólido ——— */
-.ticket-form .rs__single-value {
-  color: var(--tf-fg) !important;
-  opacity: 1 !important;            /* evita el fade que aplica react-select */
-  filter: none !important;
+/* Error sobre el editor */
+.tf-field.has-error .rtb-box{
+  border-color:#dc2626 !important;
+  box-shadow:0 0 0 3px rgba(220,38,38,.12);
 }
 
-/* El input “oculto” que queda encima no te cambie el color */
-.ticket-form .rs__input,
-.ticket-form .rs__input input {
-  color: var(--tf-fg) !important;
-  opacity: 1 !important;
+/* ==========================================================================
+   5) ACCIONES / BOTÓN
+   ========================================================================== */
+.tf-actions{
+  position:sticky;
+  bottom:0;
+  background:var(--tf-bg);
+  padding:10px 0 12px;
+  margin-top:var(--tf-gap);
+  box-shadow:0 -6px 14px rgba(2,6,23,.06);
+  z-index:2;
+  display:flex; justify-content:flex-end; gap:8px;
+}
+.tf-submit{
+  min-width:180px;
+  padding:10px 18px;
+  font-size:14px; font-weight:600;
+  color:#fff; background:var(--tf-focus);
+  border:none; border-radius:12px; cursor:pointer;
+  transition: transform .06s ease, box-shadow .15s ease, background .15s ease;
+  box-shadow:0 6px 16px rgba(37,99,235,.25);
+}
+.tf-submit:hover{ transform: translateY(-1px); }
+.tf-submit:disabled{ background:#93c5fd; box-shadow:none; cursor:not-allowed; }
+
+/* ==========================================================================
+   6) REACT-SELECT (classNamePrefix="rs")
+   ========================================================================== */
+.rs__control{
+  width:100% !important; min-width:0 !important;
+  min-height:44px; font-size:15px;
+  background:#fff !important;
+  border:1px solid var(--tf-border) !important;
+  border-radius:10px !important; box-shadow:none !important;
+}
+.rs__control--is-focused{
+  border-color:var(--tf-focus) !important;
+  box-shadow:0 0 0 3px rgba(37,99,235,.15) !important;
+}
+.rs__placeholder{ color:var(--tf-muted) !important; font-size:15px !important; }
+.rs__single-value{ font-size:15px; color:var(--tf-fg) !important; opacity:1 !important; }
+.rs__value-container{ color:var(--tf-fg) !important; }
+.rs__multi-value__label{ color:var(--tf-fg) !important; }
+.rs__control--is-disabled{ opacity:1 !important; }
+
+.rs__menu{
+  border-radius:12px !important; overflow:hidden;
+  box-shadow:0 12px 28px rgba(0,0,0,.12) !important;
+}
+.rs__menu, .rs__menu *{
+  color-scheme:light !important;
+  background:#fff !important; color:var(--tf-fg) !important; border:none !important;
+}
+.rs__option{ font-size:14px; }
+
+.rs-opt{ display:flex; align-items:center; justify-content:space-between; gap:8px; }
+.rs-opt__text{ display:flex; flex-direction:column; line-height:1.2; }
+.rs-opt__title{ font-weight:600; }
+.rs-opt__meta{ font-size:12px; color:var(--tf-muted); }
+.rs-opt__tag{
+  font-size:11px; padding:2px 6px; border-radius:999px;
+  border:1px solid rgba(0,0,0,.12); color:var(--tf-muted); white-space:nowrap;
 }
 
-/* Asegura el fondo del control (sin velo gris) */
-.ticket-form .rs__control {
-  background: #fff !important;
-  border-color: var(--tf-border) !important;
-}
-
-/* Si llega disabled, no opaques todo el control */
-.ticket-form .rs__control--is-disabled {
-  opacity: 1 !important;
-}
-
-/* Evita que el placeholder se confunda con el valor */
-.ticket-form .rs__placeholder {
-  color: var(--tf-muted) !important;
-}
-
-#asunto {
-  width: 200px !important;
-}
-
-/* 1) Haz el viewport más fluido */
+/* ==========================================================================
+   7) ANCHO / “FULL BLEED” (opcional)
+   ========================================================================== */
 .content--withSidebar .page-viewport{
+  block-size:100svh;
+  display:grid; grid-template-rows:auto 1fr;
   padding-inline: clamp(16px, 3.5vw, 56px);
-  padding-block: clamp(12px, 2.5vh, 28px);
+  padding-block: clamp(10px, 2vh, 22px);
 }
 
-/* 2) El formulario: ancho cómodo y centrado en desktop */
-.ticket-form{
-  inline-size: min(1400px, 100%);   /* antes 1280px */
-  margin-inline: auto;
+.full-bleed{
+  width:100vw;
+  margin-left:calc(50% - 50vw);
+  margin-right:calc(50% - 50vw);
+  padding-left:max(24px, calc(50vw - 800px));
+  padding-right:max(24px, calc(50vw - 800px));
+}
+.full-bleed > .ticket-form.ticket-form--xl{
+  width:100%; max-width:1600px; margin-inline:auto;
 }
 
-/* 3) En pantallas grandes puedes dar un poquito más */
-@media (min-width: 1600px){
-  .ticket-form{ inline-size: min(1520px, 100%); }
+/* ==========================================================================
+   8) RESPONSIVE / ACCESIBILIDAD
+   ========================================================================== */
+@media (max-width:980px){
+  .ticket-form.ticket-form--xl{ max-width:100%; }
+}
+@media (max-width:900px){
+  .tf-grid{ grid-template-columns:1fr; }
+  .tf-col-2{ grid-column:1 / -1; }
+  .tf-row--cats{ grid-template-columns:1fr; }
+}
+@media (min-width:1600px){
+  .ticket-form{ inline-size:min(1520px, 100%); }
+}
+@media (prefers-reduced-motion: reduce){
+  .tf-submit{ transition:none; }
+  .tf-input{ transition:none; }
+  .rs__control{ transition:none !important; }
 }
 
-/* 4) Asegura que NINGÚN wrapper limite el ancho */
+/* ==========================================================================
+   9) FIXES MENORES
+   ========================================================================== */
+/* Evita que algún estilo legado limite el ancho del form */
 .content, .page, .page-viewport, .content__inner, .center-all, .page > *{
-  max-width: none !important;
-  width: 100% !important;
-  min-width: 0 !important;
+  max-width:none !important; width:100% !important; min-width:0 !important;
 }
 
-/* 5) Ese #asunto estaba forzando un ancho y no aporta: quítalo o neutralízalo */
-#asunto{ width: 200px !important; }
-
-/* 6) Título centrado y responsivo (opcional) */
-.tf-title{
-  text-align: center;
-  font-size: clamp(22px, 2.2vw, 36px);
-}
-
-/* --- 1) Contenedor a alto de pantalla, sin scroll de la página --- */
-.content--withSidebar .page-viewport{
-  padding-inline: clamp(16px, 3.5vw, 48px);
-  padding-block: clamp(10px, 2vh, 22px);
-}
-
-.ticket-form{
-  /* ocupa la pantalla (restando paddings externos) */
-  block-size: calc(100dvh - 2 * clamp(10px, 2vh, 22px));
-  display: grid;
-  grid-template-rows: auto 1fr;  /* título + contenido scrollable */
-  overflow: hidden;               /* no scroll de la página */
-}
-
-/* El grid interno hace el scroll si es necesario */
-.tf-grid{
-  --cell-min: 360px;
-  gap: clamp(8px, 1.4vh, 16px);
-  overflow: auto;
-  padding-right: 2px;             /* evita ocultar sombra por scrollbar */
-}
-
-/* --- 2) Descripción: altura responsiva del editor --- */
-/* Si quieres apuntar solo a este campo, añade una clase .tf-field--desc al div del campo */
-.rtb-box .rte-editor{
-  /* Alto mínimo razonable en móviles, y en desktop ~30–40vh */
-  min-block-size: clamp(140px, 26vh, 280px);
-  max-block-size: clamp(280px, 42vh, 520px);
-  overflow: auto;                 /* scroll interno cuando el contenido supera el alto */
-}
-
-/* Toolbar del editor compacta */
-.rte-toolbar{ padding: 4px 6px; }
-
-/* Inputs un poco más compactos verticalmente */
-.tf-input{ padding-block: 10px; }
-
-/* Título sin comer tanto alto */
-.tf-title{
-  margin: 0 0 clamp(8px, 1.2vh, 16px);
-  text-align: center;
-  font-size: clamp(20px, 2vw, 32px);
-}
-
-/* Botón de enviar “pegado” al área visible si está al final */
-.tf-actions{
-  position: sticky;
-  bottom: 0;
-  background: var(--tf-bg);
-  padding-top: clamp(6px, 1vh, 10px);
-}
-
-/* El área que scrollea necesita espacio para el footer sticky */
-.tf-grid{
-  overflow: auto;
-  padding-right: 2px;
-  padding-bottom: 96px;             /* reserva ≈ altura del footer */
-  gap: clamp(8px, 1.4vh, 16px);
-}
-
-/* Footer de acciones visible siempre */
-.tf-actions{
-  position: sticky;
-  bottom: 0;
-  background: var(--tf-bg);
-  padding: 10px 0 12px;
-  margin-top: var(--tf-gap);
-  box-shadow: 0 -6px 14px rgba(2,6,23,.06);
-  z-index: 2;                        /* por encima del contenido */
-}
-
-/* Botón cómodo en desktop sin salirse */
-.tf-submit{
-  min-width: 180px;
-  padding: 10px 18px;
-}
-
-/* Por si el form tiene bordes redondeados y el sticky quedaba tapado */
-.ticket-form{
-  overflow: hidden;                  /* OK */
-  /* asegura que no tape el sticky: nada más que esto */
-}
-
-/* === 1) El viewport del contenido ocupa la pantalla === */
-.content--withSidebar .page-viewport{
-  block-size: 100svh;                 /* alto real de la pantalla (safe on mobile) */
-  display: grid;
-  grid-template-rows: auto 1fr;       /* (si tienes header arriba, se adapta) */
-  padding-inline: clamp(16px, 3.5vw, 56px);
-  padding-block: clamp(10px, 2vh, 22px);
-}
-
-/* === 2) El card del formulario llena el alto disponible === */
-.ticket-form{
-  block-size: 100%;                   /* ocupa todo el alto del viewport */
-  display: grid;
-  grid-template-rows: auto 1fr;       /* título + contenido scrollable */
-  overflow: hidden;                   /* sin scroll del body */
-}
-
-/* === 3) El grid interno scrollea si hace falta (no la página) === */
-.tf-grid{
-  overflow: auto;
-  gap: clamp(8px, 1.4vh, 16px);
-  padding-right: 2px;
-  padding-bottom: clamp(64px, 8vh, 96px); /* reserva para el footer/botón */
-}
-
-/* === 4) Altura del editor de descripción, responsiva a la pantalla === */
-.rtb-box .rte-editor{
-  /* mínimo útil en pantallas pequeñas, ideal ~35vh, tope ~50vh en desktop */
-  block-size: clamp(160px, 35vh, 50vh);
-  overflow: auto;
-}
-
-/* === 5) Footer/botón siempre visible y pegado abajo === */
-.tf-actions{
-  position: sticky;
-  bottom: 0;
-  background: var(--tf-bg);
-  padding: 10px 0 12px;
-  margin-top: var(--tf-gap);
-  box-shadow: 0 -6px 14px rgba(2,6,23,.06);
-  z-index: 2;
-}
-.tf-submit{
-  min-width: 180px;
-  padding: 10px 18px;
-}
-
-/* === 6) Pequeños ajustes para compactar verticalmente === */
-.tf-input{ padding-block: 10px; }
-.rte-toolbar{ padding: 4px 6px; }
-.tf-title{
-  margin: 0 0 clamp(8px, 1.2vh, 16px);
-  text-align: center;
-  font-size: clamp(20px, 2vw, 32px);
-}
+/* Quita cualquier width forzado en el label #asunto de estilos previos */
+#asunto{ width:auto !important; }
