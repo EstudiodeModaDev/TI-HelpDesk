@@ -1,3 +1,6 @@
+@import url('https://fonts.googleapis.com/css2?family=Kaushan+Script&display=swap');
+
+
 /* =========================================================
 = VARIABLES Y FORZAR TEMA CLARO DENTRO DEL FORMULARIO
 ========================================================= */
@@ -58,9 +61,12 @@ main {
 .tf-title {
   margin: 0 0 16px;
   font-size: 22px;
-  font-weight: 700;
   letter-spacing: 0.2px;
+  font-family: "Kaushan Script", cursive;
+  font-weight: 400;
+  font-style: normal; 
 }
+
 
 /* =========================================================
 = GRID LAYOUT DEL FORMULARIO
