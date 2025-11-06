@@ -15,7 +15,6 @@
   position: absolute;         /* clave para calzar dentro del marco */
   background: #fff;
   border-radius: var(--edm-radius);
-  box-shadow: var(--edm-shadow);
   padding: 12px;
   display: flex;
   flex-direction: column;
