@@ -3,7 +3,7 @@
 /* ==========================================================================
    1) VARIABLES + TEMA CLARO LOCAL
    ========================================================================== */
-:root {
+:root{
   --tf-bg:#fff;
   --tf-fg:#1f2937;
   --tf-muted:#6b7280;
@@ -12,7 +12,9 @@
   --tf-error:#ef4444;
   --tf-radius:14px;
   --tf-gap:16px;
-  --actions-h: 60px;
+
+  /* alto mínimo del área de acciones (para scroll-padding) */
+  --actions-h:56px;
 }
 
 /* Fuerza modo claro SOLO dentro del formulario */
@@ -23,15 +25,17 @@
   color:var(--tf-fg);
 }
 .dark .ticket-form[data-force-light],
-.dark .ticket-form[data-force-light] *{ color-scheme:light !important; }
+.dark .ticket-form[data-force-light] *{
+  color-scheme: light !important;
+}
 
 /* ==========================================================================
    2) CONTENEDOR BASE
    ========================================================================== */
 .ticket-form{
+  inline-size:min(1400px, 100%);
   width:100%;
   min-width:0;
-  inline-size:min(1400px, 100%);
   margin:24px auto;
   padding:20px 24px 12px;
 
@@ -41,11 +45,12 @@
   border-radius:var(--tf-radius);
   box-shadow:0 8px 24px rgba(0,0,0,.06);
 
-  /* llenar alto del viewport del contenido y manejar scroll interno */
+  /* llenar el alto del viewport del contenido y manejar scroll interno */
   block-size:100%;
   display:grid;
-  grid-template-rows:auto 1fr; /* título + contenido */
-  overflow:hidden;             /* NO scroll del card; lo tendrá .tf-grid */
+  grid-template-rows:auto 1fr;   /* título + contenido */
+  overflow:hidden;               /* el scroll va en .tf-grid */
+  min-height:0;                  /* permite encoger dentro de su contenedor */
 }
 
 /* Título */
@@ -53,7 +58,7 @@
   margin:0 0 clamp(8px, 1.2vh, 16px);
   text-align:center;
   font-family:"Boogaloo", sans-serif;
-  font-size: clamp(20px, 2vw, 32px);
+  font-size:clamp(20px, 2vw, 32px);
   letter-spacing:.2px;
   font-weight:400;
 }
@@ -65,10 +70,13 @@
   --cell-min:360px;
   display:grid;
   grid-template-columns: repeat(auto-fit, minmax(var(--cell-min), 1fr));
-  gap: clamp(8px, 1.4vh, 16px);
-  overflow:auto;                     /* ÚNICO scroll vertical */
+  gap:clamp(8px, 1.4vh, 16px);
+
+  overflow:auto;                      /* único scroll vertical */
   padding-right:2px;
-  padding-bottom: var(--actions-h);
+  padding-bottom:clamp(64px, 8vh, 96px); /* reserva para el footer sticky */
+  min-height:0;                       /* puede encoger */
+  scroll-padding-bottom:var(--actions-h);
 }
 
 /* Utilidades de columnas */
@@ -77,21 +85,32 @@
   --cell-min:280px;
   display:grid;
   grid-template-columns: repeat(auto-fit, minmax(var(--cell-min), 1fr));
-  gap: var(--tf-gap);
+  gap:var(--tf-gap);
 }
 
 /* Campos */
-.tf-field{ display:flex; flex-direction:column; gap:2px; min-width:0; }
-.tf-field{ gap: 6px; }
-.tf-label{ font-size:13px; color:var(--tf-muted); }
+.tf-field{
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+  min-width:0;
+}
+.tf-label{
+  font-size:13px;
+  color:var(--tf-muted);
+}
 
 .tf-input{
-  width:100%; min-width:0;
-  padding-block:10px; padding-inline:14px;
-  font-size:15px; background:#fff;
-  border:1px solid var(--tf-border); border-radius:10px;
+  width:100%;
+  min-width:0;
+  padding-block:10px;
+  padding-inline:14px;
+  font-size:15px;
+  background:#fff;
+  border:1px solid var(--tf-border);
+  border-radius:10px;
   outline:none;
-  transition: border-color .15s ease, box-shadow .15s ease;
+  transition:border-color .15s ease, box-shadow .15s ease;
 }
 .tf-input:focus,
 .tf-input:focus-visible{
@@ -100,24 +119,31 @@
 }
 
 /* Estados */
-.error{ color:var(--tf-error); font-size:12px; }
+.error{
+  color:var(--tf-error);
+  font-size:12px;
+}
 
 /* ==========================================================================
    4) TOOLBAR / EDITOR
    ========================================================================== */
-/* Caja contenedora del editor */
-.rtb-box{ border:1px solid #d9dde3; border-radius:10px; overflow:hidden; }
+/* Caja contenedora del editor (borde único) */
+.rtb-box{
+  border:1px solid #d9dde3;
+  border-radius:10px;
+  overflow:hidden;
+}
 
 /* Altura responsiva del área editable */
 .rtb-box .rte-editor{
-  block-size: clamp(160px, 35vh, 50vh);
+  block-size:clamp(160px, 35vh, 50vh);
   overflow:auto;
 }
 
 /* Compacción de toolbar */
 .rte-toolbar{ padding:4px 6px; }
 
-/* Quitar bordes dobles si usas otro editor (quill/ck/prosemirror) */
+/* Quita bordes dobles si usas Quill/CK/ProseMirror */
 .rtb-box .ProseMirror,
 .rtb-box .ql-container,
 .rtb-box .ck-editor__main .ck-editor__editable{
@@ -132,24 +158,32 @@
 }
 
 /* ==========================================================================
-   5) ACCIONES / BOTÓN
+   5) ACCIONES / BOTÓN (sticky)
    ========================================================================== */
 .tf-actions{
   position:sticky;
-  bottom:0;
+  bottom:env(safe-area-inset-bottom);
   background:var(--tf-bg);
-  padding:8px 0;
-  margin-top:6px;
+  padding:8px 0 12px;
+  margin-top:var(--tf-gap);
   box-shadow:0 -6px 14px rgba(2,6,23,.06);
   z-index:2;
-  display:flex; justify-content:flex-end; gap:8px;
+
+  min-height:var(--actions-h);
+  display:flex;
+  justify-content:flex-end;
+  gap:8px;
 }
 .tf-submit{
   min-width:180px;
   padding:10px 18px;
-  font-size:14px; font-weight:600;
-  color:#fff; background:var(--tf-focus);
-  border:none; border-radius:12px; cursor:pointer;
+  font-size:14px;
+  font-weight:600;
+  color:#fff;
+  background:var(--tf-focus);
+  border:none;
+  border-radius:12px;
+  cursor:pointer;
   transition: transform .06s ease, box-shadow .15s ease, background .15s ease;
   box-shadow:0 6px 16px rgba(37,99,235,.25);
 }
@@ -160,11 +194,14 @@
    6) REACT-SELECT (classNamePrefix="rs")
    ========================================================================== */
 .rs__control{
-  width:100% !important; min-width:0 !important;
-  min-height:44px; font-size:15px;
+  width:100% !important;
+  min-width:0 !important;
+  min-height:44px;
+  font-size:15px;
   background:#fff !important;
   border:1px solid var(--tf-border) !important;
-  border-radius:10px !important; box-shadow:none !important;
+  border-radius:10px !important;
+  box-shadow:none !important;
 }
 .rs__control--is-focused{
   border-color:var(--tf-focus) !important;
@@ -177,34 +214,49 @@
 .rs__control--is-disabled{ opacity:1 !important; }
 
 .rs__menu{
-  border-radius:12px !important; overflow:hidden;
+  border-radius:12px !important;
+  overflow:hidden;
   box-shadow:0 12px 28px rgba(0,0,0,.12) !important;
 }
 .rs__menu, .rs__menu *{
   color-scheme:light !important;
-  background:#fff !important; color:var(--tf-fg) !important; border:none !important;
+  background:#fff !important;
+  color:var(--tf-fg) !important;
+  border:none !important;
 }
 .rs__option{ font-size:14px; }
 
-.rs-opt{ display:flex; align-items:center; justify-content:space-between; gap:8px; }
+.rs-opt{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+}
 .rs-opt__text{ display:flex; flex-direction:column; line-height:1.2; }
 .rs-opt__title{ font-weight:600; }
 .rs-opt__meta{ font-size:12px; color:var(--tf-muted); }
 .rs-opt__tag{
-  font-size:11px; padding:2px 6px; border-radius:999px;
-  border:1px solid rgba(0,0,0,.12); color:var(--tf-muted); white-space:nowrap;
+  font-size:11px;
+  padding:2px 6px;
+  border-radius:999px;
+  border:1px solid rgba(0,0,0,.12);
+  color:var(--tf-muted);
+  white-space:nowrap;
 }
 
 /* ==========================================================================
-   7) ANCHO / “FULL BLEED” (opcional)
+   7) ANCHO / CONTEXTO
    ========================================================================== */
+/* El viewport del contenido ocupa la pantalla y deja el scroll al form */
 .content--withSidebar .page-viewport{
   block-size:100svh;
-  display:grid; grid-template-rows:auto 1fr;
-  padding-inline: clamp(16px, 3.5vw, 56px);
-  padding-block: clamp(10px, 2vh, 22px);
+  display:grid;
+  grid-template-rows:auto 1fr;
+  padding-inline:clamp(16px, 3.5vw, 56px);
+  padding-block:clamp(10px, 2vh, 22px);
 }
 
+/* Opcional: secciones “full bleed” */
 .full-bleed{
   width:100vw;
   margin-left:calc(50% - 50vw);
@@ -213,8 +265,20 @@
   padding-right:max(24px, calc(50vw - 800px));
 }
 .full-bleed > .ticket-form.ticket-form--xl{
-  width:100%; max-width:1600px; margin-inline:auto;
+  width:100%;
+  max-width:1600px;
+  margin-inline:auto;
 }
+
+/* Evita que estilos legados limiten el ancho */
+.content, .page, .page-viewport, .content__inner, .center-all, .page > *{
+  max-width:none !important;
+  width:100% !important;
+  min-width:0 !important;
+}
+
+/* Si en estilos previos había un width forzado en #asunto, neutralízalo */
+#asunto{ width:auto !important; }
 
 /* ==========================================================================
    8) RESPONSIVE / ACCESIBILIDAD
@@ -227,22 +291,22 @@
   .tf-col-2{ grid-column:1 / -1; }
   .tf-row--cats{ grid-template-columns:1fr; }
 }
-@media (min-width:1600px){
-  .ticket-form{ inline-size:min(1520px, 100%); }
+
+/* En pantallas pequeñas o de poca altura, reduce el editor para que el botón quede visible */
+@media (max-width:1280px), (max-height:820px){
+  .rtb-box .rte-editor{
+    block-size:clamp(120px, 28vh, 38vh);
+  }
 }
-@media (prefers-reduced-motion: reduce){
+
+/* En móviles algunos navegadores “cortan” sticky si el card tiene overflow */
+@media (max-width:768px){
+  .ticket-form{ overflow:visible; }
+}
+
+/* Accesibilidad: reduce animaciones si el usuario lo prefiere */
+@media (prefers-reduced-motion:reduce){
   .tf-submit{ transition:none; }
   .tf-input{ transition:none; }
   .rs__control{ transition:none !important; }
 }
-
-/* ==========================================================================
-   9) FIXES MENORES
-   ========================================================================== */
-/* Evita que algún estilo legado limite el ancho del form */
-.content, .page, .page-viewport, .content__inner, .center-all, .page > *{
-  max-width:none !important; width:100% !important; min-width:0 !important;
-}
-
-/* Quita cualquier width forzado en el label #asunto de estilos previos */
-#asunto{ width:auto !important; }
