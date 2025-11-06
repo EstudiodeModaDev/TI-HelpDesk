@@ -254,7 +254,7 @@ input[type="file"].tf-input{
 
 /* contenedor más angosto, alineado a la izquierda */
 .tf-narrow{
-  width: 300px;
+  width: 400px;
   justify-self: start;   /* o center si lo quieres centrado */
 }
 
