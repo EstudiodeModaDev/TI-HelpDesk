@@ -393,7 +393,7 @@
 .headerRow,
 .headerRow > .header-inner{
   height: 45px !important;      /* anula cualquier height anterior */
-  min-height: 52px;             /* tu altura objetivo */
+  min-height: 30px;             /* tu altura objetivo */
   padding-block: 8px;           /* ajusta si quieres más compacto */
 }
 
