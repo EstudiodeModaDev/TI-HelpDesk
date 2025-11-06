@@ -252,3 +252,20 @@ input[type="file"].tf-input{
   display: flex;
   align-items: center;
 }
+
+/* contenedor más angosto, alineado a la izquierda */
+.tf-narrow{
+  width: 100%;
+  max-width: clamp(420px, 60vw, 760px);
+  justify-self: start;   /* o center si lo quieres centrado */
+}
+
+/* el input ocupa todo el ancho del contenedor */
+.tf-narrow .tf-input{
+  width: 100%;
+}
+
+/* en mobile, deja que use todo el ancho */
+@media (max-width: 980px){
+  .tf-narrow{ max-width: 100%; }
+}
