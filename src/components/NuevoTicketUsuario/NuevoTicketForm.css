@@ -390,3 +390,55 @@ main {
   text-align: center;
   font-size: clamp(22px, 2.2vw, 36px);
 }
+
+/* --- 1) Contenedor a alto de pantalla, sin scroll de la página --- */
+.content--withSidebar .page-viewport{
+  padding-inline: clamp(16px, 3.5vw, 48px);
+  padding-block: clamp(10px, 2vh, 22px);
+}
+
+.ticket-form{
+  /* ocupa la pantalla (restando paddings externos) */
+  block-size: calc(100dvh - 2 * clamp(10px, 2vh, 22px));
+  display: grid;
+  grid-template-rows: auto 1fr;  /* título + contenido scrollable */
+  overflow: hidden;               /* no scroll de la página */
+}
+
+/* El grid interno hace el scroll si es necesario */
+.tf-grid{
+  --cell-min: 360px;
+  gap: clamp(8px, 1.4vh, 16px);
+  overflow: auto;
+  padding-right: 2px;             /* evita ocultar sombra por scrollbar */
+}
+
+/* --- 2) Descripción: altura responsiva del editor --- */
+/* Si quieres apuntar solo a este campo, añade una clase .tf-field--desc al div del campo */
+.rtb-box .rte-editor{
+  /* Alto mínimo razonable en móviles, y en desktop ~30–40vh */
+  min-block-size: clamp(140px, 26vh, 280px);
+  max-block-size: clamp(280px, 42vh, 520px);
+  overflow: auto;                 /* scroll interno cuando el contenido supera el alto */
+}
+
+/* Toolbar del editor compacta */
+.rte-toolbar{ padding: 4px 6px; }
+
+/* Inputs un poco más compactos verticalmente */
+.tf-input{ padding-block: 10px; }
+
+/* Título sin comer tanto alto */
+.tf-title{
+  margin: 0 0 clamp(8px, 1.2vh, 16px);
+  text-align: center;
+  font-size: clamp(20px, 2vw, 32px);
+}
+
+/* Botón de enviar “pegado” al área visible si está al final */
+.tf-actions{
+  position: sticky;
+  bottom: 0;
+  background: var(--tf-bg);
+  padding-top: clamp(6px, 1vh, 10px);
+}
