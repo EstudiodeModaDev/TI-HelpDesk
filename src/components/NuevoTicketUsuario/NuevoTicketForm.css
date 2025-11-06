@@ -37,7 +37,9 @@
   border: 1px solid var(--tf-border);
   border-radius: var(--tf-radius);
   box-shadow: 0 8px 24px rgba(0,0,0,0.06);
-  overflow: visible;         /* evita scroll interno del contenedor */
+  overflow: visible;  
+  inline-size: min(1280px, 100%); 
+  margin-inline: auto;       
 }
 
 /* Modificador ancho XL (actívalo con .ticket-form--xl en el contenedor) */
