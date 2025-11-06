@@ -1,215 +1,243 @@
-/* ==================== COMPRAS PAGE (Tabs + Tabla) ==================== */
-/* Reutiliza variables ya definidas y fuerza claro con .force-light      */
+/* =========================
+   0) TOKENS / THEMING
+   ========================= */
 
-/* --------- Accesibilidad --------- */
-.sr-only{
-  position: absolute !important;
-  width: 1px !important;
-  height: 1px !important;
-  padding: 0 !important;
-  margin: -1px !important;
-  overflow: hidden !important;
-  clip: rect(0, 0, 0, 0) !important;
-  white-space: nowrap !important;
-  border: 0 !important;
+/* Por defecto: claro */
+:root{
+  --bg: #f6f8fc;
+  --surface: #ffffff;
+  --ink: #0f172a;
+  --muted: #64748b;
+  --border: #d1d5db;
+  --shadow: 0 10px 28px rgba(2,6,23,.08);
+
+  --primary: #2563eb;
+  --primary-ink: #ffffff;
+
+  --success: #16a34a;
+  --warning: #d97706;
+  --danger:  #b91c1c;
+
+  --radius: 14px;
+  --gap: 14px;
+  --pad: 16px;
+  --font: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
 }
 
-/* --------- Header / Tabs --------- */
-.compra-wrap .compras-header{
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 12px;
+/* Oscuro (habilita con .theme-dark en body o en un contenedor ancestro) */
+.theme-dark{
+  --bg: #f6f8fc;
+  --surface: #ffffff;
+  --ink: #0f172a;
+  --muted: #64748b;
+  --border: #d1d5db;
+  --shadow: 0 10px 28px rgba(2,6,23,.08);
+
+  --primary: #2563eb;
+  --primary-ink: #ffffff;
+
+  --success: #16a34a;
+  --warning: #d97706;
+  --danger:  #b91c1c;
+
+  --radius: 14px;
+  --gap: 14px;
+  --pad: 16px;
+  --font: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
 }
 
-.compra-wrap .segmented{
-  display: flex;
-  gap: 8px;
+/* Forzar claro u oscuro localmente */
+.force-light{ all: initial; }
+.force-light, .force-light * { 
+  /* Reinyecta variables del tema claro cuando el ancestro sea oscuro */
+  --bg: #f6f8fc;
+  --surface: #ffffff;
+  --ink: #0f172a;
+  --muted: #64748b;
+  --border: #d1d5db;
+  --shadow: 0 10px 28px rgba(2,6,23,.08);
+  --primary: #2563eb;
+  --primary-ink: #ffffff;
+  --success: #16a34a;
+  --warning: #d97706;
+  --danger:  #b91c1c;
+  --radius: 14px;
+  --gap: 14px;
+  --pad: 16px;
+  --font: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
 }
 
-.btn.btn-primary[aria-pressed="true"]{
-  /* refuerza estado activo cuando uses aria-pressed */
-  background: var(--primary);
-  border-color: var(--primary);
-  color: #fff;
+.force-dark, .force-dark * {
+  --bg: #0f141a;
+  --surface: #131a22;
+  --ink: #e5eef9;
+  --muted: #9fb0c7;
+  --border: #1f2a36;
+  --shadow: 0 10px 28px rgba(0,0,0,.35);
+  --primary: #3b82f6;
+  --primary-ink: #0b1220;
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --danger:  #ef4444;
+  --radius: 14px;
+  --gap: 14px;
+  --pad: 16px;
+  --font: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
 }
 
-/* disabled consistente (evita fondo negro del UA) */
-.btn[disabled]{
-  background: var(--card) !important;
-  border-color: var(--border) !important;
-  color: var(--muted) !important;
-  opacity: 1;         /* legible */
-  cursor: not-allowed;
-}
+/* =========================
+   1) LAYOUT / CONTENEDOR
+   ========================= */
 
-/* --------- Barra de filtros (TablaCompras) --------- */
-.filtros{
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 8px;
-  box-shadow: var(--shadow);
-  margin-bottom: 10px;
-
+.compra-wrap{
+  font-family: var(--font);
+  color: var(--ink);
+  background: transparent;
+  padding: var(--pad);
   display: grid;
-  grid-template-columns: 1fr auto auto auto auto auto auto;
-  gap: 8px;
+  gap: var(--gap);
 }
 
-.filtros input[type="text"],
-.filtros input[type="date"],
-.filtros button,
-.filtros select{
-  height: 36px;
-  border-radius: 10px;
+/* Secciones con misma “card” base */
+#compras-form, #compras-tabla{
+  background: var(--surface);
   border: 1px solid var(--border);
-  background: var(--bg);
-  color: var(--text);
-  padding: 0 12px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: clamp(12px, 1.8vw, 20px);
+  transition: background .2s ease, border-color .2s ease, color .2s ease;
+}
+
+/* SR-only si no lo tienes aún */
+.sr-only{
+  position:absolute!important; width:1px; height:1px;
+  padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;
+}
+
+/* =========================
+   2) TOOLBAR / BOTONES (opcionales)
+   ========================= */
+
+.btn{
+  appearance: none;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--ink);
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-size: 0.95rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: transform .06s ease, background .15s ease, border-color .15s ease;
+}
+.btn:hover{ background: color-mix(in srgb, var(--surface) 88%, var(--ink) 12%); }
+.btn:active{ transform: translateY(1px); }
+
+.btn-primary{
+  background: var(--primary);
+  color: var(--primary-ink);
+  border-color: color-mix(in srgb, var(--primary) 70%, #000 30%);
+}
+.btn-primary:hover{
+  background: color-mix(in srgb, var(--primary) 86%, #fff 14%);
+}
+
+/* Etiquetas y campos genéricos del formulario dentro del card */
+.form-grid{
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 12px;
+}
+.form-item{
+  grid-column: span 6;
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  align-items: center;
+  gap: 8px;
+}
+.form-item label{
+  color: var(--muted);
+  font-size: .9rem;
+}
+.form-item input,
+.form-item select,
+.form-item textarea{
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--surface) 96%, var(--ink) 4%);
+  color: var(--ink);
   outline: none;
 }
-
-.filtros input[type="text"]::placeholder{ color: var(--muted); }
-
-.filtros input[type="text"]:focus,
-.filtros input[type="date"]:focus,
-.filtros select:focus{
-  border-color: var(--primary);
-  box-shadow: 0 0 0 4px color-mix(in oklab, var(--ring) 35%, transparent);
+.form-item input:focus,
+.form-item select:focus,
+.form-item textarea:focus{
+  border-color: color-mix(in srgb, var(--primary) 60%, var(--border) 40%);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 25%, transparent);
 }
 
-.filtros button{
-  border: 1px solid var(--border);
-  background: var(--card);
-  color: var(--text);
-  font-weight: 600;
-  cursor: pointer;
-}
-.filtros button:hover{
-  background: color-mix(in oklab, var(--card) 60%, transparent);
-}
-.filtros button:active{ transform: translateY(1px); }
+/* =========================
+   3) TABLAS (TablaCompras)
+   ========================= */
 
-/* Flecha entre fechas (el “→”) */
-.filtros > span{
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--muted);
-  padding: 0 4px;
-}
-
-/* --------- Tabla --------- */
-.table-wrap{
+.table{
   width: 100%;
-  overflow: auto;
+  border-collapse: separate;
+  border-spacing: 0;
+  overflow: hidden;
   border: 1px solid var(--border);
   border-radius: 12px;
-  background: var(--bg);
-  box-shadow: var(--shadow);
 }
-
-.table-wrap table{
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.95rem;
-}
-
-.table-wrap thead th{
-  position: sticky;
-  top: 0;
-  background: color-mix(in oklab, var(--card) 92%, white);
-  color: var(--text);
+.table thead th{
   text-align: left;
-  font-weight: 700;
+  font-weight: 600;
+  font-size: .92rem;
+  color: var(--muted);
+  background: color-mix(in srgb, var(--surface) 92%, var(--ink) 8%);
   padding: 10px 12px;
   border-bottom: 1px solid var(--border);
-  z-index: 1;
 }
-
-.table-wrap tbody td{
+.table tbody td{
   padding: 10px 12px;
-  border-top: 1px solid var(--border);
-  color: var(--text);
-  white-space: nowrap;          /* evita saltos feos en datos cortos */
+  border-bottom: 1px solid var(--border);
+}
+.table tbody tr:hover{
+  background: color-mix(in srgb, var(--surface) 88%, var(--ink) 12%);
+}
+.table tbody tr:last-child td{
+  border-bottom: none;
 }
 
-.table-wrap tbody tr:nth-child(odd){
-  background: color-mix(in oklab, var(--bg) 95%, #f2f6ff 5%);
-}
-
-/* accesible con teclado en filas clicables */
-.table-wrap tbody tr:focus{
-  outline: none;
-  box-shadow: inset 0 0 0 2px var(--primary);
-}
-
-/* --------- Paginación --------- */
-.pager{
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  padding: 10px;
-}
-
-.pager .btn,
-.pager button{
-  height: 32px;
-  padding: 0 10px;
-  border-radius: 10px;
+/* Badges */
+.badge{
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-size: .78rem;
   border: 1px solid var(--border);
-  background: var(--card);
-  color: var(--text);
-  font-weight: 600;
-  cursor: pointer;
+  background: color-mix(in srgb, var(--surface) 92%, var(--ink) 8%);
+}
+.badge.success{ border-color: color-mix(in srgb, var(--success) 55%, var(--border) 45%); }
+.badge.warn{ border-color: color-mix(in srgb, var(--warning) 55%, var(--border) 45%); }
+.badge.danger{ border-color: color-mix(in srgb, var(--danger) 55%, var(--border) 45%); }
+
+/* =========================
+   4) RESPONSIVE
+   ========================= */
+@media (max-width: 980px){
+  .form-item{ grid-template-columns: 1fr; }
+}
+@media (max-width: 720px){
+  .form-grid{ grid-template-columns: 1fr; }
+  .form-item{ grid-column: 1 / -1; }
 }
 
-.pager .btn:hover,
-.pager button:hover{
-  background: color-mix(in oklab, var(--card) 60%, transparent);
+/* =========================
+   5) ANIMACIONES SUTILES
+   ========================= */
+#compras-form, #compras-tabla{
+  opacity: 1; transform: translateY(0);
+  will-change: transform, opacity;
 }
-
-.pager .btn[disabled],
-.pager button[disabled]{
-  background: var(--card) !important;
-  border-color: var(--border) !important;
-  color: var(--muted) !important;
-  cursor: not-allowed;
-}
-
-.pager select{
-  height: 32px;
-  border-radius: 10px;
-  border: 1px solid var(--border);
-  background: var(--bg);
-  color: var(--text);
-  padding: 0 8px;
-}
-
-/* --------- Ajustes responsivos --------- */
-@media (max-width: 920px){
-  .filtros{
-    grid-template-columns: 1fr;
-  }
-  .filtros > span{ display: none; }
-  .pager{ flex-wrap: wrap; }
-}
-
-/* --------- Forzar claro dentro del scope (portal-safe) --------- */
-.force-light{
-  color-scheme: only light;
-}
-
-/* Por si el navegador insiste con botones oscuros */
-.force-light button{
-  background: var(--card);
-  color: var(--text);
-}
-
-/* --------- Microdetalles visuales --------- */
-th:first-child, td:first-child{ padding-left: 16px; }
-th:last-child,  td:last-child{  padding-right: 16px; }
-
-/* Texto secundario (puedes usar en celdas menos importantes) */
-.text-muted{ color: var(--muted); }
+#compras-form[hidden], #compras-tabla[hidden]{ display: none; }
