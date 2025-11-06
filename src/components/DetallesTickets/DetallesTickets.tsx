@@ -222,11 +222,7 @@ export function CaseDetail({ ticket, onVolver, role }: Props) {
 
       {/* ===== Botón de Seguimiento ===== */}
       <div>
-        <button
-          type="button"
-          className="btn-volver"
-          onClick={() => setShowSeg((v) => !v)}
-        >
+        <button type="button" className="btn-volver" onClick={() => setShowSeg((v) => !v)} >
           {showSeg ? "Ocultar seguimiento" : "Seguimiento ticket"}
         </button>
       </div>
@@ -234,32 +230,17 @@ export function CaseDetail({ ticket, onVolver, role }: Props) {
       {/* ===== Historial (toggle) ===== */}
       {showSeg && (
         <div className="seccion">
-          <TicketHistorial
-            role={role ?? "Usuario"}
-            onVolver={() => setShowSeg(false)}
-            ticketId={selected.ID!}
-            ticket={selected}
-          />
+          <TicketHistorial role={role ?? "Usuario"} onVolver={() => setShowSeg(false)} ticketId={selected.ID!} ticket={selected}/>
         </div>
       )}
 
       {/* ===== Modal: Recategorización ===== */}
       {showRecat && (
-        <div
-          className="modal-overlay"
-          role="dialog"
-          aria-modal="true"
-          aria-label="Recategorizar ticket"
-        >
+        <div className="modal-overlay" role="dialog" aria-modal="true" aria-label="Recategorizar ticket">
           <div className="modal-card">
             <div className="modal-head">
               <h3>Recategorizar ticket #{selected.ID}</h3>
-              <button
-                type="button"
-                className="modal-close"
-                onClick={() => setShowRecat(false)}
-                aria-label="Cerrar"
-              >
+              <button type="button" className="modal-close" onClick={() => setShowRecat(false)} aria-label="Cerrar">
                 ✕
               </button>
             </div>
@@ -272,21 +253,11 @@ export function CaseDetail({ ticket, onVolver, role }: Props) {
 
       {/* ===== Modal: Reasignación ===== */}
       {showReasig && (
-        <div
-          className="modal-overlay"
-          role="dialog"
-          aria-modal="true"
-          aria-label="Reasignar ticket"
-        >
+        <div className="modal-overlay" role="dialog" aria-modal="true" aria-label="Reasignar ticket">
           <div className="modal-card">
             <div className="modal-head">
               <h3>Reasignar ticket #{selected.ID}</h3>
-              <button
-                type="button"
-                className="modal-close"
-                onClick={() => setShowReasig(false)}
-                aria-label="Cerrar"
-              >
+              <button type="button" className="modal-close" onClick={() => setShowReasig(false)} aria-label="Cerrar">
                 ✕
               </button>
             </div>
@@ -299,21 +270,11 @@ export function CaseDetail({ ticket, onVolver, role }: Props) {
 
       {/* ===== Modal: Observador ===== */}
       {showObservador && (
-        <div
-          className="modal-overlay"
-          role="dialog"
-          aria-modal="true"
-          aria-label="Asignar observador"
-        >
+        <div className="modal-overlay" role="dialog" aria-modal="true" aria-label="Asignar observador">
           <div className="modal-card">
             <div className="modal-head">
               <h3>Asignar observador a ticket #{selected.ID}</h3>
-              <button
-                type="button"
-                className="modal-close"
-                onClick={() => setShowObservador(false)}
-                aria-label="Cerrar"
-              >
+              <button type="button" className="modal-close" onClick={() => setShowObservador(false)} aria-label="Cerrar">
                 ✕
               </button>
             </div>

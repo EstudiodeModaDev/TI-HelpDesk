@@ -21,14 +21,7 @@ type Props = {
   ticket: Ticket
 };
 
-export default function TicketHistorial({
-  role,
-  ticketId,
-  onVolver,
-  defaultTab = "solucion",
-  className,
-  ticket
-}: Props) {
+export default function TicketHistorial({role, ticketId, onVolver, defaultTab = "solucion", className, ticket}: Props) {
   const [tab, setTab] = React.useState<Tab>(defaultTab);
   const [mode, setMode] = React.useState<Mode>("detalle"); 
   const isPrivileged = role === "Administrador" || role === "Tecnico" || role === "Técnico";

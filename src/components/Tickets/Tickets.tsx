@@ -2,7 +2,6 @@
 import * as React from "react";
 import { CaseDetail } from "../DetallesTickets/DetallesTickets";
 import "./Tickets.css";
-
 import { useAuth } from "../../auth/authContext";
 import { useGraphServices } from "../../graph/GrapServicesContext";
 import { calcularColorEstado, useTickets } from "../../Funcionalidades/Tickets";
@@ -22,11 +21,9 @@ export default function TablaTickets() {
   const userMail = account?.username ?? "";
   const isAdmin = useIsAdmin(userMail);
   const userRole = useUserRole(userMail)
-
+  const isPrivileged = userRole.role === "Administrador" || userRole.role === "Tecnico" || userRole.role === "Técnico";
   const { Tickets } = useGraphServices();
-
-  const {rows, loading, error, filterMode, range, pageSize, pageIndex, hasNext, sorts,
-    setFilterMode, setRange, applyRange, setPageSize, nextPage, reloadAll,  toggleSort} = useTickets(Tickets, userMail, isAdmin.isAdmin);
+  const {rows, loading, error, filterMode, range, pageSize, pageIndex, hasNext, sorts, setFilterMode, setRange, applyRange, setPageSize, nextPage, reloadAll,  toggleSort} = useTickets(Tickets, userMail, isAdmin.isAdmin);
 
   // Búsqueda local SOLO sobre la página visible (si quieres global, hay que mover a OData)
   const [search, setSearch] = React.useState("");
@@ -136,14 +133,21 @@ export default function TablaTickets() {
                 Siguiente
               </button>
 
-              <span style={{ marginLeft: 12 }}>Tickets por pagina:</span>
-              <select value={pageSize} onChange={(e) => setPageSize(Number(e.target.value))} disabled={loading}>
-                {[10, 15, 20, 50, 100].map((n) => (
-                  <option key={n} value={n}>
-                    {n}
-                  </option>
-                ))}
-              </select>
+              {isPrivileged && (
+                <>
+                  <label htmlFor="page-size" style={{ marginLeft: 12, marginRight: 8 }}>
+                    Tickets por página:
+                  </label>
+
+                  <select id="page-size" value={pageSize} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setPageSize(parseInt(e.target.value, 10))} disabled={loading}>
+                    {[10, 15, 20, 50, 100].map((n) => (
+                      <option key={n} value={n}>
+                        {n}
+                      </option>
+                    ))}
+                  </select>
+                </>
+              )}
             </div>
           )}
         </div>
