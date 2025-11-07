@@ -354,3 +354,28 @@ input[type="file"].tf-input::-webkit-file-upload-button{
 @media (max-width: 980px){
   .tf-narrow{ width: 100%; }
 }
+
+/* Los inputs siguen con altura fija */
+input.tf-input {
+  height: var(--field-h);
+  box-sizing: border-box;
+}
+
+/* El SELECT NO usa altura fija: deja que crezca lo necesario */
+select.tf-input {
+  height: auto;                 /* <- clave */
+  min-height: var(--field-h);   /* consistente con el resto */
+  padding-block: 8px;           /* un poquito de aire vertical */
+  line-height: 1.2;             /* evita overflow del texto */
+  box-sizing: border-box;
+  font-size: inherit;           /* escala con tus tokens */
+  -webkit-appearance: none;     /* opcional: uniformar */
+  appearance: none;             /* (si lo usas, pon tu caret por CSS si quieres) */
+}
+
+/* Compacta un poco en pantallas muy pequeñas */
+@media (max-width: 420px){
+  select.tf-input{
+    padding-block: 6px;
+  }
+}

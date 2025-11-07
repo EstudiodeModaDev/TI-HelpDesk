@@ -94,6 +94,8 @@ export function useTickets(TicketsSvc: TicketsService, userMail: string, isAdmin
   const [nextLink, setNextLink] = React.useState<string | null>(null);
   const [sorts, setSorts] = React.useState<Array<{field: SortField; dir: SortDir}>>([{ field: 'id', dir: 'desc' }]);
   const [state, setState] = React.useState<RelacionadorState>({TicketRelacionar: null});
+  const [ticketsAbiertos, setTicketsAbiertos] = React.useState<number>(0)
+  const [ticketsFueraTiempo, setTicketsFueraTiempo] = React.useState<number>(0)
 
   const setField = <K extends keyof RelacionadorState>(k: K, v: RelacionadorState[K]) => setState((s) => ({ ...s, [k]: v }));
 
@@ -182,6 +184,25 @@ export function useTickets(TicketsSvc: TicketsService, userMail: string, isAdmin
     }
   }, [TicketsSvc, buildFilter, sorts]);
 
+  const loadCantidadResolutor = React.useCallback(async () => {
+    setLoading(true); setError(null);
+    try {
+      const { items: itemsAbiertos } = await TicketsSvc.getAll({filter: `(fields/CorreoSolicitante eq '${userMail}' or fields/CorreoObservador eq '${userMail}' or fields/Correoresolutor eq '${userMail}') and fields/Estadodesolicitud eq 'En Atención'`});
+      const { items: itemsFueraTiempo, nextLink } = await TicketsSvc.getAll({filter: `(fields/CorreoSolicitante eq '${userMail}' or fields/CorreoObservador eq '${userMail}' or fields/Correoresolutor eq '${userMail}') and fields/Estadodesolicitud eq 'Fuera de tiempo'`});
+      setTicketsAbiertos(itemsAbiertos.length)
+      setTicketsFueraTiempo(itemsFueraTiempo.length)
+      setNextLink(nextLink ?? null);
+      setPageIndex(1);
+    } catch (e: any) {
+      setError(e?.message ?? "Error cargando tickets");
+      setRows([]);
+      setNextLink(null);
+      setPageIndex(1);
+    } finally {
+      setLoading(false);
+    }
+  }, [TicketsSvc, buildFilter, sorts]);
+
   const handleConfirm = React.useCallback(
     async (actualId: string | number, relatedId: string | number, type: string) => {
       setLoading(true);
@@ -208,7 +229,8 @@ export function useTickets(TicketsSvc: TicketsService, userMail: string, isAdmin
 
   React.useEffect(() => {
     loadFirstPage();
-  }, [loadFirstPage]);
+    loadCantidadResolutor()
+  }, [loadFirstPage, loadCantidadResolutor]);
 
   // siguiente página: seguir el nextLink tal cual
   const hasNext = !!nextLink;
@@ -282,31 +304,8 @@ export function useTickets(TicketsSvc: TicketsService, userMail: string, isAdmin
   }
 
   return {
-    // datos visibles (solo la página actual)
-    rows,
-    loading,
-    error,
-
-    // paginación (servidor)
-    pageSize, setPageSize, // si cambias, se recarga por el efecto de arriba (porque cambia buildFilter)
-    pageIndex,
-    hasNext,
-    nextPage,
-
-    // filtros
-    filterMode, setFilterMode,
-    range, setRange,
-    applyRange,
-
-    // acciones
-    reloadAll,
-    toggleSort,
-    setField,
-    sorts,
-    toTicketOptions,
-    state, setState,
-    handleConfirm,   
-    sendFileToFlow
+    rows, ticketsAbiertos, loading, ticketsFueraTiempo, error, pageSize, pageIndex, hasNext, filterMode,sorts, range, state,
+    nextPage, setPageSize, setFilterMode, setRange, applyRange, reloadAll, toggleSort, setField, toTicketOptions, setState, handleConfirm, sendFileToFlow
   };
 }
 

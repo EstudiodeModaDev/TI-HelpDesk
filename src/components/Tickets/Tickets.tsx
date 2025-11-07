@@ -23,7 +23,7 @@ export default function TablaTickets() {
   const userRole = useUserRole(userMail)
   const isPrivileged = userRole.role === "Administrador" || userRole.role === "Tecnico" || userRole.role === "Técnico";
   const { Tickets } = useGraphServices();
-  const {rows, loading, error, filterMode, range, pageSize, pageIndex, hasNext, sorts, setFilterMode, setRange, applyRange, setPageSize, nextPage, reloadAll,  toggleSort} = useTickets(Tickets, userMail, isAdmin.isAdmin);
+  const {ticketsAbiertos, ticketsFueraTiempo, rows, loading, error, filterMode, range, pageSize, pageIndex, hasNext, sorts, setFilterMode, setRange, applyRange, setPageSize, nextPage, reloadAll,  toggleSort} = useTickets(Tickets, userMail, isAdmin.isAdmin);
 
   // Búsqueda local SOLO sobre la página visible (si quieres global, hay que mover a OData)
   const [search, setSearch] = React.useState("");
@@ -138,7 +138,6 @@ export default function TablaTickets() {
                   <label htmlFor="page-size" style={{ marginLeft: 12, marginRight: 8 }}>
                     Tickets por página:
                   </label>
-
                   <select id="page-size" value={pageSize} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setPageSize(parseInt(e.target.value, 10))} disabled={loading}>
                     {[10, 15, 20, 50, 100].map((n) => (
                       <option key={n} value={n}>
@@ -146,6 +145,9 @@ export default function TablaTickets() {
                       </option>
                     ))}
                   </select>
+                  <label htmlFor="page-size" style={{ marginLeft: 12, marginRight: 8 }}>
+                    Tickets abiertos: {ticketsAbiertos} Tickets vencidos: {ticketsFueraTiempo}
+                  </label>
                 </>
               )}
             </div>
