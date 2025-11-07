@@ -188,11 +188,9 @@ export function useTickets(TicketsSvc: TicketsService, userMail: string, isAdmin
     setLoading(true); setError(null);
     try {
       const { items: itemsAbiertos } = await TicketsSvc.getAll({filter: `(fields/CorreoSolicitante eq '${userMail}' or fields/CorreoObservador eq '${userMail}' or fields/Correoresolutor eq '${userMail}') and fields/Estadodesolicitud eq 'En Atención'`});
-      const { items: itemsFueraTiempo, nextLink } = await TicketsSvc.getAll({filter: `(fields/CorreoSolicitante eq '${userMail}' or fields/CorreoObservador eq '${userMail}' or fields/Correoresolutor eq '${userMail}') and fields/Estadodesolicitud eq 'Fuera de tiempo'`});
+      const { items: itemsFueraTiempo } = await TicketsSvc.getAll({filter: `(fields/CorreoSolicitante eq '${userMail}' or fields/CorreoObservador eq '${userMail}' or fields/Correoresolutor eq '${userMail}') and fields/Estadodesolicitud eq 'Fuera de tiempo'`});
       setTicketsAbiertos(itemsAbiertos.length)
       setTicketsFueraTiempo(itemsFueraTiempo.length)
-      setNextLink(nextLink ?? null);
-      setPageIndex(1);
     } catch (e: any) {
       setError(e?.message ?? "Error cargando tickets");
       setRows([]);
