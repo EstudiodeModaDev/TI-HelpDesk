@@ -49,7 +49,6 @@ function EdmNewsContent({title = "", html = "", inset = { top: 120, right: 16, b
                                       right: toCss(inset.right),
                                       bottom: toCss(inset.bottom),
                                       left: toCss(inset.left),
-                                      background: "transparent",
                                       borderRadius: 16,
                                       boxShadow: "0 12px 30px rgba(0,0,0,.25)",
                                       padding: 12,
@@ -88,36 +87,19 @@ function EdmNewsContent({title = "", html = "", inset = { top: 120, right: 16, b
 }
 
 /* ================================
-   Póster (fondo con 9:16)
+   Póster 
    ================================ */
-export function PosterEdmNews({width = 360, title = "", html = "", inset,}: PosterEdmNewsProps) {
+export function PosterEdmNews({ width = 360, title = "", html = "", inset }: PosterEdmNewsProps) {
   const w = typeof width === "number" ? `${width}px` : width;
 
   return (
-    <div aria-label="Poster EDM" style={{
-        width: w,
-        aspectRatio: "9 / 16",
-        position: "relative",
-        borderRadius: 16,
-        backgroundImage: `url(${bg})`,
-        backgroundPosition: "center",
-        backgroundSize: "cover",
-        backgroundRepeat: "no-repeat",
-        boxShadow: "0 10px 30px rgba(0,0,0,.18)",
-        overflow: "hidden",
-      }}>
+    <div aria-label="Poster EDM" style={{width: w, aspectRatio: "9 / 16", position: "relative", borderRadius: 16, overflow: "hidden", boxShadow: "0 10px 30px rgba(0,0,0,.18)", backgroundColor: "#0e5e64"}}>
+      <img src={bg} alt="" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "contain", objectPosition: "bottom", pointerEvents: "none",}}/>
       <EdmNewsContent title={title} html={html} inset={inset} />
-
-      {/* Ajustes de tipografía en móviles muy estrechos */}
-      <style>{`
-        @media (max-width: 360px){
-          [aria-label="Contenido del anuncio"] h3{ font-size:16px }
-          [aria-label="Contenido del anuncio"] div{ font-size:13px }
-        }
-      `}</style>
     </div>
   );
 }
+
 
 /* ================================
    Modal (overlay + póster + acciones)
