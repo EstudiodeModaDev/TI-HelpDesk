@@ -138,7 +138,7 @@ export default function NuevoTicketForm() {
     <div className="ticket-form" data-force-light>
       <h2 className="tf-title">Nuevo Ticket</h2>
 
-      <form onSubmit={(e) => {e.preventDefault(); handleSubmit}} noValidate className="tf-grid">
+      <form onSubmit={(e) => {e.preventDefault(); handleSubmit(e)}} noValidate className="tf-grid">
           {/* Solicitante */}
           <div className="tf-field">
             <label className="tf-label">Solicitante</label>
