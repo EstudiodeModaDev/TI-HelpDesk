@@ -374,3 +374,28 @@ html, body{
   block-size: 100%;
   overflow: hidden;            /* <- sin scroll exterior */
 }
+
+:root{
+  --sb-pill-bd:rgba(255,255,255,.15);
+}
+:root[data-theme="light"]{
+  --sb-pill-bd:rgba(2,6,23,.14);
+}
+
+
+.sb-prof__actions{
+  margin-top:8px;
+  display:flex;
+  gap:8px;
+}
+
+.sb-btn{
+  display:inline-flex; align-items:center; gap:8px;
+  border-radius:10px; font-weight:600; font-size:13px;
+  padding:8px 10px; cursor:pointer; transition:background .15s ease, transform .06s ease;
+}
+.sb-btn--ghost{
+  background:transparent; border:1px solid var(--sb-pill-bd); color:var(--sb-ink);
+}
+.sb-btn--ghost:hover{ background:var(--sb-hover); }
+.sb-btn--ghost:active{ transform:translateY(1px); }

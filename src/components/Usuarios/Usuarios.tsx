@@ -13,7 +13,7 @@ export default function UsuariosPanel() {
     const { franquicias, loading: loadingFranq} = useFranquicias(Franquicias);
 
     const [search, setSearch] = React.useState("");
-    const [mostrar, setMostrar] = React.useState<string>("Tecnicos");
+    const [mostrar, setMostrar] = React.useState<string>("Franquicias");
     const [modalAgregar, setModalAgregar] = React.useState<boolean>(false)
 
     const filteredTecnicos = React.useMemo(() => {

@@ -1,8 +1,9 @@
 import { GraphRest } from '../graph/GraphRest';
 import type { GetAllOpts } from '../Models/Commons';
-import type { Tarea } from '../Models/Tareas';
+import type { Tip } from '../Models/Tips';
+import { esc } from '../utils/Commons';
 
-export class TareasService {
+export class TipsService {
   private graph!: GraphRest;
   private hostname!: string;
   private sitePath!: string;
@@ -15,16 +16,13 @@ export class TareasService {
     graph: GraphRest,
     hostname = 'estudiodemoda.sharepoint.com',
     sitePath = '/sites/TransformacionDigital/IN/HD',
-    listName = 'Recordatorios'     
+    listName = 'TipsInicio'     
   ) {
     this.graph = graph;
     this.hostname = hostname;
     this.sitePath = sitePath.startsWith('/') ? sitePath : `/${sitePath}`;
     this.listName = listName;
   }
-
-  // ---------- helpers ----------
-    private esc(s: string) { return String(s).replace(/'/g, "''"); }
 
   // cache (mem + localStorage opcional)
     private loadCache() {
@@ -58,7 +56,7 @@ export class TareasService {
 
         if (!this.listId) {
         const lists = await this.graph.get<any>(
-            `/sites/${this.siteId}/lists?$filter=displayName eq '${this.esc(this.listName)}'`
+            `/sites/${this.siteId}/lists?$filter=displayName eq '${esc(this.listName)}'`
         );
         const list = lists?.value?.[0];
         if (!list?.id) throw new Error(`Lista no encontrada: ${this.listName}`);
@@ -68,23 +66,19 @@ export class TareasService {
     }
 
   // ---------- mapping ----------
-  private toModel(item: any): Tarea {
+  private toModel(item: any): Tip {
     const f = item?.fields ?? {};
     return {
       Id: String(f.ID ?? f.Id ?? f.id ?? item?.id ?? ''),
-      Cantidaddediasalarma: f.Cantidaddediasalarma ?? null,
+      Activa: f.Activa,
+      Subtitulo: f.Subtitulo ?? '',
+      TipoAnuncio: f.TipoAnuncio ?? '',
       Title: f.Title ?? '',
-      Estado: f.Estado ?? '',
-      Quienlasolicita: f.Quienlasolicita ?? '',
-      Reportadapor: f.Reportadapor ?? '',
-      ReportadaporCorreo: f.ReportadaporCorreo ?? '',
-      Fechadelanota: f.Fechadelanota,
-      Fechadesolicitud: f.Fechadesolicitud,
     };
   }
 
   // ---------- CRUD ----------
-  async create(record: Omit<Tarea, 'ID'>) {
+  async create(record: Omit<Tip, 'ID'>) {
     await this.ensureIds()
     const res = await this.graph.post<any>(
       `/sites/${this.siteId}/lists/${this.listId}/items`,
@@ -93,7 +87,7 @@ export class TareasService {
     return this.toModel(res);
   }
 
-  async update(id: string, changed: Partial<Omit<Tarea, 'ID'>>) {
+  async update(id: string, changed: Partial<Omit<Tip, 'ID'>>) {
     await this.ensureIds()
     await this.graph.patch<any>(
       `/sites/${this.siteId}/lists/${this.listId}/items/${id}/fields`,

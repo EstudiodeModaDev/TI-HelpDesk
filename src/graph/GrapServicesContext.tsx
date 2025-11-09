@@ -31,6 +31,7 @@ import { DistribucionFacturaService } from "../Services/DistribucionFactura.serv
 
 // === Servicio TEST (Paz y salvos) ===
 import { PazSalvosService } from "../Services/PazSalvos.service";
+import { TipsService } from "../Services/Tips.service";
 
 /* ================== Tipos de config ================== */
 export type SiteConfig = {
@@ -68,6 +69,7 @@ export type UnifiedConfig = {
     Tareas: string;
     Inventario: string;
     DistribucionFactura: string;
+    TipsInicio: string;
 
     // TEST
     PazYSalvos: string;
@@ -104,6 +106,7 @@ export type GraphServices = {
   Tareas: TareasService;
   Inventario: InventarioService;
   DistribucionFactura: DistribucionFacturaService;
+  TipsInicio: TipsService
 
   // TEST
   PazYSalvos: PazSalvosService;
@@ -149,6 +152,7 @@ const DEFAULT_CONFIG: UnifiedConfig = {
     Tareas: "Recordatorios",
     Inventario: "Inventario",
     DistribucionFactura: "DistribucionFactura",
+    TipsInicio: "TipsInicio",
 
     // TEST
     PazYSalvos: "Paz y salvos",
@@ -218,17 +222,15 @@ export const GraphServicesProvider: React.FC<ProviderProps> = ({ children, confi
     const Tareas               = new TareasService(graph, hd.hostname,     hd.sitePath,  lists.Tareas);
     const Inventario           = new InventarioService(graph, hd.hostname, hd.sitePath,  lists.Inventario);
     const DistribucionFactura  = new DistribucionFacturaService(graph, hd.hostname, hd.sitePath, lists.DistribucionFactura);
+    const TipsInicio                 = new TipsService(graph, hd.hostname, hd.sitePath, lists.TipsInicio)
 
     // TEST
     const PazYSalvos           = new PazSalvosService(graph, test.hostname, test.sitePath, lists.PazYSalvos);
 
     return {
       graph,
-      // HD
-      Sociedades, Proveedores, Plantillas, Internet, CasosHijosRequeridos, ActasEntrega,
-      Anuncios, Articulos, Usuarios, Logs, Tickets, Categorias, Franquicias, SubCategorias,
-      InternetTiendas, Facturas, ItemFactura, ProveedoresFactura, Item, CentroCostos,
-      CentroOperativo, Compras, Tareas, Inventario, DistribucionFactura,
+      Sociedades, Proveedores, Plantillas, Internet, CasosHijosRequeridos, ActasEntrega, Anuncios, Articulos, Usuarios, Logs, Tickets, Categorias, Franquicias, SubCategorias,
+      InternetTiendas, Facturas, ItemFactura, ProveedoresFactura, Item, CentroCostos, CentroOperativo, Compras, Tareas, Inventario, DistribucionFactura, TipsInicio,
       // TEST
       PazYSalvos,
     };

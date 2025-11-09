@@ -37,6 +37,8 @@ import ActionsIcon from "./assets/actions.svg"
 import siesaIcon from "./assets/siesa.png"
 import cajerosIcon from "./assets/cajeros.svg"
 import type { AnunciosService } from "./Services/Anuncios.service";
+import { logout } from "./auth/msal";
+import AnnouncementsTable from "./components/TipsTable/TipsTable";
 
 /* ============================================================
    Tipos de navegación y contexto de visibilidad
@@ -81,6 +83,7 @@ const NAV: MenuItem[] = [
       { id: "anuncios", label: "Anuncios", to: <CrearAnuncio />, roles: ["Administrador", "Tecnico"], icon: <img src={newsIcon} className="sb-icon" /> },
       { id: "plantillas", label: "Plantillas", icon: <img src={templateIcon} className="sb-icon" />, to: <CrearPlantilla />, roles: ["Administrador", "Tecnico"] },
       { id: "usuarios", label: "Usuarios", icon: <img src={usersIcon} className="sb-icon" />, to: <UsuariosPanel />, roles: ["Administrador"] },
+      { id: "tips", label: "Tips", icon: <img src={infoIcon} className="sb-icon" />, to: <AnnouncementsTable />, roles: ["Administrador", "Tecnico"] },
     ],
   },
   {id: "acciones", label: "Acciones", icon: <img src={ActionsIcon} className="sb-icon" />, roles: ["Administrador", "Tecnico", "Jefe de zona"], children: [
@@ -139,30 +142,6 @@ function findById(nodes: readonly MenuItem[], id: string): MenuItem | undefined 
     }
   }
   return undefined;
-}
-
-/* ============================================================
-   Header superior simple
-   ============================================================ */
-
-function HeaderBar(props: { onPrimaryAction?: { label: string; onClick: () => void; disabled?: boolean } | null }) {
-  const { onPrimaryAction } = props;
-  return (
-    <header className="headerRow">
-      <div className="header-inner">
-        <div className="brand">
-          <h1>SOLVI - Tu solución empieza aqui</h1>
-        </div>
-        <div className="userCluster">
-          {onPrimaryAction && (
-            <button className="btn-logout" onClick={onPrimaryAction.onClick} disabled={onPrimaryAction.disabled} aria-busy={onPrimaryAction.disabled}>
-              {onPrimaryAction.label}
-            </button>
-          )}
-        </div>
-      </div>
-    </header>
-  );
 }
 
 /* ============================================================
@@ -269,6 +248,14 @@ function Sidebar(props: {navs: readonly MenuItem[]; selected: string; onSelect: 
             <div className="sb-prof__mail" aria-hidden="true">
               {role}
             </div>
+            <div className="sb-prof__actions">
+              <button className="sb-btn sb-btn--ghost" onClick={() => logout()} aria-label="Cerrar sesión">
+                <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+                  <path d="M10 17l-1.4-1.4 3.6-3.6-3.6-3.6L10 7l5 5-5 5zM4 19h8v2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h8v2H4v14z" fill="currentColor"/>
+                </svg>
+                <span>Salir</span>
+              </button>
+            </div>
           </div>
         )}
       </div>
@@ -300,15 +287,12 @@ function Shell() {
     }
   };
 
-  const actionLabel = !ready ? "Cargando…" : loadingAuth ? (isLogged ? "Cerrando…" : "Abriendo Microsoft…") : isLogged ? "Cerrar sesión" : "Iniciar sesión";
-
   // estado no logueado: solo header con botón de acción
   if (!ready || !isLogged) {
     return (
       <div className="page layout">
-        <HeaderBar onPrimaryAction={{ label: actionLabel, onClick: handleAuthClick, disabled: !ready || loadingAuth }} />
         <section className="page-view">
-          <WelcomeSolvi />
+          <WelcomeSolvi onLogin={handleAuthClick}/>
         </section>
       </div>
     );
