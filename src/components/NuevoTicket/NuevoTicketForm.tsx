@@ -1,6 +1,6 @@
 import * as React from "react";
 import Select, { components, type OptionProps, type SingleValue } from "react-select";
-import "../NuevoTicketUsuario/NuevoTicketForm.css";
+import "./NuevoTicketForm.css";
 import { useFranquicias } from "../../Funcionalidades/Franquicias";
 import type { FranquiciasService } from "../../Services/Franquicias.service";3
 import type { UserOption } from "../../Models/Commons";

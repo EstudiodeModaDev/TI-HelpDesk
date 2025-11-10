@@ -70,3 +70,31 @@
   .ann-table thead th:nth-child(3),
   .ann-table tbody td:nth-child(3){ display:none; } /* oculta subtítulo en pantallas pequeñas */
 }
+
+.icon-btn{
+  /* reset */
+  appearance: none;
+  border: 1px solid var(--bd);
+  background: var(--surface);
+  padding: 0;
+
+  /* caja cuadrada */
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  color: var(--ink);
+  cursor: pointer;
+
+  /* centrar el "+" */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  /* que el glifo no “empuje” por baseline */
+  font-weight: 700;
+  font-size: 22px;
+  line-height: 1;       /* importante */
+}
+.icon-btn:focus{ outline: 2px solid color-mix(in oklab, var(--accent) 60%, transparent); outline-offset: 2px; }
+.icon-btn:active{ transform: translateY(1px); }

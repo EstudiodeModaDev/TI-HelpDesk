@@ -3,10 +3,9 @@ import { useAuth } from "../auth/authContext";
 import type { TicketsService } from "../Services/Tickets.service";
 import type { GetAllOpts } from "../Models/Commons";
 import type { DateRange } from "../Models/Filtros";
-import { toGraphDateTime } from "../utils/Date";
+import { toGraphDateTime, toISODateFlex } from "../utils/Date";
 import type { DailyPoint, Fuente, ResolutorAgg, TopCategoria } from "../Models/Dashboard";
 import type { Ticket } from "../Models/Tickets";
-import { esc } from "../utils/Commons";
 
 export function useDashboard(TicketsSvc: TicketsService) {
     const [resolutores, setResolutores] = React.useState<ResolutorAgg[]>([])
@@ -17,19 +16,22 @@ export function useDashboard(TicketsSvc: TicketsService) {
     const [porcentajeCumplimiento, setPorcentajeCumplimiento] = React.useState<number>(0)
     const [loading, setLoading] = React.useState(false);
     const [error, setError] = React.useState<string | null>(null);
-    const [range, setRange] = React.useState<DateRange>({ from: "", to: "" });
+    const today = React.useMemo(() => toISODateFlex(new Date()), []);
+    const [range, setRange] = React.useState<DateRange>({ from: today, to: today });
     const [topCategorias, setTopCategorias] = React.useState<TopCategoria[]>([]);
     const [totalCategorias, setTotalCateogria] = React.useState<TopCategoria[]>([]);
     const [casosPorDia, setCasosPorDia] = React.useState<DailyPoint[]>([]);
     const [Fuentes, setFuentes] = React.useState<Fuente[]>([]);
-    const [start, setStart] = React.useState<string>("");
-    const [final, setFinal] = React.useState<string>("");
    
     const { account } = useAuth();
 
     const buildFilterTickets = React.useCallback((mode: string): GetAllOpts => {
       const filters: string[] = [];
 
+      // Helper: escapa comillas simples por seguridad en OData
+      const esc = (s: string) => (s ?? "").replace(/'/g, "''");
+
+      // Helper: construye límites día en Z
       const dayStartIso = (d: string) => `${d}T00:00:00Z`;
       const dayEndIso   = (d: string) => `${d}T23:59:59Z`;
 
@@ -45,9 +47,6 @@ export function useDashboard(TicketsSvc: TicketsService) {
         const monthEnd   = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 0, 23, 59, 59, 999));
         const fromIso = toGraphDateTime(monthStart);
         const toIso   = toGraphDateTime(monthEnd);
-        setStart(fromIso ?? "")
-        setFinal(toIso ?? "")
-
         // toGraphDateTime debería devolver ISO con Z (ej. 2025-11-01T00:00:00Z)
         filters.push(`fields/FechaApertura ge '${fromIso}'`);
         filters.push(`fields/FechaApertura le '${toIso}'`);
@@ -55,8 +54,11 @@ export function useDashboard(TicketsSvc: TicketsService) {
 
       // Rango manual (si ambos están y son consistentes)
       if (range.from && range.to && range.from <= range.to) {
+        // Evita duplicar el filtro del mes en curso si ya aplicaste "resumen"
+        if (mode !== "resumen") {
           filters.push(`fields/FechaApertura ge '${dayStartIso(range.from)}'`);
           filters.push(`fields/FechaApertura le '${dayEndIso(range.to)}'`);
+        }
       }
 
       return {
@@ -349,7 +351,8 @@ export function useDashboard(TicketsSvc: TicketsService) {
 
   return {
     obtenerTotal, setRange, obtenerTop5, obtenerTotalCategoria, obtenerTotalResolutor, obtenerFuentes, obtenerCasosPorDia,
-    totalCasos, error, loading, totalEnCurso, totalFinalizados, totalFueraTiempo, porcentajeCumplimiento, topCategorias, range, totalCategorias, resolutores, Fuentes, casosPorDia, start, final
+    totalCasos, error, loading, totalEnCurso, totalFinalizados, totalFueraTiempo, porcentajeCumplimiento, topCategorias, range, totalCategorias, resolutores, Fuentes, casosPorDia
   };
 }
+
 

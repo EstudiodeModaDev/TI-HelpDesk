@@ -3,7 +3,7 @@ import { useDetallado } from "../../../Funcionalidades/DashboardDetallado";
 import { useGraphServices } from "../../../graph/GrapServicesContext";
 import type { TicketsService } from "../../../Services/Tickets.service";
 import "./DashboardDetallado.css";
-import type { DailyPoint, Fuente, TopCategoria } from "../../../Models/Dashboard";
+import type { Fuente, TopCategoria } from "../../../Models/Dashboard";
 
 // ===== util: formatea "2,1 mil" / "0,2 mil" =====
 function formatShort(n: number) {
@@ -12,11 +12,6 @@ function formatShort(n: number) {
     return `${k.toLocaleString("es-CO")} mil`;
   }
   return n.toLocaleString("es-CO");
-}
-
-function shorten(s: string, max = 5) {
-  if (!s) return "";
-  return s.length <= max ? s : s.slice(0, max - 1) + "…";
 }
 
 type Props = { data: Fuente[] };
@@ -35,8 +30,8 @@ export default function DashboardDetallado() {
   const { Tickets } = useGraphServices() as ReturnType<typeof useGraphServices> & {
     TicketService: TicketsService;
   };
-  const { totalCasos, totalEnCurso, totalFinalizados, totalFueraTiempo, porcentajeCumplimiento, topCategorias, range, totalCategorias, resolutores, Fuentes, loading,
-    obtenerTotal, setRange, obtenerFuentes, casosPorDia} = useDetallado(Tickets);
+  const { totalCasos, totalEnCurso, totalFinalizados, totalFueraTiempo, porcentajeCumplimiento, topCategorias, range,  resolutores, Fuentes, loading, conteoPorMes,
+    obtenerTotal, setRange, obtenerFuentes, } = useDetallado(Tickets);
 
   // carga inicial
   React.useEffect(() => {
@@ -88,12 +83,10 @@ export default function DashboardDetallado() {
       <main className="dash-center">
         <header className="center-head">
           <div className="filters">
-            <input className="date" type="date" onChange={(e) => setRange({ ...range, from: e.target.value })}/>
-            <input className="date" type="date" onChange={(e) => setRange({ ...range, to: e.target.value })}/>
+            <input className="date" type="date" onChange={(e) => setRange({ ...range, from: e.target.value })} value={range.from}/>
+            <input className="date" type="date" onChange={(e) => setRange({ ...range, to: e.target.value })} value={range.to}/>
           </div>
         </header>
-        <h4 className="cats__title">Total Casos por Categoria</h4>  
-        <CategoriasChart data={totalCategorias} />
 
         <section className="resolutores">
           <h4>Resolutores</h4>
@@ -123,7 +116,7 @@ export default function DashboardDetallado() {
         
         <section className="panel">
           <h4>Casos mensuales</h4>
-          <CasosPorDiaChart data={casosPorDia} height={200} maxBars={31}/>
+          <CasosPorMesChart data={conteoPorMes} height={200} maxBars={5}/>
           <div className="linechart placeholder" />
         </section>
       </aside>
@@ -312,24 +305,44 @@ function TopCategorias({data,}: {data: TopCategoria[]; total: number;}) {
   );
 }
 
-function CategoriasChart({data, maxBars = 18, height = 160,}: {data: TopCategoria[]; maxBars?: number; height?: number;}) {
-  const items = (data ?? []).slice(0, maxBars);
+
+
+// Tipo local (coincide con el hook)
+type ConteoMes = { mes: string; total: number };
+
+function CasosPorMesChart({data, maxBars = 6, height = 160,}: {data: ConteoMes[]; maxBars?: number; height?: number;}) {
+  // Toma los últimos N meses (más útil para vista mensual)
+  const items = (data ?? []).slice(-maxBars);
   const max = Math.max(...items.map((d) => d.total), 1);
+
+  // Etiqueta "nov 25" en es-CO
+  const monthShort = (yyyyMM: string) => {
+    const [y, m] = yyyyMM.split("-");
+    const dt = new Date(Number(y), Number(m) - 1, 1);
+    const mm = dt
+      .toLocaleDateString("es-CO", { month: "short" })
+      .replace(/\.$/, ""); // sin punto
+    return `${mm} ${String(y).slice(2)}`; // ej: "nov 25"
+  };
 
   return (
     <div className="cats">
       <div className="cats__plot" style={{ height }}>
         <div className="cats__bars" role="list">
           {items.map((d) => {
-            const h = Math.max(2, Math.round((d.total / max) * (height - 36))); // deja espacio para label superior
+            const h = Math.max(2, Math.round((d.total / max) * (height - 36)));
             return (
-              <div key={d.nombre} className="cats__col" role="listitem">
+              <div key={d.mes} className="cats__col" role="listitem">
                 <div className="cats__val" aria-hidden="true">
                   {d.total.toLocaleString("es-CO")}
                 </div>
-                <div className="cats__bar" style={{ height: h }} title={d.nombre}/>
-                <div className="cats__lbl" title={d.nombre}>
-                  {shorten(d.nombre)}
+                <div
+                  className="cats__bar"
+                  style={{ height: h }}
+                  title={d.mes}
+                />
+                <div className="cats__lbl" title={d.mes}>
+                  {monthShort(d.mes)}
                 </div>
               </div>
             );
@@ -341,31 +354,4 @@ function CategoriasChart({data, maxBars = 18, height = 160,}: {data: TopCategori
   );
 }
 
-function CasosPorDiaChart({data, maxBars = 18, height = 160,}: {data: DailyPoint[]; maxBars?: number; height?: number;}) {
-  const items = (data ?? []).slice(0, maxBars);
-  const max = Math.max(...items.map((d) => d.total), 1);
 
-  return (
-    <div className="cats">
-      <div className="cats__plot" style={{ height }}>
-        <div className="cats__bars" role="list">
-          {items.map((d) => {
-            const h = Math.max(2, Math.round((d.total / max) * (height - 36))); // deja espacio para label superior
-            return (
-              <div key={d.fecha} className="cats__col" role="listitem">
-                <div className="cats__val" aria-hidden="true">
-                  {d.total.toLocaleString("es-CO")}
-                </div>
-                <div className="cats__bar" style={{ height: h }} title={d.fecha}/>
-                <div className="cats__lbl" title={d.fecha}>
-                  {shorten(d.fecha)}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-        <div className="cats__baseline" />
-      </div>
-    </div>
-  );
-}

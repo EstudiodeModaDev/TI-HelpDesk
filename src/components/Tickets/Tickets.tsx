@@ -23,7 +23,7 @@ export default function TablaTickets() {
   const userRole = useUserRole(userMail)
   const isPrivileged = userRole.role === "Administrador" || userRole.role === "Tecnico" || userRole.role === "Técnico";
   const { Tickets } = useGraphServices();
-  const {ticketsAbiertos, ticketsFueraTiempo, rows, loading, error, filterMode, range, pageSize, pageIndex, hasNext, sorts, setFilterMode, setRange, applyRange, setPageSize, nextPage, reloadAll,  toggleSort} = useTickets(Tickets, userMail, isAdmin.isAdmin);
+  const {ticketsAbiertos, ticketsFueraTiempo, rows, loading, error, filterMode, range, pageSize, pageIndex, hasNext, sorts, setFilterMode, setRange, setPageSize, nextPage, reloadAll,  toggleSort} = useTickets(Tickets, userMail, isAdmin.isAdmin);
 
   // Búsqueda local SOLO sobre la página visible (si quieres global, hay que mover a OData)
   const [search, setSearch] = React.useState("");
@@ -55,14 +55,6 @@ export default function TablaTickets() {
           <input type="date" value={range.from} onChange={(e) => setRange({ ...range, from: e.target.value })} title="Desde"/>
           <span>→</span>
           <input type="date" value={range.to} onChange={(e) => setRange({ ...range, to: e.target.value })} title="Hasta"/>
-
-          <button type="button" onClick={applyRange} title="Aplicar rango">
-            Aplicar
-          </button>
-
-          <button type="button" onClick={reloadAll} title="Recargar">
-            ⟳
-          </button>
         </div>
       )}
 

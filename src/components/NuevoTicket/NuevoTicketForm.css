@@ -1,0 +1,253 @@
+/* ================================
+   FORM / NUEVO TICKET (tokens teal)
+   ================================ */
+
+/* Contenedor general */
+.ticket-form{
+  color: var(--ink);
+  background: transparent;
+  font-size: 16px;
+  line-height: 1.45;
+  display: grid;
+  gap: var(--page-pad);
+  padding: var(--page-pad);
+  border: transparent;
+  
+}
+
+/* Título */
+.tf-title{
+  margin: 0;
+  font-weight: 800;
+  line-height: 1.25;
+  font-size: clamp(20px, 1.2vw + 12px, 30px);
+  letter-spacing: .2px;
+  color: var(--ink);
+}
+
+/* Card/form grid */
+.tf-grid{
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-3xl);
+  box-shadow: var(--shadow);
+  padding: calc(var(--page-pad) + 4px);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--page-pad);
+  max-height: none;         /* deja que crezca, tu layout lo controla */
+  overflow: visible;
+}
+
+/* Campos */
+.tf-field{ display: grid; gap: 8px; min-width: 0; }
+.tf-col-2{ grid-column: 1 / -1; }
+
+/* Labels */
+.tf-label{
+  color: var(--muted);
+  font-weight: 600;
+  font-size: .95em;
+}
+
+/* Checkbox inline */
+.tf-checkbox{
+  display: inline-grid;
+  grid-auto-flow: column;
+  align-items: center;
+  gap: 10px;
+  color: var(--ink);
+  font-weight: 600;
+}
+.tf-checkbox input[type="checkbox"]{
+  inline-size: 18px; block-size: 18px;
+  accent-color: var(--primary);
+}
+
+/* Inputs base (text, date, file, select nativo) */
+.tf-input{
+  height: clamp(36px, 5.5dvh, 44px);
+  border: 1px solid var(--border);
+  background: var(--field-bg);
+  border-radius: 12px;
+  padding: 0 12px;
+  color: var(--ink);
+  outline: none;
+  transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
+  box-sizing: border-box;
+}
+.tf-input::placeholder{
+  color: color-mix(in oklab, var(--muted) 70%, transparent);
+}
+.tf-input:focus{
+  border-color: var(--primary);
+  box-shadow: 0 0 0 6px var(--ring);
+}
+
+/* Select nativo: caret coherente */
+select.tf-input{
+  appearance: none;
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--muted) 50%),
+    linear-gradient(135deg, var(--muted) 50%, transparent 50%);
+  background-position:
+    calc(100% - 18px) 50%,
+    calc(100% - 12px) 50%;
+  background-size: 6px 6px, 6px 6px;
+  background-repeat: no-repeat;
+  padding-right: 34px;
+}
+
+/* File input (adaptable) */
+input[type="file"].tf-input{
+  display: inline-flex; align-items: center; gap: 10px;
+  min-height: clamp(36px, 5.5dvh, 44px);
+  height: auto; padding: 6px 8px;
+}
+input[type="file"].tf-input::file-selector-button{
+  margin: 0; padding: 0 14px;
+  height: calc(clamp(36px, 5.5dvh, 44px) - 12px);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--ink);
+  cursor: pointer;
+  transition: filter .15s ease, box-shadow .15s ease, border-color .15s ease;
+}
+input[type="file"].tf-input::file-selector-button:hover{
+  border-color: color-mix(in oklab, var(--border) 70%, var(--ink) 30%);
+  box-shadow: 0 4px 10px color-mix(in oklab, var(--ink) 12%, transparent);
+}
+
+/* RichText contenedor */
+.rtb-box{
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: color-mix(in oklab, var(--surface-elev) 92%, transparent);
+  padding: 8px;
+  min-height: clamp(160px, 24dvh, 260px);
+  max-height: clamp(220px, 36dvh, 420px);
+  overflow-y: auto;
+  transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
+  scrollbar-width: thin;
+}
+.rtb-box:focus-within{
+  border-color: var(--primary);
+  box-shadow: 0 0 0 6px var(--ring);
+}
+
+/* Fila categorías (árbol) */
+.tf-row--cats{
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--page-pad);
+}
+
+/* Acciones */
+.tf-actions{
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+/* Botón principal */
+.tf-submit{
+  height: clamp(36px, 5.5dvh, 44px);
+  padding: 0 18px;
+  border-radius: 12px;
+  border: 1px solid color-mix(in oklab, var(--primary) 65%, var(--border) 35%);
+  background: var(--primary);
+  color: var(--primary-ink);
+  font-weight: 800;
+  letter-spacing: .2px;
+  cursor: pointer;
+  transition: transform .08s ease, filter .15s ease, box-shadow .15s ease;
+  box-shadow: 0 6px 16px color-mix(in oklab, var(--primary) 30%, transparent);
+}
+.tf-submit:hover{ filter: brightness(1.05); }
+.tf-submit:active{ transform: translateY(1px) scale(.995); }
+.tf-submit:disabled{
+  opacity: .6; cursor: not-allowed; box-shadow: none;
+}
+
+/* Errores */
+.error{
+  color: color-mix(in oklab, var(--primary) 10%, var(--ink) 0%);
+  /* usamos el texto normal con intensidad; si quieres rojo, define --danger en tokens */
+  font-size: .85em;
+  font-weight: 700;
+}
+.tf-field.has-error .tf-input,
+.tf-field.has-error .rtb-box{
+  border-color: color-mix(in oklab, var(--primary) 50%, var(--border) 50%);
+  box-shadow: 0 0 0 6px color-mix(in oklab, var(--ring) 70%, transparent);
+}
+
+/* ===============================
+   React-Select (classNamePrefix=rs)
+   =============================== */
+.rs__control{
+  background: var(--field-bg) !important;
+  border: 1px solid var(--border) !important;
+  min-height: clamp(36px, 5.5dvh, 44px) !important;
+  border-radius: 12px !important;
+  color: var(--ink) !important;
+  box-shadow: none !important;
+}
+.rs__control--is-focused{
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 6px var(--ring) !important;
+}
+.rs__value-container{ padding: 0 10px !important; }
+.rs__placeholder{ color: color-mix(in oklab, var(--muted) 70%, transparent) !important; }
+.rs__single-value, .rs__input input{ color: var(--ink) !important; }
+
+.rs__menu{
+  background: var(--surface-elev) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 12px !important;
+  box-shadow: var(--shadow) !important;
+  overflow: hidden;
+  z-index: 50;
+}
+.rs__menu-list{
+  max-height: 42dvh !important;
+  padding: 6px !important;
+}
+
+.rs__option{
+  color: var(--ink) !important;
+  background: transparent !important;
+  padding: 10px 12px !important;
+  border-radius: 10px !important;
+}
+.rs__option--is-focused{
+  background: color-mix(in oklab, var(--primary) 12%, transparent) !important;
+}
+.rs__option--is-selected{
+  background: color-mix(in oklab, var(--primary) 18%, transparent) !important;
+  outline: 1px solid color-mix(in oklab, var(--primary) 45%, var(--border) 55%) !important;
+}
+.rs__indicator, .rs__dropdown-indicator, .rs__clear-indicator{
+  color: var(--muted) !important;
+}
+.rs__indicator:hover{ color: var(--ink) !important; }
+.rs__control--is-disabled{
+  background: color-mix(in oklab, var(--field-bg) 85%, transparent) !important;
+  border-color: color-mix(in oklab, var(--border) 70%, transparent) !important;
+  opacity: .7;
+}
+
+/* ===============================
+   Responsive
+   =============================== */
+@media (max-width: 980px){
+  .tf-grid{ grid-template-columns: 1fr; }
+  .tf-actions{ justify-content: stretch; }
+  .tf-submit{ width: 100%; }
+}
+
+/* Scrollbar sutil en contenedores altos */
+.rtb-box, .rs__menu-list{
+  scrollbar-width: thin;
+}

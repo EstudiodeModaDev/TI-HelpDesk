@@ -39,6 +39,7 @@ import cajerosIcon from "./assets/cajeros.svg"
 import type { AnunciosService } from "./Services/Anuncios.service";
 import { logout } from "./auth/msal";
 import AnnouncementsTable from "./components/TipsTable/TipsTable";
+import { useTheme } from "./Funcionalidades/Theme";
 
 /* ============================================================
    Tipos de navegación y contexto de visibilidad
@@ -248,14 +249,6 @@ function Sidebar(props: {navs: readonly MenuItem[]; selected: string; onSelect: 
             <div className="sb-prof__mail" aria-hidden="true">
               {role}
             </div>
-            <div className="sb-prof__actions">
-              <button className="sb-btn sb-btn--ghost" onClick={() => logout()} aria-label="Cerrar sesión">
-                <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
-                  <path d="M10 17l-1.4-1.4 3.6-3.6-3.6-3.6L10 7l5 5-5 5zM4 19h8v2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h8v2H4v14z" fill="currentColor"/>
-                </svg>
-                <span>Salir</span>
-              </button>
-            </div>
           </div>
         )}
       </div>
@@ -309,6 +302,7 @@ function Shell() {
 function LoggedApp({ user }: { user: User }) {
   const { role } = useUserRole(user!.mail);
   const services = useGraphServices() as { Tickets: TicketsService; Usuarios: UsuariosSPService; Logs: LogService, Anuncios: AnunciosService } & Record<string, any>;
+  const { theme, toggle } = useTheme();
 
   const navCtx = React.useMemo<NavContext>(() => {
     const safeRole: string = role === "Administrador" || role === "Tecnico" || role === "Jefe de zona" || role === "Usuario" ? (role as string) : "Usuario";
@@ -447,7 +441,21 @@ function LoggedApp({ user }: { user: User }) {
       <Sidebar navs={navs} selected={selected} onSelect={handleSelect} user={user} role={role} collapsed={collapsed} onToggle={toggleCollapsed} />
       <main className="content content--withSidebar">
         <div className="page-viewport">
-          <div className="page page--fluid center-all">{element}</div>
+            <div className="content-toolbar" role="toolbar" aria-label="Acciones de vista">
+              <button className="theme-btn" onClick={toggle} aria-label={`Cambiar a modo ${theme === "dark" ? "claro" : "oscuro"}`} aria-pressed={theme === "dark"} title={theme === "dark" ? "Modo oscuro activado" : "Modo claro activado"}>
+                <span className="theme-btn__icon" aria-hidden="true">
+                  {theme === "dark" ? "🌙" : "☀️"}
+                </span>
+                <span className="theme-btn__txt">{theme === "dark" ? "Oscuro" : "Claro"}</span>
+              </button>
+              <button className="sb-btn sb-btn--ghost" onClick={() => logout()} aria-label="Cerrar sesión">
+                <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+                  <path d="M10 17l-1.4-1.4 3.6-3.6-3.6-3.6L10 7l5 5-5 5zM4 19h8v2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h8v2H4v14z" fill="currentColor"/>
+                </svg>
+                <span>Salir</span>
+              </button>
+            </div>
+            <div className="page page--fluid center-all">{element}</div>
         </div>
       </main>
 

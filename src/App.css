@@ -1,194 +1,187 @@
 /* ==========================================================================
-   0) TOKENS / VARIABLES GLOBALES
+   0) TOKENS / PALETAS
+   - Dark por defecto (root)
+   - Light con <html data-theme="light">
+   - Sidebar conserva el aguamarina en ambos modos
    ========================================================================== */
-:root{
-  /* Sidebar */
-  --sb-bg:#176d72;
-  --sb-bg-2:#1e7e83;
-  --sb-pill:rgba(255,255,255,0.12);
-  --sb-hover:rgba(255,255,255,0.08);
-  --sb-text:#eaf6f6;
-  --sb-muted:#bfe4e4;
-  --sb-shadow:0 10px 30px rgba(0,0,0,.15);
 
-  /* Superficie general */
-  --surface:#0d1117;
-  --ink:#e5eef9;
-  --muted:#9fb0c7;
-  --border:#1f2a36;
-  --field-bg:#0f141a;
-  --primary:#3b82f6;
-  --primary-ink:#fff;
-  --ring:rgba(59,130,246,.25);
+/* ====== DARK (por defecto) ====== */
+:root{
+  /* Marca / aguamarina */
+  --brand-600:#176d72;     /* sidebar base */
+  --brand-700:#0f686c;     /* sidebar más oscuro */
+  --brand-500:#1e7e83;     /* chips/badges */
+  --brand-400:#23a3a3;     /* realces sutiles */
+
+  /* Superficies y texto (contenido) */
+  --page-bg: radial-gradient(1200px 800px at 20% -10%, #0e3d3f 0%, #0b2327 35%, #0b171a 100%);
+  --surface:#0f1a1d;       /* paneles/cards */
+  --surface-elev:#122126;  /* panel elevado */
+  --field-bg:#0c1619;      /* inputs */
+  --ink:#eaf6f6;           /* texto */
+  --muted:#a6c2c5;
+  --border:#1c3135;        /* bordes sutiles */
+  --ring:rgba(35, 163, 163, .28);
+
+  /* Botón primario (mint/teal) */
+  --primary:#23c2ad;
+  --primary-ink:#052b2b;
+
+  /* Sombras y radios */
+  --shadow:0 14px 34px rgba(0,0,0,.35);
+  --radius:18px;
+  --radius-3xl:26px;
+
+  /* Sidebar */
+  --sb-bg:var(--brand-600);
+  --sb-bg-2:var(--brand-700);
+  --sb-text:#eaf6f6;
+  --sb-muted:#cfe7e5;
+  --sb-pill:rgba(255,255,255,.12);
+  --sb-hover:rgba(255,255,255,.10);
+  --sb-shadow:0 14px 34px rgba(0,0,0,.28);
+  --sb-pill-bd:rgba(255,255,255,.18);
 
   /* Layout */
   --page-pad:16px;
-  --radius:16px;
-  --radius-3xl:28px;
+  --radius-xl:22px;
+  --sb-w-open:280px;
+  --sb-w-closed:72px;
 
-  /* Dimensiones del sidebar */
-  --sb-w-open: 280px;
-  --sb-w-closed: 72px;
+  /* Charts */
+  --chart-grid: color-mix(in oklab, var(--ink) 10%, transparent);
+  --chart-axis: color-mix(in oklab, var(--ink) 65%, transparent);
+  --chart-tooltip-bg: var(--surface);
+  --chart-tooltip-bd: var(--border);
+  --chart-tooltip-ink: var(--ink);
+
+  /* Alias */
+  --bd: var(--border);
 }
 
-/* Fondo de página (opcional) */
-.layout{
-  min-height: 90dvh;
-  background:#8dc2c5;
-  overflow: hidden;
+/* ====== LIGHT ====== */
+:root[data-theme="light"]{
+  /* Conserva sidebar aguamarina */
+  --sb-bg:var(--brand-600);
+  --sb-bg-2:var(--brand-700);
+  --sb-text:#eaf6f6;
+  --sb-muted:#cfe7e5;
+  --sb-pill:rgba(255,255,255,.12);
+  --sb-hover:rgba(255,255,255,.10);
+  --sb-shadow:0 14px 30px rgba(2,6,23,.10);
+  --sb-pill-bd:rgba(255,255,255,.18);
+
+  /* Fondo general con degradé suave */
+  --page-bg: radial-gradient(1200px 800px at 22% -10%, #d8f5ef 0%, #b9eee6 35%, #a8e6de 70%, #eafefd 100%);
+
+  /* Superficies del contenido */
+  --surface:#ffffff;
+  --surface-elev:#ffffff;
+  --field-bg:#f7fbfb;
+  --ink:#0f172a;
+  --muted:#6b7b80;
+  --border:#e6eef0;
+  --ring:rgba(35,163,163,.22);
+
+  /* Botón primario mint/teal */
+  --primary:#22c5af;
+  --primary-ink:#053131;
+
+  /* Sombras */
+  --shadow:0 12px 28px rgba(2,6,23,.12);
+
+  /* Charts */
+  --chart-grid: color-mix(in oklab, var(--ink) 12%, transparent);
+  --chart-axis: color-mix(in oklab, var(--ink) 58%, transparent);
+  --chart-tooltip-bg: var(--surface);
+  --chart-tooltip-bd: var(--border);
+  --chart-tooltip-ink: var(--ink);
+
+  --bd: var(--border);
 }
 
 /* ==========================================================================
-   1) LAYOUT CON SIDEBAR (GRID) + CONTENIDO
+   1) BASE / LAYOUT
    ========================================================================== */
 
-/* Grid principal */
+html, body{
+  block-size:100%;
+  overflow:hidden;
+  background: var(--page-bg);
+  color: var(--ink);
+  font-synthesis-weight: none;
+}
+
+.layout{
+  min-height:90dvh;
+  background: var(--page-bg);
+  overflow:hidden;
+}
+
 .layout--withSidebar{
   display:grid;
-  grid-template-columns: var(--sb-w, var(--sb-w-open)) minmax(0, 1fr);
+  grid-template-columns: var(--sb-w, var(--sb-w-open)) minmax(0,1fr);
   grid-template-areas:"sidebar content";
   gap:16px;
-
-  box-sizing:border-box;
-  padding-inline: var(--page-pad);
-  padding-block:  var(--page-pad);
-
+  padding: var(--page-pad);
   min-height:90dvh;
   align-items:stretch;
   transition:grid-template-columns .22s ease;
 }
+.layout--withSidebar.is-collapsed{ --sb-w: var(--sb-w-closed); }
 
-/* Estado colapsado del sidebar */
-.layout--withSidebar.is-collapsed{
-  --sb-w: var(--sb-w-closed);
-}
-
-/* Área de contenido */
 .content--withSidebar{
-  grid-area: content;
+  grid-area:content;
   display:grid;
-  place-items: stretch;
-  min-height:0;
-  min-width:0;
-  overflow-y: hidden;
+  place-items:stretch;
+  min-width:0; min-height:0;
+  overflow:hidden;
 }
 
-/* Viewport contenedor de páginas */
 .page-viewport{
   width:100%;
   min-height: calc(90dvh - 32px);
   display:grid;
-  place-items: stretch;
+  place-items:stretch;
   min-width:0;
   padding:20px;
-  overflow: hidden;
-}
-
-/* Componente de página */
-.page{
-  display:grid;
-  grid-template-rows:auto 1fr;
-  height:auto;
-  min-height:90dvh;
-  place-items:stretch;
-
-  /* Importante: sin scroll exterior; lo tendrá el formulario */
-  overflow:hidden;
-}
-
-/* Los hijos directos de .page ocupan todo el panel */
-.page > *{
-  width:100% !important;
-  min-width:0 !important;
-  min-height:0 !important;
-}
-.page > .page-view{
-  min-height:0;
-  overflow:hidden; /* bloqueamos scroll aquí; lo maneja el form */
-}
-
-/* Limpieza de wrappers antiguos que centraban/limitaban */
-.content__inner, .center-all{
-  width:100% !important;
-  max-width:none !important;
-  justify-self:stretch !important;
-  align-self:stretch !important;
-}
-.center-all > *{ place-items:center; }
-
-/* Inputs estándar dentro del contenido */
-.content--withSidebar input,
-.content--withSidebar select,
-.content--withSidebar textarea{
-  background:#ffffff;
-  border:1px solid #e6eef0;
-  border-radius:12px;
+  overflow:auto;
+  background: transparent;
 }
 
 /* ==========================================================================
-   2) SIDEBAR (VISUAL, SCROLL Y ESTADOS)
+   2) SIDEBAR
    ========================================================================== */
-
 .sidebar{
   grid-area:sidebar;
-  display:flex;
-  flex-direction:column;
-  background:var(--sb-bg);
+  display:flex; flex-direction:column;
+  background:var(--sb-bg); color:var(--sb-text);
   border-radius:var(--radius-3xl);
   box-shadow:var(--sb-shadow);
-  color:var(--sb-text);
-
   padding:14px 14px 8px;
-
-  position:sticky;
-  top: var(--page-pad);
+  position:sticky; top: var(--page-pad);
   margin-block-end: var(--page-pad);
-  justify-self:start;
   height: calc(100dvh - (var(--page-pad) * 2) - var(--page-pad));
-
-  transition: padding .22s ease;
 }
 
-/* Header del sidebar */
 .sidebar__header{
-  display:grid;
-  grid-template-columns:1fr auto;
-  align-items:center;
-  gap:8px;
-  font-weight:700;
-  letter-spacing:.3px;
-  opacity:.9;
+  display:grid; grid-template-columns:1fr auto;
+  gap:8px; align-items:center;
   padding:8px 10px 14px 10px;
+  font-weight:700; letter-spacing:.3px;
 }
 
-/* Marca */
 .sb-brand{ display:flex; align-items:center; gap:8px; min-width:0; }
 .sb-logo{ font-size:18px; }
-.sb-title{
-  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-  color:var(--sb-text); opacity:.9;
-}
-.sb-subtitle{
-  font-size:12px; line-height:1.25; font-weight:500;
-  color:var(--sb-text, #94a3b8); opacity:.8;
-  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-}
+.sb-title{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:var(--sb-text); }
 
-/* Nav con scroll fino */
 .sidebar__nav{
-  overflow:auto;
-  padding:4px;
-  flex:1;
-  scrollbar-width:thin;
-  scrollbar-color:var(--sb-hover) transparent;
+  overflow:auto; padding:4px; flex:1;
+  scrollbar-width:thin; scrollbar-color:var(--sb-hover) transparent;
 }
 .sidebar__nav::-webkit-scrollbar{ width:8px; }
-.sidebar__nav::-webkit-scrollbar-thumb{
-  background:var(--sb-hover);
-  border-radius:999px;
-}
+.sidebar__nav::-webkit-scrollbar-thumb{ background:var(--sb-hover); border-radius:999px; }
 
-/* Lista e ítems */
 .sb-ul{ list-style:none; margin:0; padding:0; }
 .sb-li + .sb-li{ margin-top:2px; }
 
@@ -203,148 +196,127 @@
 }
 .sideItem:hover{ background:var(--sb-hover); }
 .sideItem:active{ transform:translateY(1px); }
-.sideItem--leaf{ position:relative; }
-.sideItem__icon{ width:22px; display:inline-flex; justify-content:center; opacity:.92; }
+.sideItem--active{ background:var(--sb-pill); outline:2px solid rgba(255,255,255,.08); }
+.sideItem__icon{ width:22px; display:inline-flex; justify-content:center; opacity:.94; }
 .sideItem__label{ font-size:15px; }
-.sideItem--folder{ font-weight:600; }
-.sideItem--active{
-  background:var(--sb-pill);
-  outline:2px solid rgba(255,255,255,0.08);
-}
-.caret{ margin-right:6px; opacity:.8; transition:transform .2s ease; }
+.caret{ margin-right:6px; opacity:.85; transition:transform .2s ease; }
 .caret.rot{ transform:rotate(90deg); }
 
-/* Footer del sidebar (usuario) */
 .sidebar__footer{
-  background:rgba(255,255,255,0.06);
+  background:rgba(255,255,255,.08);
   border-radius:14px;
   padding:10px 12px;
   display:flex; align-items:center; gap:10px;
-  color:var(--sb-muted);
-  margin-bottom:10px;
+  color:var(--sb-muted); margin-bottom:10px;
 }
 .sb-prof__avatar{
   width:28px; height:28px; border-radius:999px;
-  background:var(--sb-bg-2); display:grid; place-items:center;
-  font-weight:800; color:white;
+  background:var(--sb-bg-2); color:white; display:grid; place-items:center; font-weight:800;
 }
 .sb-prof__info{ display:grid; }
-.sb-prof__name{ font-weight:700; color:var(--sb-text); font-size:14px; }
-.sb-prof__mail{ font-size:12px; opacity:.9; }
+.sb-prof__mail{ font-size:12px; opacity:.95; }
 
-/* Iconos compactos */
-.sb-icon-wrap{
-  display:inline-flex; align-items:center; justify-content:center;
-  width:1.75rem; height:1.75rem; margin-right:.5rem; flex-shrink:0;
-}
-.sb-icon{ width:1.25rem; height:1.25rem; }
-.sb-emoji{ font-size:1.1rem; line-height:1; }
-
-/* Sidebar colapsado */
-.layout--withSidebar.is-collapsed .sidebar{ padding-left:10px; padding-right:10px; }
-.layout--withSidebar.is-collapsed .sideItem{
-  gap:0; padding-left:10px; padding-right:10px; justify-content:center;
-}
-.layout--withSidebar.is-collapsed .sideItem__label,
-.layout--withSidebar.is-collapsed .sidebar__header .sb-title,
-.layout--withSidebar.is-collapsed .sb-prof__info,
-.layout--withSidebar.is-collapsed .caret{ display:none !important; }
-.layout--withSidebar.is-collapsed .sb-icon-wrap{ margin-right:0; }
-.layout--withSidebar.is-collapsed .sidebar__footer{
-  justify-content:center; padding-left:8px; padding-right:8px;
-}
-
-/* Botón toggle */
 .sb-toggle{
-  border:0;
-  background:var(--sb-pill);
-  color:var(--sb-text);
-  padding:8px 10px;
-  border-radius:10px;
-  cursor:pointer;
+  border:0; background:var(--sb-pill); color:var(--sb-text);
+  padding:8px 10px; border-radius:10px; cursor:pointer;
   box-shadow:var(--sb-shadow);
-  transition: transform .06s ease, background .2s ease;
 }
-.sb-toggle:hover{ background: var(--sb-hover); }
-.sb-toggle:active{ transform: translateY(1px); }
+.layout--withSidebar.is-collapsed .sideItem{ gap:0; padding-inline:10px; justify-content:center; }
+.layout--withSidebar.is-collapsed .sb-icon-wrap{ margin-right:0; }
+.layout--withSidebar.is-collapsed .sidebar__footer,
+.layout--withSidebar.is-collapsed .sb-prof__info,
+.layout--withSidebar.is-collapsed .sidebar__header .sb-title,
+.layout--withSidebar.is-collapsed .sideItem__label,
+.layout--withSidebar.is-collapsed .caret{ display:none !important; }
 
 /* ==========================================================================
-   3) HEADER (FONDO FULL-BLEED + CONTENIDO CENTRADO)
+   3) HEADER / TOOLBAR SUPERIOR
    ========================================================================== */
-
 .headerRow{
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
-  padding-block: 12px;
-  padding-inline: 16px;
-}
-
-.header-inner{
-  width: min(100%, var(--content-max, 1200px));
-  margin-inline:auto;
-  display:grid;
-  grid-template-columns:1fr auto;
-  align-items:center;
-  gap:16px;
-  height:20px;
-}
-
-/* Marca / título */
-.brand{ display:flex; align-items:center; gap:10px; min-width:0; }
-.brand h1{
-  margin:0; font-size:18px; font-weight:800; line-height:1.1; color:#0d1117;
-  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-}
-
-/* Cluster de usuario */
-.userCluster{
-  display:grid; grid-auto-flow:column; grid-auto-columns:max-content;
-  align-items:center; gap:12px;
-}
-.avatar{
-  width:36px; height:36px; border-radius:999px;
-  background:var(--field-bg); color:var(--ink);
+  background: linear-gradient(180deg, color-mix(in oklab, var(--surface) 92%, transparent), var(--surface));
   border:1px solid var(--border);
-  display:grid; place-items:center; font-weight:700;
+  padding: 12px 16px;
+  border-radius: var(--radius);
 }
-.userInfo{ display:grid; align-content:center; line-height:1.15; }
-.userName{ font-weight:700; font-size:14px; color:var(--ink); }
-.userMail{ font-size:12px; color:var(--muted); }
+.header-inner{
+  width:min(100%, 1180px);
+  margin-inline:auto;
+  display:grid; grid-template-columns:1fr auto;
+  gap:16px; align-items:center;
+}
+.brand{ display:flex; align-items:center; gap:10px; }
+.brand h1{ margin:0; font-size:18px; font-weight:800; color:var(--ink); }
 
-/* Botón primario */
-.btn-logout{
-  appearance:none;
-  border:1px solid var(--primary);
-  background:var(--primary);
-  color:var(--primary-ink);
-  padding:8px 12px;
-  border-radius: calc(var(--radius) - 8px);
-  font-weight:600;
-  cursor:pointer;
-  transition: transform .06s ease, box-shadow .15s ease, opacity .15s ease;
+.theme-btn{
+  display:inline-grid; grid-auto-flow:column; align-items:center; gap:8px;
+  padding:8px 12px; border-radius:999px;
+  border:1px solid var(--bd);
+  background:var(--surface); color:var(--ink);
+  box-shadow:var(--shadow); cursor:pointer; font-weight:600;
 }
-.btn-logout:hover{ box-shadow:0 0 0 4px var(--ring); }
-.btn-logout:active{ transform: translateY(1px); }
-.btn-logout:disabled, .btn-logout[aria-busy="true"]{
-  opacity:.6; cursor:default; box-shadow:none;
-}
-
-/* Header sticky opcional */
-.headerRow.is-sticky{ position:sticky; top:0; z-index:40; }
-
-/* Compactación final del header */
-.headerRow,
-.headerRow > .header-inner{
-  height:55px !important;
-  min-height:30px;
-  padding-block:8px;
-}
-.headerRow .avatar{ width:30px; height:30px; }
-.headerRow .btn-logout{ padding:6px 10px; }
-.headerRow .brand h1{ font-size:16px; line-height:1.2; }
+.theme-btn__icon{ font-size:16px; }
 
 /* ==========================================================================
-   4) RESPONSIVE
+   4) TARJETAS / FORM / BOTONES
+   ========================================================================== */
+.card{
+  background: var(--surface);
+  border:1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+.card--elev{ background: var(--surface-elev); }
+
+input, select, textarea{
+  background: var(--field-bg);
+  color: var(--ink);
+  border:1px solid var(--border);
+  border-radius:12px;
+}
+::placeholder{ color: color-mix(in oklab, var(--muted) 88%, transparent); }
+
+.btn{
+  appearance:none; border:1px solid var(--primary);
+  background: var(--primary); color: var(--primary-ink);
+  padding:10px 14px; border-radius: 999px; font-weight:700;
+  box-shadow: 0 0 0 0 rgba(0,0,0,0);
+  transition: box-shadow .18s ease, transform .06s ease, filter .15s ease;
+}
+.btn:hover{ box-shadow: 0 0 0 6px var(--ring); filter: brightness(1.02); }
+.btn:active{ transform: translateY(1px); }
+.btn[disabled]{ opacity:.6; cursor:not-allowed; }
+
+/* ==========================================================================
+   5) TABLAS Y TEXTO
+   ========================================================================== */
+.table{ width:100%; border-collapse:separate; border-spacing:0; }
+.table thead th{
+  text-align:left; font-weight:700; color:var(--ink);
+  background: var(--surface);
+  border-bottom:2px solid var(--border);
+  padding:12px;
+}
+.table tbody td{
+  color:var(--ink); padding:12px; border-bottom:1px solid var(--border);
+}
+.table tbody tr:nth-child(odd){
+  background: color-mix(in oklab, var(--surface) 96%, var(--border));
+}
+
+/* ==========================================================================
+   6) CHARTS (Recharts)
+   ========================================================================== */
+.recharts-cartesian-grid line{ stroke: var(--chart-grid) !important; }
+.recharts-cartesian-axis-tick text{ fill: var(--chart-axis) !important; }
+.recharts-legend-item text{ fill: var(--ink) !important; }
+.recharts-tooltip-wrapper .recharts-default-tooltip{
+  background: var(--chart-tooltip-bg) !important;
+  border:1px solid var(--chart-tooltip-bd) !important;
+  color: var(--chart-tooltip-ink) !important;
+}
+
+/* ==========================================================================
+   7) RESPONSIVE
    ========================================================================== */
 @media (max-width:960px){
   .layout--withSidebar{
@@ -354,48 +326,459 @@
       "sidebar"
       "content";
   }
-  .sidebar{
-    position:relative;
-    top:auto;
-    height:auto;
-    margin-block-end: var(--page-pad);
-  }
-  .page-viewport{ min-height:calc(100dvh - var(--page-pad)); }
+  .sidebar{ position:relative; top:auto; height:auto; margin-block-end: var(--page-pad); }
+  .page-viewport{ min-height: calc(100dvh - var(--page-pad)); }
 }
-
 @media (max-width:640px){
-  .headerRow{ padding-block:10px; padding-inline:12px; }
-  .header-inner{ grid-template-columns:1fr; gap:8px; }
   .brand h1{ font-size:16px; }
-  .btn-logout{ padding:6px 10px; }
+  .theme-btn{ padding:6px 10px; }
 }
 
-html, body{
-  block-size: 100%;
-  overflow: hidden;            /* <- sin scroll exterior */
-}
-
+/* 0) Gutter global reutilizable */
 :root{
-  --sb-pill-bd:rgba(255,255,255,.15);
+  --page-pad: clamp(14px, 2.4vw, 28px); /* margen izq/der fluido */
+  --page-max: 1920px;                   /* ancho cómodo del contenido */
 }
-:root[data-theme="light"]{
-  --sb-pill-bd:rgba(2,6,23,.14);
+
+/* 1) Si tu layout principal es el grid con sidebar (.msb-layout) */
+.msb-layout{
+  gap: var(--gap, 14px);
+}
+
+/* 1.a) Aplica padding solo a la columna de contenido (2da columna) */
+.msb-layout > *:last-child{
+  padding-inline: var(--page-pad);
+  width: min(100%, var(--page-max));
+  margin-inline: auto;                 /* centra el contenido */
+  box-sizing: border-box;
+}
+
+/* 2) Páginas/sections sueltas (por si no usas .msb-layout en todas)
+   — añade gutters y límite de ancho sin tocar el sidebar */
+.page,
+.dashboard-page,
+.pz-page,
+.detalle-ticket-page{
+  padding-inline: var(--page-pad);
+  width: min(100%, var(--page-max));
+  margin-inline: auto;
+  box-sizing: border-box;
+}
+
+/* 3) Header/toolbar: alinéalo con el container */
+.header-inner{
+  width: min(100%, var(--page-max));
+  padding-inline: var(--page-pad);
+  margin-inline: auto;
+  box-sizing: border-box;
+}
+
+/* 4) Evita que algún wrapper anule los gutters */
+.app-content,
+main{
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* 5) En pantallas pequeñas no quites gutters */
+@media (max-width: 720px){
+  :root{ --page-pad: clamp(10px, 4vw, 16px); }
+}
+
+/* 1) NO metas padding en el grid del layout */
+.layout--withSidebar{
+  gap: 16px;
+  padding: 0 !important;             /* antes: padding: var(--page-pad) */
+}
+
+/* 2) Aplica gutters y ancho máximo SOLO al contenido */
+.content--withSidebar{
+  padding-inline: var(--page-pad);    /* gutters */
+  box-sizing: border-box;
+}
+
+/* 3) El viewport de la página se centra y limita ancho */
+.page-viewport{
+  padding: 20px 0;                    /* top/bottom */
+  padding-inline: var(--page-pad);    /* usa tus gutters */
+  width: min(100%, var(--page-max));  /* límite de ancho */
+  margin-inline: auto;                /* centrado */
+  box-sizing: border-box;
+}
+
+/* 4) El header ya lo alíneaste: asegúrate de no tener 2 definiciones */
+.header-inner{
+  width: min(100%, var(--page-max));
+  padding-inline: var(--page-pad);
+  margin-inline: auto;
+  box-sizing: border-box;
+}
+
+/* 5) Opcional: que TODAS las páginas “sueltas” hereden gutters y ancho */
+.page, .dashboard-page, .pz-page, .detalle-ticket-page{
+  padding-inline: var(--page-pad);
+  width: min(100%, var(--page-max));
+  margin-inline: auto;
+  box-sizing: border-box;
+}
+
+/* 6) Si algún wrapper pisa los gutters, fuerza box-sizing */
+.app-content, main{ box-sizing: border-box; width: 100%; }
+
+/* ===== Toolbar fijo que no se desplaza ===== */
+:root{
+  --toolbar-h: clamp(52px, 6vw, 64px);
+}
+
+/* Offsets calculados según tu layout (sidebar + gap + gutters) */
+.layout--withSidebar{
+  --toolbar-top: var(--page-pad);
+  --toolbar-left: calc(var(--page-pad) + var(--sb-w, var(--sb-w-open)) + 16px); /* 16px = gap del grid */
+  --toolbar-right: var(--page-pad);
+}
+
+/* Dá espacio arriba al contenido para que no quede tapado por el toolbar */
+.page-viewport{
+  padding-top: calc(var(--toolbar-h) + var(--toolbar-top) + 8px);
+}
+
+/* En móvil (sidebar apilado), el toolbar ocupa el ancho del contenido */
+@media (max-width: 960px){
+  .layout--withSidebar{
+    --toolbar-left: var(--page-pad);
+  }
+}
+
+/* Seguridad para notch/iOS */
+@supports (top: env(safe-area-inset-top)){
+  .layout--withSidebar{
+    --toolbar-top: calc(var(--page-pad) + env(safe-area-inset-top));
+  }
+}
+
+/* ===== Toolbar fijo alineado al contenedor ===== */
+:root{
+  --toolbar-h: clamp(52px, 6vw, 64px);
+}
+
+/* offsets según tu layout (sidebar + gap + gutters) */
+.layout--withSidebar{
+  --toolbar-top:  var(--page-pad);
+  --toolbar-gap:  16px; /* tu gap del grid */
+  --toolbar-left: calc(var(--page-pad) + var(--sb-w, var(--sb-w-open)) + var(--toolbar-gap));
+  --toolbar-right: var(--page-pad);
 }
 
 
-.sb-prof__actions{
-  margin-top:8px;
-  display:flex;
-  gap:8px;
+/* espacio para que el contenido no quede bajo el toolbar */
+.page-viewport{
+  padding-top: calc(var(--toolbar-h) + var(--toolbar-top) + 8px);
 }
 
+
+/* móvil: toolbar ocupa todo el ancho del contenido */
+@media (max-width: 960px){
+  .layout--withSidebar{
+    --toolbar-left: var(--page-pad);
+  }
+}
+
+/* safe area (iOS) */
+@supports (top: env(safe-area-inset-top)){
+  .layout--withSidebar{
+    --toolbar-top: calc(var(--page-pad) + env(safe-area-inset-top));
+  }
+}
+
+/* === Toolbar en flujo normal (no fijo ni sticky) === */
+.content-toolbar{
+  position: static !important;  /* ← clave */
+  top: auto !important;
+  left: auto !important;
+  right: auto !important;
+  width: auto !important;
+
+  /* Mantén su estilo y comportamiento responsive */
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+  row-gap: 10px;
+
+  background: var(--sb-bg);
+  color: var(--sb-text);
+  border: 1px solid var(--bd);
+  box-shadow: var(--sb-shadow);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  margin-bottom: 10px;          /* separación con el contenido */
+  height: 45px;
+}
+
+/* Si añadiste espacio para el toolbar fijo, elimínalo */
+.page-viewport{
+  padding-top: 20px;            /* vuelve a tu padding normal */
+}
+
+/* Si creaste un spacer para el toolbar, anúlalo */
+.toolbar-spacer{ height: 0 !important; }
+
+/* =========================================
+   Botón de tema (pill con icono + texto)
+   ========================================= */
+.theme-btn{
+  display: inline-grid;
+  grid-auto-flow: column;
+  align-items: center;
+  gap: 8px;
+
+  height: 40px;
+  padding: 0 14px;
+  border-radius: 999px;
+
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+
+  font: inherit;
+  font-weight: 700;
+  letter-spacing: .2px;
+  cursor: pointer;
+  user-select: none;
+
+  transition: filter .15s ease, transform .06s ease,
+              border-color .16s ease, box-shadow .16s ease, background .16s ease;
+}
+
+.theme-btn__icon{
+  font-size: 16px;
+  line-height: 1;
+  display: grid;
+  place-items: center;
+}
+
+.theme-btn:hover{
+  filter: brightness(1.03);
+  border-color: color-mix(in oklab, var(--border) 65%, var(--ink) 35%);
+  box-shadow: 0 0 0 6px var(--ring);
+}
+
+.theme-btn:active{
+  transform: translateY(1px);
+  filter: brightness(1.01);
+}
+
+.theme-btn:focus-visible{
+  outline: none;
+  box-shadow: 0 0 0 6px var(--ring);
+}
+
+.theme-btn[disabled]{
+  opacity: .6;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* Variante compacta (si necesitas menos espacio) */
+.theme-btn.is-compact{
+  height: 34px;
+  padding: 0 10px;
+  gap: 6px;
+  font-weight: 700;
+}
+.theme-btn.is-compact .theme-btn__icon{ font-size: 14px; }
+
+/* =========================================
+   Botón ghost (texto + icono, fondo transparente)
+   ========================================= */
 .sb-btn{
-  display:inline-flex; align-items:center; gap:8px;
-  border-radius:10px; font-weight:600; font-size:13px;
-  padding:8px 10px; cursor:pointer; transition:background .15s ease, transform .06s ease;
+  display: inline-grid;
+  grid-auto-flow: column;
+  align-items: center;
+  gap: 8px;
+
+  height: 40px;
+  padding: 0 12px;
+  border-radius: var(--radius);
+
+  font: inherit;
+  font-weight: 800;
+  letter-spacing: .2px;
+  cursor: pointer;
+  user-select: none;
+
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid transparent;
+  transition: background .16s ease, color .16s ease, border-color .16s ease,
+              transform .06s ease, box-shadow .16s ease, filter .15s ease;
 }
+
+.sb-btn svg{ display:block; }
+
+/* Ghost por defecto */
 .sb-btn--ghost{
-  background:transparent; border:1px solid var(--sb-pill-bd); color:var(--sb-ink);
+  background: color-mix(in oklab, var(--surface) 8%, transparent);
+  border-color: color-mix(in oklab, var(--border) 40%, transparent);
 }
-.sb-btn--ghost:hover{ background:var(--sb-hover); }
-.sb-btn--ghost:active{ transform:translateY(1px); }
+
+.sb-btn--ghost:hover{
+  background: color-mix(in oklab, var(--surface) 16%, transparent);
+  border-color: color-mix(in oklab, var(--border) 70%, transparent);
+  box-shadow: 0 0 0 6px var(--ring);
+}
+
+.sb-btn--ghost:active{
+  transform: translateY(1px);
+  filter: brightness(1.02);
+}
+
+.sb-btn--ghost:focus-visible{
+  outline: none;
+  box-shadow: 0 0 0 6px var(--ring);
+}
+
+/* Variantes semánticas (opcional) */
+.sb-btn--primary{
+  background: var(--primary);
+  color: var(--primary-ink);
+  border-color: var(--primary);
+  box-shadow: 0 10px 24px color-mix(in oklab, var(--primary) 28%, transparent);
+}
+.sb-btn--primary:hover{ box-shadow: 0 0 0 6px var(--ring); }
+.sb-btn--primary:active{ transform: translateY(1px); }
+
+/* Estado disabled */
+.sb-btn[disabled],
+.sb-btn--ghost[disabled]{
+  opacity: .6;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* Tamaño reducido */
+.sb-btn.is-compact{
+  height: 34px;
+  padding: 0 10px;
+  gap: 6px;
+}
+
+/* Ajuste responsive mínimo para contenedores estrechos */
+@media (max-width: 520px){
+  .theme-btn, .sb-btn{ height: 36px; padding-inline: 10px; }
+}
+
+/* ====== REACT-SELECT (classNamePrefix="rs") ====== */
+/* valor seleccionado y texto que escribes */
+/* ============================================
+   THEME React-Select (classNamePrefix="rs")
+   ============================================ */
+/* Contenedor y control */
+.rs__control{
+  border-radius: var(--dt-radius);
+  border: 1px solid var(--dt-bd) !important;
+  background: var(--dt-field-bg) !important;
+  color: var(--dt-fg) !important;
+  min-height: 42px;
+  box-shadow: none !important;
+  transition: box-shadow .15s ease, border-color .15s ease, background .15s ease;
+}
+
+.rs__control--is-focused{
+  border-color: color-mix(in oklab, var(--dt-primary) 52%, var(--dt-bd) 48%) !important;
+  box-shadow: 0 0 0 4px var(--dt-ring) !important;
+}
+
+.rs__value-container{
+  padding: 4px 10px !important;
+}
+
+.rs__input-container,
+.rs__single-value{
+  color: var(--dt-fg) !important;
+}
+
+.rs__placeholder{
+  color: color-mix(in oklab, var(--dt-muted) 80%, transparent) !important;
+}
+
+/* Indicadores (flecha, clear) */
+.rs__indicators,
+.rs__indicator{
+  color: color-mix(in oklab, var(--dt-fg) 85%, transparent) !important;
+  fill: currentColor !important;
+}
+
+.rs__indicator-separator{
+  background: color-mix(in oklab, var(--dt-bd) 85%, transparent) !important;
+}
+
+/* Menú / opciones */
+.rs__menu{
+  background: var(--dt-surface) !important;
+  border: 1px solid var(--dt-bd) !important;
+  border-radius: var(--dt-radius) !important;
+  box-shadow: var(--dt-shadow) !important;
+  overflow: hidden;
+}
+
+.rs__menu-list{
+  padding-block: 6px !important;
+}
+
+.rs__option{
+  background: transparent !important;
+  color: var(--dt-fg) !important;
+  padding: 8px 10px !important;
+}
+
+.rs__option--is-focused{
+  background: color-mix(in oklab, var(--dt-primary) 12%, transparent) !important;
+}
+
+.rs__option--is-selected{
+  background: color-mix(in oklab, var(--dt-primary) 22%, transparent) !important;
+  color: var(--dt-fg) !important;
+}
+
+/* Clear y multi-values (por si luego usas isMulti) */
+.rs__multi-value{
+  background: color-mix(in oklab, var(--dt-primary) 18%, transparent) !important;
+  border: 1px solid color-mix(in oklab, var(--dt-primary) 36%, var(--dt-bd) 64%) !important;
+}
+
+.rs__multi-value__label{
+  color: var(--dt-fg) !important;
+}
+
+.rs__multi-value__remove{
+  color: var(--dt-fg) !important;
+}
+
+.rs__multi-value__remove:hover{
+  background: color-mix(in oklab, var(--dt-primary) 24%, transparent) !important;
+}
+
+/* Portal: respeta elevación sobre modales/sidebars */
+.rs__menu-portal{
+  z-index: 9999;
+}
+
+.rs__single-value,
+.rs__input,
+.rs__input-container{
+  color: #000 !important;
+}
+
+/* placeholder del select negro */
+.rs__placeholder{
+  color: #000 !important;
+  opacity: 1 !important;
+}
+
+/* etiquetas de multi-value (por si luego usas isMulti) */
+.rs__multi-value__label{
+  color: #000 !important;
+}

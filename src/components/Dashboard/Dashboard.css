@@ -1,278 +1,445 @@
-/* Layout */
+/* =========================================================
+   TOP NAV (reemplazo del sidebar) — Usa tus TOKENS del :root
+   Estructura JSX actual se mantiene (msb-layout / msb / msb-track / msb-item)
+   ========================================================= */
+
+/* ---------- Contenedor general: NAV arriba + CONTENIDO abajo ---------- */
 .msb-layout{
-  display:grid;
-  grid-template-columns: 86px 1fr;  /* rail + contenido */
+  display: grid;
+  grid-template-rows: auto 1fr;    /* nav arriba, contenido ocupa resto */
+  grid-template-columns: 1fr;
+  gap: 12px;
   min-height: 100dvh;
-  gap: 12px
 }
 
-/* Sidebar */
+/* ---------- NAV (usa las clases existentes .msb y .msb-track) ---------- */
 .msb{
-  position: sticky;
-  top: 0;
-  align-self: start;
-  background: #0b61ff;            /* azul del mock */
-  border-right: 2px solid #0a54db;
-  width: 86px;
-  box-sizing: border-box;
-}
-.msb-track{
-  display:flex;
-  flex-direction:column;
-  gap: 10px;
-  padding: 8px;
-}
-
-/* Items */
-.msb-item{
-  appearance: none;
-  border: 2px solid transparent;
-  background: #57a5ff;
-  color: #fff;
-  border-radius: 6px;
-  padding: 8px 6px;
-  cursor: pointer;
-  transition: transform .08s ease, background .15s ease, border-color .15s ease;
-}
-.msb-item:hover{ background:#4a97f0; transform: translateY(-1px); }
-.msb-item.is-active{
-  background:#3c8cf0;
-  border-color:#fff;               /* marco blanco como en la imagen */
-}
-
-/* Contenido del item */
-.msb-item__inner{
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap: 8px;
-}
-.msb-icon{
-  width: 46px; height: 46px;
-  display:grid; place-items:center;
-  border-radius: 6px;
-  outline: 2px solid rgba(255,255,255,.6); /* cuadro del icono */
-  background: rgba(255,255,255,.12);
-  font-size: 24px;                 /* si usas emoji/SVG */
-}
-.msb-label{
-  font-size: 12px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: .03em;
-  text-align:center;
-}
-
-/* Relleno al final del rail */
-.msb-spacer{ flex:1 1 auto; }
-
-/* Área de contenido */
-.msb-content{
-  background: #0a0f1a;            /* fondo oscuro del dashboard */
-  color: #e5f0ff;
-  padding: 16px;
-  min-width: 0;                    /* evita overflow en grid */
-}
-
-.msb-content * { min-width:0; }
-img, svg, canvas { max-width:100%; height:auto; display:block; }
-
-/* Responsive: colapsar rail en móviles si quieres */
-@media (max-width: 640px){
-  .msb-layout{ grid-template-columns: 72px 1fr; }
-  .msb-icon{ width:40px; height:40px; font-size:20px; }
-  .msb-label{ font-size: 11px; }
-}
-
-@media (max-width: 900px){
-  .msb-layout{ grid-template-columns: 1fr; }
-  /* opcional: convertir el rail a una tirilla horizontal */
-  .msb{ position: static; width:auto; border-right:0; }
-  .msb-track{ display:flex; overflow-x:auto; }
-}
-
-/* ==== Sidebar acorde al tablero (usa tus tokens) ==== */
-
-/* Rail */
-.msb{
-  position: sticky;
-  top: 0;
-  align-self: start;
-  inline-size: 86px;
-  box-sizing: border-box;
-
-  background: color-mix(in oklab, var(--bg-elev) 96%, transparent);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
+  /* barra superior */
+  background: linear-gradient(
+    180deg,
+      color-mix(in oklab, var(--surface-elev) 96%, transparent),
+      color-mix(in oklab, var(--surface-elev) 92%, transparent)
+  );
+  border: 1px solid var(--bd);
+  border-radius: var(--radius-3xl);
   box-shadow: var(--shadow);
-  padding: 8px;
+  padding: 10px;
+
+  /* centrar y alinear con el resto del layout */
+  width: min(100%, var(--page-max, 1320px));
+  margin-inline: auto;
+  box-sizing: border-box;
 }
 
-/* Separación con el contenido (ya tienes gap en el grid) */
-.msb-layout{ gap: var(--gap); }
-
-/* Pista interna */
+/* fila de elementos del menú */
 .msb-track{
-  display:flex;
-  flex-direction:column;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+  align-items: center;
+  justify-content: start;
   gap: 10px;
-  inline-size: 100%;
-  max-inline-size: 100%;
-  overflow-y: auto;
+
+  /* overflow horizontal suave si no cabe */
+  overflow-x: auto;
+  overflow-y: hidden;
   scrollbar-width: thin;
-  scrollbar-color: #334155 transparent;
+  scrollbar-color: var(--sb-hover) transparent;
 }
-.msb-track::-webkit-scrollbar{ width: 8px; }
+.msb-track::-webkit-scrollbar{ height: 8px; }
 .msb-track::-webkit-scrollbar-thumb{
-  background: #334155; border-radius: 999px;
+  background: var(--sb-hover);
+  border-radius: 999px;
 }
 
-/* Botón del rail */
+/* ---------- ITEM (pestaña con icono + label) ---------- */
 .msb-item{
   appearance: none;
-  inline-size: 100%;
-  border: 1px solid var(--border);
-  border-radius: calc(var(--radius) - 4px);
-  padding: 8px 6px;
-  background: color-mix(in oklab, var(--bg-elev) 92%, transparent);
+  border: 1px solid var(--bd);
+  border-radius: 12px;
+  padding: 8px 12px;
+  background: color-mix(in oklab, var(--surface-elev) 96%, transparent);
   color: var(--ink);
   cursor: pointer;
-  transition: transform .12s ease, background .16s ease, border-color .16s ease, box-shadow .16s ease;
+
+  transition:
+    background .16s ease,
+    border-color .16s ease,
+    box-shadow .16s ease,
+    transform .08s ease;
 }
 .msb-item:hover{
-  background: color-mix(in oklab, var(--bg-elev) 88%, transparent);
-  border-color: color-mix(in oklab, var(--border) 75%, var(--ink) 25%);
+  background: color-mix(in oklab, var(--surface-elev) 90%, transparent);
+  border-color: color-mix(in oklab, var(--bd) 75%, var(--ink) 25%);
 }
 .msb-item:active{ transform: translateY(1px); }
 .msb-item:focus-visible{
-  outline: 2px solid color-mix(in oklab, var(--accent) 55%, #ffffff 0%);
+  outline: 3px solid var(--ring);
   outline-offset: 2px;
 }
 
-/* Estado activo con el acento del dashboard */
-.msb-item.is-active{
-  background: linear-gradient(0deg, color-mix(in oklab, var(--accent) 14%, transparent), color-mix(in oklab, var(--accent) 14%, transparent)),
-              color-mix(in oklab, var(--bg-elev) 90%, transparent);
-  border-color: color-mix(in oklab, var(--accent) 60%, var(--border) 40%);
-  box-shadow: 0 0 0 1px color-mix(in oklab, var(--accent) 35%, transparent);
-}
-
-/* Contenido del botón */
+/* Contenido interno centrado */
 .msb-item__inner{
-  display:flex; flex-direction:column; align-items:center; gap: 8px;
+  display: grid;
+  grid-auto-flow: row;
+  grid-template-rows: auto auto;
+  justify-items: center;
+  align-items: center;
+  gap: 6px;
+  min-width: 120px;         /* ancho cómodo de pestaña */
+  text-align: center;
 }
+
+/* Icono con fondo oscuro SIEMPRE */
 .msb-icon{
-  inline-size: 46px; block-size: 46px;
-  display:grid; place-items:center;
+  width: 36px; height: 36px;
+  display: grid; place-items: center;
   border-radius: 10px;
-  background: color-mix(in oklab, var(--bg-elev) 80%, transparent);
-  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--border) 70%, transparent);
+  background:
+    linear-gradient(0deg,
+      color-mix(in oklab, var(--sb-bg-2) 86%, transparent),
+      color-mix(in oklab, var(--sb-bg-2) 86%, transparent));
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--bd) 70%, transparent);
 }
-.msb-icon img, .msb-icon svg{ max-width:100%; height:auto; display:block; }
+.msb-icon img, .msb-icon svg{
+  display:block; max-width:70%; max-height:70%; object-fit: contain;
+}
 
+/* Label (1–2 líneas) */
 .msb-label{
-  font-size: 12px; font-weight: 700; text-transform: uppercase;
-  letter-spacing: .03em; text-align:center; color: var(--muted);
+  color: var(--ink);
+  font-weight: 800;
+  font-size: 12.5px;
+  line-height: 1.12;
+  letter-spacing: .02em;
+  padding-inline: 4px;
+
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: normal;
 }
 
-/* Flecha/handler opcional al pie (como en tu captura) */
-.msb-footer{
-  margin-top: 6px;
-  display:grid; place-items:center;
-  color: var(--muted);
-  font-size: 12px;
-  user-select:none;
+/* Activo: realce con primario y subrayado inferior */
+.msb-item.is-active{
+  background:
+    linear-gradient(0deg,
+      color-mix(in oklab, var(--primary) 12%, transparent),
+      color-mix(in oklab, var(--primary) 12%, transparent)),
+    color-mix(in oklab, var(--surface-elev) 92%, transparent);
+  border-color: color-mix(in oklab, var(--primary) 60%, var(--bd) 40%);
+  box-shadow:
+    0 0 0 1px color-mix(in oklab, var(--primary) 28%, transparent),
+    inset 0 -3px 0 color-mix(in oklab, var(--primary) 70%, transparent); /* subrayado */
 }
 
-/* Seguridad: nada expande el ancho del rail */
-.msb, .msb *{ box-sizing: border-box; min-width: 0; }
+/* ---------- CONTENIDO ---------- */
+.msb-content{
+  width: min(100%, var(--page-max, 1320px));
+  margin-inline: auto;
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--bd);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 16px;
+  min-width: 0;
+}
 
-/* ==== Responsivo coherente con el resto ==== */
+/* =========================================================
+   MODIFICADORES ÚTILES
+   ========================================================= */
+
+/* .msb.is-sticky → si alguna vez quieres que el nav se quede arriba */
+.msb.is-sticky{
+  position: sticky;
+  top: var(--page-pad);
+  z-index: 5;
+}
+
+/* Variante estilo “pills” más compacta */
+.msb--compact .msb-item{
+  border-radius: 999px;
+  padding: 8px 12px;
+}
+.msb--compact .msb-item__inner{
+  grid-template-rows: 1fr; grid-auto-flow: column; gap: 8px;
+  min-width: unset;
+}
+.msb--compact .msb-icon{ width: 24px; height: 24px; }
+.msb--compact .msb-label{ -webkit-line-clamp: 1; font-size: 12px; }
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
 @media (max-width: 900px){
-  .msb-layout{ grid-template-columns: 1fr; }
-  .msb{ position: static; inline-size: auto; border-radius: calc(var(--radius) - 2px); }
-  .msb-track{
-    flex-direction: row; overflow-x: auto; overflow-y: hidden;
-    gap: 8px; padding-block: 4px;
-  }
-  .msb-item{ min-width: 120px; }
-  .msb-item__inner{ gap: 6px; }
+  .msb-item__inner{ min-width: 108px; }
+  .msb-icon{ width: 32px; height: 32px; border-radius: 8px; }
+  .msb-label{ font-size: 11.8px; }
 }
-
-/* Más compacto en teléfonos pequeños */
 @media (max-width: 640px){
-  .msb-item{ padding: 8px; }
-  .msb-icon{ inline-size: 40px; block-size: 40px; border-radius: 8px; }
+  .msb{ padding: 8px; }
+  .msb-item{ padding: 8px 10px; }
+  .msb-item__inner{ min-width: 96px; gap: 4px; }
+  .msb-icon{ width: 28px; height: 28px; border-radius: 8px; }
   .msb-label{ font-size: 11px; }
 }
 
-/* ====== Vars para anchos del rail ====== */
-:root{
-  --rail: 132px;        /* antes ~86px */
-  --rail-sm: 112px;     /* tablets */
-  --rail-xs: 88px;      /* móviles (cuando lo conviertes en tira) */
-}
+/* ===== NAV COMPACTO + etiqueta debajo del icono ===== */
 
-/* Layout: usa la var */
-.msb-layout{
-  display:grid;
-  grid-template-columns: var(--rail) 1fr;
-  gap: var(--gap, 12px);
-  min-height: 100dvh;
-}
-
-/* Rail */
+/* Barra superior más baja */
 .msb{
-  inline-size: var(--rail);
-  box-sizing: border-box;
+  padding: 6px 8px;
+  border-radius: var(--radius-3xl);
 }
 
-/* Pista interna ocupa exactamente el rail */
+/* Fila de pestañas más ceñida */
 .msb-track{
-  inline-size: 100%;
-  max-inline-size: 100%;
-  overflow-y: auto;
+  gap: 8px;
+  align-items: center;
+  /* si no caben, que scrollee horizontal sin crecer en alto */
+  overflow-x: auto; overflow-y: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: var(--sb-hover) transparent;
+}
+.msb-track::-webkit-scrollbar{ height: 8px; }
+.msb-track::-webkit-scrollbar-thumb{
+  background: var(--sb-hover); border-radius: 999px;
 }
 
-/* Botón ocupa todo el ancho disponible del rail */
-.msb-item{ inline-size: 100%; max-inline-size: 100%; }
-
-/* Icono un poco más grande, acorde al nuevo ancho */
-.msb-icon{
-  inline-size: 56px;    /* era 46px */
-  block-size: 56px;
+/* Pestañas compactas */
+.msb-item{
+  padding: 6px 10px;                     /* antes 8–12px */
   border-radius: 12px;
+  background: color-mix(in oklab, var(--surface-elev) 96%, transparent);
+  border: 1px solid var(--bd);
+  color: var(--ink);
+  min-inline-size: 96px;                  /* ancho cómodo */
 }
 
-/* Etiqueta: permite 2 líneas y evita corte feo */
+/* Contenido SIEMPRE en columna (icono arriba, texto abajo) */
+.msb-item__inner{
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center;
+  gap: 4px;                               /* menos separación */
+  min-block-size: 66px;                   /* altura baja y estable */
+  text-align: center;
+}
+
+/* Icono centrado con fondo oscuro constante */
+.msb-icon{
+  inline-size: 32px;                      /* más pequeño */
+  block-size: 32px;
+  display: grid; place-items: center;
+  border-radius: 8px;
+  margin: 0 auto;
+
+  background:
+    linear-gradient(0deg,
+      color-mix(in oklab, var(--sb-bg-2) 86%, transparent),
+      color-mix(in oklab, var(--sb-bg-2) 86%, transparent));
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--bd) 70%, transparent);
+}
+.msb-icon img, .msb-icon svg{
+  max-inline-size: 70%;
+  max-block-size: 70%;
+  object-fit: contain;
+  display: block;
+}
+
+/* Texto debajo, centrado, sin desbordes */
 .msb-label{
-  font-size: 12.5px;
-  line-height: 1.1;
-  max-inline-size: 100%;
-  white-space: normal;         /* permite salto de línea */
+  padding-inline: 4px;
+  color: var(--ink);
+  font-weight: 800;
+  font-size: 12px;
+  line-height: 1.05;
+  letter-spacing: .01em;
+
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;                  /* 1 línea para bajar altura */
   overflow: hidden;
-  text-overflow: ellipsis;     /* por si acaso */
+  text-overflow: ellipsis;
+  white-space: normal;
 }
 
-/* ====== Responsivo ====== */
-@media (max-width: 1100px){
-  :root{ --rail: var(--rail-sm); }
-  .msb{ inline-size: var(--rail-sm); }
+/* Estado activo compacto (subrayado sutil) */
+.msb-item.is-active{
+  background:
+    linear-gradient(0deg,
+      color-mix(in oklab, var(--primary) 10%, transparent),
+      color-mix(in oklab, var(--primary) 10%, transparent)),
+    color-mix(in oklab, var(--surface-elev) 94%, transparent);
+  border-color: color-mix(in oklab, var(--primary) 55%, var(--bd) 45%);
+  box-shadow:
+    0 0 0 1px color-mix(in oklab, var(--primary) 28%, transparent),
+    inset 0 -2px 0 color-mix(in oklab, var(--primary) 65%, transparent);
 }
 
+/* Hover/focus (sin aumentar la altura) */
+.msb-item:hover{
+  background: color-mix(in oklab, var(--surface-elev) 90%, transparent);
+  border-color: color-mix(in oklab, var(--bd) 75%, var(--ink) 25%);
+}
+.msb-item:focus-visible{
+  outline: 3px solid var(--ring);
+  outline-offset: 2px;
+}
+
+/* ===== Responsive ===== */
 @media (max-width: 900px){
-  /* en móvil lo conviertes en tira horizontal */
-  .msb-layout{ grid-template-columns: 1fr; }
-  .msb{
-    position: static;
-    inline-size: auto;
-  }
-  .msb-track{
-    flex-direction: row;
-    overflow-x: auto; overflow-y: hidden;
-    gap: 8px;
-  }
-  .msb-item{ min-width: var(--rail-xs); }   /* cada botón como “chip ancho” */
-  .msb-icon{ inline-size: 44px; block-size: 44px; }
+  .msb-item{ min-inline-size: 88px; }
+  .msb-item__inner{ min-block-size: 60px; gap: 4px; }
+  .msb-icon{ inline-size: 28px; block-size: 28px; border-radius: 7px; }
   .msb-label{ font-size: 11.5px; }
 }
+@media (max-width: 640px){
+  .msb{ padding: 6px; }
+  .msb-item{ padding: 6px 8px; min-inline-size: 80px; }
+  .msb-item__inner{ min-block-size: 56px; }
+  .msb-icon{ inline-size: 26px; block-size: 26px; }
+  .msb-label{ font-size: 11px; }
+}
+
+/* === Centrado milimétrico del icono dentro de su cuadro === */
+.msb-item__inner{
+  display: grid !important;
+  grid-template-rows: auto auto;
+  justify-items: center;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Caja del icono: cuadrada y sin interferencias de línea base */
+.msb-icon{
+  inline-size: 36px;               /* ajusta si lo quieres más grande */
+  aspect-ratio: 1 / 1;             /* cuadrado perfecto */
+  display: grid;
+  place-items: center;             /* centrar X/Y */
+  line-height: 0;                  /* elimina altura por baseline */
+  padding: 0;                      /* sin rellenos inesperados */
+  margin: 0;
+
+  border-radius: 10px;
+  background:
+    linear-gradient(0deg,
+      color-mix(in oklab, var(--sb-bg-2) 86%, transparent),
+      color-mix(in oklab, var(--sb-bg-2) 86%, transparent));
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--bd) 70%, transparent);
+}
+
+/* Contenido gráfico del icono: sin márgenes, centrado y contenido */
+.msb-icon > img,
+.msb-icon > svg{
+  width: 70%;
+  height: 70%;
+  display: block;                  /* quita baseline/márgenes de inline */
+  margin: 0;
+  object-fit: contain;             /* no se deforma */
+  pointer-events: none;
+}
+
+/* Si usas fuente de íconos/emoji dentro del cuadro */
+.msb-icon > *:not(img):not(svg){
+  line-height: 1;
+  font-size: 0.9rem;               /* opcional */
+  margin: 0;
+}
+
+/* Pestaña/label (por si el peso del texto empujaba visualmente) */
+.msb-label{
+  text-align: center;
+  font-weight: 800;
+  font-size: 12px;
+  line-height: 1.08;
+  padding-inline: 4px;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  overflow: hidden;
+}
+
+/* --- Cada item del nav es una "píldora" vertical --- */
+.msb-item{
+  display: inline-block;                 /* no ocupa toda la fila */
+  vertical-align: top;
+  padding: 6px 10px;
+  border-radius: 12px;
+  min-inline-size: 96px;                 /* ancho cómodo (ajustable) */
+}
+
+/* Icono ARRIBA + label ABAJO, centrados */
+.msb-item__inner{
+  display: flex !important;
+  flex-direction: column !important;     /* ← clave */
+  align-items: center !important;
+  justify-content: center;
+  gap: 6px;
+  min-block-size: 66px;                   /* altura estable/compacta */
+  text-align: center;
+  width: max-content;                     /* evita que el label se vaya a la derecha */
+  margin-inline: auto;
+}
+
+/* Caja del icono, cuadrada y centrada */
+.msb-icon{
+  inline-size: 36px;
+  aspect-ratio: 1 / 1;
+  display: grid;
+  place-items: center;
+  line-height: 0;
+  border-radius: 10px;
+  background:
+    linear-gradient(0deg,
+      color-mix(in oklab, var(--sb-bg-2) 86%, transparent),
+      color-mix(in oklab, var(--sb-bg-2) 86%, transparent));
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--bd) 70%, transparent);
+}
+.msb-icon > img,
+.msb-icon > svg{
+  width: 70%;
+  height: 70%;
+  display: block;
+  object-fit: contain;
+}
+
+/* Label debajo, centrado, una línea (o 2 si quieres) */
+.msb-label{
+  display: block;                         /* evita inline al lado del icono */
+  text-align: center;
+  font-weight: 800;
+  font-size: 12px;
+  line-height: 1.08;
+  padding-inline: 4px;
+
+  /* 1 línea compacta; pon 2 si lo prefieres */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  /* Para 2 líneas, usa:
+  white-space: normal;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  */
+}
+
+/* Responsive: mantiene columna y proporciones */
+@media (max-width: 900px){
+  .msb-item{ min-inline-size: 88px; }
+  .msb-item__inner{ min-block-size: 60px; gap: 4px; }
+  .msb-icon{ inline-size: 32px; border-radius: 8px; }
+  .msb-label{ font-size: 11.5px; }
+}
+@media (max-width: 640px){
+  .msb-item{ min-inline-size: 80px; padding: 6px 8px; }
+  .msb-item__inner{ min-block-size: 56px; }
+  .msb-icon{ inline-size: 28px; }
+  .msb-label{ font-size: 11px; }
+}
+

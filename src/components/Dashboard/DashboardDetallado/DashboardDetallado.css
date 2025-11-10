@@ -1,313 +1,222 @@
-/* =========================
-   Tokens base (mantén consistencia)
-   ========================= */
+/* =========================================================
+   0) ALIASES / NORMALIZACIÓN — SOLO TOKENS
+   ========================================================= */
 :root{
-  --bg: #0f141a;
-  --bg-elev: #131a22;
-  --ink: #e5eef9;
-  --muted: #9fb0c7;
-  --border: #1f2a36;
-  --shadow: 0 6px 20px rgba(0,0,0,.25);
-  
-  --accent: #22c55e;
-  --radius: 14px;
+  /* alias semánticos (no colores fijos) */
+  --bg:              var(--surface);
+  --bg-elev:         var(--surface-elev);
+  --ink-strong:      var(--ink);
+  --ink-weak:        color-mix(in oklab, var(--ink) 70%, transparent);
+  --ink-muted:       var(--muted);
+  --bd:              var(--border);
+  --focus-ring:      var(--ring);
+  --accent:          var(--primary);
+  --accent-ink:      var(--primary-ink);
+
+  /* contenedor y gutters fluidos */
+  --page-max: clamp(1200px, 94vw, 1760px);
+  --page-pad: clamp(14px, 2.4vw, 32px);
+
+  /* espaciamiento */
   --gap: 14px;
   --pad: 16px;
-  --font: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+
+  /* anchura de sidebar (usará las ya definidas en tus tokens) */
+  --sb-w: var(--sb-w-open);
 }
 
-/* =========================
-   Layout general
-   ========================= */
-.msb-layout{
-  width: 100%;
+/* =========================================================
+   1) SHELL / BASE
+   ========================================================= */
+html, body{
+  min-height: 100%;
+  background: var(--page-bg);
+  color: var(--ink-strong);
+}
+
+#root, .app{
+  min-height: 100dvh;
   display: grid;
-  grid-template-columns: 260px minmax(0,1fr);
-  gap: var(--gap);
-  color: var(--ink);
-  font-family: var(--font);
-  /* bloque único con fondo y borde suave */
-  background: var(--bg-elev);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  padding: var(--pad);
-  box-sizing: border-box;
-  overflow: auto;
 }
 
-/* =========================
-   Sidebar (msb)
-   ========================= */
+/* =========================================================
+   2) LAYOUT PRINCIPAL (sidebar + contenido)
+   ========================================================= */
+.msb-layout{
+  /* centrado con ancho máximo y gutters coherentes */
+  width: min(100%, var(--page-max));
+  margin-inline: auto;
+  padding-inline: var(--page-pad);
+  padding-block: var(--page-pad);
+  box-sizing: border-box;
+
+  display: grid;
+  grid-template-columns: var(--sb-w) minmax(0,1fr);
+  gap: var(--gap);
+  color: var(--ink-strong);
+}
+
+/* cuando colapses el sidebar desde JS, solo cambia la var */
+.msb-layout.is-collapsed{ --sb-w: var(--sb-w-closed); }
+
+/* =========================================================
+   3) SIDEBAR
+   ========================================================= */
 .msb{
-  position: sticky;   /* se queda visible al hacer scroll del contenido */
-  top: var(--pad);
+  position: sticky;
+  top: var(--page-pad);
   align-self: start;
 
-  background: color-mix(in oklab, var(--bg-elev) 98%, transparent);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 10px;
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,.02);
+  background: var(--sb-bg);
+  color: var(--sb-text);
+  border: 1px solid color-mix(in oklab, var(--sb-text) 14%, transparent);
+  border-radius: var(--radius-3xl);
+  box-shadow: var(--sb-shadow);
+  padding: 12px;
+  min-height: calc(100dvh - (var(--page-pad) * 2));
 }
 
 .msb-track{
   display: grid;
   gap: 8px;
-  max-height: calc(100vh - (var(--pad) * 2));
+  max-height: calc(100dvh - (var(--page-pad) * 2) - 60px);
   overflow: auto;
   scrollbar-width: thin;
-  scrollbar-color: #334155 transparent;
+  scrollbar-color: var(--sb-hover) transparent;
 }
 .msb-track::-webkit-scrollbar{ width: 8px; }
 .msb-track::-webkit-scrollbar-thumb{
-  background: #334155;
+  background: var(--sb-hover);
   border-radius: 999px;
 }
 
-/* Item del menú */
+/* item */
 .msb-item{
-  width: 100%;
-  text-align: left;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 10px;
-  background: #0f141a;
-  color: var(--ink);
-  cursor: pointer;
-  transition: transform .16s ease, background .16s ease, border-color .16s ease, box-shadow .16s ease;
-}
-.msb-item:hover{
-  background: #0d1218;
-  border-color: #253445;
-}
-.msb-item:active{
-  transform: translateY(1px);
-}
-.msb-item:focus-visible{
-  outline: 2px solid color-mix(in oklab, var(--accent) 55%, #ffffff 0%);
-  outline-offset: 2px;
-}
-
-/* Contenido interno del item */
-.msb-item__inner{
   display: grid;
   grid-template-columns: 28px 1fr;
   align-items: center;
   gap: 10px;
-}
 
-.msb-icon{
-  width: 28px; height: 28px;
-  display: grid; place-items: center;
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 1px solid var(--sb-pill-bd);
+  background: var(--sb-pill);
+  color: var(--sb-text);
+  cursor: pointer;
+  transition: transform .08s ease, background .18s ease, border-color .18s ease;
 }
-.sb-icon{
-  display: block; width: 22px; height: 22px; object-fit: contain;
-  filter: drop-shadow(0 0 0 rgba(0,0,0,0)); /* limpia halos raros */
-}
-
-.msb-label{
-  font-weight: 700;
-  font-size: .98rem;
-  letter-spacing: .2px;
-}
-
-/* Estado activo */
+.msb-item:hover{ background: var(--sb-hover); }
+.msb-item:active{ transform: translateY(1px); }
 .msb-item.is-active{
-  background: linear-gradient(0deg, rgba(34,197,94,.10), rgba(34,197,94,.10)), #0f141a;
-  border-color: color-mix(in oklab, var(--accent) 55%, var(--border) 45%);
-  box-shadow: 0 0 0 1px color-mix(in oklab, var(--accent) 35%, transparent);
+  outline: 2px solid color-mix(in oklab, var(--sb-text) 14%, transparent);
+  background: color-mix(in oklab, var(--sb-text) 10%, transparent);
 }
+.msb-label{ font-weight: 700; letter-spacing: .2px; }
 
-/* Espaciador final para que no quede el último item pegado al borde */
-.msb-spacer{
-  height: 2px; background: transparent;
-}
+/* compacidad opcional */
+.msb--compact .msb-item{ padding: 8px 10px; grid-template-columns: 24px 1fr; }
 
-/* =========================
-   Contenido principal
-   ========================= */
+/* =========================================================
+   4) CONTENIDO / HEADER / TOOLBAR
+   ========================================================= */
 .msb-content{
-  min-width: 0;
-  background: color-mix(in oklab, var(--bg-elev) 96%, transparent);
-  border: 1px solid var(--border);
-  border-radius: 12px;
+  min-width: 0; /* evita overflow del grid */
+  background: var(--bg);
+  border: 1px solid var(--bd);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
   padding: 14px;
 }
 
-/* Si tu DashboardResumen / DashboardDetallado usan contenedores internos,
-   puedes darles un poco de separación vertical entre “paneles” genéricos */
-.msb-content .panel{
-  margin-top: 12px;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  background: color-mix(in oklab, var(--bg-elev) 92%, transparent);
+/* header de página dentro del contenido */
+.headerRow{
+  background: linear-gradient(180deg, color-mix(in oklab, var(--bg) 92%, transparent), var(--bg));
+  border: 1px solid var(--bd);
+  border-radius: var(--radius);
+  padding: 12px 16px;
+  margin-bottom: 10px;
+}
+.header-inner{
+  width: min(100%, var(--page-max));
+  margin-inline: auto;
+  padding-inline: clamp(8px, 2vw, 16px);
+  display: grid; grid-template-columns: 1fr auto;
+  gap: 16px; align-items: center;
+}
+.brand{ display: flex; align-items: center; gap: 10px; }
+.brand h1{ margin: 0; font-weight: 800; font-size: 18px; color: var(--ink-strong); }
+
+/* toolbar pegajosa */
+.content-toolbar{
+  position: sticky; top: 0; z-index: 10;
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end;
+  gap: 8px; row-gap: 10px;
+  padding: 10px 12px;
+  background: var(--sb-bg);
+  color: var(--sb-text);
+  border: 1px solid color-mix(in oklab, var(--sb-text) 18%, transparent);
+  border-top-left-radius: var(--radius);
+  border-top-right-radius: var(--radius);
+  box-shadow: var(--sb-shadow);
 }
 
-/* =========================
-   Responsivo
-   ========================= */
-@media (max-width: 1080px){
-  .msb-layout{
-    grid-template-columns: 220px minmax(0,1fr);
-  }
+.theme-btn{
+  display: inline-grid; grid-auto-flow: column; align-items: center; gap: 8px;
+  padding: 8px 12px; border-radius: 999px;
+  border: 1px solid var(--bd);
+  background: var(--bg);
+  color: var(--ink-strong);
+  box-shadow: var(--shadow);
+  font-weight: 600; cursor: pointer;
 }
 
-@media (max-width: 860px){
-  /* El sidebar se convierte en “tabs” arriba */
-  .msb-layout{
-    grid-template-columns: 1fr;
-    gap: 10px;
-    padding: calc(var(--pad) - 4px);
-  }
-  .msb{
-    position: static;
-    border-radius: 10px;
-    padding: 8px;
-  }
-  .msb-track{
-    display: grid;
-    grid-auto-flow: column;
-    grid-auto-columns: minmax(140px, 1fr);
-    gap: 8px;
-    overflow-x: auto;
-    overflow-y: auto;
-    padding-bottom: 2px;
-  }
-  .msb-item{
-    text-align: center;
-    padding: 10px 12px;
-  }
-  .msb-item__inner{
-    grid-template-columns: 1fr;   /* icono arriba, label abajo en móviles */
-    justify-items: center;
-    gap: 6px;
-  }
-  .msb-label{ font-size: .95rem; }
-  .msb-content{
-    padding: 12px;
-  }
-}
-
-/* =========================
-   Accesibilidad y motion
-   ========================= */
-@media (prefers-reduced-motion: reduce){
-  .msb-item{
-    transition: none;
-  }
-}
-
-/* =========================
-   Utilidades opcionales
-   ========================= */
-/* Compacta el sidebar si necesitas más densidad */
-.msb--compact .msb-item{ padding: 8px; }
-.msb--compact .msb-item__inner{ grid-template-columns: 24px 1fr; gap: 8px; }
-.msb--compact .sb-icon{ width: 20px; height: 20px; }
-/* === 1) Full-bleed desde la raíz === */
-html, body, #root {
-  height: 100%;
-  width: 100%;
-}
-
-#root, .app, .page, .content, .container {
-  max-width: none !important;   /* quita límites heredados */
-  width: 100% !important;
-  margin: 0 !important;         /* evita centrados */
-  padding: 0;                   /* deja que tu layout mande */
-  box-sizing: border-box;
-}
-
-/* === 2) Layout de tu página (sidebar + contenido) siempre a 100% === */
-.msb-layout{
-  width: 100% !important;
-  max-width: 100vw !important;
-  margin: 0;
-  /* si quieres un “respiro” lateral uniforme: */
-  padding: 16px;                /* ajústalo si usas otro padding */
-}
-
-/* === 3) El área de contenido no puede encoger ni recortar === */
-.msb-content{
-  min-width: 0;                 /* evita overflow/encogimiento del grid */
-  width: 100%;
-}
-
-/* Si el .dash vive dentro de .msb-content, hazlo full-width del contenedor */
-.msb-content > .dash{
-  width: 100%;
-}
-
-/* === 4) Evitar que algún wrapper de tus paneles tenga ancho fijo === */
-.dash, .dash-left, .dash-center, .dash-right,
-.panel, .card, .section {
-  max-width: none;
-}
-
-/* === 5) (Opcional) utilidad por si tu shell usa contenedores “centrados” === */
-.full-bleed{
-  width: 100vw;
-  margin-left: 50%;
-  transform: translateX(-50%);
-}
-
-/* =========================
-   Dashboard: 3 columnas dentro de .msb-content
-   ========================= */
+/* =========================================================
+   5) DASHBOARD GRID (3 columnas → 2 → 1)
+   ========================================================= */
 .dash{
   width: 100%;
   display: grid;
-  grid-template-columns: 320px minmax(0,1fr) 360px; /* ← izquierda / centro / derecha */
-  column-gap: 14px;
+  grid-template-columns: 320px minmax(0,1fr) 360px;
+  column-gap: clamp(12px, 1.2vw, 20px);
   row-gap: 0;
 
-  /* bloque único con fondo/borde */
   background: var(--bg-elev);
-  border: 1px solid var(--border);
+  border: 1px solid var(--bd);
   border-radius: 12px;
   box-shadow: var(--shadow);
   padding: 14px;
   box-sizing: border-box;
   overflow: clip;
 }
-
-/* columnas internas: SIN fondo propio (ya lo tiene .dash) */
-.dash-left,
-.dash-center,
-.dash-right{
+.dash-left, .dash-center, .dash-right{
   min-width: 0;
   padding: 12px 14px;
   background: transparent;
-  border: 0;
-  box-shadow: none;
 }
+.dash-center{ border-left: 1px solid var(--bd); }
+.dash-right{  border-left: 1px solid var(--bd); }
 
-/* separadores sutiles entre columnas */
-.dash-center{ border-left: 1px solid var(--border); }
-.dash-right{  border-left: 1px solid var(--border); }
-
-/* paneles dentro de cada columna */
+/* paneles */
 .panel{
   margin-top: 12px;
   padding: 12px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--bd);
   border-radius: 12px;
   background: color-mix(in oklab, var(--bg-elev) 94%, transparent);
 }
 
-/* ===== Responsivo ===== */
+/* ===== breakpoints del dashboard ===== */
 @media (max-width: 1200px){
   .dash{
     grid-template-columns: 300px minmax(0,1fr);
   }
   .dash-right{
     border-left: 0;
-    border-top: 1px solid var(--border);
-    grid-column: 1 / -1; /* baja a segunda fila */
+    border-top: 1px solid var(--bd);
+    grid-column: 1 / -1;
   }
 }
-
 @media (max-width: 880px){
   .dash{
     grid-template-columns: 1fr;
@@ -316,187 +225,195 @@ html, body, #root {
   .dash-center,
   .dash-right{
     border-left: 0;
-    border-top: 1px solid var(--border);
+    border-top: 1px solid var(--bd);
   }
 }
 
-/* =========================
-   Mini componentes: donuts, gauge, bullets
-   ========================= */
+/* =========================================================
+   6) FORM / CAMPOS / BOTONES (solo tokens)
+   ========================================================= */
+input, select, textarea{
+  width: 100%;
+  background: var(--field-bg);
+  color: var(--ink-strong);
+  border: 1px solid var(--bd);
+  border-radius: 12px;
+  padding: 10px 12px;
+  outline: none;
+  transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
+}
+::placeholder{ color: color-mix(in oklab, var(--ink-weak) 88%, transparent); }
+input:focus, select:focus, textarea:focus{
+  border-color: color-mix(in oklab, var(--accent) 55%, var(--bd) 45%);
+  box-shadow: 0 0 0 4px var(--focus-ring);
+}
 
-/* KPI donut grande */
+.btn{
+  appearance: none;
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: 8px;
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: var(--accent-ink);
+  padding: 10px 14px;
+  border-radius: 999px;
+  font-weight: 700;
+  box-shadow: var(--shadow);
+  transition: transform .06s ease, filter .15s ease, box-shadow .18s ease;
+  cursor: pointer;
+}
+.btn:hover{ box-shadow: 0 0 0 6px var(--focus-ring); filter: brightness(1.03); }
+.btn:active{ transform: translateY(1px); }
+.btn[disabled]{ opacity: .6; cursor: not-allowed; }
+
+/* =========================================================
+   7) WIDGETS (KPI / gauge / listas)
+   ========================================================= */
 .kpi-total{ position: relative; display: grid; place-items: center; margin-bottom: 14px; }
 .kpi-total__text{ position: absolute; display:grid; place-items:center; }
-.kpi-total .big{ font-size: 1.8rem; font-weight: 800; line-height: 1; }
-.kpi-total .sub{ color: var(--muted); font-weight: 600; }
+.kpi-total .big{ font-size: 1.8rem; font-weight: 800; line-height: 1; color: var(--ink-strong); }
+.kpi-total .sub{ color: var(--ink-muted); font-weight: 600; }
 
-/* Donuts (grande y pequeño) */
-.donut{ display:block; }
-.donut.small{ width: 64px; height: 64px; }
-.donut-txt{
-  fill: var(--ink);
-  font-weight: 800;
-  font-size: .8rem;
-  dominant-baseline: middle;
-}
+.gauge{ display: grid; gap: 8px; }
+.gauge-svg{ display: block; }
+.gauge-txt{ fill: var(--ink-strong); font-weight: 800; font-size: .9rem; }
+.gauge__labels{ display: flex; justify-content: space-between; color: var(--ink-muted); font-size: .9rem; }
 
-/* Gauge semicircular */
-.gauge{ display:grid; gap: 8px; }
-.gauge-svg{ display:block; }
-.gauge-txt{
-  fill: var(--ink);
-  font-weight: 800;
-  font-size: .9rem;
-}
-.gauge__labels{
-  display:flex; justify-content:space-between;
-  color: var(--muted); font-size: .9rem;
-}
-
-/* =========================
-   Barras de estado (A tiempo / Fuera / En curso)
-   ========================= */
-.bullets{ list-style:none; margin: 6px 0 10px; padding: 0; }
+/* bullets */
+.bullets{ list-style: none; margin: 6px 0 10px; padding: 0; }
 .bullets--barred .bullet-row{
-  display:grid;
+  display: grid;
   grid-template-columns: 12px auto 1fr auto;
-  align-items:center;
-  gap:10px;
-  padding:6px 0;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 0;
 }
-.bullet-dot{ width:10px; height:10px; border-radius:2px; display:inline-block; }
-.bullet-label{ color:var(--ink); font-weight:700; font-size:.95rem; }
-.bullet-bar{
-  height:8px; border-radius:999px; overflow:hidden;
-  background:#1f2b38;
-}
-.bullet-fill{ height:100%; border-radius:inherit; }
-.bullet-val{ color:var(--muted); font-weight:700; }
+.bullet-dot{ width: 10px; height: 10px; border-radius: 2px; display: inline-block; background: var(--accent); }
+.bullet-label{ color: var(--ink-strong); font-weight: 700; font-size: .95rem; }
+.bullet-bar{ height: 8px; border-radius: 999px; overflow: hidden; background: color-mix(in oklab, var(--ink-weak) 10%, transparent); }
+.bullet-fill{ height: 100%; border-radius: inherit; background: var(--brand-400); }
+.bullet-val{ color: var(--ink-muted); font-weight: 700; }
 
-/* =========================
-   Resolutores (lista)
-   ========================= */
-.res-list{ list-style:none; margin:8px 0 0; padding:0; display:grid; gap:10px; }
+/* resolutores */
+.res-list{ list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 10px; }
 .res-item{
-  display:flex; align-items:center; justify-content:space-between;
-  padding:10px;
-  border:1px solid var(--border);
-  border-radius:12px;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px;
+  border: 1px solid var(--bd);
+  border-radius: 12px;
   background: color-mix(in oklab, var(--bg-elev) 96%, transparent);
 }
-.res-left{ display:flex; align-items:center; gap:10px; }
-.res-meta{ display:grid; gap:2px; }
-.res-name{ font-weight:700; }
-.res-sub{ color:var(--muted); font-size:.85rem; }
-.res-right{ text-align:right; }
-.res-total{ font-weight:800; }
-.res-caption{ color:var(--muted); font-size:.85rem; }
+.res-left{ display: flex; align-items: center; gap: 10px; }
+.res-meta{ display: grid; gap: 2px; }
+.res-name{ font-weight: 700; color: var(--ink-strong); }
+.res-sub{ color: var(--ink-muted); font-size: .85rem; }
+.res-right{ text-align: right; }
+.res-total{ font-weight: 800; }
 
-/* Corrige alineación del puntito (li) que te salía a la izquierda */
-.resolutores ul{ list-style: none; padding-left: 0; }
+/* top categorías */
+.topcats{ list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 10px; }
+.topcats-row{ display: grid; grid-template-columns: minmax(0, 160px) 1fr auto; align-items: center; gap: 12px; }
+.topcats-name{ font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.topcats-bar{ width: 100%; height: 10px; border-radius: 999px; background: color-mix(in oklab, var(--ink-weak) 10%, transparent); overflow: hidden; }
+.topcats-fill{ height: 100%; background: var(--brand-400); }
+.topcats-count{ font-weight: 800; }
 
-/* =========================
-   Top 5 categorías (lista con barras)
-   ========================= */
-.topcats{ list-style:none; margin:8px 0 0; padding:0; display:grid; gap:10px; }
-.topcats-row{
-  display:grid;
-  grid-template-columns: minmax(0, 160px) 1fr auto;
-  align-items:center; gap:12px;
-}
-.topcats-left{ min-width:0; }
-.topcats-name{ font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.topcats-bar{
-  width:100%; height:10px; border-radius:999px; background:#1f2b38; overflow:hidden;
-}
-.topcats-fill{ height:100%; background:#1b8a96; }
-.topcats-count{ font-weight:800; }
-
-/* =========================
-   Barras verticales (categorías / casos por día)
-   ========================= */
+/* barras “manuales” */
 .cats__title{ margin: 8px 0 6px; }
 .cats__plot{
-  position:relative; padding:8px 6px 4px;
+  position: relative; padding: 8px 6px 4px;
   background: color-mix(in oklab, var(--bg-elev) 96%, transparent);
-  border:1px solid var(--border);
-  border-radius:12px;
+  border: 1px solid var(--bd);
+  border-radius: 12px;
 }
 .cats__bars{
-  display:grid;
-  grid-auto-flow: column;
-  grid-auto-columns: minmax(28px, 1fr);
-  align-items:end;
-  gap:10px;
-  height:100%;
+  display: grid; grid-auto-flow: column; grid-auto-columns: minmax(28px, 1fr);
+  align-items: end; gap: 10px; height: 100%;
 }
-.cats__col{ display:grid; grid-template-rows:auto 1fr auto; align-items:end; gap:6px; }
-.cats__val{ text-align:center; font-weight:800; font-size:.85rem; color:var(--ink); }
-.cats__bar{
-  background:#1b8a96;
-  border-radius:6px 6px 2px 2px;
-  box-shadow: inset 0 -2px 0 rgba(255,255,255,.08);
-}
-.cats__lbl{
-  text-align:center; font-size:.8rem; color:var(--muted);
-  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-}
-.cats__baseline{
-  position:absolute; left:8px; right:8px; bottom:6px; height:2px;
-  background:#17707a; opacity:.55; border-radius:2px;
-}
+.cats__col{ display: grid; grid-template-rows: auto 1fr auto; align-items: end; gap: 6px; }
+.cats__val{ text-align: center; font-weight: 800; font-size: .85rem; color: var(--ink-strong); }
+.cats__bar{ background: var(--brand-500); border-radius: 6px 6px 2px 2px; box-shadow: inset 0 -2px 0 color-mix(in oklab, var(--ink-weak) 12%, transparent); }
+.cats__lbl{ text-align: center; font-size: .8rem; color: var(--ink-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cats__baseline{ position: absolute; left: 8px; right: 8px; bottom: 6px; height: 2px; background: color-mix(in oklab, var(--brand-600) 60%, transparent); opacity: .55; border-radius: 2px; }
 
-/* =========================
-   Fuentes de solicitud
-   ========================= */
+/* fuentes de solicitud */
 .fs-title{ margin: 0 0 8px; }
-.fs-hint{ color: var(--muted); }
+.fs-hint{ color: var(--ink-muted); }
+.fs-legend{ display: flex; flex-wrap: wrap; gap: 10px 16px; list-style: none; margin: 0 0 10px; padding: 0; }
+.fs-legend__item{ display: flex; align-items: center; gap: 8px; font-weight: 600; }
+.fs-legend__dot{ width: 10px; height: 10px; border-radius: 2px; display: inline-block; background: var(--brand-400); }
+.fs-legend__label{ color: var(--ink-strong); }
+.fs-stack{ display: flex; width: 100%; height: 18px; border-radius: 999px; overflow: hidden; background: color-mix(in oklab, var(--ink-weak) 8%, transparent); border: 1px solid var(--bd); }
+.fs-stack__seg{ height: 100%; }
 
-.fs-legend{
-  display:flex; flex-wrap:wrap; gap:10px 16px;
-  list-style:none; margin:0 0 10px; padding:0;
-}
-.fs-legend__item{ display:flex; align-items:center; gap:8px; font-weight:600; }
-.fs-legend__dot{ width:10px; height:10px; border-radius:2px; display:inline-block; }
-.fs-legend__label{ color:var(--ink); }
-
-.fs-stack{
-  display:flex; width:100%; height:18px; border-radius:999px; overflow:hidden;
-  background:#19232d; border:1px solid var(--border);
-}
-.fs-stack__seg{ height:100%; }
-
-.fs-grid{
-  display:grid; grid-template-columns: repeat(2, 1fr);
-  gap:10px; margin-top:12px;
-}
-.fs-card{
-  border:1px solid var(--border); border-radius:12px; padding:10px;
-  background: color-mix(in oklab, var(--bg-elev) 96%, transparent);
-  display:grid; place-items:center;
-}
-.fs-card__value{ font-weight:900; font-size:1.1rem; }
-.fs-card__label{ color:var(--muted); font-weight:600; }
-
-/* =========================
-   Encabezado centro + filtros
-   ========================= */
-.center-head{
-  display:flex; align-items:center; justify-content:flex-end;
-  gap:10px; margin-bottom:8px;
-}
+/* filtros */
+.center-head{ display: flex; align-items: center; justify-content: flex-end; gap: 10px; margin-bottom: 8px; }
 .filters .date{
-  background:#0f141a; color: var(--ink);
-  border:1px solid var(--border);
-  border-radius:10px; padding:6px 8px; height:34px;
+  background: var(--field-bg);
+  color: var(--ink-strong);
+  border: 1px solid var(--bd);
+  border-radius: 10px;
+  padding: 6px 8px; height: 34px;
 }
 
-/* =========================
-   Ajustes responsive finos
-   ========================= */
-@media (max-width: 540px){
-  .fs-grid{ grid-template-columns: 1fr; }
-  .cats__bars{ grid-auto-columns: minmax(24px, 1fr); gap: 8px; }
+/* =========================================================
+   8) TABLAS (por si usas alguna)
+   ========================================================= */
+.table{ width: 100%; border-collapse: separate; border-spacing: 0; }
+.table thead th{
+  text-align: left; font-weight: 700; color: var(--ink-strong);
+  background: var(--bg);
+  border-bottom: 2px solid var(--bd);
+  padding: 12px;
+}
+.table tbody td{
+  color: var(--ink-strong); padding: 12px; border-bottom: 1px solid var(--bd);
+}
+.table tbody tr:nth-child(odd){
+  background: color-mix(in oklab, var(--bg) 96%, var(--bd));
+}
+
+/* =========================================================
+   9) RESPONSIVE GLOBAL
+   ========================================================= */
+@media (max-width: 1080px){
+  .msb-layout{ grid-template-columns: 220px minmax(0,1fr); }
+}
+
+@media (max-width: 960px){
+  .msb-layout{
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  .msb{
+    position: static;
+    min-height: auto;
+  }
+  .msb-track{
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(140px, 1fr);
+    gap: 8px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-bottom: 2px;
+  }
+  .msb-item{
+    text-align: center;
+    grid-template-columns: 1fr;   /* icono arriba, label abajo */
+    justify-items: center;
+  }
+}
+
+@media (max-width: 640px){
+  .brand h1{ font-size: 16px; }
+  .theme-btn{ padding: 6px 10px; }
   .topcats-row{ grid-template-columns: minmax(0, 120px) 1fr auto; }
+  .cats__bars{ grid-auto-columns: minmax(24px, 1fr); gap: 8px; }
+  .fs-legend{ gap: 8px 12px; }
 }
 
+/* accesibilidad */
+@media (prefers-reduced-motion: reduce){
+  .msb-item, .btn{ transition: none; }
+}

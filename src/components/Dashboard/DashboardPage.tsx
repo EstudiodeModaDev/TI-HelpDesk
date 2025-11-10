@@ -17,7 +17,6 @@ export default function DashBoardPage() {
 
   return (
     <section className="msb-layout">
-      <aside className="msb" aria-label="Secciones">
         <div className="msb-track">
           {Items.map((it) => {
             const isActive = mode === it.id;
@@ -33,11 +32,8 @@ export default function DashBoardPage() {
           })}
           <div className="msb-spacer" aria-hidden="true" />
         </div>
-      </aside>
 
-      <div className="msb-content">
         {mode === "resumen" ? <DashboardResumen /> : <DashboardDetallado />}
-      </div>
     </section>
   );
 }
