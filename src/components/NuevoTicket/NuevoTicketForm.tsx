@@ -13,6 +13,8 @@ import type { TicketsService } from "../../Services/Tickets.service";
 import RichTextBase64 from "../RichTextBase64/RichTextBase64";
 import type { LogService } from "../../Services/Log.service";
 import { norm } from "../../utils/Commons";
+import { useTheme } from "../../Funcionalidades/Theme";
+const { theme } = useTheme();
 
 export type UserOptionEx = UserOption & { source?: "Empleado" | "Franquicia" };
 type TreeOption = {
@@ -135,7 +137,7 @@ export default function NuevoTicketForm() {
   const disabledCats = submitting || loadingCatalogos;
 
   return (
-    <div className="ticket-form" data-force-light>
+  <div className="ticket-form" data-theme={theme}>
       <h2 className="tf-title">Nuevo Ticket</h2>
 
       <form onSubmit={(e) => {e.preventDefault(); handleSubmit(e)}} noValidate className="tf-grid">
@@ -267,3 +269,5 @@ export default function NuevoTicketForm() {
       </div>
   );
 }
+
+

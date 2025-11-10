@@ -12,7 +12,7 @@
   gap: var(--page-pad);
   padding: var(--page-pad);
   border: transparent;
-  
+  overflow: visible;
 }
 
 /* Título */
@@ -148,6 +148,7 @@ input[type="file"].tf-input::file-selector-button:hover{
   display: flex;
   justify-content: flex-end;
   gap: 10px;
+  height: 10px;
 }
 
 /* Botón principal */
@@ -181,61 +182,7 @@ input[type="file"].tf-input::file-selector-button:hover{
 .tf-field.has-error .rtb-box{
   border-color: color-mix(in oklab, var(--primary) 50%, var(--border) 50%);
   box-shadow: 0 0 0 6px color-mix(in oklab, var(--ring) 70%, transparent);
-}
-
-/* ===============================
-   React-Select (classNamePrefix=rs)
-   =============================== */
-.rs__control{
-  background: var(--field-bg) !important;
-  border: 1px solid var(--border) !important;
-  min-height: clamp(36px, 5.5dvh, 44px) !important;
-  border-radius: 12px !important;
-  color: var(--ink) !important;
-  box-shadow: none !important;
-}
-.rs__control--is-focused{
-  border-color: var(--primary) !important;
-  box-shadow: 0 0 0 6px var(--ring) !important;
-}
-.rs__value-container{ padding: 0 10px !important; }
-.rs__placeholder{ color: color-mix(in oklab, var(--muted) 70%, transparent) !important; }
-.rs__single-value, .rs__input input{ color: var(--ink) !important; }
-
-.rs__menu{
-  background: var(--surface-elev) !important;
-  border: 1px solid var(--border) !important;
-  border-radius: 12px !important;
-  box-shadow: var(--shadow) !important;
-  overflow: hidden;
-  z-index: 50;
-}
-.rs__menu-list{
-  max-height: 42dvh !important;
-  padding: 6px !important;
-}
-
-.rs__option{
-  color: var(--ink) !important;
-  background: transparent !important;
-  padding: 10px 12px !important;
-  border-radius: 10px !important;
-}
-.rs__option--is-focused{
-  background: color-mix(in oklab, var(--primary) 12%, transparent) !important;
-}
-.rs__option--is-selected{
-  background: color-mix(in oklab, var(--primary) 18%, transparent) !important;
-  outline: 1px solid color-mix(in oklab, var(--primary) 45%, var(--border) 55%) !important;
-}
-.rs__indicator, .rs__dropdown-indicator, .rs__clear-indicator{
-  color: var(--muted) !important;
-}
-.rs__indicator:hover{ color: var(--ink) !important; }
-.rs__control--is-disabled{
-  background: color-mix(in oklab, var(--field-bg) 85%, transparent) !important;
-  border-color: color-mix(in oklab, var(--border) 70%, transparent) !important;
-  opacity: .7;
+  
 }
 
 /* ===============================
@@ -250,4 +197,103 @@ input[type="file"].tf-input::file-selector-button:hover{
 /* Scrollbar sutil en contenedores altos */
 .rtb-box, .rs__menu-list{
   scrollbar-width: thin;
+}
+
+/* ===== Modo oscuro: campos oscuros, texto claro ===== */
+/* Activa cuando el wrapper tenga data-theme="dark" y NO fuerces claro */
+.ticket-form[data-theme="dark"]:not([data-force-light]) {
+  color: var(--ink);
+}
+
+/* Inputs nativos (text, date, file, select) */
+.ticket-form[data-theme="dark"]:not([data-force-light]) .tf-input {
+  background: var(--field-bg);
+  color: var(--ink);
+  border: 1px solid var(--bd);
+  box-shadow: none;
+}
+.ticket-form[data-theme="dark"]:not([data-force-light]) .tf-input::placeholder{
+  color: color-mix(in oklab, var(--ink) 45%, transparent);
+}
+.ticket-form[data-theme="dark"]:not([data-force-light]) .tf-input:focus{
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--ring);
+}
+
+/* Select nativo (que no herede altura rígida de inputs si no quieres) */
+.ticket-form[data-theme="dark"]:not([data-force-light]) select.tf-input{
+  background: var(--field-bg);
+  color: var(--ink);
+}
+
+/* File input (contenedor + botón nativo) */
+.ticket-form[data-theme="dark"]:not([data-force-light]) input[type="file"].tf-input{
+  background: var(--field-bg);
+  color: var(--ink);
+  border-color: var(--bd);
+}
+.ticket-form[data-theme="dark"]:not([data-force-light]) input[type="file"].tf-input::file-selector-button,
+.ticket-form[data-theme="dark"]:not([data-force-light]) input[type="file"].tf-input::-webkit-file-upload-button{
+  background: var(--surface-elev);
+  color: var(--ink);
+  border: 1px solid var(--bd);
+}
+
+/* RichText / editor */
+.ticket-form[data-theme="dark"]:not([data-force-light]) .rtb-box{
+  background: var(--field-bg);
+  color: var(--ink);
+  border: 1px solid var(--bd);
+}
+.ticket-form[data-theme="dark"]:not([data-force-light]) .rtb-box *{
+  color: inherit;   /* asegura texto claro adentro */
+}
+
+/* ===== React-Select (classNamePrefix="rs") ===== */
+.ticket-form[data-theme="dark"]:not([data-force-light]) .rs__control{
+  background: var(--field-bg);
+  color: var(--ink);
+  border: 1px solid var(--bd);
+  box-shadow: none;
+}
+.ticket-form[data-theme="dark"]:not([data-force-light]) .rs__value-container{
+  color: var(--ink);
+}
+.ticket-form[data-theme="dark"]:not([data-force-light]) .rs__single-value,
+.ticket-form[data-theme="dark"]:not([data-force-light]) .rs__input-container input{
+  color: var(--ink);
+}
+.ticket-form[data-theme="dark"]:not([data-force-light]) .rs__placeholder{
+  color: color-mix(in oklab, var(--ink) 45%, transparent);
+}
+.ticket-form[data-theme="dark"]:not([data-force-light]) .rs__indicators svg{
+  /* iconos legibles en oscuro */
+  color: var(--ink);
+  fill: currentColor;
+}
+.ticket-form[data-theme="dark"]:not([data-force-light]) .rs__menu{
+  background: var(--surface-elev);
+  color: var(--ink);
+  border: 1px solid var(--bd);
+  box-shadow: var(--shadow);
+}
+.ticket-form[data-theme="dark"]:not([data-force-light]) .rs__option{
+  background: transparent;
+  color: var(--ink);
+}
+.ticket-form[data-theme="dark"]:not([data-force-light]) .rs__option--is-focused{
+  background: color-mix(in oklab, var(--primary) 14%, transparent);
+}
+.ticket-form[data-theme="dark"]:not([data-force-light]) .rs__option--is-selected{
+  background: var(--primary);
+  color: var(--primary-ink);
+}
+
+/* Etiquetas y ayudas */
+.ticket-form[data-theme="dark"]:not([data-force-light]) .tf-label{ color: var(--muted); }
+.ticket-form[data-theme="dark"]:not([data-force-light]) .error{ color: color-mix(in oklab, var(--primary) 10%, #ff6b6b); }
+
+/* Botón submit (ya usa tokens) — sin cambios, solo asegurar foco */
+.ticket-form[data-theme="dark"]:not([data-force-light]) .tf-submit:focus-visible{
+  box-shadow: 0 0 0 3px var(--ring);
 }

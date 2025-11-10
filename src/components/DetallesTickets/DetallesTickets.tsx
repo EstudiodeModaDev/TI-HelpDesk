@@ -11,6 +11,7 @@ import { ParseDateShow } from "../../utils/Date";
 import Trunc from "../Trunc/trunc";
 import { useTicketsAttachments } from "../../Funcionalidades/AttachmentsTickets";
 
+
 /* ================== Helpers y tipos ================== */
 const hasRecatRole = (r?: string) => {
   const v = (r ?? "").trim().toLowerCase();
@@ -238,12 +239,9 @@ export function CaseDetail({ ticket, onVolver, role }: Props) {
       {showRecat && (
         <div className="modal-overlay" role="dialog" aria-modal="true" aria-label="Recategorizar ticket">
           <div className="modal-card">
-            <div className="modal-head">
-              <h3>Recategorizar ticket #{selected.ID}</h3>
               <button type="button" className="modal-close" onClick={() => setShowRecat(false)} aria-label="Cerrar">
                 ✕
               </button>
-            </div>
             <div className="modal-body">
               <Recategorizar ticket={selected} />
             </div>

@@ -1,11 +1,4 @@
-/* ==========================================================================
-   0) TOKENS / PALETAS
-   - Dark por defecto (root)
-   - Light con <html data-theme="light">
-   - Sidebar conserva el aguamarina en ambos modos
-   ========================================================================== */
-
-/* ====== DARK (por defecto) ====== */
+/* ====== DARK ====== */
 :root{
   /* Marca / aguamarina */
   --brand-600:#176d72;     /* sidebar base */
@@ -353,6 +346,8 @@ input, select, textarea{
   box-sizing: border-box;
 }
 
+
+
 /* 2) Páginas/sections sueltas (por si no usas .msb-layout en todas)
    — añade gutters y límite de ancho sin tocar el sidebar */
 .page,
@@ -506,10 +501,10 @@ main{
   gap: 8px;
   row-gap: 10px;
 
-  background: var(--sb-bg);
+  background: transparent !important;
   color: var(--sb-text);
-  border: 1px solid var(--bd);
-  box-shadow: var(--sb-shadow);
+  border: 1px solid transparent;
+
   border-radius: var(--radius);
   padding: 10px 12px;
   margin-bottom: 10px;          /* separación con el contenido */
@@ -781,4 +776,56 @@ main{
 /* etiquetas de multi-value (por si luego usas isMulti) */
 .rs__multi-value__label{
   color: #000 !important;
+}
+
+/* ===== Reset de sombras/auras en la pantalla de Nuevo Ticket ===== */
+
+/* 1) Contenedores y cards */
+.msb-layout,
+.msb-content,
+.dash,
+.panel,
+.ticket-form,
+.tf-grid {
+  box-shadow: none !important;
+  filter: none !important;            /* por si hubiera drop-shadow */
+}
+
+/* 2) Pills del header (Salir / Cambiar de rol / tema) */
+.theme-btn,
+.sb-btn,
+.sb-btn--ghost {
+  box-shadow: none !important;
+}
+.theme-btn:focus-visible,
+.sb-btn:focus-visible {
+  /* foco accesible, sin glow verdoso */
+  box-shadow: none !important;
+  outline: 2px solid color-mix(in oklab, var(--ink) 40%, transparent);
+  outline-offset: 2px;
+}
+
+/* 3) Controles del formulario */
+.tf-submit {
+  box-shadow: none !important;
+}
+.tf-input:focus,
+.rtb-box:focus-within,
+select.tf-input:focus {
+  /* usa solo un borde, sin sombra */
+  box-shadow: none !important;
+  outline: 2px solid var(--ring);     /* o cámbialo por var(--border) si no quieres color */
+  outline-offset: 2px;
+}
+
+/* 4) Toolbar de rich text / inputs especiales */
+.ql-toolbar,
+.rs__control,
+.rs__menu {
+  box-shadow: none !important;
+}
+
+/* 5) Si quieres “apagar” completamente el glow menta del tema en esa vista: */
+.ticket-form {
+  --ring: transparent;  /* desactiva el color de halo localmente */
 }

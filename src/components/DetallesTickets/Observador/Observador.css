@@ -2,20 +2,6 @@
    DetalleTicket.css
    =============================== */
 
-:root{
-  --fg:#0b2b6a;           /* título/valores */
-  --muted:#6b7280;        /* labels */
-  --border:#e5e7eb;
-  --surface:#ffffff;
-  --surface-2:#f9fafb;
-  --accent:#62d4bf;       /* verde botón */
-  --accent-600:#48b7a3;
-  --ghost:#f1f5f9;
-
-  --radius:14px;
-  --shadow:0 10px 24px rgba(0,0,0,.06);
-}
-
 /* Contenedor principal */
 .detalle-ticket{
   background: var(--surface);

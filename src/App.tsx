@@ -300,7 +300,7 @@ function Shell() {
    ============================================================ */
 
 function LoggedApp({ user }: { user: User }) {
-  const { role } = useUserRole(user!.mail);
+  const { role, changeUser } = useUserRole(user!.mail);
   const services = useGraphServices() as { Tickets: TicketsService; Usuarios: UsuariosSPService; Logs: LogService, Anuncios: AnunciosService } & Record<string, any>;
   const { theme, toggle } = useTheme();
 
@@ -442,17 +442,24 @@ function LoggedApp({ user }: { user: User }) {
       <main className="content content--withSidebar">
         <div className="page-viewport">
             <div className="content-toolbar" role="toolbar" aria-label="Acciones de vista">
-              <button className="theme-btn" onClick={toggle} aria-label={`Cambiar a modo ${theme === "dark" ? "claro" : "oscuro"}`} aria-pressed={theme === "dark"} title={theme === "dark" ? "Modo oscuro activado" : "Modo claro activado"}>
-                <span className="theme-btn__icon" aria-hidden="true">
-                  {theme === "dark" ? "🌙" : "☀️"}
-                </span>
-                <span className="theme-btn__txt">{theme === "dark" ? "Oscuro" : "Claro"}</span>
-              </button>
               <button className="sb-btn sb-btn--ghost" onClick={() => logout()} aria-label="Cerrar sesión">
                 <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
                   <path d="M10 17l-1.4-1.4 3.6-3.6-3.6-3.6L10 7l5 5-5 5zM4 19h8v2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h8v2H4v14z" fill="currentColor"/>
                 </svg>
                 <span>Salir</span>
+              </button>
+              {(user?.mail === "cesanchez@estudiodemoda.com.co" || user?.mail === "dpalacios@estudiodemoda.com.co") &&
+                <button className="sb-btn sb-btn--ghost" onClick={() => changeUser()} aria-label="Cambiar de rol">
+                  <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+                    <path d="M10 17l-1.4-1.4 3.6-3.6-3.6-3.6L10 7l5 5-5 5zM4 19h8v2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h8v2H4v14z" fill="currentColor"/>
+                  </svg>
+                  <span>Cambiar de rol</span>
+                </button>
+              }
+              <button className="theme-btn" onClick={toggle} aria-label={`Cambiar a modo ${theme === "dark" ? "claro" : "oscuro"}`} aria-pressed={theme === "dark"} title={theme === "dark" ? "Modo oscuro activado" : "Modo claro activado"}>
+                <span className="theme-btn__icon" aria-hidden="true">
+                  {theme === "dark" ? "🌙" : "☀️"}
+                </span>
               </button>
             </div>
             <div className="page page--fluid center-all">{element}</div>

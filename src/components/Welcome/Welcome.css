@@ -236,10 +236,10 @@
 /* Opcional: en móviles volvemos a layout “normal” con padding arriba */
 @media (max-width: 960px){
   .solvi-left{
-    align-content: start;        /* evita que quede muy abajo en pantallas chicas */
+    align-content: start;        
   }
   .solvi-left__inner{
-    padding: 28px;               /* tu valor móvil */
+    padding: 28px;              
     margin-block: 0;
   }
 }
