@@ -53,6 +53,7 @@ export const Items = [
     { codigo: "SC41", descripcion: "MMTO. EQ. COMPUTO Y COMU SERVICIOS RC" },
     { codigo: "SC70", descripcion: "UTILES, PAPELERIA Y FOTOCOPIAS RC" },
     { codigo: "SC80", descripcion: "SERVICIO DE TELEFONIA" },
+    { codigo: "SC254", descripcion: "MTTO.EQ.COMPUTO Y COMUN SERVIC" },
   ];
 
 export const UN = [
