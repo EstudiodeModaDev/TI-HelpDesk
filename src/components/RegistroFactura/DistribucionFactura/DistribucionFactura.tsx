@@ -9,6 +9,9 @@ import { useFacturas } from "../../../Funcionalidades/RegistrarFactura";
 import DistribucionesLista from "./DistribucionesLista"; // ✅ Importamos la lista
 import { useAuth } from "../../../auth/authContext";
 
+import Select from "react-select"; // ✅ nuevo: para el campo de ítems
+
+
 export default function DistribucionFactura() {
 
   // Obtener mes actual en español
@@ -48,9 +51,10 @@ const mensajePredeterminado = `Detalle de impresiones en ${mesActual}`;
     CosTotServAdmin: 0,
     FechaEmision: "",
     NoFactura: "",
+    
+    Items: "",
+    DescripItems: "",
     // 🔸 Campos ocultos (no visibles en el formulario)
-    Items: "SC70",
-    DescripItems: "UTILES, PAPELERIA Y FOTOCOPIAS RC",
     CCmn: "22111",
     CCmi: "21111",
     CCcedi: "31311",
@@ -298,6 +302,86 @@ const mensajePredeterminado = `Detalle de impresiones en ${mesActual}`;
               <input type="text" id="nit" name="Title" value={formData.Title} readOnly />
             </div>
           </div>
+
+          {/* 🧾 Ítem (Código + descripción automática con búsqueda) */}
+{/* --------------------------------------------------------------
+    Este bloque permite seleccionar un código de ítem y su descripción
+    sin que se llenen automáticamente desde valores fijos del estado.
+    Puedes cargar la lista desde tu servicio o definirla localmente.
+   -------------------------------------------------------------- */}
+{(() => {
+  // Lista local de ejemplo (puedes reemplazarla por datos desde SharePoint)
+  const Items = [
+    { codigo: "SC11", descripcion: "ARREND. EQ. COMPUTAC Y COMUNICACIÓN" },
+    { codigo: "SC40", descripcion: "MMTO. EQ. COMPUTO Y COMU COMPRAS RC" },
+    { codigo: "SC41", descripcion: "MMTO. EQ. COMPUTO Y COMU SERVICIOS RC" },
+    { codigo: "SC70", descripcion: "UTILES, PAPELERIA Y FOTOCOPIAS RC" },
+    { codigo: "SC80", descripcion: "SERVICIO DE TELEFONIA" },
+    { codigo: "SC254", descripcion: "MTTO.EQ.COMPUTO Y COMUN SERVIC" },
+  ];
+
+  // Estado de errores opcional
+  const errors = { Items: "" };
+
+  return (
+    <>
+      <div className="form-group">
+        <label>Ítem (Código + descripción)</label>
+        <Select
+          classNamePrefix="rs"
+          className="rs-override"
+          options={Items.map((op) => ({
+            value: op.codigo,
+            label: `${op.codigo} - ${op.descripcion}`,
+          }))}
+          placeholder="Buscar ítem…"
+          isClearable
+          value={
+            formData.Items
+              ? {
+                  value: formData.Items,
+                  label:
+                    Items.find((op) => op.codigo === formData.Items)?.descripcion ||
+                    formData.Items,
+                }
+              : null
+          }
+          onChange={(opt) => {
+            // ✅ Permite seleccionar manualmente ítem y descripción
+            setFormData((prev) => ({
+              ...prev,
+              Items: opt?.value || "",
+              DescripItems: opt?.label?.split(" - ")[1] || "",
+            }));
+          }}
+          filterOption={(option, input) =>
+            option.label.toLowerCase().includes(input.toLowerCase())
+          }
+        />
+        <small className="error">{errors.Items}</small>
+      </div>
+
+      {/* 📝 Descripción del ítem (solo lectura o editable según necesidad) */}
+      <div className="form-group">
+        <label htmlFor="DescripItems">Descripción del ítem</label>
+        <input
+          id="DescripItems"
+          name="DescripItems"
+          value={formData.DescripItems}
+          onChange={(e) =>
+            setFormData((prev) => ({
+              ...prev,
+              DescripItems: e.target.value,
+            }))
+          }
+          placeholder="Escribe o selecciona descripción del ítem"
+        />
+        <small className="error">{errors.Items}</small>
+      </div>
+    </>
+  );
+})()}
+
 
           {/* Fecha de Emisión */}
           <div className="form-group">
