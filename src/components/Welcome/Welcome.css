@@ -121,13 +121,13 @@
 }
 
 .tagline{
-  margin: 0 0 28px;
+  margin: 0 0 78px;
   color: var(--muted);
   font-size: 16px;
   max-width: 52ch;
 }
 
-.cards{ display: grid; gap: 12px; }
+.cards{ display: grid; gap: 12px; margin-right: 50px;}
 
 .card{
   display:grid;
