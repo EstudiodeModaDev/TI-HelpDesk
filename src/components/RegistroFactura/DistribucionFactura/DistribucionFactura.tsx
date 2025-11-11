@@ -317,7 +317,7 @@ const mensajePredeterminado = `Detalle de impresiones en ${mesActual}`;
     { codigo: "SC41", descripcion: "MMTO. EQ. COMPUTO Y COMU SERVICIOS RC" },
     { codigo: "SC70", descripcion: "UTILES, PAPELERIA Y FOTOCOPIAS RC" },
     { codigo: "SC80", descripcion: "SERVICIO DE TELEFONIA" },
-    { codigo: "SC254", descripcion: "MTTO.EQ.COMPUTO Y COMUN SERVIC" },
+    { codigo: "SC254", descripcion: "MTTO.EQ.COMPUTO Y COMUN SERVIC(items o servicios sin iva)" },
   ];
 
   // Estado de errores opcional
