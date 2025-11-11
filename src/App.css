@@ -1,5 +1,3 @@
-
-
 /* ==========================================================================
    1) BASE / LAYOUT
    ========================================================================== */
@@ -23,7 +21,7 @@ html, body{
   grid-template-columns: var(--sb-w, var(--sb-w-open)) minmax(0,1fr);
   grid-template-areas:"sidebar content";
   gap:16px;
-  padding: var(--page-pad);
+  /* padding removido y gestionado por content/page-viewport */
   min-height:90dvh;
   align-items:stretch;
   transition:grid-template-columns .22s ease;
@@ -36,17 +34,69 @@ html, body{
   place-items:stretch;
   min-width:0; min-height:0;
   overflow:hidden;
+  padding-inline: var(--page-pad);    /* gutters */
+  box-sizing: border-box;
 }
 
 .page-viewport{
-  width:100%;
+  width: min(100%, var(--page-max));
   min-height: calc(90dvh - 32px);
   display:grid;
   place-items:stretch;
   min-width:0;
-  padding:20px;
+  padding: 20px 0;                    /* top/bottom */
+  padding-inline: var(--page-pad);    /* gutters */
   overflow:auto;
   background: transparent;
+  margin-inline: auto;                /* centrado */
+  box-sizing: border-box;
+}
+
+/* 0) Gutter global reutilizable */
+:root{
+  --page-pad: clamp(14px, 2.4vw, 28px);
+  --page-max: 1920px;
+}
+
+/* 1) Si tu layout principal es el grid con sidebar (.msb-layout) */
+.msb-layout{ gap: var(--gap, 14px); }
+
+/* 1.a) Padding solo a la columna de contenido (2da columna) */
+.msb-layout > *:last-child{
+  padding-inline: var(--page-pad);
+  width: min(100%, var(--page-max));
+  margin-inline: auto;
+  box-sizing: border-box;
+}
+
+/* 2) Páginas/sections sueltas */
+.page,
+.dashboard-page,
+.pz-page,
+.detalle-ticket-page{
+  padding-inline: var(--page-pad);
+  width: min(100%, var(--page-max));
+  margin-inline: auto;
+  box-sizing: border-box;
+}
+
+/* 3) Header/toolbar alineado al container */
+.header-inner{
+  width: min(100%, var(--page-max));
+  padding-inline: var(--page-pad);
+  margin-inline: auto;
+  box-sizing: border-box;
+}
+
+/* 4) Evita que algún wrapper anule los gutters */
+.app-content, main{
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* 5) En pantallas pequeñas no quites gutters */
+@media (max-width: 720px){
+  :root{ --page-pad: clamp(10px, 4vw, 16px); }
 }
 
 /* ==========================================================================
@@ -139,23 +189,32 @@ html, body{
   padding: 12px 16px;
   border-radius: var(--radius);
 }
-.header-inner{
-  width:min(100%, 1180px);
-  margin-inline:auto;
-  display:grid; grid-template-columns:1fr auto;
-  gap:16px; align-items:center;
-}
 .brand{ display:flex; align-items:center; gap:10px; }
 .brand h1{ margin:0; font-size:18px; font-weight:800; color:var(--ink); }
 
-.theme-btn{
-  display:inline-grid; grid-auto-flow:column; align-items:center; gap:8px;
-  padding:8px 12px; border-radius:999px;
-  border:1px solid var(--bd);
-  background:var(--surface); color:var(--ink);
-  box-shadow:var(--shadow); cursor:pointer; font-weight:600;
+/* ===== Toolbar en flujo normal (no fijo ni sticky) ===== */
+.content-toolbar{
+  position: static !important;
+  top: auto !important;
+  left: auto !important;
+  right: auto !important;
+  width: auto !important;
+
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+  row-gap: 10px;
+
+  background: transparent !important;
+  color: var(--sb-text);
+  border: 1px solid transparent;
+
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  height: 45px;
 }
-.theme-btn__icon{ font-size:16px; }
 
 /* ==========================================================================
    4) TARJETAS / FORM / BOTONES
@@ -186,6 +245,137 @@ input, select, textarea{
 .btn:hover{ box-shadow: 0 0 0 6px var(--ring); filter: brightness(1.02); }
 .btn:active{ transform: translateY(1px); }
 .btn[disabled]{ opacity:.6; cursor:not-allowed; }
+
+/* =========================================
+   Botón de tema (pill con icono + texto)
+   ========================================= */
+.theme-btn{
+  display: inline-grid;
+  grid-auto-flow: column;
+  align-items: center;
+  gap: 8px;
+
+  height: 40px;
+  padding: 0 14px;
+  border-radius: 999px;
+
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+
+  font: inherit;
+  font-weight: 700;
+  letter-spacing: .2px;
+  cursor: pointer;
+  user-select: none;
+
+  transition: filter .15s ease, transform .06s ease,
+              border-color .16s ease, box-shadow .16s ease, background .16s ease;
+}
+.theme-btn__icon{
+  font-size: 16px;
+  line-height: 1;
+  display: grid;
+  place-items: center;
+}
+.theme-btn:hover{
+  filter: brightness(1.03);
+  border-color: color-mix(in oklab, var(--border) 65%, var(--ink) 35%);
+  box-shadow: 0 0 0 6px var(--ring);
+}
+.theme-btn:active{
+  transform: translateY(1px);
+  filter: brightness(1.01);
+}
+.theme-btn:focus-visible{
+  outline: none;
+  box-shadow: 0 0 0 6px var(--ring);
+}
+.theme-btn[disabled]{
+  opacity: .6;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+.theme-btn.is-compact{
+  height: 34px;
+  padding: 0 10px;
+  gap: 6px;
+  font-weight: 700;
+}
+.theme-btn.is-compact .theme-btn__icon{ font-size: 14px; }
+
+/* =========================================
+   Botón ghost (texto + icono, fondo transparente)
+   ========================================= */
+.sb-btn{
+  display: inline-grid;
+  grid-auto-flow: column;
+  align-items: center;
+  gap: 8px;
+
+  height: 40px;
+  padding: 0 12px;
+  border-radius: var(--radius);
+
+  font: inherit;
+  font-weight: 800;
+  letter-spacing: .2px;
+  cursor: pointer;
+  user-select: none;
+
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid transparent;
+  transition: background .16s ease, color .16s ease, border-color .16s ease,
+              transform .06s ease, box-shadow .16s ease, filter .15s ease;
+}
+.sb-btn svg{ display:block; }
+
+.sb-btn--ghost{
+  background: color-mix(in oklab, var(--surface) 8%, transparent);
+  border-color: color-mix(in oklab, var(--border) 40%, transparent);
+}
+.sb-btn--ghost:hover{
+  background: color-mix(in oklab, var(--surface) 16%, transparent);
+  border-color: color-mix(in oklab, var(--border) 70%, transparent);
+  box-shadow: 0 0 0 6px var(--ring);
+}
+.sb-btn--ghost:active{
+  transform: translateY(1px);
+  filter: brightness(1.02);
+}
+.sb-btn--ghost:focus-visible{
+  outline: none;
+  box-shadow: 0 0 0 6px var(--ring);
+}
+
+/* Variantes semánticas */
+.sb-btn--primary{
+  background: var(--primary);
+  color: var(--primary-ink);
+  border-color: var(--primary);
+  box-shadow: 0 10px 24px color-mix(in oklab, var(--primary) 28%, transparent);
+}
+.sb-btn--primary:hover{ box-shadow: 0 0 0 6px var(--ring); }
+.sb-btn--primary:active{ transform: translateY(1px); }
+
+.sb-btn[disabled],
+.sb-btn--ghost[disabled]{
+  opacity: .6;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+.sb-btn.is-compact{
+  height: 34px;
+  padding: 0 10px;
+  gap: 6px;
+}
+
+/* Ajuste responsive de botones */
+@media (max-width: 520px){
+  .theme-btn, .sb-btn{ height: 36px; padding-inline: 10px; }
+}
 
 /* ==========================================================================
    5) TABLAS Y TEXTO
@@ -235,395 +425,31 @@ input, select, textarea{
   .theme-btn{ padding:6px 10px; }
 }
 
-/* 0) Gutter global reutilizable */
-:root{
-  --page-pad: clamp(14px, 2.4vw, 28px); /* margen izq/der fluido */
-  --page-max: 1920px;                   /* ancho cómodo del contenido */
-}
-
-/* 1) Si tu layout principal es el grid con sidebar (.msb-layout) */
-.msb-layout{
-  gap: var(--gap, 14px);
-}
-
-/* 1.a) Aplica padding solo a la columna de contenido (2da columna) */
-.msb-layout > *:last-child{
-  padding-inline: var(--page-pad);
-  width: min(100%, var(--page-max));
-  margin-inline: auto;                 /* centra el contenido */
-  box-sizing: border-box;
-}
-
-
-
-/* 2) Páginas/sections sueltas (por si no usas .msb-layout en todas)
-   — añade gutters y límite de ancho sin tocar el sidebar */
-.page,
-.dashboard-page,
-.pz-page,
-.detalle-ticket-page{
-  padding-inline: var(--page-pad);
-  width: min(100%, var(--page-max));
-  margin-inline: auto;
-  box-sizing: border-box;
-}
-
-/* 3) Header/toolbar: alinéalo con el container */
-.header-inner{
-  width: min(100%, var(--page-max));
-  padding-inline: var(--page-pad);
-  margin-inline: auto;
-  box-sizing: border-box;
-}
-
-/* 4) Evita que algún wrapper anule los gutters */
-.app-content,
-main{
-  width: 100%;
-  box-sizing: border-box;
-}
-
-/* 5) En pantallas pequeñas no quites gutters */
-@media (max-width: 720px){
-  :root{ --page-pad: clamp(10px, 4vw, 16px); }
-}
-
-/* 1) NO metas padding en el grid del layout */
-.layout--withSidebar{
-  gap: 16px;
-  padding: 0 !important;             /* antes: padding: var(--page-pad) */
-}
-
-/* 2) Aplica gutters y ancho máximo SOLO al contenido */
-.content--withSidebar{
-  padding-inline: var(--page-pad);    /* gutters */
-  box-sizing: border-box;
-}
-
-/* 3) El viewport de la página se centra y limita ancho */
-.page-viewport{
-  padding: 20px 0;                    /* top/bottom */
-  padding-inline: var(--page-pad);    /* usa tus gutters */
-  width: min(100%, var(--page-max));  /* límite de ancho */
-  margin-inline: auto;                /* centrado */
-  box-sizing: border-box;
-}
-
-/* 4) El header ya lo alíneaste: asegúrate de no tener 2 definiciones */
-.header-inner{
-  width: min(100%, var(--page-max));
-  padding-inline: var(--page-pad);
-  margin-inline: auto;
-  box-sizing: border-box;
-}
-
-/* 5) Opcional: que TODAS las páginas “sueltas” hereden gutters y ancho */
-.page, .dashboard-page, .pz-page, .detalle-ticket-page{
-  padding-inline: var(--page-pad);
-  width: min(100%, var(--page-max));
-  margin-inline: auto;
-  box-sizing: border-box;
-}
-
-/* 6) Si algún wrapper pisa los gutters, fuerza box-sizing */
-.app-content, main{ box-sizing: border-box; width: 100%; }
-
-/* ===== Toolbar fijo que no se desplaza ===== */
-:root{
-  --toolbar-h: clamp(52px, 6vw, 64px);
-}
-
-/* Offsets calculados según tu layout (sidebar + gap + gutters) */
-.layout--withSidebar{
-  --toolbar-top: var(--page-pad);
-  --toolbar-left: calc(var(--page-pad) + var(--sb-w, var(--sb-w-open)) + 16px); /* 16px = gap del grid */
-  --toolbar-right: var(--page-pad);
-}
-
-/* Dá espacio arriba al contenido para que no quede tapado por el toolbar */
-.page-viewport{
-  padding-top: calc(var(--toolbar-h) + var(--toolbar-top) + 8px);
-}
-
-/* En móvil (sidebar apilado), el toolbar ocupa el ancho del contenido */
-@media (max-width: 960px){
-  .layout--withSidebar{
-    --toolbar-left: var(--page-pad);
-  }
-}
-
-/* Seguridad para notch/iOS */
-@supports (top: env(safe-area-inset-top)){
-  .layout--withSidebar{
-    --toolbar-top: calc(var(--page-pad) + env(safe-area-inset-top));
-  }
-}
-
-/* ===== Toolbar fijo alineado al contenedor ===== */
-:root{
-  --toolbar-h: clamp(52px, 6vw, 64px);
-}
-
-/* offsets según tu layout (sidebar + gap + gutters) */
-.layout--withSidebar{
-  --toolbar-top:  var(--page-pad);
-  --toolbar-gap:  16px; /* tu gap del grid */
-  --toolbar-left: calc(var(--page-pad) + var(--sb-w, var(--sb-w-open)) + var(--toolbar-gap));
-  --toolbar-right: var(--page-pad);
-}
-
-
-/* espacio para que el contenido no quede bajo el toolbar */
-.page-viewport{
-  padding-top: calc(var(--toolbar-h) + var(--toolbar-top) + 8px);
-}
-
-
-/* móvil: toolbar ocupa todo el ancho del contenido */
-@media (max-width: 960px){
-  .layout--withSidebar{
-    --toolbar-left: var(--page-pad);
-  }
-}
-
-/* safe area (iOS) */
-@supports (top: env(safe-area-inset-top)){
-  .layout--withSidebar{
-    --toolbar-top: calc(var(--page-pad) + env(safe-area-inset-top));
-  }
-}
-
-/* === Toolbar en flujo normal (no fijo ni sticky) === */
-.content-toolbar{
-  position: static !important;  /* ← clave */
-  top: auto !important;
-  left: auto !important;
-  right: auto !important;
-  width: auto !important;
-
-  /* Mantén su estilo y comportamiento responsive */
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  align-items: center;
-  gap: 8px;
-  row-gap: 10px;
-
-  background: transparent !important;
-  color: var(--sb-text);
-  border: 1px solid transparent;
-
-  border-radius: var(--radius);
-  padding: 10px 12px;
-  margin-bottom: 10px;          /* separación con el contenido */
-  height: 45px;
-}
-
-/* Si añadiste espacio para el toolbar fijo, elimínalo */
-.page-viewport{
-  padding-top: 20px;            /* vuelve a tu padding normal */
-}
-
-/* Si creaste un spacer para el toolbar, anúlalo */
-.toolbar-spacer{ height: 0 !important; }
-
-/* =========================================
-   Botón de tema (pill con icono + texto)
-   ========================================= */
-.theme-btn{
-  display: inline-grid;
-  grid-auto-flow: column;
-  align-items: center;
-  gap: 8px;
-
-  height: 40px;
-  padding: 0 14px;
-  border-radius: 999px;
-
-  background: var(--surface);
-  color: var(--ink);
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow);
-
-  font: inherit;
-  font-weight: 700;
-  letter-spacing: .2px;
-  cursor: pointer;
-  user-select: none;
-
-  transition: filter .15s ease, transform .06s ease,
-              border-color .16s ease, box-shadow .16s ease, background .16s ease;
-}
-
-.theme-btn__icon{
-  font-size: 16px;
-  line-height: 1;
-  display: grid;
-  place-items: center;
-}
-
-.theme-btn:hover{
-  filter: brightness(1.03);
-  border-color: color-mix(in oklab, var(--border) 65%, var(--ink) 35%);
-  box-shadow: 0 0 0 6px var(--ring);
-}
-
-.theme-btn:active{
-  transform: translateY(1px);
-  filter: brightness(1.01);
-}
-
-.theme-btn:focus-visible{
-  outline: none;
-  box-shadow: 0 0 0 6px var(--ring);
-}
-
-.theme-btn[disabled]{
-  opacity: .6;
-  cursor: not-allowed;
-  box-shadow: none;
-}
-
-/* Variante compacta (si necesitas menos espacio) */
-.theme-btn.is-compact{
-  height: 34px;
-  padding: 0 10px;
-  gap: 6px;
-  font-weight: 700;
-}
-.theme-btn.is-compact .theme-btn__icon{ font-size: 14px; }
-
-/* =========================================
-   Botón ghost (texto + icono, fondo transparente)
-   ========================================= */
-.sb-btn{
-  display: inline-grid;
-  grid-auto-flow: column;
-  align-items: center;
-  gap: 8px;
-
-  height: 40px;
-  padding: 0 12px;
-  border-radius: var(--radius);
-
-  font: inherit;
-  font-weight: 800;
-  letter-spacing: .2px;
-  cursor: pointer;
-  user-select: none;
-
-  background: transparent;
-  color: var(--ink);
-  border: 1px solid transparent;
-  transition: background .16s ease, color .16s ease, border-color .16s ease,
-              transform .06s ease, box-shadow .16s ease, filter .15s ease;
-}
-
-.sb-btn svg{ display:block; }
-
-/* Ghost por defecto */
-.sb-btn--ghost{
-  background: color-mix(in oklab, var(--surface) 8%, transparent);
-  border-color: color-mix(in oklab, var(--border) 40%, transparent);
-}
-
-.sb-btn--ghost:hover{
-  background: color-mix(in oklab, var(--surface) 16%, transparent);
-  border-color: color-mix(in oklab, var(--border) 70%, transparent);
-  box-shadow: 0 0 0 6px var(--ring);
-}
-
-.sb-btn--ghost:active{
-  transform: translateY(1px);
-  filter: brightness(1.02);
-}
-
-.sb-btn--ghost:focus-visible{
-  outline: none;
-  box-shadow: 0 0 0 6px var(--ring);
-}
-
-/* Variantes semánticas (opcional) */
-.sb-btn--primary{
-  background: var(--primary);
-  color: var(--primary-ink);
-  border-color: var(--primary);
-  box-shadow: 0 10px 24px color-mix(in oklab, var(--primary) 28%, transparent);
-}
-.sb-btn--primary:hover{ box-shadow: 0 0 0 6px var(--ring); }
-.sb-btn--primary:active{ transform: translateY(1px); }
-
-/* Estado disabled */
-.sb-btn[disabled],
-.sb-btn--ghost[disabled]{
-  opacity: .6;
-  cursor: not-allowed;
-  box-shadow: none;
-}
-
-/* Tamaño reducido */
-.sb-btn.is-compact{
-  height: 34px;
-  padding: 0 10px;
-  gap: 6px;
-}
-
-/* Ajuste responsive mínimo para contenedores estrechos */
-@media (max-width: 520px){
-  .theme-btn, .sb-btn{ height: 36px; padding-inline: 10px; }
-}
-
-/* =========================================================
+/* ==========================================================================
    THEME GLOBAL REACT-SELECT  (classNamePrefix="rs")
-   Depende solo de tus tokens en :root / [data-theme="light"]
-   ========================================================= */
-
-/* Tamaño/forma por defecto */
+   (versión más reciente unificada)
+   ========================================================================== */
 .rs__control{
   --rs-h: 44px;
-
   min-height: var(--rs-h);
-  border-radius: var(--radius);
-  background: var(--field-bg) !important;
+  border-radius: 12px;
   border: 1px solid var(--bd) !important;
-  color: var(--ink) !important;
-
+  background: var(--panel, var(--field-bg)) !important;
+  color: var(--fg, var(--ink)) !important;
   box-shadow: none !important;
   transition: border-color .15s ease, box-shadow .15s ease, background .15s ease, opacity .15s ease;
 }
-
-/* Hover/focus/disabled */
-.rs__control:hover{
-  border-color: color-mix(in oklab, var(--bd) 70%, var(--ink) 30%) !important;
-}
+.rs__value-container{ padding: 6px 10px !important; gap: 6px; }
+.rs__single-value,
+.rs__input-container{ color: var(--fg, var(--ink)) !important; }
+.rs__placeholder{ color: color-mix(in oklab, var(--mut, var(--muted)) 80%, transparent) !important; }
 .rs__control--is-focused{
-  border-color: color-mix(in oklab, var(--primary) 55%, var(--bd) 45%) !important;
+  border-color: color-mix(in oklab, var(--pri, var(--primary)) 55%, var(--bd) 45%) !important;
   box-shadow: 0 0 0 4px var(--ring) !important;
 }
-.rs__control--is-disabled{
-  opacity: .6 !important;
-  cursor: not-allowed !important;
-}
-
-/* Contenido interno */
-.rs__value-container{
-  padding: 6px 10px !important;
-  gap: 6px;
-}
-.rs__input-container,
-.rs__single-value{
-  color: var(--ink) !important;
-}
-.rs__placeholder{
-  color: color-mix(in oklab, var(--muted) 80%, transparent) !important;
-}
-
-/* Indicadores (flecha, clear, loading) */
-.rs__indicators{
-  gap: 4px;
-}
+.rs__indicators{ gap: 4px; }
 .rs__indicator{
-  color: color-mix(in oklab, var(--ink) 85%, transparent) !important;
+  color: color-mix(in oklab, var(--fg, var(--ink)) 85%, transparent) !important;
   fill: currentColor !important;
   transition: opacity .15s ease;
 }
@@ -631,130 +457,54 @@ main{
   background: color-mix(in oklab, var(--bd) 85%, transparent) !important;
 }
 .rs__clear-indicator:hover,
-.rs__dropdown-indicator:hover{
-  opacity: .85 !important;
-}
+.rs__dropdown-indicator:hover{ opacity: .85 !important; }
 
-/* Menú flotante */
-
-/* ====== React-Select dentro del panel ====== */
-.rs__control{
-  min-height: 44px;
-  border-radius: 12px;
-  border: 1px solid var(--bd) !important;
-  background: var(--panel) !important;
-  color: var(--fg) !important;
-  box-shadow: none !important;
-}
-.rs__value-container{ padding: 6px 10px !important; }
-.rs__single-value,
-.rs__input-container{ color: var(--fg) !important; }
-.rs__placeholder{ color: color-mix(in oklab, var(--mut) 80%, transparent) !important; }
-.rs__control--is-focused{
-  border-color: color-mix(in oklab, var(--pri) 55%, var(--bd) 45%) !important;
-  box-shadow: 0 0 0 4px var(--ring) !important;
-}
 .rs__menu{
   background: var(--surface-elev) !important;
-  color: var(--fg) !important;
+  color: var(--fg, var(--ink)) !important;
   border: 1px solid var(--bd) !important;
-  border-radius: var(--r) !important;
+  border-radius: var(--r, var(--radius)) !important;
   box-shadow: var(--shadow) !important;
 }
 
-
-/* ===== Reset de sombras/auras en la pantalla de Nuevo Ticket ===== */
-
-/* 1) Contenedores y cards */
+/* ==========================================================================
+   RESETS ESPECÍFICOS (última versión)
+   ========================================================================== */
 .msb-layout,
 .msb-content,
 .dash,
 .panel,
 .ticket-form,
-.tf-grid {
-  box-shadow: none !important;
-  filter: none !important;            /* por si hubiera drop-shadow */
-}
+.tf-grid { box-shadow: none !important; filter: none !important; }
 
-/* 2) Pills del header (Salir / Cambiar de rol / tema) */
 .theme-btn,
 .sb-btn,
-.sb-btn--ghost {
-  box-shadow: none !important;
-}
+.sb-btn--ghost { box-shadow: none !important; }
+
 .theme-btn:focus-visible,
-.sb-btn:focus-visible {
-  /* foco accesible, sin glow verdoso */
+.sb-btn:focus-visible{
   box-shadow: none !important;
   outline: 2px solid color-mix(in oklab, var(--ink) 40%, transparent);
   outline-offset: 2px;
 }
 
-/* 3) Controles del formulario */
-.tf-submit {
-  box-shadow: none !important;
-}
+.tf-submit { box-shadow: none !important; }
 .tf-input:focus,
 .rtb-box:focus-within,
-select.tf-input:focus {
-  /* usa solo un borde, sin sombra */
+select.tf-input:focus{
   box-shadow: none !important;
-  outline: 2px solid var(--ring);     /* o cámbialo por var(--border) si no quieres color */
+  outline: 2px solid var(--ring);
   outline-offset: 2px;
 }
-
-/* 4) Toolbar de rich text / inputs especiales */
 .ql-toolbar,
 .rs__control,
-.rs__menu {
-  box-shadow: none !important;
-}
+.rs__menu { box-shadow: none !important; }
 
-/* 5) Si quieres “apagar” completamente el glow menta del tema en esa vista: */
-.ticket-form {
-  --ring: transparent;  /* desactiva el color de halo localmente */
-}
+.ticket-form, .cajeros-pos{ --ring: transparent; }
 
-/* ====== Botones ====== */
-
-/*Boton principal*/
-.btn-primary{
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-
-  height: clamp(36px, 5dvh, 44px);
-  padding: 0 16px;
-  border-radius: 12px;
-  border: 1px solid color-mix(in oklab, var(--pri) 60%, var(--bd) 40%);
-  background: var(--pri);
-  color: var(--pri-ink);
-  font-weight: 800;
-  letter-spacing: .2px;
-  cursor: pointer;
-
-  box-shadow: 0 8px 18px color-mix(in oklab, var(--pri) 22%, transparent);
-  transition: transform .08s ease, filter .15s ease, box-shadow .15s ease;
-}
-.btn-primary:hover{ filter: brightness(1.05); }
-.btn-primary:active{ transform: translateY(1px) scale(.995); }
-.btn-primary:disabled{ opacity: .6; cursor: not-allowed; box-shadow: none; }
-
-/*Boton secundario*/
-.btn-secondary{
-  border: 1px solid color-mix(in oklab, var(--primary) 35%, var(--bd));
-  background: color-mix(in oklab, var(--primary) 10%, transparent);
-  color: var(--ink);
-  box-shadow: 0 6px 16px color-mix(in oklab, var(--primary) 16%, transparent);
-}
-
-/* Botón full-width en móviles */
-@media (max-width: 900px){
-  .btn-primary{ width: 100%; }
-}
-
-/* ------------------------- Paginación -------------------- */
+/* ==========================================================================
+   PAGINACIÓN
+   ========================================================================== */
 .pager{
   display: flex;
   align-items: center;
@@ -774,7 +524,6 @@ select.tf-input:focus {
   gap: 10px;
   align-items: center;
 }
-
 .pager-right > button{
   height: 36px;
   padding: 0 12px;
@@ -785,9 +534,7 @@ select.tf-input:focus {
   font-weight: 700;
   cursor: pointer;
 }
-.pager-right > button:disabled{
-  opacity: .55; cursor: not-allowed;
-}
+.pager-right > button:disabled{ opacity: .55; cursor: not-allowed; }
 .pager-right > select{
   height: 36px;
   border-radius: 10px;
@@ -797,10 +544,11 @@ select.tf-input:focus {
   padding: 0 10px;
 }
 
+/* Fuerza que ningún wrapper imponga max-widths */
 #root, .app, .page, .content, .container {
-  max-width: none !important;   /* quita límites heredados */
+  max-width: none !important;
   width: 100% !important;
-  margin: 0 !important;         /* evita centrados */
-  padding: 0;                   /* deja que tu layout mande */
+  margin: 0 !important;
+  padding: 0;
   box-sizing: border-box;
 }

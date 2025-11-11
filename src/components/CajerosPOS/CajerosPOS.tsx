@@ -64,20 +64,16 @@ export default function CajerosPOSForm({ services }: Props) {
           <div className="cp-campo">
             <label>Compañía</label>
             <Select<Option, false>
-              classNamePrefix="rs"
-              placeholder="Selecciona compañía…"
               options={companiaOptions}
+              placeholder="Selecciona"
               value={companiaOptions.find(o => o.value === state.Compañia) ?? null}
               onChange={(opt: SingleValue<Option>) =>
                 setField("Compañia", opt?.value ?? "")
               }
-              isClearable
-              styles={{
-                container: (base) => ({ ...base, width: "100%" }),
-                menuPortal: (base) => ({ ...base, zIndex: 9999 }),
-              }}
-              menuPortalTarget={typeof document !== "undefined" ? document.body : null}
-            />
+              classNamePrefix="rs"
+               isClearable
+                        />
+
             {(errors as any).Compañia && (
               <small style={{ color: "#b91c1c" }}>
                 {(errors as any).Compañia}
