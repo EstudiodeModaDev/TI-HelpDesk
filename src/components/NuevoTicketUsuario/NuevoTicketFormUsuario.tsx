@@ -57,6 +57,7 @@ export default function NuevoTicketUsuarioForm() {
             </ul>)}
         </div>
       </form>
+      <br />
       <div className="tf-actions tf-col-2">
         <button type="submit" disabled={submitting} className="btn-primary">
           {submitting ? "Enviando..." : "Enviar Ticket"}

@@ -92,7 +92,7 @@
 .as-text{
   background:none; border:none; padding:0;
   color: color-mix(in oklab, var(--primary) 78%, var(--ink));
-  font-weight:700; cursor:pointer;
+  font-weight:400; cursor:pointer;
 }
 .as-text:hover{ text-decoration: underline; }
 .cd-value .as-text:focus-visible{
@@ -121,13 +121,15 @@
   background: color-mix(in oklab, var(--surface-elev) 92%, var(--surface));
 }
 .cd-people-label{
-  background: rgb(158, 156, 156);
+  background: rgb(221, 218, 218);
   color: black;
-  padding:8px 10px; font-weight:800;
+  font-weight:800;
   border-bottom:1px solid var(--bd);
+  height:30px;
+  padding-left: 10px;
 }
 .cd-people-value{
-  padding:8px 10px; min-height:34px; display:flex; align-items:center;
+  padding:8px 10px; min-height:10px; display:flex; align-items:center;
 }
 
 /* Bloque derecho (título, descripción, casos) */

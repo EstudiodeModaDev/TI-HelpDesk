@@ -181,7 +181,8 @@
 /* === Tipos ======================================================= */
 /* Seguimiento — gris pastel */
 .th-bubble.th-default{
-  background: color-mix(in oklab, var(--bd, #e5e7eb) 55%, var(--surface, #fff));
+  --th-gray: var(--primary, #e6e8ec);
+  background: color-mix(in oklab, #9c9e9d 55%, var(--surface, #fff));
   border-color: color-mix(in oklab, var(--bd, #e5e7eb) 70%, var(--surface, #fff));
   border-left-color: color-mix(in oklab, var(--bd, #e5e7eb) 90%, var(--surface, #fff));
   color: var(--ink, #0f172a);
@@ -190,7 +191,7 @@
 /* Solución — azul pastel (usa --primary si existe) */
 .th-bubble.th-solucion{
   --th-blue: var(--primary, #3b82f6);
-  background: color-mix(in oklab, var(--th-blue) 18%, var(--surface, #fff));
+  background: #ccf0d8;
   border-color: color-mix(in oklab, var(--th-blue) 38%, var(--bd, #e5e7eb));
   border-left-color: color-mix(in oklab, var(--th-blue) 65%, var(--bd, #e5e7eb));
   color: var(--ink, #0f172a);
@@ -198,10 +199,10 @@
 
 /* Creación — verde pastel (usa --success si lo tienes; si no, #22c55e) */
 .th-bubble.th-creacion{
-  --th-green: #22c55e; 
-  background: #bbf7d0;
+ --th-blue: var(--primary, #3b82f6);
+   background: color-mix(in oklab, var(--th-blue) 18%, var(--surface, #fff));
   border-color: color-mix(in oklab, --th-green 38%, var(--bd, #e5e7eb));
-  border-left-color: color-mix(in oklab, --th-green 65%, var(--bd, #e5e7eb));
+  border-left-color: rgb(104, 104, 206);
   color: var(--ink, #0f172a);
 }
 

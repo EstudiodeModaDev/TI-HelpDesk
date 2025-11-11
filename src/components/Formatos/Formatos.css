@@ -26,6 +26,7 @@
   font-weight: 800;
   letter-spacing: .2px;
   color: var(--ink);
+  border-left: 0px;
 }
 
 /* Select nativo elegante */
