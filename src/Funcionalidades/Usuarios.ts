@@ -146,7 +146,7 @@ export function useUsuarios(usuariosSvc: UsuariosSPService) {
         const id     = String((u as any).ID ?? "");
 
         // label como "Nombre - correo" (si hay correo)
-        const label  = correo ? `${nombre} - ${correo}` : nombre;
+        const label  = nombre;
 
         return {
           value: correo || id,   // usa correo como clave estable; fallback id
