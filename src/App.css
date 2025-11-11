@@ -1,97 +1,4 @@
-/* ====== DARK ====== */
-:root{
-  /* Marca / aguamarina */
-  --brand-600:#176d72;     /* sidebar base */
-  --brand-700:#0f686c;     /* sidebar más oscuro */
-  --brand-500:#1e7e83;     /* chips/badges */
-  --brand-400:#23a3a3;     /* realces sutiles */
 
-  /* Superficies y texto (contenido) */
-  --page-bg: radial-gradient(1200px 800px at 20% -10%, #0e3d3f 0%, #0b2327 35%, #0b171a 100%);
-  --surface:#0f1a1d;       /* paneles/cards */
-  --surface-elev:#122126;  /* panel elevado */
-  --field-bg:#0c1619;      /* inputs */
-  --ink:#eaf6f6;           /* texto */
-  --muted:#a6c2c5;
-  --border:#1c3135;        /* bordes sutiles */
-  --ring:rgba(35, 163, 163, .28);
-
-  /* Botón primario (mint/teal) */
-  --primary:#23c2ad;
-  --primary-ink:#052b2b;
-
-  /* Sombras y radios */
-  --shadow:0 14px 34px rgba(0,0,0,.35);
-  --radius:18px;
-  --radius-3xl:26px;
-
-  /* Sidebar */
-  --sb-bg:var(--brand-600);
-  --sb-bg-2:var(--brand-700);
-  --sb-text:#eaf6f6;
-  --sb-muted:#cfe7e5;
-  --sb-pill:rgba(255,255,255,.12);
-  --sb-hover:rgba(255,255,255,.10);
-  --sb-shadow:0 14px 34px rgba(0,0,0,.28);
-  --sb-pill-bd:rgba(255,255,255,.18);
-
-  /* Layout */
-  --page-pad:16px;
-  --radius-xl:22px;
-  --sb-w-open:280px;
-  --sb-w-closed:72px;
-
-  /* Charts */
-  --chart-grid: color-mix(in oklab, var(--ink) 10%, transparent);
-  --chart-axis: color-mix(in oklab, var(--ink) 65%, transparent);
-  --chart-tooltip-bg: var(--surface);
-  --chart-tooltip-bd: var(--border);
-  --chart-tooltip-ink: var(--ink);
-
-  /* Alias */
-  --bd: var(--border);
-}
-
-/* ====== LIGHT ====== */
-:root[data-theme="light"]{
-  /* Conserva sidebar aguamarina */
-  --sb-bg:var(--brand-600);
-  --sb-bg-2:var(--brand-700);
-  --sb-text:#eaf6f6;
-  --sb-muted:#cfe7e5;
-  --sb-pill:rgba(255,255,255,.12);
-  --sb-hover:rgba(255,255,255,.10);
-  --sb-shadow:0 14px 30px rgba(2,6,23,.10);
-  --sb-pill-bd:rgba(255,255,255,.18);
-
-  /* Fondo general con degradé suave */
-  --page-bg: radial-gradient(1200px 800px at 22% -10%, #d8f5ef 0%, #b9eee6 35%, #a8e6de 70%, #eafefd 100%);
-
-  /* Superficies del contenido */
-  --surface:#ffffff;
-  --surface-elev:#ffffff;
-  --field-bg:#f7fbfb;
-  --ink:#0f172a;
-  --muted:#6b7b80;
-  --border:#e6eef0;
-  --ring:rgba(35,163,163,.22);
-
-  /* Botón primario mint/teal */
-  --primary:#22c5af;
-  --primary-ink:#053131;
-
-  /* Sombras */
-  --shadow:0 12px 28px rgba(2,6,23,.12);
-
-  /* Charts */
-  --chart-grid: color-mix(in oklab, var(--ink) 12%, transparent);
-  --chart-axis: color-mix(in oklab, var(--ink) 58%, transparent);
-  --chart-tooltip-bg: var(--surface);
-  --chart-tooltip-bd: var(--border);
-  --chart-tooltip-ink: var(--ink);
-
-  --bd: var(--border);
-}
 
 /* ==========================================================================
    1) BASE / LAYOUT
@@ -154,7 +61,8 @@ html, body{
   padding:14px 14px 8px;
   position:sticky; top: var(--page-pad);
   margin-block-end: var(--page-pad);
-  height: calc(100dvh - (var(--page-pad) * 2) - var(--page-pad));
+  height: auto;
+  margin-top: 10px;
 }
 
 .sidebar__header{
@@ -665,118 +573,95 @@ main{
   .theme-btn, .sb-btn{ height: 36px; padding-inline: 10px; }
 }
 
-/* ====== REACT-SELECT (classNamePrefix="rs") ====== */
-/* valor seleccionado y texto que escribes */
-/* ============================================
-   THEME React-Select (classNamePrefix="rs")
-   ============================================ */
-/* Contenedor y control */
+/* =========================================================
+   THEME GLOBAL REACT-SELECT  (classNamePrefix="rs")
+   Depende solo de tus tokens en :root / [data-theme="light"]
+   ========================================================= */
+
+/* Tamaño/forma por defecto */
 .rs__control{
-  border-radius: var(--dt-radius);
-  border: 1px solid var(--dt-bd) !important;
-  background: var(--dt-field-bg) !important;
-  color: var(--dt-fg) !important;
-  min-height: 42px;
+  --rs-h: 44px;
+
+  min-height: var(--rs-h);
+  border-radius: var(--radius);
+  background: var(--field-bg) !important;
+  border: 1px solid var(--bd) !important;
+  color: var(--ink) !important;
+
   box-shadow: none !important;
-  transition: box-shadow .15s ease, border-color .15s ease, background .15s ease;
+  transition: border-color .15s ease, box-shadow .15s ease, background .15s ease, opacity .15s ease;
 }
 
+/* Hover/focus/disabled */
+.rs__control:hover{
+  border-color: color-mix(in oklab, var(--bd) 70%, var(--ink) 30%) !important;
+}
 .rs__control--is-focused{
-  border-color: color-mix(in oklab, var(--dt-primary) 52%, var(--dt-bd) 48%) !important;
-  box-shadow: 0 0 0 4px var(--dt-ring) !important;
+  border-color: color-mix(in oklab, var(--primary) 55%, var(--bd) 45%) !important;
+  box-shadow: 0 0 0 4px var(--ring) !important;
+}
+.rs__control--is-disabled{
+  opacity: .6 !important;
+  cursor: not-allowed !important;
 }
 
+/* Contenido interno */
 .rs__value-container{
-  padding: 4px 10px !important;
+  padding: 6px 10px !important;
+  gap: 6px;
 }
-
 .rs__input-container,
 .rs__single-value{
-  color: var(--dt-fg) !important;
+  color: var(--ink) !important;
 }
-
 .rs__placeholder{
-  color: color-mix(in oklab, var(--dt-muted) 80%, transparent) !important;
+  color: color-mix(in oklab, var(--muted) 80%, transparent) !important;
 }
 
-/* Indicadores (flecha, clear) */
-.rs__indicators,
+/* Indicadores (flecha, clear, loading) */
+.rs__indicators{
+  gap: 4px;
+}
 .rs__indicator{
-  color: color-mix(in oklab, var(--dt-fg) 85%, transparent) !important;
+  color: color-mix(in oklab, var(--ink) 85%, transparent) !important;
   fill: currentColor !important;
+  transition: opacity .15s ease;
 }
-
 .rs__indicator-separator{
-  background: color-mix(in oklab, var(--dt-bd) 85%, transparent) !important;
+  background: color-mix(in oklab, var(--bd) 85%, transparent) !important;
+}
+.rs__clear-indicator:hover,
+.rs__dropdown-indicator:hover{
+  opacity: .85 !important;
 }
 
-/* Menú / opciones */
-.rs__menu{
-  background: var(--dt-surface) !important;
-  border: 1px solid var(--dt-bd) !important;
-  border-radius: var(--dt-radius) !important;
-  box-shadow: var(--dt-shadow) !important;
-  overflow: hidden;
-}
+/* Menú flotante */
 
-.rs__menu-list{
-  padding-block: 6px !important;
+/* ====== React-Select dentro del panel ====== */
+.rs__control{
+  min-height: 44px;
+  border-radius: 12px;
+  border: 1px solid var(--bd) !important;
+  background: var(--panel) !important;
+  color: var(--fg) !important;
+  box-shadow: none !important;
 }
-
-.rs__option{
-  background: transparent !important;
-  color: var(--dt-fg) !important;
-  padding: 8px 10px !important;
-}
-
-.rs__option--is-focused{
-  background: color-mix(in oklab, var(--dt-primary) 12%, transparent) !important;
-}
-
-.rs__option--is-selected{
-  background: color-mix(in oklab, var(--dt-primary) 22%, transparent) !important;
-  color: var(--dt-fg) !important;
-}
-
-/* Clear y multi-values (por si luego usas isMulti) */
-.rs__multi-value{
-  background: color-mix(in oklab, var(--dt-primary) 18%, transparent) !important;
-  border: 1px solid color-mix(in oklab, var(--dt-primary) 36%, var(--dt-bd) 64%) !important;
-}
-
-.rs__multi-value__label{
-  color: var(--dt-fg) !important;
-}
-
-.rs__multi-value__remove{
-  color: var(--dt-fg) !important;
-}
-
-.rs__multi-value__remove:hover{
-  background: color-mix(in oklab, var(--dt-primary) 24%, transparent) !important;
-}
-
-/* Portal: respeta elevación sobre modales/sidebars */
-.rs__menu-portal{
-  z-index: 9999;
-}
-
+.rs__value-container{ padding: 6px 10px !important; }
 .rs__single-value,
-.rs__input,
-.rs__input-container{
-  color: #000 !important;
+.rs__input-container{ color: var(--fg) !important; }
+.rs__placeholder{ color: color-mix(in oklab, var(--mut) 80%, transparent) !important; }
+.rs__control--is-focused{
+  border-color: color-mix(in oklab, var(--pri) 55%, var(--bd) 45%) !important;
+  box-shadow: 0 0 0 4px var(--ring) !important;
+}
+.rs__menu{
+  background: var(--surface-elev) !important;
+  color: var(--fg) !important;
+  border: 1px solid var(--bd) !important;
+  border-radius: var(--r) !important;
+  box-shadow: var(--shadow) !important;
 }
 
-/* placeholder del select negro */
-.rs__placeholder{
-  color: #000 !important;
-  opacity: 1 !important;
-}
-
-/* etiquetas de multi-value (por si luego usas isMulti) */
-.rs__multi-value__label{
-  color: #000 !important;
-}
 
 /* ===== Reset de sombras/auras en la pantalla de Nuevo Ticket ===== */
 
@@ -828,4 +713,94 @@ select.tf-input:focus {
 /* 5) Si quieres “apagar” completamente el glow menta del tema en esa vista: */
 .ticket-form {
   --ring: transparent;  /* desactiva el color de halo localmente */
+}
+
+/* ====== Botones ====== */
+
+/*Boton principal*/
+.btn-primary{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  height: clamp(36px, 5dvh, 44px);
+  padding: 0 16px;
+  border-radius: 12px;
+  border: 1px solid color-mix(in oklab, var(--pri) 60%, var(--bd) 40%);
+  background: var(--pri);
+  color: var(--pri-ink);
+  font-weight: 800;
+  letter-spacing: .2px;
+  cursor: pointer;
+
+  box-shadow: 0 8px 18px color-mix(in oklab, var(--pri) 22%, transparent);
+  transition: transform .08s ease, filter .15s ease, box-shadow .15s ease;
+}
+.btn-primary:hover{ filter: brightness(1.05); }
+.btn-primary:active{ transform: translateY(1px) scale(.995); }
+.btn-primary:disabled{ opacity: .6; cursor: not-allowed; box-shadow: none; }
+
+/*Boton secundario*/
+.btn-secondary{
+  border: 1px solid color-mix(in oklab, var(--primary) 35%, var(--bd));
+  background: color-mix(in oklab, var(--primary) 10%, transparent);
+  color: var(--ink);
+  box-shadow: 0 6px 16px color-mix(in oklab, var(--primary) 16%, transparent);
+}
+
+/* Botón full-width en móviles */
+@media (max-width: 900px){
+  .btn-primary{ width: 100%; }
+}
+
+/* ------------------------- Paginación -------------------- */
+.pager{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-top: 1px solid color-mix(in oklab, var(--bd) 70%, transparent);
+  background: color-mix(in oklab, var(--surface-elev) 92%, transparent);
+  color: var(--muted);
+  flex-wrap: wrap;
+}
+.flex-spacer{ flex: 1 1 auto; }
+
+.pager-right{
+  display: inline-grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+  gap: 10px;
+  align-items: center;
+}
+
+.pager-right > button{
+  height: 36px;
+  padding: 0 12px;
+  border-radius: 10px;
+  border: 1px solid color-mix(in oklab, var(--primary) 35%, var(--bd));
+  background: color-mix(in oklab, var(--primary) 12%, transparent);
+  color: var(--ink);
+  font-weight: 700;
+  cursor: pointer;
+}
+.pager-right > button:disabled{
+  opacity: .55; cursor: not-allowed;
+}
+.pager-right > select{
+  height: 36px;
+  border-radius: 10px;
+  border: 1px solid color-mix(in oklab, var(--bd) 75%, transparent);
+  background: var(--field-bg);
+  color: var(--ink);
+  padding: 0 10px;
+}
+
+#root, .app, .page, .content, .container {
+  max-width: none !important;   /* quita límites heredados */
+  width: 100% !important;
+  margin: 0 !important;         /* evita centrados */
+  padding: 0;                   /* deja que tu layout mande */
+  box-sizing: border-box;
 }

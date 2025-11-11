@@ -1,6 +1,7 @@
 import * as React from "react";
 import Select, { components, type OptionProps, type SingleValue } from "react-select";
 import "./NuevoTicketForm.css";
+import "../../App.css"
 import { useFranquicias } from "../../Funcionalidades/Franquicias";
 import type { FranquiciasService } from "../../Services/Franquicias.service";3
 import type { UserOption } from "../../Models/Commons";
@@ -13,8 +14,6 @@ import type { TicketsService } from "../../Services/Tickets.service";
 import RichTextBase64 from "../RichTextBase64/RichTextBase64";
 import type { LogService } from "../../Services/Log.service";
 import { norm } from "../../utils/Commons";
-import { useTheme } from "../../Funcionalidades/Theme";
-const { theme } = useTheme();
 
 export type UserOptionEx = UserOption & { source?: "Empleado" | "Franquicia" };
 type TreeOption = {
@@ -137,7 +136,7 @@ export default function NuevoTicketForm() {
   const disabledCats = submitting || loadingCatalogos;
 
   return (
-  <div className="ticket-form" data-theme={theme}>
+  <div className="ticket-form">
       <h2 className="tf-title">Nuevo Ticket</h2>
 
       <form onSubmit={(e) => {e.preventDefault(); handleSubmit(e)}} noValidate className="tf-grid">
@@ -261,7 +260,7 @@ export default function NuevoTicketForm() {
 
           {/* Submit */}
           <div className="tf-actions tf-col-2">
-            <button type="submit" disabled={submitting || loadingCatalogos} className="tf-submit">
+            <button type="submit" disabled={submitting || loadingCatalogos} className="btn-primary">
               {submitting ? "Enviando..." : "Enviar Ticket"}
             </button>
           </div>

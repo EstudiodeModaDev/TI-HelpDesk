@@ -17,8 +17,8 @@ export default function ActivityStatusCard({title = "Estado de actividad", perce
 
   const safePercent = Math.ceil(Math.max(0, Math.min(100, Number(percent) || 0)));
   const stroke = 10;
-  const radius = (ringSize - stroke) / 2;
-  const circumference = 2 * Math.PI * radius;
+  const radius = (ringSize - stroke) / 2.5;
+  const circumference = 4 * Math.PI * radius;
   const dashOffset = circumference * (1 - safePercent / 100);
 
   // Formateador de fechas
@@ -60,9 +60,9 @@ export default function ActivityStatusCard({title = "Estado de actividad", perce
             );
             return (
               <li className="as-task" key={i}>
-                <div className="as-task-title">{t.Title}</div>
+                <div className="as-task-title" title={t.Title}>{t.Title}</div>
                 <div className="as-task-date">
-                  <span className="as-task-day">{day}</span>
+                  <span className="as-task-day" title={day}>{day}</span>
                   <span className="as-task-rest">{rest.trim()}</span>
                 </div>
               </li>

@@ -1,12 +1,12 @@
 import * as React from "react";
 import Select, { type SingleValue } from "react-select";
-import "./Recategorizar.css";
+import "./ModalsStyles.css";
 import { useGraphServices } from "../../../graph/GrapServicesContext";
 import type { TicketsService } from "../../../Services/Tickets.service";
 import { useRecategorizarTicket } from "../../../Funcionalidades/Recategorizar";
 import type { Ticket } from "../../../Models/Tickets";
+import { norm } from "../../../utils/Commons";
 
-const norm = (s: string) => (s ?? "").normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase().trim();
 type CategoriaItem = { ID: string | number; Title: string };
 
 export default function Recategorizar({ ticket }: { ticket: Ticket }) {
@@ -137,14 +137,14 @@ export default function Recategorizar({ ticket }: { ticket: Ticket }) {
   const disabledArts = submitting || loadingCatalogos
 
   return (
-    <div className="ticket-form">
-      <h2 className="tf-title">Recategorizar Ticket</h2>
+    <div className="dta-form">
+      <h2 className="dta-title">Recategorizar Ticket</h2>
 
-      <form onSubmit={handleRecategorizar} noValidate className="tf-grid">
+      <form onSubmit={handleRecategorizar} noValidate className="dta-grid">
 
         {/* Categoría / Subcategoría / Artículo */}
-        <div className="tf-field">
-          <label className="tf-label">Categoría</label>
+        <div className="dta-field">
+          <label className="dta-label">Categoría</label>
           <Select
             classNamePrefix="rs"
             options={catOptions}
@@ -158,8 +158,8 @@ export default function Recategorizar({ ticket }: { ticket: Ticket }) {
           {errors.categoria && <small className="error">{errors.categoria}</small>}
         </div>
 
-        <div className="tf-field">
-          <label className="tf-label">Subcategoría</label>
+        <div className="dta-field">
+          <label className="dta-label">Subcategoría</label>
           <Select
             classNamePrefix="rs"
             options={subcatOptions}
@@ -179,8 +179,8 @@ export default function Recategorizar({ ticket }: { ticket: Ticket }) {
           {errors.subcategoria && <small className="error">{errors.subcategoria}</small>}
         </div>
 
-        <div className="tf-field tf-col-2">
-          <label className="tf-label">Artículo</label>
+        <div className="dta-field dta-col-2">
+          <label className="dta-label">Artículo</label>
           <Select
             classNamePrefix="rs"
             options={artOptions}
@@ -200,8 +200,8 @@ export default function Recategorizar({ ticket }: { ticket: Ticket }) {
           {/* Si quieres mostrar error de artículo obligatorio, vuelve a validarlo en el hook */}
         </div>
         {/* Submit */}
-        <div className="tf-actions tf-col-2">
-          <button type="submit" disabled={submitting || loadingCatalogos} className="tf-submit">
+        <div className="dta-actions dta-col-2">
+          <button type="submit" disabled={submitting || loadingCatalogos} className="btn-primary">
             {submitting ? "Enviando..." : "Recategorizar Ticket"}
           </button>
         </div>

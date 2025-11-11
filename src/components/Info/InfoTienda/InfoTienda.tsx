@@ -41,24 +41,13 @@ export default function StoreInfoPanel() {
     useInfoInternetTiendas(InternetSvc, CompaniasSvc);
 
   return (
-    <section className="store-info w-full max-w-[1100px] mx-auto p-6 md:p-10">
-      <h3 className="text-3xl md:text-4xl font-bold tracking-tight">Información de la tienda</h3>
+    <section className="store-info">
+      <h3 className="store-title">Información de la tienda</h3>
 
       <form onSubmit={(e) => { e.preventDefault(); loadQuery(); }} className="store-actions">
         <div className="store-actions__left">
-          <input
-            type="text"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Buscar por nombre de la tienda o identificador de servicio..."
-            className="flex-1 px-4 py-3 text-base shadow-sm"
-            aria-label="Buscar tienda"
-          />
-          <button
-            type="submit"
-            disabled={loading}
-            className="inline-flex items-center justify-center gap-2 px-5 py-3 text-sm font-semibold bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-60"
-          >
+          <input type="text" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Buscar por nombre de la tienda o identificador de servicio..." className="flex-1 px-4 py-3 text-base shadow-sm" aria-label="Buscar tienda"/>          
+          <button type="submit" disabled={loading} className="inline-flex items-center justify-center gap-2 px-5 py-3 text-sm font-semibold bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-60">
             <span className="i-lucide-check mr-1" aria-hidden />
             {loading ? "Buscando…" : "Buscar"}
           </button>
@@ -67,13 +56,13 @@ export default function StoreInfoPanel() {
 
       {error && <div className="alert-error mt-4">{error}</div>}
 
-      <div className="card mt-6 overflow-hidden">
+      <div className="store-card">
         <div className="store-scroll">
           <table className="w-full border-collapse">
             <thead>
               <tr>
                 {COLS.map((c) => (
-                  <th key={c.key} scope="col" className="text-left text-sm font-semibold px-4 py-3 sticky top-0 bg-white">
+                  <th key={c.key} scope="col">
                     {c.label}
                   </th>
                 ))}

@@ -2,7 +2,7 @@ import React from "react";
 import { useDashboard } from "../../../Funcionalidades/Dashboard";
 import { useGraphServices } from "../../../graph/GrapServicesContext";
 import type { TicketsService } from "../../../Services/Tickets.service";
-import "./Dashboard.css";
+import "./DashboardResumen.css";
 import type { DailyPoint, Fuente, TopCategoria } from "../../../Models/Dashboard";
 
 // ===== util: formatea "2,1 mil" / "0,2 mil" =====
@@ -91,7 +91,7 @@ export default function DashboardResumen() {
       {/* Columna central */}
       <main className="dash-center">
         <header className="center-head">
-          <div className="filters">
+          <div className="dash-filters">
             <input className="date" type="date" value={range.from} onChange={(e) => setRange({ ...range, from: e.target.value })} />
             <input className="date" type="date" value={range.to} onChange={(e) => setRange({ ...range, to: e.target.value })}/>
           </div>

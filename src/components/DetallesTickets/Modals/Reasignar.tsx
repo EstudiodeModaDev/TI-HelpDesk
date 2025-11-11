@@ -3,7 +3,7 @@ import Select, {
   type OptionProps,
   type FilterOptionOption
 } from "react-select";
-import "./Reasignar.css";
+import "./ModalsStyles.css";
 import type { UserOption } from "../../../Models/Commons";
 import { useGraphServices } from "../../../graph/GrapServicesContext";
 import { useUsuarios } from "../../../Funcionalidades/Usuarios";
@@ -11,9 +11,7 @@ import { UsuariosSPService } from "../../../Services/Usuarios.Service";
 import { useReasignarTicket } from "../../../Funcionalidades/Reasignar";
 import type { Ticket } from "../../../Models/Tickets";
 import type { LogService } from "../../../Services/Log.service";
-
-const norm = (s: string) =>
-  (s ?? "").normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase().trim();
+import { norm } from "../../../utils/Commons";
 
 type UserOptionEx = UserOption & {
   source?: "Empleado" | "Franquicia";
@@ -67,13 +65,13 @@ export default function Reasignar({ ticket }: { ticket: Ticket }) {
   const maxLen = 500;
 
   return (
-    <div className="ticket-form">
-      <h2 className="tf-title">Reasignar Ticket</h2>
+    <div className="dta-form">
+      <h2 className="dta-title">Reasignar Ticket</h2>
 
       <form onSubmit={handleReasignar} noValidate className="tf-grid">
         {/* Resolutor */}
-        <div className="tf-field">
-          <label className="tf-label" htmlFor={selectId}>Nuevo Resolutor</label>
+        <div className="dta-field">
+          <label className="dta-label" htmlFor={selectId}>Nuevo Resolutor</label>
           <Select<UserOptionEx, false>
             inputId={selectId}
             options={UseruserOptions as UserOptionEx[]}
@@ -94,35 +92,17 @@ export default function Reasignar({ ticket }: { ticket: Ticket }) {
         </div>
 
         {/* Nota (razón de la reasignación) */}
-        <div className="tf-field">
-          <label className="tf-label" htmlFor={noteId}>Nota (razón de la reasignación)</label>
-          <textarea
-            id={noteId}
-            className="tf-textarea"
-            placeholder="Explica brevemente por qué reasignas este ticket…"
-            value={nota}
-            maxLength={maxLen}
-            onChange={(e) => setField("Nota", e.target.value)}
-            rows={4}
-            disabled={submitting}
-            aria-describedby={`${noteId}-help ${noteId}-counter`}
-          />
-          <div className="tf-help" id={`${noteId}-help`}>
-            Esta nota se enviará junto con la reasignación.
-          </div>
-          <div className="tf-counter" id={`${noteId}-counter`}>
-            {nota.length}/{maxLen}
-          </div>
+        <div className="dta-field">
+          <label className="rf-label" htmlFor={noteId}>Nota (razón de la reasignación)</label>
+          <textarea id={noteId} className="dta-textarea" placeholder="Explica brevemente por qué reasignas este ticket…" value={nota} maxLength={maxLen} onChange={(e) => setField("Nota", e.target.value)} rows={4} disabled={submitting}/>
+          <div className="dta-help" id={`${noteId}-help`}>Esta nota se enviará junto con la reasignación.</div>
+          <div className="dta-counter" id={`${noteId}-counter`}> {nota.length}/{maxLen} </div>
           {errors.Nota && <small className="error">{errors.Nota}</small>}
         </div>
 
         {/* Submit */}
-        <div className="tf-actions tf-col-2">
-          <button
-            type="submit"
-            disabled={submitting || loading}
-            className="tf-submit"
-          >
+        <div className="dta-actions rf-col-2">
+          <button type="submit" disabled={submitting || loading} className="btn-primary">
             {submitting ? "Enviando..." : "Enviar solicitud"}
           </button>
         </div>

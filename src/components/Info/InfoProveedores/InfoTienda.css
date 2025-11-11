@@ -1,256 +1,124 @@
-/* ========== Tokens y resets locales ========== */
-:root {
-  --it-bg: #ffffff;
-  --it-ink: #0f172a;
-  --it-ink-muted: #475569;
-  --it-border: #e2e8f0;
-  --it-border-strong: #cbd5e1;
-  --it-accent: #4f46e5;    /* Indigo-600 */
-  --it-accent-ink: #ffffff;
-  --it-row-alt: #f8fafc;   /* slate-50 */
-  --it-row-hover: #eef2ff; /* indigo-50 */
-  --it-shadow: 0 8px 24px rgba(2, 6, 23, 0.08);
-  --it-radius: 14px;
-  --it-ring: 0 0 0 3px rgba(79, 70, 229, 0.35);
+/* =========================================================
+   PROVEEDOR INFO — contenedor + filtro a la derecha + tabla
+   ========================================================= */
+.proveedor-info{
+  --pad: clamp(14px, 2vw, 20px);
+  --gap: clamp(10px, 1.6vw, 16px);
+
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--bd);
+  border-radius: var(--radius-3xl, var(--radius));
+  box-shadow: var(--shadow);
+  padding: var(--pad);
+  container-type: inline-size;
+  isolation: isolate;
 }
 
-/* Modo oscuro automático (respetando el `dark:` del JSX) */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --it-bg: #ffffff;
-    --it-ink: #0f172a;
-    --it-ink-muted: #475569;
-    --it-border: #e2e8f0;
-    --it-border-strong: #cbd5e1;
-    --it-accent: #4f46e5;    /* Indigo-600 */
-    --it-accent-ink: #ffffff;
-    --it-row-alt: #f8fafc;   /* slate-50 */
-    --it-row-hover: #eef2ff; /* indigo-50 */
-    --it-shadow: 0 8px 24px rgba(2, 6, 23, 0.08);
-    --it-radius: 14px;
-    --it-ring: 0 0 0 3px rgba(79, 70, 229, 0.35);
-  }
+/* ===== Título ===== */
+.pi-title{
+  margin: 0 0 8px 0;
+  color: var(--ink);
+  font-weight: 800;
+  letter-spacing: -.015em;
+  font-size: clamp(22px, 2.4vw, 30px);
 }
 
-/* ========== Ámbito opcional (recomendado) ========== */
-/* Añade className="store-info" al <section> si quieres encapsular */
-.store-info { color: var(--it-ink); }
-
-/* ========== Título ==========
-   Se complementa con las clases tailwind del JSX */
-.store-info h1 {
-  letter-spacing: -0.02em;
+/* ===== Acciones (filtro a la derecha) ===== */
+.pi-actions{
+  margin-top: 6px;
+}
+.pi-actions__right{
+  display: grid;
+  grid-template-columns: 1fr max-content; /* izquierda vacía | derecha select */
+  align-items: center;
+  gap: 10px;
+}
+.pi-only{ 
+  position: absolute; 
+  inline-size: 1px; block-size: 1px; overflow: hidden; 
+  clip-path: inset(50%); white-space: nowrap; 
 }
 
-/* ========== Formulario de acciones (input + botón + select) ========== */
-.store-info input[type="text"],
-.store-info select {
-  background: #fff;
-  border: 1px solid var(--it-border);
-  color: var(--it-ink);
+/* Select */
+.pi-select{
+  appearance: none;
+  background: var(--field-bg);
+  color: var(--ink);
+  border: 1px solid var(--bd);
   border-radius: 12px;
-  transition: box-shadow .15s ease, border-color .15s ease;
-}
-
-@media (prefers-color-scheme: dark) {
-  .store-info input[type="text"],
-  .store-info select {
-    background: #0f172a;
-    color: var(--it-ink);
-  }
-}
-
-.store-info input[type="text"]:focus,
-.store-info select:focus {
+  padding: 10px 14px;
   outline: none;
-  border-color: var(--it-accent);
-  box-shadow: var(--it-ring);
+  min-width: 180px;
+  box-shadow: var(--shadow);
+  transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
+  background-image:
+    linear-gradient(45deg, transparent 50%, color-mix(in oklab, var(--ink) 55%, transparent) 50%),
+    linear-gradient(135deg, color-mix(in oklab, var(--ink) 55%, transparent) 50%, transparent 50%),
+    linear-gradient(var(--field-bg), var(--field-bg));
+  background-position:
+    calc(100% - 18px) calc(50% - 3px),
+    calc(100% - 12px) calc(50% - 3px),
+    calc(100% - 2.2rem) 0;
+  background-size: 6px 6px, 6px 6px, 1px 100%;
+  background-repeat: no-repeat;
+  padding-right: 2.6rem;
+}
+.pi-select:focus{
+  border-color: color-mix(in oklab, var(--primary) 55%, var(--bd) 45%);
+  box-shadow: 0 0 0 4px var(--ring);
 }
 
-/* Botón primario (refuerza el hover/focus) */
-.store-info button[type="submit"] {
-  border-radius: 12px;
-  box-shadow: var(--it-shadow);
-}
-.store-info button[type="submit"]:focus-visible {
-  outline: none;
-  box-shadow: var(--it-ring);
-}
-
-/* ========== Icono inline: .i-lucide-check ==========
-   Icono por máscara SVG para no depender de librerías */
-.i-lucide-check {
-  width: 1.1em;
-  height: 1.1em;
-  display: inline-block;
-  background: currentColor;
-  -webkit-mask: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M20 6L9 17l-5-5' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
-          mask: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M20 6L9 17l-5-5' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
-}
-
-/* ========== Alertas / errores ========== */
-.store-info .alert-error {
-  border: 1px solid #fecaca;   /* red-200 */
-  background: #fef2f2;         /* red-50 */
-  color: #991b1b;              /* red-800 */
-  border-radius: 10px;
-  padding: .75rem 1rem;
-}
-@media (prefers-color-scheme: dark) {
-  .store-info .alert-error {
-    border-color: #7f1d1d;
-    background: #450a0a;
-    color: #fecaca;
-  }
-}
-
-/* ========== Card / tabla contenedora ========== */
-.store-info .card {
-  background: var(--it-bg);
-  border: 1px solid var(--it-border);
-  border-radius: var(--it-radius);
-  box-shadow: var(--it-shadow);
+/* ===== Card / Tabla ===== */
+.pi-card{
+  margin-top: 12px;
+  background: color-mix(in oklab, var(--surface-elev) 96%, transparent);
+  border: 1px solid var(--bd);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
   overflow: hidden;
 }
 
-/* ========== Tabla ==========
-   Refuerza estilos del JSX (zebra, hover, sticky col) */
-.store-info table {
-  width: 100%;
-  border-collapse: collapse;
-  color: var(--it-ink);
-  font-size: 0.95rem;
-  line-height: 1.5;
-}
-
-.store-info tbody tr:nth-child(even) {
-  background: var(--it-row-alt);
-}
-.store-info tbody tr:hover {
-  background: var(--it-row-hover);
-}
-
-/* Celda de encabezado (primera columna, sticky) */
-.store-info th[scope="row"] {
-  position: sticky; /* ya lo trae el JSX, reforzamos compat */
-  left: 0;
-  z-index: 1;
-  background: linear-gradient(90deg, var(--it-row-alt), var(--it-row-alt));
-  color: var(--it-ink-muted);
-  font-weight: 700;
-  width: 280px;
-  border-right: 1px solid var(--it-border);
-  box-shadow: 6px 0 12px -8px rgba(2, 6, 23, 0.18); /* sombra al separarse */
-}
-
-/* Bordes inferiores suaves */
-.store-info th[scope="row"],
-.store-info td {
-  border-bottom: 1px solid var(--it-border);
-  padding: .75rem 1rem;
-  vertical-align: top;
-  text-align: center;
-}
-
-/* Valor vacío/N/A: estilo sutil (opcional, detectado por texto) */
-.store-info td:has(> code),
-.store-info td:has(> kbd) { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
-
-.store-info td:where(:has(> *)) { color: var(--it-ink); }
-.store-info .store-scroll {
+.pi-scroll{
   overflow: auto;
+  max-height: min(60vh, 900px);
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in oklab, var(--ink) 24%, transparent) transparent;
 }
-
-/* Scrollbar (webkit) */
-.store-info .store-scroll::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
-.store-info .store-scroll::-webkit-scrollbar-thumb {
-  background: var(--it-border-strong);
-  border-radius: 10px;
-}
-.store-info .store-scroll::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-/* ========== Tip / texto auxiliar ========== */
-.store-info .tip {
-  color: var(--it-ink-muted);
-  font-size: 0.78rem;
-}
-
-/* ========== Accesibilidad: sr-only por si no usas Tailwind ========== */
-.sr-only {
-  position: absolute !important;
-  width: 1px; height: 1px;
-  padding: 0; margin: -1px;
-  overflow: hidden; clip: rect(0,0,0,0);
-  white-space: nowrap; border: 0;
-}
-
-/* ========== Estados de foco visibles para filas (teclado) ========== */
-.store-info tr:focus-within {
-  outline: none;
-  box-shadow: var(--it-ring);
-}
-
-/* ========== Badges opcionales para valores especiales (si decides aplicarlos) ========== */
-.store-info .badge {
-  display: inline-block;
-  padding: .2rem .5rem;
+.pi-scroll::-webkit-scrollbar{ height: 8px; width: 10px; }
+.pi-scroll::-webkit-scrollbar-thumb{
+  background: color-mix(in oklab, var(--ink) 24%, transparent);
   border-radius: 999px;
-  font-size: .75rem;
-  line-height: 1;
-  border: 1px solid var(--it-border-strong);
-}
-.store-info .badge--muted { background: var(--it-row-alt); color: var(--it-ink-muted); }
-.store-info .badge--ok { background: #ecfdf5; border-color: #a7f3d0; color: #065f46; }
-.store-info .badge--warn { background: #fff7ed; border-color: #fed7aa; color: #9a3412; }
-.store-info .badge--danger { background: #fef2f2; border-color: #fecaca; color: #991b1b; }
-/* Barra de acciones: izquierda y derecha */
-.store-actions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 12px;
-  margin-top: 1.5rem; /* sustituye mt-6 si quieres */
-  margin-bottom: 1.5rem;
 }
 
-.store-actions__left {
-  display: flex;
-  align-items: stretch;
-  gap: 12px;
-  flex: 1 1 auto;   /* ocupa todo el espacio disponible */
+/* Tabla */
+.pi-table{ width: 100%; border-collapse: collapse; min-width: 720px; }
+.pi-table thead th{
+  position: sticky; top: 0; z-index: 1;
+  background: var(--surface);
+  color: var(--ink);
+  border-bottom: 2px solid var(--bd);
+  padding: 10px 12px;
+  text-align: left;
+  white-space: nowrap;
+  font-weight: 800;
+}
+.pi-table tbody td{
+  padding: 10px 12px;
+  color: var(--ink);
+  border-bottom: 1px solid var(--bd);
+  vertical-align: top;
+}
+.pi-table tbody tr:nth-child(odd){
+  background: color-mix(in oklab, var(--surface) 96%, var(--bd));
+}
+.pi-table tbody tr:hover{
+  background: color-mix(in oklab, var(--field-bg) 90%, transparent);
 }
 
-.store-actions__left input[type="text"] {
-  flex: 1 1 auto;   /* el input crece */
-  min-width: 220px;
-}
-
-.store-actions__right {
-  margin-left: auto; /* empuja a la derecha */
-  display: flex;
-  align-items: center;
-}
-
-/* En pantallas pequeñas, que se apile normal */
-@media (max-width: 767px) {
-  .store-actions {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  .store-actions__right {
-    margin-left: 0;
-  }
-}
-
-
-
-/* ========== Compactación responsiva ========== */
-@media (max-width: 680px) {
-  .store-info th[scope="row"] { width: 200px; }
-  .store-info table { font-size: 0.9rem; }
+/* ===== Responsive (container queries) ===== */
+@container (max-width: 760px){
+  .pi-select{ width: 100%; min-width: 0; }
+  .pi-actions__right{ grid-template-columns: 1fr; }
+  .pi-table{ min-width: 600px; }
 }

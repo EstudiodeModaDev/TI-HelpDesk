@@ -3,7 +3,9 @@ import React, { useState } from "react";
 import type { ReFactura } from "../../../Models/RegistroFacturaInterface";
 import { FacturaEditar as facturaFx } from "../../../Funcionalidades/FacturaEditar";
 import "./FacturaEditar.css";
-import { opcionescc, opcionesco, opcionesFactura, opcionesun } from "../RegistroFactura";
+import { useGraphServices } from "../../../graph/GrapServicesContext";
+import { useCentroCostos, useCO } from "../../../Funcionalidades/Compras";
+import { Items } from "../../../Models/Compras";
 
 interface Props {
   factura: ReFactura;
@@ -34,6 +36,9 @@ export default function FacturaEditarCompo({ factura, onClose, onEliminar, onGua
     : "", 
     
   });
+  const { CentroCostos, CentroOperativo } = useGraphServices();
+  const { ccOptions} = useCentroCostos(CentroCostos as any);
+  const { COOptions, UNOptions} = useCO(CentroOperativo as any);
   
   const setField = <K extends keyof ReFactura>(k: K, v: ReFactura[K]) => setFormData((s) => ({ ...s, [k]: v }));
 
@@ -109,14 +114,14 @@ export default function FacturaEditarCompo({ factura, onClose, onEliminar, onGua
           <label>Ítems:
             <select name="Items" value={formData.Items} onChange={(e) => {
                                                         const codigo = e.target.value;
-                                                        const item = opcionesFactura.find((of) => String(of.codigo) === String(codigo));
+                                                        const item = Items.find((of) => String(of.codigo) === String(codigo));
                                                         setField("Items", codigo);
                                                         setField("DescripItems", item?.descripcion ?? "");
                                                       }}
                                                       required
                                                     >
               <option value="">Seleccionar ítem</option>
-              {opcionesFactura.map((of) => (
+              {Items.map((of) => (
                 <option key={of.codigo} value={of.codigo}>
                   {of.codigo} - {of.descripcion}
                 </option>
@@ -126,9 +131,9 @@ export default function FacturaEditarCompo({ factura, onClose, onEliminar, onGua
 
           <label> C.C:
             <select name="CC" value={formData.CC} onChange={(e) => {setField("CC", e.target.value);}} required> <option value="">Seleccionar centro de costo</option>
-                  {opcionescc.map((cc) => (
-                    <option key={cc.codigo} value={cc.codigo}>
-                      {cc.codigo} - {cc.descripcion}
+                  {ccOptions.map((cc) => (
+                    <option key={cc.value} value={cc.label}>
+                      {cc.value} - {cc.label}
                     </option>
                   ))}
             </select>
@@ -136,9 +141,9 @@ export default function FacturaEditarCompo({ factura, onClose, onEliminar, onGua
 
           <label> C.O:
             <select name="CO" value={formData.CO} onChange={(e) => {setField("CO", e.target.value);}}  required> <option value="">Seleccionar centro operativo</option>
-                  {opcionesco.map((co) => (
-                    <option key={co.codigo} value={co.codigo}>
-                      {co.codigo} - {co.descripcion}
+                  {COOptions.map((co) => (
+                    <option key={co.value} value={co.value}>
+                      {co.value} - {co.label}
                     </option>
                   ))}
             </select>
@@ -146,9 +151,9 @@ export default function FacturaEditarCompo({ factura, onClose, onEliminar, onGua
           
           <label> U.N:
           <select name="UN" value={formData.un} onChange={(e) => {setField("un", e.target.value);}}  required> <option value="">Seleccionar unidad de negocio</option>
-                {opcionesun.map((un) => (
-                  <option key={un.codigo} value={un.codigo}>
-                    {un.codigo} - {un.descripcion}
+                {UNOptions.map((un) => (
+                  <option key={un.value} value={un.value}>
+                    {un.value} - {un.label}
                   </option>
                 ))}
             </select>

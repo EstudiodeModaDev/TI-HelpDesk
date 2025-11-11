@@ -23,21 +23,15 @@ export default function EscalamientoInternet({ticket,}: Props) {
   );
 
   return (
-    <div className="esc-form" data-force-light>
-      <h1 className="esc-title">Escalamiento internet</h1>
+    <div className="esc-form">
 
       {loading && <p style={{ opacity: 0.7, marginBottom: 8 }}>Cargando datos…</p>}
       {error && <p style={{ color: "#b91c1c", marginBottom: 8 }}>{error}</p>}
 
       {/* Buscador */}
       <div className="esc-search">
-        <input
-          className="esc-input"
-          placeholder="Buscar..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-        <button className="esc-button" type="button" onClick={() => onSearch(search)}>
+        <input className="esc-input" placeholder="Buscar..." value={search} onChange={(e) => setSearch(e.target.value)} />
+        <button className="btn-primary" type="button" onClick={() => onSearch(search)}>
           Buscar
         </button>
       </div>

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import "./FacturaFiltros.css";
 import type { ReFactura } from "../../../Models/RegistroFacturaInterface";
-import { opcionescc, opcionesco, opcionesun } from "../RegistroFactura";
+import { useGraphServices } from "../../../graph/GrapServicesContext";
+import { useCentroCostos, useCO } from "../../../Funcionalidades/Compras";
 
 /**
  * 🔎 Componente de filtros reutilizable
@@ -20,6 +21,9 @@ export default function FacturaFiltros({
     Items: "",
     DescripItems: "",
   });
+    const { CentroCostos, CentroOperativo } = useGraphServices();
+    const { ccOptions} = useCentroCostos(CentroCostos as any);
+    const { COOptions, UNOptions} = useCO(CentroOperativo as any);
 
   const opcionesFactura = [
     { codigo: "SC11", descripcion: "ARREND. EQ. COMPUTAC Y COMUNICACIÓN" },
@@ -105,9 +109,9 @@ export default function FacturaFiltros({
         {/* 🧾 Selector de cc */}
         <select name="CC" value={filtros.CC || ""} onChange={handleChange}>
           <option value="">Sel centro cos</option>
-          {opcionescc.map((oc) => (
-            <option key={oc.codigo} value={oc.codigo}>
-              {oc.codigo} - {oc.descripcion}
+          {ccOptions.map((oc) => (
+            <option key={oc.value} value={oc.label}>
+              {oc.value} - {oc.label}
             </option>
           ))}
         </select>
@@ -116,9 +120,9 @@ export default function FacturaFiltros({
         {/* 🧾 Selector de co */}
         <select name="CO" value={filtros.CO || ""} onChange={handleChange}>
           <option value="">Sel centro ope</option>
-          {opcionesco.map((oco) => (
-            <option key={oco.codigo} value={oco.codigo}>
-              {oco.codigo} - {oco.descripcion}
+          {COOptions.map((oco) => (
+            <option key={oco.value} value={oco.value}>
+              {oco.value} - {oco.label}
             </option>
           ))}
         </select>
@@ -126,9 +130,9 @@ export default function FacturaFiltros({
          {/* 🧾 Selector de un */}
         <select name="un" value={filtros.un || ""} onChange={handleChange}>
           <option value="">Sel und. negocio</option>
-          {opcionesun.map((ou) => (
-            <option key={ou.codigo} value={ou.codigo}>
-              {ou.codigo} - {ou.descripcion}
+          {UNOptions.map((ou) => (
+            <option key={ou.value} value={ou.label}>
+              {ou.value} - {ou.label}
             </option>
           ))}
         </select>

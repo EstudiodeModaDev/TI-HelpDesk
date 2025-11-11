@@ -36,6 +36,7 @@ export function useDetallado(TicketsSvc: TicketsService) {
   const [range, setRange] = React.useState<DateRange>(monthRange)
 
   const [topCategorias, setTopCategorias] = React.useState<TopCategoria[]>([])
+  const [topSolicitante, setopSolicitante] = React.useState<TopCategoria[]>([])
   const [totalCategorias, setTotalCateogria] = React.useState<TopCategoria[]>([])
   const [casosPorDia, setCasosPorDia] = React.useState<DailyPoint[]>([])
   const [Fuentes, setFuentes] = React.useState<Fuente[]>([])
@@ -161,6 +162,18 @@ export function useDetallado(TicketsSvc: TicketsService) {
 
       const pct = total ? buckets.at / total : 0
 
+      const countBySolicitante = (key: (t: Ticket)=>string) => {
+        const m = new Map<string, number>()
+        for (const t of tickets) {
+          const k = key(t) || "(En blanco)"
+          m.set(k, (m.get(k) ?? 0) + 1)
+        }
+        return Array.from(m, ([nombre, total]) => ({ nombre, total }))
+          .sort((a,b)=>b.total-a.total)
+      }
+      const allSolicitantes = countBySolicitante(t => String((t as any).Solicitante).trim())
+      const top5Solicitante = allSolicitantes.slice(0,5)
+
       const countBy = (key: (t: Ticket)=>string) => {
         const m = new Map<string, number>()
         for (const t of tickets) {
@@ -184,9 +197,9 @@ export function useDetallado(TicketsSvc: TicketsService) {
       for (const t of tickets) mapDay.set(dayKey(t), (mapDay.get(dayKey(t)) ?? 0)+1)
       const series = Array.from(mapDay, ([fecha,total])=>({fecha,total})).sort((a,b)=>a.fecha.localeCompare(b.fecha))
 
-      obtenerFuentes()
+      
       obtenerConteoUltimosMeses(5)
-
+      setopSolicitante(top5Solicitante)
 
       setTotalCasos(total)
       setTotalencurso(buckets.inprog)
@@ -292,10 +305,10 @@ export function useDetallado(TicketsSvc: TicketsService) {
     // existentes
     obtenerTotal, setRange, obtenerFuentes, buildResolutores,
     totalCasos, error, loading, totalEnCurso, totalFinalizados, totalFueraTiempo,
-    porcentajeCumplimiento, topCategorias, range, totalCategorias, resolutores, Fuentes, casosPorDia,
+    porcentajeCumplimiento, topCategorias, range, totalCategorias, resolutores, Fuentes, casosPorDia, topSolicitante,
 
     // NUEVO
     conteoPorMes,
-    obtenerConteoUltimosMeses,
+    obtenerConteoUltimosMeses, 
   }
 }

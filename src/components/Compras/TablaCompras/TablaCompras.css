@@ -1,285 +1,309 @@
-/* =====================  TABLA COMPRAS (LISTADO)  ===================== */
-/* Siempre claro dentro de .force-light si tu wrapper lo usa */
+/* =========================================================
+   TABLA COMPRAS — tokens globales (dark/light)
+   ========================================================= */
 
-.tabla-tickets{
-  display: grid;
-  gap: 10px;
-  color-scheme: only light;               /* evita controles oscuros del UA */
+.tabla-compras{
+  color: var(--ink);
+  border-radius: var(--radius-3xl);
+  inline-size: auto;
+  margin-inline: auto;
+  padding: clamp(14px, 2.2vw, 22px);
+  overflow: visible;
+  box-sizing: border-box;
+  height: 700px;
 }
 
-/* ---------- Barra de filtros ---------- */
-.tabla-tickets .filtros{
-  background: var(--bg, #fff);
-  border: 1px solid var(--border, #e5e7eb);
-  border-radius: 14px;
-  padding: 8px;
-  box-shadow: var(--shadow, 0 8px 24px rgba(2,6,23,.08));
+.tabla-compras *{ box-sizing: border-box; }
 
-  display: grid;
-  grid-template-columns: 1fr auto auto auto auto auto auto;
-  gap: 8px;
-}
-
-.tabla-tickets .filtros input[type="text"],
-.tabla-tickets .filtros input[type="date"],
-.tabla-tickets .filtros button,
-.tabla-tickets .filtros select{
-  height: 36px;
-  border-radius: 10px;
-  border: 1px solid var(--border, #e5e7eb);
-  background: var(--bg, #fff);
-  color: var(--text, #0f172a);
-  padding: 0 12px;
-  outline: none;
-}
-
-.tabla-tickets .filtros input[type="text"]::placeholder{
-  color: var(--muted, #6b7280);
-}
-
-.tabla-tickets .filtros input[type="text"]:focus,
-.tabla-tickets .filtros input[type="date"]:focus,
-.tabla-tickets .filtros select:focus{
-  border-color: var(--primary, #2563eb);
-  box-shadow: 0 0 0 4px color-mix(in oklab, var(--ring, #93c5fd) 35%, transparent);
-}
-
-.tabla-tickets .filtros button{
-  border: 1px solid var(--border, #e5e7eb);
-  background: var(--card, #f8fafc);
-  color: var(--text, #0f172a);
-  font-weight: 600;
-  cursor: pointer;
-  transition: background .15s ease, transform .06s ease;
-}
-.tabla-tickets .filtros button:hover{
-  background: color-mix(in oklab, var(--card, #f8fafc) 60%, transparent);
-}
-.tabla-tickets .filtros button:active{
-  transform: translateY(1px);
-}
-
-.tabla-tickets .filtros > span{
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--muted, #6b7280);
-  padding: 0 4px;
-}
-
-.tabla-tickets > h2 {
-  margin: 0 0 16px;
-  font-size: 1.4rem;
+.tabla-compras h2{
+  margin: 0 0 12px 0;
+  font-weight: 800;
   letter-spacing: .2px;
 }
 
+/* ------------------------ Filtros ------------------------ */
+.tc-filtros{
+  --h: 44px;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr max-content max-content 1fr max-content max-content;
+  gap: 10px;
+  align-items: center;
 
-/* ---------- Contenedor de tabla ---------- */
-.table-wrap{
-  width: 100%;
-  overflow: auto;
-  border: 1px solid var(--border, #e5e7eb);
+  margin-bottom: 14px;
+  padding: 10px;
+  border-radius: var(--radius);
+  background: color-mix(in oklab, var(--surface-elev) 94%, transparent);
+  border: 1px solid color-mix(in oklab, var(--bd) 75%, transparent);
+  box-shadow: 0 10px 22px color-mix(in oklab, var(--surface) 20%, transparent);
+}
+
+.tc-filtros input[type="text"], .tc-filtros input[type="date"]{
+  height: var(--h);
   border-radius: 12px;
-  background: var(--bg, #fff);
-  box-shadow: var(--shadow, 0 8px 24px rgba(2,6,23,.08));
+  background: var(--field-bg);
+  color: var(--ink);
+  border: 1px solid var(--bd);
+  padding: 0 12px;
+  outline: none;
+  transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
+  min-width: 0;
+}
+.tc-filtros input::placeholder{
+  color: color-mix(in oklab, var(--muted) 70%, transparent);
+}
+.tc-filtros input:focus{
+  border-color: color-mix(in oklab, var(--primary) 55%, var(--bd));
+  box-shadow: 0 0 0 4px var(--ring);
 }
 
-.table-wrap table{
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.95rem;
-  color: var(--text, #0f172a);
+.tc-filtros > span{
+  inline-size: 18px;
+  text-align: center;
+  color: var(--muted);
 }
 
-/* Header pegajoso */
-.table-wrap thead th{
+
+
+@media (max-width: 1100px){
+  .tc-filtros{
+    grid-auto-flow: row;
+    grid-auto-columns: unset;
+    grid-template-columns: 1fr 1fr;
+  }
+  .tc-filtros > span{ display: none; }
+}
+@media (max-width: 680px){
+  .tc-filtros{ grid-template-columns: 1fr; }
+}
+
+/* ------------------------- Tabla ------------------------- */
+.tc-wrap{
+  border: 1px solid color-mix(in oklab, var(--bd) 75%, transparent);
+  border-radius: var(--radius);
+  background: color-mix(in oklab, var(--surface) 96%, transparent);
+  box-shadow: var(--shadow);
+    
+  display: block;
+  max-inline-size: 100%;
+  overflow: auto;                 /* scroll x/y cuando haga falta */
+  -webkit-overflow-scrolling: touch;         /* scroll x/y si hace falta */
+}
+
+.tc-wrap table{
+
+  table-layout: fixed;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: transparent;
+  font-size: .98rem;
+}
+
+.tc-wrap thead{
   position: sticky;
   top: 0;
-  background: color-mix(in oklab, var(--card, #f8fafc) 92%, white);
-  color: var(--text, #0f172a);
-  text-align: left;
-  font-weight: 700;
-  padding: 10px 12px;
-  border-bottom: 1px solid var(--border, #e5e7eb);
   z-index: 1;
 }
 
-.table-wrap tbody td{
-  padding: 10px 12px;
-  border-top: 1px solid var(--border, #e5e7eb);
+.tc-wrap thead th{
+  background: linear-gradient(180deg,
+      color-mix(in oklab, var(--surface-elev) 94%, transparent) 0%,
+      color-mix(in oklab, var(--surface-elev) 86%, transparent) 100%);
+  color: color-mix(in oklab, var(--ink) 92%, transparent);
+  padding: 12px 14px;
+  font-weight: 800;
+  letter-spacing: .2px;
+  border-bottom: 1px solid color-mix(in oklab, var(--bd) 65%, transparent);
   white-space: nowrap;
+  user-select: none;
+  margin-right: 5px;
+}
+.tc-wrap thead th:first-child{ border-top-left-radius: calc(var(--radius) + 2px); }
+.tc-wrap thead th:last-child { border-top-right-radius: calc(var(--radius) + 2px); }
+
+.tc-wrap tbody td{
+  padding: 12px 14px;
+  color: color-mix(in oklab, var(--ink) 92%, transparent);
+  border-bottom: 1px solid color-mix(in oklab, var(--bd) 60%, transparent);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* Zebra + hover */
-.table-wrap tbody tr:nth-child(odd){
-  background: color-mix(in oklab, var(--bg, #fff) 95%, #f2f6ff 5%);
+.tc-wrap tbody tr{ transition: background-color .15s ease, box-shadow .15s ease; }
+.tc-wrap tbody tr:nth-child(odd)  td{ background: color-mix(in oklab, var(--field-bg) 80%, transparent); }
+.tc-wrap tbody tr:nth-child(even) td{ background: color-mix(in oklab, var(--field-bg) 86%, transparent); }
+.tc-wrap tbody tr:hover td{
+  background: color-mix(in oklab, var(--primary) 12%, var(--field-bg));
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--primary) 28%, var(--bd));
 }
 
-/* Navegación por teclado en filas clicables */
-.table-wrap tbody tr{
-  outline: none;
+/* ------------------------- Badges ------------------------ */
+.badge{
+  display: inline-block;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-weight: 700;
+  letter-spacing: .2px;
+  border: 1px solid color-mix(in oklab, var(--primary) 35%, var(--bd));
+  background: color-mix(in oklab, var(--primary) 16%, transparent);
+  color: var(--ink);
 }
-.table-wrap tbody tr:focus{
-  box-shadow: inset 0 0 0 2px var(--primary, #2563eb);
+.badge-success{
+  border-color: color-mix(in oklab, var(--primary) 55%, var(--bd));
+  background: color-mix(in oklab, var(--primary) 26%, transparent);
 }
 
-/* Padding lateral agradable */
-th:first-child, td:first-child{ padding-left: 16px; }
-th:last-child,  td:last-child{  padding-right: 16px; }
 
-/* ---------- Paginación ---------- */
-/* Si puedes, añade className="pager" al contenedor de paginación en JSX.
-   Aun así, cubrimos el caso actual con el selector adyacente. */
-.pager,
-.table-wrap + div{
-  display: flex;
+
+/* ------------------------- Compactación vertical --------- */
+@media (max-height: 720px){
+  .tc-wrap thead th,
+  .tc-wrap tbody td{ padding: 10px 12px; }
+}
+
+/* Scrollbars sutiles */
+.tc-wrap,
+.tc-wrap table{
+  scrollbar-width: thin;
+}
+
+/* 1) NUNCA uses margin en th/td: quítalo */
+.tc-wrap thead th{
+  margin-right: 0 !important;            /* ← clave */
+  width: auto;
+  border-right: 1px solid color-mix(in oklab, var(--bd) 55%, transparent);
+}
+.tc-wrap thead th:last-child{ border-right: none; }
+
+/* 2) Evita que la tabla se comprima y se desalineen los encabezados */
+.tc-wrap table{
+  min-inline-size: 1120px;               /* fuerza ancho base */
+  inline-size: 100%;
+  table-layout: fixed;                   /* ya lo tienes */
+  border-collapse: separate;             /* ya lo tienes */
+  border-spacing: 0;                     /* asegura cero gaps */
+}
+
+/* 3) Mantén el sticky header alineado con el body */
+.tc-wrap thead{
+  position: sticky;
+  top: 0;
+  z-index: 2;                            /* un poco más alto por si hay sombras */
+  background: color-mix(in oklab, var(--surface) 100%, transparent);
+}
+
+/* 4) Misma caja y padding en th/td (sin márgenes) */
+.tc-wrap thead th,
+.tc-wrap tbody td{
+  box-sizing: border-box;
+  padding: 12px 14px;
+  white-space: nowrap;
+}
+
+/* 5) Columna de Acciones: no recortar botones */
+.tc-wrap th:last-child,
+.tc-wrap td:last-child{
+  width: 200px;
+  min-width: 180px;
+}
+.tc-wrap td:last-child{
+  overflow: visible;
+  text-overflow: clip;
+}
+.tc-wrap td:last-child > div{
+  display: inline-flex;
   gap: 8px;
-  align-items: center;
-  margin-top: 8px;
-}
-
-.pager button,
-.table-wrap + div > button{
-  height: 32px;
-  padding: 0 10px;
-  border-radius: 10px;
-  border: 1px solid var(--border, #e5e7eb);
-  background: var(--card, #f8fafc);
-  color: var(--text, #0f172a);
-  font-weight: 600;
-  cursor: pointer;
-  transition: background .15s ease, transform .06s ease;
-}
-.pager button:hover,
-.table-wrap + div > button:hover{
-  background: color-mix(in oklab, var(--card, #f8fafc) 60%, transparent);
-}
-.pager button:active,
-.table-wrap + div > button:active{
-  transform: translateY(1px);
-}
-
-.pager button[disabled],
-.table-wrap + div > button[disabled]{
-  background: var(--card, #f8fafc) !important;
-  border-color: var(--border, #e5e7eb) !important;
-  color: var(--muted, #6b7280) !important;
-  cursor: not-allowed;
-}
-
-.pager select,
-.table-wrap + div > select{
-  height: 32px;
-  border-radius: 10px;
-  border: 1px solid var(--border, #e5e7eb);
-  background: var(--bg, #fff);
-  color: var(--text, #0f172a);
-  padding: 0 8px;
-}
-
-/* Texto “Página X” */
-.pager span,
-.table-wrap + div > span{
-  color: var(--text, #0f172a);
-}
-
-/* ---------- Responsivo ---------- */
-@media (max-width: 920px){
-  .tabla-tickets .filtros{
-    grid-template-columns: 1fr;
-  }
-  .tabla-tickets .filtros > span{ display: none; }
-
-  .pager,
-  .table-wrap + div{
-    flex-wrap: wrap;
-    row-gap: 6px;
-  }
 }
 
 
-.btn-ver{
-  height:42px;
-  padding:0 14px;
-  border-radius:10px;
-  border:1px solid var(--bd);
-  background:#2563eb(210, 40%, 98%);
-  color:var(--ink);
-  cursor:pointer;
-  transition:transform .05s ease, box-shadow .15s ease, background .15s ease, filter .15s ease;
+
+/* Quita separadores con bordes en el header */
+.tc-wrap thead th{
+  /* lo demás igual que tienes */
+  border-right: none !important;          /* ← fuera el borde */
+  background-clip: padding-box;           /* evita halos en radios */
 }
-/* Centrar encabezados y celdas */
-.table-wrap table th,
-.table-wrap table td{
+
+/* Dibuja el separador visual sin afectar layout */
+.tc-wrap thead th:not(:last-child){
+  box-shadow: inset -1px 0 0 color-mix(in oklab, var(--bd) 55%, transparent);
+}
+
+/* Opcional: separador suave también abajo del header */
+.tc-wrap thead{
+  box-shadow: inset 0 -1px 0 color-mix(in oklab, var(--bd) 65%, transparent);
+}
+
+/* Asegura que el sticky header no “salte” por sombras/bordes */
+.tc-wrap thead{ z-index: 2; }
+.tc-wrap thead th,
+.tc-wrap tbody td{
+  box-sizing: border-box;                 /* iguala cajas */
+}
+
+/* ====== Repartir anchos: 1ª fija, resto iguales ====== */
+.tc-wrap{
+  /* Ancho fijo de la 1ª columna (ID) y nº de columnas restantes */
+  --idw: 7.5ch;    /* ajusta: 6–8ch suele ir bien */
+  --cols: 9;       /* total columnas - 1 (sin la 1ª). Tienes 10 → 9 */
+}
+
+/* Primera columna (ID) fija */
+.tc-wrap th:first-child,
+.tc-wrap td:first-child{
+  width: var(--idw);
+  min-width: var(--idw);
+  max-width: var(--idw);
   text-align: center;
 }
- 
-/* Asegura centrado vertical (por si hay varias líneas o botones) */
-.table-wrap tbody td{
-  vertical-align: middle;
-}
- 
-/* Centrar el contenedor de acciones (donde tienes dos botones) */
-.table-wrap td > div{
-  display: inline-flex;      /* se centra como contenido en la celda */
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
- 
-/* Si usas badges dentro de la celda, que no se peguen a la izquierda */
-.table-wrap .badge{
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
-}
-/* Contenedor inferior: izquierda ↔ derecha */
-.pager{
-  display: flex;
-  align-items: center;
-  justify-content: space-between;  /* separa extremos */
-  gap: 8px;
-  margin-top: 8px;
-}
- 
-/* Grupo derecho (paginación) */
-.pager-right{
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
- 
-/* Responsive: permite salto a dos filas si no cabe */
-@media (max-width: 920px){
-  .pager{
-    flex-wrap: wrap;
-    row-gap: 6px;
-  }
-  .pager-right{
-    width: 100%;
-    justify-content: flex-end;     /* paginación a la derecha en la segunda fila */
-  }
+
+/* Todas las demás exactamente iguales */
+.tc-wrap th:not(:first-child),
+.tc-wrap td:not(:first-child){
+  width: calc((100% - var(--idw)) / var(--cols));
+  min-width: calc((100% - var(--idw)) / var(--cols));
+  max-width: calc((100% - var(--idw)) / var(--cols));
 }
 
-/* Centra texto en encabezados y celdas */
-.table-wrap th,
-.table-wrap td{
-  text-align: center;
-  vertical-align: middle; /* centra verticalmente */
+/* Importante: nada de márgenes en th/td y misma caja */
+.tc-wrap thead th,
+.tc-wrap tbody td{
+  margin: 0 !important;
+  box-sizing: border-box;
 }
- 
-/* Si dentro del TH/TD pones contenedores (div, span, button, etc.)
-   los centramos también */
-.table-wrap th > *,
-.table-wrap td > *{
-  margin-left: auto;
-  margin-right: auto;
+
+/* Mantén los separadores del header sin desplazar layout */
+.tc-wrap thead th{ border-right: none !important; }
+.tc-wrap thead th:not(:last-child){
+  box-shadow: inset -1px 0 0 color-mix(in oklab, var(--bd) 55%, transparent);
 }
- 
-/* Si usas contenedores de acciones dentro de celdas, mejor inline-flex */
-.table-wrap td > div{
+
+/* Si antes diste ancho especial a la última columna (Acciones), elimínalo */
+.tc-wrap th:last-child,
+.tc-wrap td:last-child{
+  width: auto;
+  min-width: 1000px;
+  max-width: 0px;
+  overflow: hidden;            /* evita que empuje la tabla */
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Si los botones de Acciones necesitan respirar, compénsalos dentro */
+.tc-wrap td:last-child > div{
   display: inline-flex;
-  align-items: center;
-  justify-content: center;
   gap: 8px;
+  max-width: 100%;
+}
+
+.tc-wrap th:nth-child(5), .tc-wrap td:nth-child(5), .tc-wrap th:nth-child(6), .tc-wrap td:nth-child(6) .tc-wrap th:nth-child(8), .tc-wrap td:nth-child(8){
+  width: 8ch;            /* columnas compactas */
+  max-width: 10ch;
+}
+
+.tc-wrap th:nth-child(7), .tc-wrap td:nth-child(7) .tc-wrap th:nth-child(8), .tc-wrap td:nth-child(8){
+  width: 20ch;            /* columnas compactas */
+  max-width: 20ch;
 }

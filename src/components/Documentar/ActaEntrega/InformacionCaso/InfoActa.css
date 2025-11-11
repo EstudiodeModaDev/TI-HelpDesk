@@ -1,108 +1,69 @@
-/* ====== ActaEntrega.css (tema claro persistente y aislado) ====== */
+/* ====== ActaEntrega.css (tokens-only, claro consistente con tu tema) ====== */
 
-/* 0) Scope: SIEMPRE claro y aislado */
-.acta-form{
-  color-scheme: light !important;  /* inputs nativos, scrollbars, datepicker en claro */
-  isolation: isolate;              /* evita blends/filtros/temas del padre */
-  
-  /* ===== Tokens locales (no globales) ===== */
-  --bg: #ffffff;
-  --surface: #ffffff;
-  --text: #0f172a;          /* slate-900 */
-  --muted: #475569;         /* slate-600 */
-  --border: #e5e7eb;        /* gray-200 */
-  --ring: #2563eb;          /* blue-600 */
-  --error: #b91c1c;         /* red-700 */
-  --shadow: 0 1px 2px rgba(16,24,40,.04), 0 1px 3px rgba(16,24,40,.06);
-
-  --radius: 12px;
-  --radius-sm: 10px;
-
-  --space-1: 6px;
-  --space-2: 10px;
-  --space-3: 14px;
-  --space-4: 18px;
-  --space-5: 24px;
-
-  --font-title: clamp(22px, 2.6vw, 34px);
-  --font-sub: clamp(16px, 1.6vw, 20px);
-
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: var(--space-5);
-  background: var(--bg) !important;
-  color: var(--text);
-}
-
-/* 0.1) Si la app está en dark, reafirma claro y ajusta bordes/grises */
-.dark .acta-form{
-  color-scheme: light !important;
-  --border: #dfe3e8;
-  --muted: #667085;
-}
-
-/* 0.2) Neutralización agresiva del dark global */
-.dark .acta-form, .dark .acta-form *{
-  color-scheme: light !important;
-}
+/* Scope básico */
 .acta-form, .acta-form *{
   box-sizing: border-box;
   min-width: 0;
-  mix-blend-mode: normal !important;
-  filter: none !important;
-  opacity: 1 !important;
+}
+
+/* Contenedor */
+.acta-form{
+  isolation: isolate;
+  max-width: 1100px;
+  margin: 0 auto;
+  background: var(--surface);
+  color: var(--ink);
 }
 
 /* ====== Título ====== */
 .acta-title{
-  font-size: var(--font-title);
+  font-size: clamp(22px, 2.6vw, 34px);
   font-weight: 800;
   letter-spacing: -0.02em;
-  margin: 6px 0 var(--space-4);
+  margin: 6px 0 clamp(14px, 2vw, 18px);
+  color: var(--ink);
 }
 
 /* ====== Grid cabecera ====== */
 .acta-grid{
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-4) var(--space-5);
-  margin-bottom: var(--space-5);
+  gap: clamp(14px, 1.8vw, 18px) clamp(18px, 2.2vw, 24px);
+  margin-bottom: clamp(18px, 2.4vw, 24px);
 }
 .acta-field{ display: flex; flex-direction: column; gap: 6px; }
 .acta-field > label{
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--muted);
 }
 
 /* ====== Inputs / Selects ====== */
 .acta-input{
   width: 100%;
-  background: var(--surface) !important;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
+  background: var(--field-bg) !important;
+  border: 1px solid var(--bd);
+  border-radius: var(--radius, 12px);
   padding: 10px 12px;
   font: inherit;
-  color: var(--text) !important;
+  color: var(--ink) !important;
   outline: none;
   transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
-  -webkit-appearance: none;
-     -moz-appearance: none;
-          appearance: none;
+  appearance: none;
 }
-.acta-input::placeholder{ color: var(--muted); }
+.acta-input::placeholder{ color: color-mix(in oklab, var(--muted) 82%, transparent); }
 .acta-input:focus{
-  border-color: var(--ring);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--ring) 18%, transparent);
-  background: #ffffff !important;
+  border-color: color-mix(in oklab, var(--primary) 55%, var(--bd) 45%);
+  box-shadow: 0 0 0 4px var(--ring);
+  background: var(--field-bg) !important;
 }
 
-/* Select: caret consistente y blanco */
+/* Select: caret con tokens */
 select.acta-input{
   background-image:
-    linear-gradient(45deg, transparent 50%, #64748b 50%),
-    linear-gradient(135deg, #64748b 50%, transparent 50%),
-    linear-gradient(#ffffff, #ffffff);
+    linear-gradient(45deg, transparent 50%, color-mix(in oklab, var(--ink) 55%, transparent) 50%),
+    linear-gradient(135deg, color-mix(in oklab, var(--ink) 55%, transparent) 50%, transparent 50%),
+    linear-gradient(var(--field-bg), var(--field-bg));
   background-position:
     calc(100% - 18px) calc(50% - 3px),
     calc(100% - 12px) calc(50% - 3px),
@@ -114,23 +75,24 @@ select.acta-input{
 
 /* Disabled-friendly */
 .acta-input:disabled{
-  background: #f8fafc;
-  color: #64748b;
+  background: color-mix(in oklab, var(--field-bg) 92%, transparent);
+  color: color-mix(in oklab, var(--muted) 86%, transparent);
   cursor: not-allowed;
 }
 
 /* Error */
 .error{
-  color: var(--error);
+  color: color-mix(in oklab, var(--primary) 40%, var(--ink) 60%);
   font-size: 12px;
   margin-top: 4px;
 }
 
 /* ====== Secciones ====== */
 .acta-subtitle{
-  font-size: var(--font-sub);
+  font-size: clamp(16px, 1.6vw, 20px);
   font-weight: 700;
-  margin: var(--space-5) 0 var(--space-3);
+  margin: clamp(20px, 2.4vw, 24px) 0 clamp(10px, 1.6vw, 14px);
+  color: var(--ink);
 }
 .acta-label-strong{ font-weight: 700; margin-bottom: 6px; }
 
@@ -138,8 +100,8 @@ select.acta-input{
 .entregas-grid{
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-3) var(--space-5);
-  margin-bottom: var(--space-5);
+  gap: clamp(10px, 1.6vw, 14px) clamp(18px, 2.2vw, 24px);
+  margin-bottom: clamp(18px, 2.4vw, 24px);
 }
 .entrega-item{ display: flex; align-items: center; gap: 10px; }
 .entrega-item--span2{ grid-column: 1 / -1; }
@@ -148,56 +110,57 @@ select.acta-input{
 .galeria-grid{
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-4);
-  margin-bottom: var(--space-5);
+  gap: clamp(14px, 2vw, 18px);
+  margin-bottom: clamp(18px, 2.4vw, 24px);
 }
 .galeria-card{
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border: 1px solid var(--bd);
+  border-radius: var(--radius, 12px);
   background: var(--surface);
+  color: var(--ink);
   box-shadow: var(--shadow);
-  padding: var(--space-4);
+  padding: clamp(14px, 2vw, 18px);
 }
-.galeria-header{ font-weight: 700; margin-bottom: var(--space-3); }
+.galeria-header{ font-weight: 700; margin-bottom: clamp(10px, 1.4vw, 14px); }
 .galeria-row{
   display: grid;
   grid-template-columns: 180px 1fr;
   align-items: center;
-  gap: var(--space-2);
-  margin-bottom: var(--space-2);
+  gap: clamp(8px, 1.2vw, 10px);
+  margin-bottom: clamp(8px, 1.2vw, 10px);
 }
 .galeria-row > label{
   font-size: 13px;
   color: var(--muted);
-  font-weight: 600;
+  font-weight: 700;
 }
 
 /* ====== Footer acciones ====== */
 .acta-actions{
   display: flex;
   justify-content: flex-end;
-  gap: var(--space-3);
-  margin-top: var(--space-4);
+  gap: clamp(10px, 1.6vw, 14px);
+  margin-top: clamp(14px, 2vw, 18px);
 }
 .acta-primary{
   appearance: none;
-  border: 1px solid transparent;
-  border-radius: var(--radius-sm);
+  border: 1px solid var(--primary);
+  border-radius: 10px;
   padding: 10px 14px;
-  background: var(--ring);
-  color: #fff;
-  font-weight: 700;
+  background: var(--primary);
+  color: var(--primary-ink);
+  font-weight: 800;
   cursor: pointer;
-  transition: transform .06s ease, box-shadow .15s ease, background .2s ease;
-  box-shadow: 0 2px 6px rgba(37,99,235,.25);
+  transition: transform .06s ease, box-shadow .15s ease, filter .15s ease;
+  box-shadow: var(--shadow);
 }
 .acta-primary:hover{
+  box-shadow: 0 0 0 6px var(--ring);
+  filter: brightness(1.03);
   transform: translateY(-1px);
-  box-shadow: 0 6px 16px rgba(37,99,235,.25);
 }
 .acta-primary:active{
   transform: translateY(0);
-  box-shadow: 0 3px 8px rgba(37,99,235,.25);
 }
 
 /* ====== Responsivo ====== */
@@ -210,20 +173,29 @@ select.acta-input{
 
 /* ====== Parches nativos ====== */
 .acta-form input[type="date"]::-webkit-calendar-picker-indicator{
-  filter: none !important; opacity: 1 !important;
+  filter: none !important;
+  opacity: 1 !important;
 }
+
+/* Autofill con tokens */
 .acta-form .acta-input:-webkit-autofill,
 .acta-form .acta-input:-webkit-autofill:hover,
 .acta-form .acta-input:-webkit-autofill:focus{
-  -webkit-text-fill-color: var(--text);
-  -webkit-box-shadow: 0 0 0px 1000px #ffffff inset;
+  -webkit-text-fill-color: var(--ink);
+  -webkit-box-shadow: 0 0 0px 1000px var(--field-bg) inset;
   transition: background-color 9999s ease-out 0s;
 }
 
-/* ====== Scrollbar clara (opcional) ====== */
+/* ====== Scrollbar (opcional) ====== */
 .acta-form{
-  scrollbar-color: #cfd8e3 #ffffff; /* Firefox */
+  scrollbar-color: color-mix(in oklab, var(--ink) 22%, transparent)
+                   color-mix(in oklab, var(--surface) 94%, transparent);
 }
 .acta-form::-webkit-scrollbar{ height: 10px; width: 10px; }
-.acta-form::-webkit-scrollbar-thumb{ background: #cfd8e3; border-radius: 8px; }
-.acta-form::-webkit-scrollbar-track{ background: #ffffff; }
+.acta-form::-webkit-scrollbar-thumb{
+  background: color-mix(in oklab, var(--ink) 22%, transparent);
+  border-radius: 8px;
+}
+.acta-form::-webkit-scrollbar-track{
+  background: color-mix(in oklab, var(--surface) 94%, transparent);
+}

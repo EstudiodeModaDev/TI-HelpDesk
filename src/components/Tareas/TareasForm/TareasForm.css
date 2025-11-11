@@ -1,314 +1,136 @@
-/* =========================================================
-   1) TOKENS / VARIABLES DE TEMA (MODO CLARO)
-   =======================================================*/
-:root {
-  --bg: #ffffff;
-  --surface: #ffffff;
-  --border: #e5e7eb;
-  --ink: #0f172a;
-  --muted: #64748b;
+/* ===== FT — Nueva Tarea: layout 1 columna angosta ===== */
+.ft-scope{
+  --pad: 12px;
+  --gap: 8px;
+  --h-input: 36px;
+  --h-btn: 36px;
+  --radius-sm: 10px;
 
-  --field-bg: #f8fafc;
-  --field-bg-disabled: #f1f5f9;
-
-  --primary: #2563eb;
-  --ring: rgba(37, 99, 235, 0.35); /* anillo externo suave */
-
-  --primary-ink: #ffffff;
-  --danger: #dc2626;
-
-  --radius: 14px;
-  --shadow: 0 12px 28px rgba(2, 6, 23, 0.08);
+  background: var(--surface, #fff);
+  color: var(--ink, #0f172a);
+  border-radius: var(--radius-3xl, var(--radius, 12px));
+  box-shadow: var(--shadow, 0 8px 22px rgba(0,0,0,.06));
+  padding: var(--pad);
+  max-width: 420px;       /* 👈 tarjeta angosta */
+  width: 100%;
 }
 
-/* =========================================================
-   2) SCOPE / CARD
-   =======================================================*/
-.ft-scope {
-  isolation: isolate;
-  color-scheme: light !important;
+.ft-title{
+  margin: 0 0 6px 0;
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: -.015em;
+  color: var(--ink, #0f172a);
 }
 
-.dark .ft-scope,
-.dark .ft-scope * {
-  color-scheme: light !important;
-}
-
-.ft-card {
-  max-width: 560px;
-  margin: 24px auto;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  padding: 18px 18px 16px;
-}
-
-.ft-title {
-  margin: 4px 0 14px;
-  text-align: center;
-  font-weight: 700;
-  font-size: 20px;
-  color: var(--ink);
-}
-
-/* =========================================================
-   3) LAYOUT DEL FORMULARIO
-   =======================================================*/
-.ft-form {
+/* Siempre UNA columna */
+.ft-form{
   display: grid;
-  gap: 14px;
+  grid-template-columns: 1fr !important;  /* 👈 fuerza 1 col */
+  gap: var(--gap);
 }
 
-.ft-field {
+.ft-field{
   display: grid;
-  gap: 8px;
+  gap: 4px;
+  min-width: 0;
 }
 
-.ft-label {
-  font-size: 14px;
+.ft-label{
+  font-size: .9rem;
   font-weight: 600;
-  color: var(--ink);
+  color: var(--muted, #64748b);
+  margin: 0;
 }
 
-/* =========================================================
-   4) INPUTS / SELECTS NATIVOS
-   =======================================================*/
-.ft-form input[type="text"],
-.ft-form input[type="date"],
-.ft-form input[type="time"],
-.ft-form select {
+/* Inputs compactos */
+.ft-field input[type="text"],
+.ft-field input[type="date"],
+.ft-field input[type="time"],
+.ft-field select{
   appearance: none;
-  width: 100%;
-  height: 42px;
-  padding: 0 12px;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  background: var(--field-bg);
-  color: var(--ink);
-  font-size: 14px;
-  transition: box-shadow 0.15s ease, border-color 0.15s ease, background 0.15s ease;
-}
-
-.ft-form input::placeholder {
-  color: #94a3b8;
-}
-
-/* =========================================================
-   5) FOCO (NATIVOS)
-   =======================================================*/
-.ft-form input:focus,
-.ft-form select:focus {
+  height: var(--h-input);
+  padding: 0 10px;
+  background: var(--field-bg, #f8fafc);
+  color: var(--ink, #0f172a);
+  border: 1px solid var(--bd, #e5e7eb);
+  border-radius: var(--radius-sm);
   outline: none;
-  border-color: var(--primary);
-  box-shadow: 0 0 0 4px var(--ring);
-  background: #fff;
+  transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
+  min-width: 0;
+}
+.ft-field input::placeholder{ color: color-mix(in oklab, var(--muted, #64748b) 80%, transparent); }
+.ft-field :is(input,select):hover{ border-color: var(--bd-strong, #d1d5db); }
+.ft-field :is(input,select):focus{
+  border-color: color-mix(in oklab, var(--primary, #3b82f6) 60%, var(--bd, #e5e7eb) 40%);
+  box-shadow: 0 0 0 3px var(--ring, rgba(59,130,246,.25));
 }
 
-/* =========================================================
-   6) ESTADOS: DISABLED Y ERRORES
-   =======================================================*/
-.ft-form input:disabled,
-.ft-form select:disabled {
-  background: var(--field-bg-disabled);
-  color: #94a3b8;
-  cursor: not-allowed;
+/* Select caret nativo */
+.ft-field select{
+  padding-right: 34px;
+  background-image:
+    linear-gradient(45deg, transparent 50%, color-mix(in oklab, var(--ink, #0f172a) 45%, transparent) 50%),
+    linear-gradient(135deg, color-mix(in oklab, var(--ink, #0f172a) 45%, transparent) 50%, transparent 50%),
+    linear-gradient(var(--field-bg, #f8fafc), var(--field-bg, #f8fafc));
+  background-position:
+    calc(100% - 16px) calc(50% - 3px),
+    calc(100% - 10px) calc(50% - 3px),
+    calc(100% - 2.1rem) 0;
+  background-size: 6px 6px, 6px 6px, 1px 100%;
+  background-repeat: no-repeat;
 }
 
-.error {
-  color: var(--danger);
-  font-size: 12px;
-}
-
-/* =========================================================
-   7) FIELDSET (FECHA / HORA)
-   =======================================================*/
-.ft-fieldset {
-  border: 0;
+/* Fieldset compacto, también 1 columna */
+.ft-fieldset{
   margin: 0;
-  padding: 0;
+  padding: var(--pad);
+  border: 1px solid var(--bd, #e5e7eb);
+  border-radius: var(--radius-sm);
+  background: color-mix(in oklab, var(--surface, #fff) 96%, transparent);
   display: grid;
-  gap: 12px;
+  grid-template-columns: 1fr !important; /* 👈 1 col */
+  gap: var(--gap);
 }
-
-.ft-legend {
-  font-size: 14px;
+.ft-legend{
+  padding: 0 6px;
+  font-size: .9rem;
   font-weight: 700;
-  margin-bottom: 2px;
-  color: var(--ink);
+  color: var(--muted, #64748b);
 }
 
-/* =========================================================
-   8) ACCIONES / BOTONES
-   =======================================================*/
-.ft-actions {
+/* Botón a lo ancho */
+.ft-actions{
   display: flex;
-  justify-content: flex-end;
-  margin-top: 8px;
-}
-
-.ft-btn {
-  display: inline-flex;
-  align-items: center;
   gap: 8px;
-  height: 40px;
-  padding: 0 16px;
-  border: 1px solid var(--primary);
-  background: var(--primary);
-  color: var(--primary-ink);
-  border-radius: 12px;
-  font-weight: 600;
-  font-size: 14px;
+  margin-top: 4px;
+}
+.ft-btn{
+  flex: 1;                        /* 👈 ocupa todo el ancho */
+  height: var(--h-btn);
+  padding: 0 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--primary, #3b82f6);
+  background: var(--primary, #3b82f6);
+  color: var(--primary-ink, #fff);
+  font-weight: 800;
   cursor: pointer;
-  transition: filter 0.15s ease, transform 0.02s ease;
+  box-shadow: var(--shadow, 0 8px 22px rgba(0,0,0,.06));
+  transition: transform .06s ease, filter .15s ease, box-shadow .18s ease;
 }
+.ft-btn:hover{ box-shadow: 0 0 0 4px var(--ring, rgba(59,130,246,.25)); filter: brightness(1.03); }
+.ft-btn:active{ transform: translateY(1px); }
 
-.ft-btn::before {
-  content: "✓";
+/* Errores mini */
+.error{
+  color: color-mix(in oklab, var(--primary, #3b82f6) 35%, var(--ink, #0f172a));
   font-weight: 700;
-  line-height: 1;
+  font-size: .8rem;
 }
 
-.ft-btn:hover { filter: brightness(1.03); }
-.ft-btn:active { transform: translateY(1px); }
-.ft-btn:disabled { opacity: 0.7; cursor: not-allowed; }
-
-/* =========================================================
-   9) REACT-SELECT (classNamePrefix="rs")
-   =======================================================*/
-.rs__control {
-  min-height: 44px;
-  border-radius: 10px !important;
-  border: 1px solid var(--border) !important;
-  background: var(--field-bg) !important;
-  box-shadow: none !important;
-  overflow: hidden; /* recorta bordes y fondo de la flecha */
-}
-
-/* Foco del control */
-.rs__control--is-focused {
-  border-color: var(--primary) !important;
-  box-shadow: 0 0 0 3px var(--ring) !important;
-  background: var(--field-bg) !important;
-  background-clip: padding-box;
-}
-
-/* Deshabilitado */
-.rs__control--is-disabled {
-  background: var(--field-bg-disabled) !important;
-  color: #94a3b8 !important;
-  cursor: not-allowed !important;
-}
-
-/* === Arreglo de fondo blanco y halo interno === */
-.rs__control *,
-.rs__value-container,
-.rs__input-container,
-.rs__indicators,
-.rs__indicators *,
-.rs__control input,
-.rs__control input:focus {
-  background: transparent !important;
-  box-shadow: none !important;
-  outline: none !important;
-}
-
-/* Indicadores (flecha) */
-.rs__indicator-separator { display: none !important; }
-.rs__dropdown-indicator { color: #64748b !important; }
-
-/* Placeholder y texto */
-.rs__placeholder { color: var(--muted) !important; }
-.rs__single-value { color: var(--ink) !important; }
-.rs__input-container input { color: var(--ink) !important; }
-
-/* Menú desplegable */
-.rs__menu {
-  margin-top: 6px !important;
-  border-radius: 10px !important;
-  border: 1px solid var(--border) !important;
-  box-shadow: var(--shadow) !important;
-  overflow: hidden;
-  z-index: 20;
-}
-
-.rs__menu-list { padding: 6px !important; }
-
-/* Opción */
-.rs__option {
-  border-radius: 8px;
-  padding: 10px 10px;
-  color: var(--ink);
-}
-
-.rs__option--is-focused { background: #f3f4f6 !important; }
-.rs__option--is-selected {
-  background: #dbeafe !important;
-  color: var(--ink) !important;
-  font-weight: 600;
-}
-
-/* Mensajes del menú */
-.rs__no-options,
-.rs__loading-message {
-  color: #64748b !important;
-  padding: 10px !important;
-}
-
-/* =========================================================
-   10) COHERENCIA VISUAL GENERAL
-   =======================================================*/
-.ft-card,
-.lt-card { padding: 22px 22px 18px; }
-
-.ft-title { font-size: 22px; }
-
-.ft-form input[type="text"],
-.ft-form input[type="date"],
-.ft-form input[type="time"],
-.ft-form select,
-.rs__control {
-  height: 44px;
-  border-radius: 12px;
-}
-
-/* =========================================================
-   11) RESPONSIVE
-   =======================================================*/
-@media (min-width: 640px) {
-  .ft-form {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    column-gap: 14px;
-    row-gap: 14px;
-  }
-
-  .ft-form .ft-field { grid-column: span 2; }
-
-  .ft-fieldset {
-    grid-column: span 2;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-  }
-
-  .ft-legend { grid-column: 1 / -1; }
-  .ft-fieldset .ft-field { grid-column: span 1; }
-  .ft-actions { grid-column: 2; justify-self: end; }
-}
-
-@media (max-width: 480px) {
-  .ft-card { margin: 16px 12px; padding: 14px; }
-  .ft-title { font-size: 18px; }
-}
-
-/* =========================================================
-   12) CONTEXTO TAREAS PAGE
-   =======================================================*/
-.tareas-page .ft-card,
-.tareas-page .lt-card {
-  width: 100%;
-  max-width: none;
-  margin: 0;
-  min-height: unset;
+/* Sin animaciones si el usuario lo prefiere */
+@media (prefers-reduced-motion: reduce){
+  .ft-field :is(input,select),
+  .ft-btn,
+  .ft-field .rs__control{ transition: none !important; }
 }

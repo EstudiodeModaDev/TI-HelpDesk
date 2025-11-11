@@ -1,69 +1,85 @@
-/* 🧩 Contenedor de la tabla con scroll vertical y horizontal */
-.tabla-scroll {
-  flex: 1;
-  overflow-y: auto;
-  overflow-x: auto;           /* scroll horizontal si el contenido no cabe */
-  max-height: 50vh;
-  margin-bottom: 20px;
-  border-radius: 12px;        /* similar a tabla-tickets */
-  border: 1px solid #e5e7eb; /* borde ligero */
-  background: #ffffff;        /* fondo claro */
-  box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+/* =========================================================
+   TABLA DE FACTURAS — usa tokens globales
+   ========================================================= */
+.facturas-lista{
+  display: grid;
+  gap: 14px;
+  container-type: inline-size;     /* <— habilita @container */
 }
 
-/* 🧩 Tabla */
-.tabla-facturas {
+.tabla-scroll{
+  flex: 1;
+  overflow: auto;                       /* x + y */
+  max-height: 50vh;
+  margin-bottom: 20px;
+  border-radius: var(--radius-3xl, var(--radius, 12px));
+  border: 1px solid var(--bd, #e5e7eb);
+  background: var(--surface, #fff);
+  box-shadow: var(--shadow, 0 8px 24px rgba(0,0,0,.06));
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in oklab, var(--ink, #0f172a) 24%, transparent) transparent;
+}
+.tabla-scroll::-webkit-scrollbar{ height: 10px; width: 10px; }
+.tabla-scroll::-webkit-scrollbar-thumb{
+  background: color-mix(in oklab, var(--ink, #0f172a) 24%, transparent);
+  border-radius: 999px;
+}
+
+/* Tabla */
+.tabla-facturas{
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
   margin-top: 10px;
-  min-width: 1200px;        /* evita que se aplaste demasiado */
+  min-width: 1200px;                    /* evita columnas aplastadas */
   font-size: 14px;
   background: transparent;
+  color: var(--ink, #0f172a);
 }
 
 /* Encabezados */
-.tabla-facturas th {
+.tabla-facturas th{
   position: sticky;
   top: 0;
-  z-index: 2;
-  background: #ffffff;
-  color: #111827;
+  z-index: 1;
+  background: var(--surface, #fff);
+  color: var(--ink, #0f172a);
   padding: 10px 12px;
   text-align: left;
-  font-weight: 600;
-  border-bottom: 1px solid #e5e7eb;
-  box-shadow: 0 1px 0 #e5e7eb, 0 2px 10px rgba(0,0,0,.05);
+  font-weight: 700;
+  border-bottom: 1px solid var(--bd, #e5e7eb);
+  box-shadow:
+    0 1px 0 var(--bd, #e5e7eb),
+    0 2px 10px color-mix(in oklab, var(--ink, #0f172a) 8%, transparent);
   white-space: nowrap;
 }
 
 /* Celdas */
-.tabla-facturas td {
+.tabla-facturas td{
   padding: 10px 12px;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--bd, #e5e7eb);
   text-align: left;
   vertical-align: middle;
   word-wrap: break-word;
   white-space: normal;
-  background: #fff;
+  background: var(--surface, #fff);
+  color: var(--ink, #0f172a);
 }
 
 /* Filas alternadas y hover */
-.tabla-facturas tbody tr:nth-child(odd) {
-  background: #ffffff;
+.tabla-facturas tbody tr:nth-child(odd){
+  background: color-mix(in oklab, var(--surface, #fff) 98%, var(--bd, #e5e7eb));
 }
-
-.tabla-facturas tbody tr:nth-child(even) {
-  background: #e6e6e6;
+.tabla-facturas tbody tr:nth-child(even){
+  background: color-mix(in oklab, var(--surface, #fff) 94%, var(--bd, #e5e7eb));
 }
-
-.tabla-facturas tbody tr:hover {
-  background: #eef2ff;
+.tabla-facturas tbody tr:hover{
+  background: color-mix(in oklab, var(--field-bg, #f8fafc) 92%, transparent);
   cursor: pointer;
 }
 
 /* Texto con puntos suspensivos */
-.one-line-ellipsis {
+.one-line-ellipsis{
   display: block;
   max-width: 100%;
   white-space: nowrap;
@@ -71,49 +87,218 @@
   text-overflow: ellipsis;
 }
 
-/* Columnas específicas */
+/* Anchos sugeridos (ajusta según tus columnas reales) */
 .tabla-facturas th:nth-child(1),
-.tabla-facturas td:nth-child(1) { width: 50px; }   /* Num */
+.tabla-facturas td:nth-child(1){ width: 50px; }     /* Num */
+
 .tabla-facturas th:nth-child(4),
-.tabla-facturas td:nth-child(4) { width: 150px; }  /* Proveedor */
+.tabla-facturas td:nth-child(4){ width: 150px; }    /* Proveedor */
+
 .tabla-facturas th:nth-child(5),
-.tabla-facturas td:nth-child(5) { width: 130px; }  /* NIT */
+.tabla-facturas td:nth-child(5){ width: 130px; }    /* NIT */
+
 .tabla-facturas th:nth-child(13),
 .tabla-facturas td:nth-child(13),
 .tabla-facturas th:nth-child(14),
-.tabla-facturas td:nth-child(14) {
+.tabla-facturas td:nth-child(14){
   width: 240px;
   text-align: left;
 }
 
 /* Columna Acciones compacta */
 .tabla-facturas th:last-child,
-.tabla-facturas td:last-child {
+.tabla-facturas td:last-child{
   width: 64px;
   text-align: center;
   white-space: nowrap;
 }
 
 /* Botón editar */
-.btn-editar {
+.btn-editar{
   display: inline-flex;
   align-items: center;
   justify-content: center;
   width: 36px;
   height: 36px;
   padding: 0;
-  border: 0;
+  border: 1px solid var(--bd, #e5e7eb);
   border-radius: 10px;
-  background: #f6f7f9;
+  background: color-mix(in oklab, var(--field-bg, #f6f7f9) 96%, transparent);
+  color: var(--ink, #0f172a);
   cursor: pointer;
   line-height: 1;
+  box-shadow: var(--shadow, 0 8px 24px rgba(0,0,0,.06));
+  transition: border-color .15s ease, box-shadow .18s ease, transform .06s ease, filter .15s ease;
 }
+.btn-editar:hover{
+  border-color: var(--bd-strong, #d1d5db);
+  box-shadow: 0 0 0 4px var(--ring, rgba(59,130,246,.25));
+  filter: brightness(1.02);
+}
+.btn-editar:active{ transform: translateY(1px); }
 
 /* Responsive */
 @media (max-width: 980px){
-  .tabla-facturas { min-width: 900px; }
+  .tabla-facturas{ min-width: 900px; }
+}
+@media (max-width: 520px){
+  .tabla-facturas{ min-width: 640px; }
 }
 
-@media (max-width: 520px){
-  .tabla-facturas { min-width: 640px; }
+/* Respeta preferencias de movimiento */
+@media (prefers-reduced-motion: reduce){
+  .btn-editar, .tabla-facturas th, .tabla-facturas td{ transition: none; }
+}
+
+/* =========================================================
+   FACTURAS: filtros + tabla — responsive con tokens
+   ========================================================= */
+
+/* 1) El panel de filtros se comporta como grid fluido */
+.filtros-busqueda,
+.filters-bar,
+.filtros, 
+.filtros .row, 
+.filtros .grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0,1fr));
+  gap: 10px;
+  align-items: end;
+  container-type: inline-size;
+}
+
+.filtros-busqueda > * ,
+.filters-bar > * ,
+.filtros > * {
+  min-width: 0;
+}
+
+/* Inputs/selects ocupan 3 columnas por defecto (4 items por fila) */
+.filtros-busqueda :is(input, select, .rs-override),
+.filters-bar :is(input, select, .rs-override),
+.filtros :is(input, select, .rs-override){
+  grid-column: span 3;
+  height: var(--input-h, 44px);
+}
+
+/* Etiquetas/“campos con label arriba” también respetan el span */
+.filtros-busqueda label,
+.filters-bar label,
+.filtros label{
+  grid-column: span 3;
+}
+
+/* Botones grandes (si los tienes) */
+.filtros-busqueda .btn,
+.filters-bar .btn,
+.filtros .btn{
+  grid-column: span 3;
+  height: var(--input-h, 44px);
+}
+
+/* 2) Ajustes progresivos por espacio real (container queries) */
+@container (max-width: 1100px){
+  /* 3 por fila */
+  .filtros-busqueda :is(input, select, .rs-override),
+  .filters-bar :is(input, select, .rs-override),
+  .filtros :is(input, select, .rs-override),
+  .filtros-busqueda label,
+  .filters-bar label,
+  .filtros label,
+  .filtros-busqueda .btn,
+  .filters-bar .btn,
+  .filtros .btn{
+    grid-column: span 4;
+  }
+}
+
+@container (max-width: 820px){
+  /* 2 por fila */
+  .filtros-busqueda :is(input, select, .rs-override),
+  .filters-bar :is(input, select, .rs-override),
+  .filtros :is(input, select, .rs-override),
+  .filtros-busqueda label,
+  .filters-bar label,
+  .filtros label,
+  .filtros-busqueda .btn,
+  .filters-bar .btn,
+  .filtros .btn{
+    grid-column: span 6;
+  }
+}
+
+@container (max-width: 560px){
+  /* 1 por fila + compacidad */
+  .filtros-busqueda :is(input, select, .rs-override),
+  .filters-bar :is(input, select, .rs-override),
+  .filtros :is(input, select, .rs-override),
+  .filtros-busqueda label,
+  .filters-bar label,
+  .filtros label,
+  .filtros-busqueda .btn,
+  .filters-bar .btn,
+  .filtros .btn{
+    grid-column: 1 / -1;
+  }
+}
+
+/* 3) Make sure React-Select encoge correctamente en filtros */
+.filtros-busqueda .rs-override .rs__control,
+.filters-bar .rs-override .rs__control,
+.filtros .rs-override .rs__control{
+  min-height: var(--input-h, 44px);
+  height: var(--input-h, 44px);
+}
+
+/* 4) Tabla: permitir buen scroll en pantallas angostas */
+.tabla-scroll{
+  max-inline-size: 100%;
+  border: 1px solid var(--bd, #e5e7eb);
+  background: var(--surface, #fff);
+}
+
+/* Reducimos el ancho mínimo de la tabla en viewports menores */
+@media (max-width: 1280px){
+  .tabla-facturas{ min-width: 1100px; }
+}
+@media (max-width: 1024px){
+  .tabla-facturas{ min-width: 980px; }
+}
+@media (max-width: 820px){
+  .tabla-facturas{ min-width: 840px; }
+}
+@media (max-width: 640px){
+  .tabla-facturas{ min-width: 700px; }
+}
+
+/* 5) Compactación suave en móvil */
+@media (max-width: 560px){
+  .tabla-facturas th,
+  .tabla-facturas td{ padding: 8px 10px; font-size: 13px; }
+}
+
+/* 6) Tokens para el bloque de filtros (opcional, si no existía) */
+.filtros-busqueda,
+.filters-bar,
+.filtros{
+  background: color-mix(in oklab, var(--surface-elev, #fff) 96%, transparent);
+  border: 1px solid var(--bd, #e5e7eb);
+  border-radius: var(--radius-3xl, var(--radius, 12px));
+  padding: clamp(10px, 2vw, 16px);
+  box-shadow: var(--shadow, 0 8px 22px rgba(0,0,0,.06));
+}
+.filtros-busqueda input,
+.filtros-busqueda select{
+  border: 1px solid var(--bd, #e5e7eb);
+  background: var(--field-bg, #f8fafc);
+  color: var(--ink, #0f172a);
+  border-radius: 10px;
+  padding: 10px 12px;
+  outline: none;
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+.filtros-busqueda input:focus,
+.filtros-busqueda select:focus{
+  border-color: color-mix(in oklab, var(--primary, #3b82f6) 60%, var(--bd, #e5e7eb) 40%);
+  box-shadow: 0 0 0 4px var(--ring, rgba(59,130,246,.25));
 }

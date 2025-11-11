@@ -89,13 +89,6 @@ export function toISODateTimeFlex(v?: string | Date | null): string {
   return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
 
-/** Alternativa en formato local "DD/MM/YYYY HH:mm" */
-export function toCoDateTimeFlex(v?: string | Date | null): string {
-  const d = parseDateFlex(v);
-  if (!d) return '';
-  return `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
-}
-
 export function toGraphDateTime(
   v: Date | { toISOString: () => string } | string | null | undefined
 ): string | undefined {

@@ -1,300 +1,238 @@
 /* =========================================================
-   TABLA DE TICKETS — usa tus tokens globales
+   TABLA DE TICKETS — limpia, responsive y basada en tokens
+   (sin colores fijos; todo sale de tus variables globales)
    ========================================================= */
 
-/* Contenedor principal */
+/* --------- Contenedor principal --------- */
 .tabla-tickets{
-  --pad: var(--page-pad, 16px);
-  --card: var(--surface);
-  --card-elev: var(--surface-elev);
-  --ink: var(--ink);
-  --muted: var(--muted);
-  --bd: var(--border);
-  --shadow: var(--shadow);
-  --radius: var(--radius);
-  --ring: var(--ring, rgba(0,0,0,.15)); /* si no tienes ring definido, usa el tuyo */
+  /* alias a tokens de la app (con fallback suave) */
+  --card:      var(--surface, #fff);
+  --ink:       var(--ink, #0f172a);
+  --muted:     var(--muted, #64748b);
+  --bd:        var(--border, #e5e7eb);
+  --bd-strong: var(--bd-strong, color-mix(in oklab, var(--bd) 75%, black));
+  --shadow:    var(--shadow, 0 10px 30px rgba(0,0,0,.08));
+  --radius:    var(--radius, 14px);
+  --pad:       clamp(10px, 2vw, 16px);
+  --gap:       clamp(10px, 1.8vw, 14px);
+  --ring:      var(--ring, color-mix(in oklab, var(--primary, #3b82f6) 25%, transparent));
+  --radius: 15px;
+
   color: var(--ink);
-  min-width: 0;                /* clave si el padre es grid/flex */
 }
 
-/* “Tarjeta” que envuelve filtros + tabla */
+/* Si marcas data-force-light, reinterpreta tokens para modo claro */
+.tabla-tickets[data-force-light]{
+  --card: var(--surface, #fff);
+  --ink:  var(--ink, #0f172a);
+  --muted:var(--muted, #64748b);
+  --bd:   var(--border, #e5e7eb);
+}
+
+/* --------- Wrapper tabla (scroll horizontal cómodo) --------- */
 .tabla-tickets .table-wrap{
-  background: color-mix(in oklab, var(--surface) 96%, transparent);
-  border: 1px solid color-mix(in oklab, var(--bd) 75%, transparent);
-  border-radius: var(--radius-3xl, 26px);
-  box-shadow: var(--shadow, none);
-  max-inline-size: 100%;
-  min-width: 0;
-  overflow-x: auto;            /* ← scroll horizontal */
-  overflow-y: auto;
-  contain: inline-size;        /* aísla el ancho interno */
-  scrollbar-width: thin;
-}
-.table-wrap::-webkit-scrollbar{ height: 10px; width: 10px; }
-.table-wrap::-webkit-scrollbar-thumb{
-  background: color-mix(in oklab, var(--bd) 70%, transparent);
-  border-radius: 10px;
-}
-.table-wrap::-webkit-scrollbar-track{
-  background: color-mix(in oklab, var(--surface) 90%, transparent);
+  background: var(--card);
+  border: 1px solid var(--bd);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: var(--pad);
+  overflow-x: auto;              /* 🔑 no se “rompe” en pantallas estrechas */
+  scrollbar-gutter: stable both-edges;
 }
 
-/* ------------------------ Filtros ------------------------ */
-.filtros{
-  --h: 46px;
+/* --------- Filtros superiores --------- */
+.tickets-filtros{
   display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: 1fr max-content max-content max-content max-content max-content;
-  gap: 12px;
+  grid-template-columns: 1.2fr max-content repeat(2, max-content) 1fr;
   align-items: center;
-
-  padding: 10px;
-  margin: 6px 6px 14px 6px;
-  border-radius: var(--radius-3xl, 26px);
-  background:
-    linear-gradient(180deg,
-      color-mix(in oklab, var(--surface) 94%, transparent) 0%,
-      color-mix(in oklab, var(--surface) 98%, transparent) 100%);
-  border: 1px solid color-mix(in oklab, var(--bd) 70%, transparent);
-  box-shadow:
-    0 12px 28px color-mix(in oklab, var(--surface) 18%, transparent),
-    0 0 0 6px color-mix(in oklab, var(--primary) 8%, transparent);
+  gap: var(--gap);
+  background: color-mix(in oklab, var(--card) 96%, transparent);
+  border: 1px solid var(--bd);
+  border-radius: var(--radius);
+  padding: var(--pad);
+  margin-bottom: var(--gap);
   overflow: hidden;
 }
-
-.filtros input[type="text"]{
-  height: var(--h);
-  border-radius: calc(var(--radius-3xl, 26px) - 6px);
-  background:
-    linear-gradient(180deg,
-      color-mix(in oklab, var(--field-bg) 88%, transparent),
-      color-mix(in oklab, var(--field-bg) 92%, transparent));
-  border: 1px solid color-mix(in oklab, var(--bd) 80%, transparent);
-  color: var(--ink);
-  padding: 0 16px;
-  outline: none;
-  transition: border-color .15s ease, box-shadow .15s ease, background .15s ease, filter .15s ease;
-  min-width: 0;
-}
-.filtros input[type="text"]::placeholder{
-  color: color-mix(in oklab, var(--muted) 64%, transparent);
-}
-.filtros input[type="text"]:focus{
-  border-color: color-mix(in oklab, var(--primary) 55%, var(--bd));
-  box-shadow: 0 0 0 3px var(--ring);
-}
-
-.filtros select,
-.filtros input[type="date"]{
-  height: var(--h);
-  border-radius: 16px;
-  border: 1px solid color-mix(in oklab, var(--bd) 80%, transparent);
-  background:
-    linear-gradient(180deg,
-      color-mix(in oklab, var(--field-bg) 90%, transparent),
-      color-mix(in oklab, var(--field-bg) 96%, transparent));
-  color: var(--ink);
-  padding: 0 14px;
-  outline: none;
-  transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
+.tickets-filtros input[type="text"],
+.tickets-filtros input[type="date"],
+.tickets-filtros select{
   appearance: none;
-}
-.filtros select:focus,
-.filtros input[type="date"]:focus{
-  border-color: color-mix(in oklab, var(--primary) 55%, var(--bd));
-  box-shadow: 0 0 0 3px var(--ring);
-}
-
-.filtros > span{
-  inline-size: 24px;
-  text-align: center;
-  color: var(--muted);
-  user-select: none;
-}
-
-.filtros button:first-of-type{
-  height: var(--h);
-  padding: 0 16px;
-  border-radius: 16px;
-  border: 1px solid color-mix(in oklab, var(--primary) 45%, var(--bd) 55%);
-  background: color-mix(in oklab, var(--primary) 10%, transparent);
-  color: var(--primary-ink);
-  font-weight: 800;
-  letter-spacing: .2px;
-  cursor: pointer;
-  transition: transform .08s ease, filter .15s ease, box-shadow .15s ease, background .15s ease;
-  box-shadow: 0 8px 18px color-mix(in oklab, var(--primary) 18%, transparent);
-}
-.filtros button:first-of-type:hover{ filter: brightness(1.06); }
-.filtros button:first-of-type:active{ transform: translateY(1px) scale(.995); }
-
-.filtros button:last-of-type{
-  inline-size: var(--h);
-  block-size: var(--h);
-  display: grid;
-  place-items: center;
-  border-radius: 999px;
-  border: 1px solid color-mix(in oklab, var(--primary) 38%, var(--bd) 62%);
-  background: linear-gradient(180deg,
-               color-mix(in oklab, var(--surface-elev) 98%, transparent),
-               color-mix(in oklab, var(--surface-elev) 90%, transparent));
+  background: color-mix(in oklab, var(--card) 98%, transparent);
   color: var(--ink);
-  box-shadow:
-    0 10px 24px color-mix(in oklab, var(--primary) 22%, transparent),
-    0 0 0 6px color-mix(in oklab, var(--primary) 10%, transparent);
-  cursor: pointer;
-  transition: transform .08s ease, filter .15s ease, box-shadow .15s ease, border-color .15s ease;
+  border: 1px solid var(--bd);
+  border-radius: calc(var(--radius) - 6px);
+  padding: 10px 12px;
+  min-width: 0;
+  box-shadow: 0 1px 0 rgba(0,0,0,.02) inset;
 }
-.filtros button:last-of-type:hover{
-  filter: brightness(1.05);
-  border-color: color-mix(in oklab, var(--primary) 60%, var(--bd) 40%);
-}
-.filtros button:last-of-type:active{ transform: translateY(1px); }
+.tickets-filtros input::placeholder{ color: color-mix(in oklab, var(--muted) 85%, transparent); }
+.tickets-filtros span{ color: var(--muted); user-select: none; }
 
-/* ------------------------- Tabla ------------------------- */
-.table-wrap table{
-  /* la tabla no encoge por debajo de este mínimo: aparecerá scroll-x */
-  min-inline-size: 1280px;     /* ajusta a 1200/1100 según tu “pantalla pequeña” */
-  table-layout: fixed;
+/* enfoque accesible */
+.tickets-filtros input:focus,
+.tickets-filtros select:focus{
+  outline: none;
+  border-color: var(--bd-strong);
+  box-shadow: 0 0 0 4px var(--ring);
+}
+
+/* --------- Tabla --------- */
+.tabla-tickets table{
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
-  background: transparent;
-  font-size: 0.98rem;
+  table-layout: fixed;         /* celdas estables */
+  min-width: 860px;            /* cabe todo sin romper; el wrap hace scroll */
 }
 
-/* Cabecera sticky con mayor contraste */
-.table-wrap thead{
+/* Cabezera sticky para tablas largas */
+.tabla-tickets thead th{
   position: sticky;
   top: 0;
-  z-index: 2;
-}
-.table-wrap thead th{
-  background: linear-gradient(180deg,
-    color-mix(in oklab, var(--surface-elev) 94%, transparent) 0%,
-    color-mix(in oklab, var(--surface-elev) 86%, transparent) 100%);
-  color: color-mix(in oklab, var(--ink) 92%, transparent);
-  border-bottom: 1px solid color-mix(in oklab, var(--bd) 65%, transparent);
-  padding: 12px 14px;
-  font-weight: 800;
-  letter-spacing: .2px;
+  z-index: 1;
+  background: color-mix(in oklab, var(--card) 98%, transparent);
+  color: var(--ink);
+  text-align: left;
+  font-weight: 700;
+  letter-spacing: .01em;
+  border-bottom: 1px solid var(--bd);
+  padding: 12px;
   white-space: nowrap;
-  user-select: none;
-}
-.table-wrap thead th:first-child{ border-top-left-radius: calc(var(--radius) + 4px); }
-.table-wrap thead th:last-child { border-top-right-radius: calc(var(--radius) + 4px); }
-
-.table-wrap thead th[role="button"]:focus-visible{
-  outline: 2px solid var(--ring);
-  outline-offset: -2px;
-  border-radius: 8px;
 }
 
-/* Celdas */
-.table-wrap tbody td{
-  padding: 12px 14px;
-  border-bottom: 1px solid color-mix(in oklab, var(--bd) 60%, transparent);
-  color: color-mix(in oklab, var(--ink) 92%, transparent);
-  white-space: nowrap;
+/* Indicador de “clickable” para columnas ordenables (role="button") */
+.tabla-tickets thead th[role="button"]{
+  cursor: pointer;
+}
+.tabla-tickets thead th[role="button"]:hover{
+  background: color-mix(in oklab, var(--card) 92%, transparent);
+}
+
+/* Filas */
+.tabla-tickets tbody td{
+  border-bottom: 1px solid var(--bd);
+  padding: 12px;
+  color: var(--ink);
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-/* Filas (zebra + hover) */
-.table-wrap tbody tr{
-  transition: background-color .15s ease, box-shadow .15s ease, transform .02s ease;
+/* Zebra + hover */
+.tabla-tickets tbody tr:nth-child(odd){
+  background: color-mix(in oklab, var(--card) 98%, transparent);
 }
-.table-wrap tbody tr:nth-child(odd)  td{ background: color-mix(in oklab, var(--field-bg) 80%, transparent); }
-.table-wrap tbody tr:nth-child(even) td{ background: color-mix(in oklab, var(--field-bg) 86%, transparent); }
-.table-wrap tbody tr:hover td{
-  background: color-mix(in oklab, var(--primary) 12%, var(--field-bg));
-  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--primary) 28%, var(--bd));
+.tabla-tickets tbody tr:hover{
+  background: color-mix(in oklab, gray 15%, transparent);
 }
 
-/* Estado (bolita de color) */
+.tabla-tickets th:nth-child(1), .tc-wrap td:nth-child(1),.tabla-tickets th:nth-child(7), .tc-wrap td:nth-child(7){
+  width: 5ch;            /* columnas compactas */
+  max-width: 5ch;
+}
+
+.tabla-tickets th:nth-child(5), .tc-wrap td:nth-child(5),.tabla-tickets th:nth-child(6), .tc-wrap td:nth-child(6){
+  width: 13ch;            /* columnas compactas */
+  max-width: 13ch;
+  text-align: center;
+  align-items: center;
+  justify-items: right;
+}
+
+/* Clickable rows (accesible) */
+.tabla-tickets tbody tr{
+  transition: background .15s ease;
+}
+.tabla-tickets tbody tr:focus-within{
+  outline: none;
+  background: color-mix(in oklab, var(--card) 88%, transparent);
+  box-shadow: 0 0 0 4px var(--ring) inset;
+}
+
+/* Columna “Estado” con circulito */
 .estado-circulo{
   display: inline-block;
-  inline-size: 12px;
-  block-size: 12px;
+  width: 14px;
+  height: 14px;
   border-radius: 999px;
-  box-shadow: 0 0 0 2px color-mix(in oklab, var(--surface) 92%, transparent);
+  border: 1px solid var(--bd);
+  vertical-align: middle;
+  /* el color de fondo lo pones inline con calcularColorEstado() */
 }
 
-/* ----------------------- Paginación ---------------------- */
+/* --------- Paginación --------- */
 .paginacion{
-  display: flex;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
   align-items: center;
   gap: 10px;
-  padding: 12px 14px;
-  border-top: 1px solid color-mix(in oklab, var(--bd) 70%, transparent);
-  background: color-mix(in oklab, var(--surface-elev) 92%, transparent);
+  margin-top: var(--gap);
+  padding-top: var(--gap);
+  border-top: 1px solid var(--bd);
   color: var(--muted);
-  flex-wrap: wrap;
 }
-.paginacion span{ font-weight: 700; }
-
+.paginacion > span{
+  font-weight: 700; color: var(--ink);
+}
 .paginacion button{
-  height: 38px;
-  padding: 0 14px;
-  border-radius: 12px;
-  border: 1px solid color-mix(in oklab, var(--primary) 35%, var(--bd));
-  background: color-mix(in oklab, var(--primary) 14%, transparent);
-  color: var(--primary-ink);
-  font-weight: 800;
-  letter-spacing: .2px;
-  cursor: pointer;
-  transition: filter .15s ease, transform .06s ease, box-shadow .15s ease;
-  box-shadow: 0 6px 16px color-mix(in oklab, var(--primary) 20%, transparent);
+  background: color-mix(in oklab, var(--card) 94%, transparent);
+  color: var(--ink);
+  border: 1px solid var(--bd);
+  border-radius: calc(var(--radius) - 8px);
+  padding: 8px 12px;
+  font-weight: 600;
 }
-.paginacion button:hover{ filter: brightness(1.06); }
-.paginacion button:active{ transform: translateY(1px); }
-.paginacion button:disabled{ opacity: .55; cursor: not-allowed; box-shadow: none; }
-
+.paginacion button:hover:enabled{
+  background: color-mix(in oklab, var(--card) 88%, transparent);
+}
+.paginacion button:disabled{
+  opacity: .5; cursor: not-allowed;
+}
 .paginacion select{
-  height: 38px;
-  border-radius: 10px;
-  border: 1px solid color-mix(in oklab, var(--bd) 75%, transparent);
-  background: color-mix(in oklab, var(--field-bg) 90%, transparent);
+  background: color-mix(in oklab, var(--card) 96%, transparent);
   color: var(--ink);
-  padding: 0 10px;
+  border: 1px solid var(--bd);
+  border-radius: calc(var(--radius) - 8px);
+  padding: 6px 10px;
 }
 
-/* ----------------------- Responsivo ---------------------- */
-/* Filtros pasan a filas antes para no forzar ancho */
-@media (max-width: 1400px){
-  .filtros{
-    grid-auto-flow: row;
-    grid-auto-columns: unset;
+/* --------- Estados de la vista (loading / error / vacío) --------- */
+.tabla-tickets p{
+  margin: 8px 0;
+  color: var(--muted);
+}
+.tabla-tickets p strong{ color: var(--ink); }
+
+/* =========================================================
+   RESPONSIVE / ADAPTATIVO
+   ========================================================= */
+
+/* 1) Filtros se reacomodan en pantallas medianas */
+@container (max-width: 1100px){
+  .tickets-filtros{
     grid-template-columns: 1fr 1fr;
+    grid-auto-rows: minmax(40px, auto);
   }
-  .filtros > span{ display:none; }
-}
-@media (max-width: 820px){
-  .filtros{ grid-template-columns: 1fr; }
+  .tickets-filtros span{ display: none; } /* ocultamos el “→” si no hay espacio */
 }
 
-/* Compactación vertical si hay poca altura */
-@media (max-height: 720px){
-  .table-wrap thead th,
-  .table-wrap tbody td{ padding: 10px 12px; }
+/* 2) Filtros en una sola columna en pantallas estrechas */
+@container (max-width: 640px){
+  .tickets-filtros{
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
 }
 
-/* ----------------- Light tuning opcional ----------------- */
-:root[data-theme="light"] .table-wrap{
-  background: var(--surface);
-  border-color: var(--bd);
-}
-:root[data-theme="light"] .table-wrap thead th{
-  background: color-mix(in oklab, var(--surface-elev) 98%, transparent);
-  color: var(--ink);
-  border-bottom-color: var(--bd);
-}
-:root[data-theme="light"] .table-wrap tbody tr:nth-child(odd)  td{ background: color-mix(in oklab, var(--field-bg) 96%, transparent); }
-:root[data-theme="light"] .table-wrap tbody tr:nth-child(even) td{ background: color-mix(in oklab, var(--field-bg) 92%, transparent); }
-:root[data-theme="light"] .table-wrap tbody tr:hover td{
-  background: color-mix(in oklab, var(--primary) 8%, var(--field-bg));
+/* 3) Tabla: reduce padding en celdas cuando el viewport es angosto
+   (el overflow-x del .table-wrap asegura el scroll horizontal) */
+@media (max-width: 720px){
+  .tabla-tickets thead th,
+  .tabla-tickets tbody td{ padding: 10px 8px; }
 }
 
-#page-size {
-  width: 60px;
+/* 4) Mejoras de accesibilidad / motion */
+@media (prefers-reduced-motion: reduce){
+  .tabla-tickets tbody tr{ transition: none; }
 }

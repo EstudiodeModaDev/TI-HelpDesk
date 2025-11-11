@@ -75,18 +75,7 @@ export default function FormTarea() {
         {/* Asunto */}
         <div className="ft-field">
           <label className="ft-label" htmlFor="titulo">Asunto *</label>
-          <input
-            id="titulo"
-            name="titulo"
-            type="text"
-            placeholder="Ingrese el asunto del recordatorio"
-            value={state.titulo}
-            onChange={(e) => setField("titulo", e.target.value)}
-            autoComplete="off"
-            required
-            aria-required="true"
-            aria-describedby={errors.titulo ? "err-titulo" : undefined}
-          />
+          <input id="titulo" name="titulo" type="text" placeholder="Ingrese el asunto del recordatorio" value={state.titulo} onChange={(e) => setField("titulo", e.target.value)} autoComplete="off" required aria-required="true" aria-describedby={errors.titulo ? "err-titulo" : undefined}/>
           {errors.titulo && (
             <small id="err-titulo" className="error">
               {errors.titulo}

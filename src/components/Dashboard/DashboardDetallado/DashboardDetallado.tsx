@@ -2,7 +2,7 @@ import React from "react";
 import { useDetallado } from "../../../Funcionalidades/DashboardDetallado";
 import { useGraphServices } from "../../../graph/GrapServicesContext";
 import type { TicketsService } from "../../../Services/Tickets.service";
-import "./DashboardDetallado.css";
+import "../DashboardGeneral/DashboardResumen.css";
 import type { Fuente, TopCategoria } from "../../../Models/Dashboard";
 
 // ===== util: formatea "2,1 mil" / "0,2 mil" =====
@@ -30,13 +30,13 @@ export default function DashboardDetallado() {
   const { Tickets } = useGraphServices() as ReturnType<typeof useGraphServices> & {
     TicketService: TicketsService;
   };
-  const { totalCasos, totalEnCurso, totalFinalizados, totalFueraTiempo, porcentajeCumplimiento, topCategorias, range,  resolutores, Fuentes, loading, conteoPorMes,
+  const { totalCasos, totalEnCurso, totalFinalizados, totalFueraTiempo, porcentajeCumplimiento, topCategorias, range,  resolutores, Fuentes, loading, conteoPorMes, topSolicitante,
     obtenerTotal, setRange, obtenerFuentes, } = useDetallado(Tickets);
 
   // carga inicial
   React.useEffect(() => {
     obtenerTotal();
-    obtenerFuentes();
+    obtenerFuentes()
   }, [range.from, range.to]); 
 
   if (loading) {
@@ -82,7 +82,7 @@ export default function DashboardDetallado() {
       {/* Columna central */}
       <main className="dash-center">
         <header className="center-head">
-          <div className="filters">
+          <div className="dash-filters">
             <input className="date" type="date" onChange={(e) => setRange({ ...range, from: e.target.value })} value={range.from}/>
             <input className="date" type="date" onChange={(e) => setRange({ ...range, to: e.target.value })} value={range.to}/>
           </div>
@@ -119,6 +119,11 @@ export default function DashboardDetallado() {
           <CasosPorMesChart data={conteoPorMes} height={200} maxBars={5}/>
           <div className="linechart placeholder" />
         </section>
+
+        <div className="panel">
+          <h4>Top 5 solicitantes</h4>
+          <TopCategorias data={topSolicitante} total={totalCasos} />
+        </div>
       </aside>
     </section>
   );
@@ -288,7 +293,7 @@ function TopCategorias({data,}: {data: TopCategoria[]; total: number;}) {
         return (
           <li key={c.nombre} className="topcats-row">
             <div className="topcats-left">
-              <span className="topcats-name" title={c.nombre}>{c.nombre}</span>
+              <span className="topcats-name" title={c.nombre}>{c.nombre.slice(0, 17)}...</span>
             </div>
             <div className="topcats-bar">
               <div className="topcats-fill" style={{ width: `${w}%` }} />

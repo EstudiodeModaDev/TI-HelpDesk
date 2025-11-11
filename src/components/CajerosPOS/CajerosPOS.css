@@ -1,394 +1,104 @@
-/* ============================================
-   DETALLE / FORM POS — usa solo tokens dados
-   ============================================ */
-.detalle-ticket{
-  --dt-fg:        var(--ink);
-  --dt-muted:     var(--muted);
-  --dt-bd:        var(--bd);
-  --dt-surface:   var(--surface);
-  --dt-field-bg:  var(--field-bg);
-  --dt-ring:      var(--ring);
-  --dt-shadow:    var(--shadow);
-  --dt-radius:    var(--radius);
-  --dt-radius-xl: var(--radius-xl);
-  --dt-primary:   var(--primary);
-  --dt-primary-ink: var(--primary-ink);
+/* ================ CAJEROS POS ================ */
+.cajeros-pos{
+  /* tokens locales derivados */
+  --fg: var(--ink);
+  --mut: var(--muted);
+  --bd: var(--bd);
+  --panel: var(--surface-elev);
+  --field: var(--field-bg);
+  --r: var(--radius);
+  --rxl: var(--radius-3xl);
+  --pri: var(--primary);
+  --pri-ink: var(--primary-ink);
 
-  color: var(--dt-fg);
-  background: transparent;
-}
-
-.detalle-ticket h2{
-  margin: 0 0 12px 0;
-  font-weight: 650;
-  letter-spacing: .2px;
-  color: var(--dt-fg);
-}
-
-/* ---------- Form ---------- */
-.detalle-ticket form{
-  display: grid;
-  gap: 14px;
-}
-
-/* Filas: 2 columnas en desktop, 1 en pantallas estrechas */
-.detalle-ticket .fila{
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
-
-@media (max-width: 860px){
-  .detalle-ticket .fila{
-    grid-template-columns: 1fr;
-  }
-}
-
-.detalle-ticket .campo{
-  display: grid;
-  gap: 8px;
-}
-
-.detalle-ticket .campo label{
-  font-size: .95rem;
-  color: color-mix(in oklab, var(--dt-fg) 88%, transparent);
-}
-
-/* ---------- Inputs nativos ---------- */
-.detalle-ticket input[type="text"],
-.detalle-ticket input[type="email"],
-.detalle-ticket input[type="number"]{
-  width: 100%;
-  border-radius: var(--dt-radius);
-  border: 1px solid var(--dt-bd);
-  background: var(--dt-field-bg);
-  color: var(--dt-fg);
-  padding: 10px 12px;
-  outline: none;
-  box-shadow: 0 0 0 0 var(--dt-ring);
-  transition: box-shadow .15s ease, border-color .15s ease, background .15s ease;
-}
-
-.detalle-ticket input::placeholder{
-  color: color-mix(in oklab, var(--dt-muted) 80%, transparent);
-}
-
-.detalle-ticket input:focus{
-  border-color: color-mix(in oklab, var(--dt-primary) 52%, var(--dt-bd) 48%);
-  box-shadow: 0 0 0 4px var(--dt-ring);
-}
-
-/* Mensajes pequeños (errores/ayuda) sin color fijo */
-.detalle-ticket .campo small{
-  font-size: .85rem;
-  line-height: 1.2;
-  color: color-mix(in oklab, var(--dt-primary) 35%, var(--dt-fg) 65%);
-}
-
-/* ---------- Botón acción ---------- */
-.btn-volver{
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-
-  padding: 10px 14px;
-  border-radius: var(--dt-radius-xl);
-  border: 1px solid color-mix(in oklab, var(--dt-primary) 65%, var(--dt-bd) 35%);
-  background: var(--dt-primary);
-  color: var(--dt-primary-ink);
-  font-weight: 600;
-  letter-spacing: .2px;
-  box-shadow: var(--dt-shadow);
-  cursor: pointer;
-  transition: transform .06s ease, filter .15s ease, box-shadow .15s ease, border-color .15s ease;
-}
-
-.btn-volver:hover{
-  filter: brightness(1.03);
-  transform: translateY(-1px);
-}
-
-.btn-volver:active{
-  transform: translateY(0);
-  filter: brightness(.98);
-}
-
-.btn-volver:disabled{
-  opacity: .6;
-  cursor: not-allowed;
-  transform: none;
-}
-
-/* ============================================
-   THEME React-Select (classNamePrefix="rs")
-   ============================================ */
-/* Contenedor y control */
-.rs__control{
-  border-radius: var(--dt-radius);
-  border: 1px solid var(--dt-bd) !important;
-  background: var(--dt-field-bg) !important;
-  color: var(--dt-fg) !important;
-  min-height: 42px;
-  box-shadow: none !important;
-  transition: box-shadow .15s ease, border-color .15s ease, background .15s ease;
-}
-
-.rs__control--is-focused{
-  border-color: color-mix(in oklab, var(--dt-primary) 52%, var(--dt-bd) 48%) !important;
-  box-shadow: 0 0 0 4px var(--dt-ring) !important;
-}
-
-.rs__value-container{
-  padding: 4px 10px !important;
-}
-
-.rs__input-container,
-.rs__single-value{
-  color: var(--dt-fg) !important;
-}
-
-.rs__placeholder{
-  color: color-mix(in oklab, var(--dt-muted) 80%, transparent) !important;
-}
-
-/* Indicadores (flecha, clear) */
-.rs__indicators,
-.rs__indicator{
-  color: color-mix(in oklab, var(--dt-fg) 85%, transparent) !important;
-  fill: currentColor !important;
-}
-
-.rs__indicator-separator{
-  background: color-mix(in oklab, var(--dt-bd) 85%, transparent) !important;
-}
-
-/* Menú / opciones */
-.rs__menu{
-  background: var(--dt-surface) !important;
-  border: 1px solid var(--dt-bd) !important;
-  border-radius: var(--dt-radius) !important;
-  box-shadow: var(--dt-shadow) !important;
-  overflow: hidden;
-}
-
-.rs__menu-list{
-  padding-block: 6px !important;
-}
-
-.rs__option{
-  background: transparent !important;
-  color: var(--dt-fg) !important;
-  padding: 8px 10px !important;
-}
-
-.rs__option--is-focused{
-  background: color-mix(in oklab, var(--dt-primary) 12%, transparent) !important;
-}
-
-.rs__option--is-selected{
-  background: color-mix(in oklab, var(--dt-primary) 22%, transparent) !important;
-  color: var(--dt-fg) !important;
-}
-
-/* Clear y multi-values (por si luego usas isMulti) */
-.rs__multi-value{
-  background: color-mix(in oklab, var(--dt-primary) 18%, transparent) !important;
-  border: 1px solid color-mix(in oklab, var(--dt-primary) 36%, var(--dt-bd) 64%) !important;
-}
-
-.rs__multi-value__label{
-  color: var(--dt-fg) !important;
-}
-
-.rs__multi-value__remove{
-  color: var(--dt-fg) !important;
-}
-
-.rs__multi-value__remove:hover{
-  background: color-mix(in oklab, var(--dt-primary) 24%, transparent) !important;
-}
-
-/* Portal: respeta elevación sobre modales/sidebars */
-.rs__menu-portal{
-  z-index: 9999;
-}
-
-/* ============================================
-   Tarjeta / panel (si lo envuelves en card)
-   ============================================ */
-.detalle-ticket{
-  background: var(--dt-surface);
-  border: 1px solid var(--dt-bd);
-  border-radius: var(--dt-radius-xl);
-  padding: 16px;
-  box-shadow: var(--dt-shadow);
-}
-
-/* Espaciado top del botón */
-.detalle-ticket .fila + div[style]{
-  margin-top: 8px !important; /* refina el inline marginTop */
-}
-
-/* =========================
-   1) limitar ancho del panel
-   ========================= */
-.detalle-ticket{
-  /* ancho cómodo en desktop, centrado */
-  width: clamp(720px, 86vw, 1100px);
-  margin-inline: auto;
-  padding: 18px;
   background: var(--surface);
+  color: var(--fg);
   border: 1px solid var(--bd);
-  border-radius: var(--radius-xl);
+  border-radius: var(--rxl);
   box-shadow: var(--shadow);
+
+  inline-size: min(700px, 100%);
+   max-width: 1100px; 
+  margin-inline: auto;
+  padding-block: clamp(12px, 2vw, 20px);
+  padding-inline: clamp(12px, 3vw, 28px); 
+
+  /* evita cualquier desborde horizontal accidental */
+  overflow-x: clip;
 }
 
-/* filas con columnas que no se “estiren de más” */
-.detalle-ticket .fila{
+.cajeros-pos *{ box-sizing: border-box; min-width: 0; }
+
+/* Título más compacto */
+.cajeros-pos h2{
+  margin: 0 0 10px 0;
+  font-weight: 800;
+  letter-spacing: .2px;
+}
+
+/* ====== Layout ====== */
+html, body { overflow-x: hidden; }
+
+.cajeros-pos *{
+  box-sizing: border-box;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.cajeros-pos form{
   display: grid;
-  grid-template-columns: minmax(260px, 1fr) minmax(260px, 1fr);
-  gap: 12px;
+  gap: 12px;                 /* ↓ menos aire vertical */
 }
-@media (max-width: 980px){
-  .detalle-ticket .fila{ grid-template-columns: 1fr; }
+.cajeros-pos .cp-fila{
+  display: grid;
+  grid-template-columns: repeat(2, minmax(260px, 1fr));
+  gap: 10px 12px;            /* row-gap / column-gap */
+  align-items: start;
 }
-
-/* título más legible */
-.detalle-ticket h2{
-  margin: 0 0 14px 0;
-  font-weight: 700;
-  color: var(--ink);
+@media (max-width: 900px){
+  .cajeros-pos .cp-fila{ grid-template-columns: 1fr; }
 }
 
-/* =========================
-   2) más contraste en campos
-   ========================= */
-
-/* labels con mayor contraste */
-.detalle-ticket .campo label{
-  color: color-mix(in oklab, var(--ink) 96%, transparent);
+.cajeros-pos .cp-campo{
+  display: grid;
+  gap: 6px;                  /* ↓ separa poco label/input */
+}
+.cajeros-pos .cp-campo > label{
+  color: var(--mut);
+  font-weight: 600;
+  font-size: .95rem;
+  line-height: 1.2;
 }
 
-/* inputs nativos */
-.detalle-ticket input[type="text"],
-.detalle-ticket input[type="email"],
-.detalle-ticket input[type="number"]{
-  background: color-mix(in oklab, var(--field-bg) 92%, var(--surface) 8%);
-  color: var(--ink);
-  border: 1px solid color-mix(in oklab, var(--ink) 18%, var(--bd) 82%);
-  border-radius: var(--radius);
-  padding: 11px 12px;
-  font-weight: 500; /* sube legibilidad */
-  box-shadow: none;
+/* ====== Inputs nativos ====== */
+.cajeros-pos input[type="text"],
+.cajeros-pos input[type="email"],
+.cajeros-pos input[type="number"]{
+  width: 100%;               /* <-- quita el 70% */
+  height: clamp(36px, 5dvh, 44px);
+  border-radius: 12px;
+  border: 1px solid var(--bd);
+  background: var(--panel);
+  color: var(--fg);
+  padding: 0 12px;
   outline: none;
   transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
+  border: 1px solid black !important;
+}
+.cajeros-pos input::placeholder{
+  color: color-mix(in oklab, var(--mut) 70%, transparent);
+}
+.cajeros-pos input:focus{
+  border-color: var(--pri);
+  box-shadow: 0 0 0 6px var(--ring);
 }
 
-/* placeholder menos “lavado” */
-.detalle-ticket input::placeholder{
-  color: color-mix(in oklab, var(--ink) 50%, transparent);
+/* Mensajes cortos */
+.cajeros-pos .cp-campo small{
+  font-size: .86rem;
+  line-height: 1.25;
+  color: color-mix(in oklab, var(--pri) 35%, var(--ink) 65%);
 }
 
-/* foco visible y con buen contraste */
-.detalle-ticket input:focus{
-  border-color: color-mix(in oklab, var(--primary) 55%, var(--bd) 45%);
-  box-shadow: 0 0 0 4px var(--ring);
-}
 
-/* mensajes pequeños sin usar colores fijos */
-.detalle-ticket .campo small{
-  color: color-mix(in oklab, var(--primary) 40%, var(--ink) 60%);
-  font-weight: 500;
-}
 
-/* botón primario: realce y contraste */
-.btn-volver{
-  background: var(--primary);
-  color: var(--primary-ink);
-  border: 1px solid color-mix(in oklab, var(--primary) 65%, var(--bd) 35%);
-  border-radius: var(--radius-xl);
-  padding: 10px 16px;
-  font-weight: 700;
-  letter-spacing: .2px;
-  box-shadow: var(--shadow);
-}
-.btn-volver:hover{ filter: brightness(1.04); transform: translateY(-1px); }
-.btn-volver:active{ transform: translateY(0); filter: brightness(.98); }
-
-/* =========================
-   React-Select (classNamePrefix="rs")
-   ========================= */
-.rs__control{
-  background: color-mix(in oklab, var(--field-bg) 92%, var(--surface) 8%) !important;
-  border: 1px solid color-mix(in oklab, var(--ink) 18%, var(--bd) 82%) !important;
-  color: var(--ink) !important;
-  border-radius: var(--radius) !important;
-  min-height: 44px;
-  box-shadow: none !important;
-}
-.rs__control--is-focused{
-  border-color: color-mix(in oklab, var(--primary) 55%, var(--bd) 45%) !important;
-  box-shadow: 0 0 0 4px var(--ring) !important;
-}
-.rs__single-value,
-.rs__input-container{ color: var(--ink) !important; }
-.rs__placeholder{ color: color-mix(in oklab, var(--ink) 50%, transparent) !important; }
-
-.rs__menu{
-  background: var(--surface-elev) !important;
-  border: 1px solid var(--bd) !important;
-  border-radius: var(--radius) !important;
-  box-shadow: var(--shadow) !important;
-}
-.rs__option{ color: var(--ink) !important; }
-.rs__option--is-focused{
-  background: color-mix(in oklab, var(--primary) 14%, transparent) !important;
-}
-.rs__option--is-selected{
-  background: color-mix(in oklab, var(--primary) 22%, transparent) !important;
-}
-
-/* ====== INPUTS NATIVOS: texto SIEMPRE negro ====== */
-.detalle-ticket input[type="text"],
-.detalle-ticket input[type="email"],
-.detalle-ticket input[type="number"],
-.detalle-ticket textarea{
-  color: #000 !important;
-  caret-color: #000 !important;
-}
-
-/* placeholder negro */
-.detalle-ticket input::placeholder,
-.detalle-ticket textarea::placeholder{
-  color: #000 !important;
-  opacity: 1 !important; /* evita que los navegadores lo aclaren */
-}
-
-/* corrige autofill de Chrome/Edge */
-.detalle-ticket input:-webkit-autofill,
-.detalle-ticket input:-webkit-autofill:hover,
-.detalle-ticket input:-webkit-autofill:focus{
-  -webkit-text-fill-color: #000 !important;
-  caret-color: #000 !important;
-  transition: background-color 9999s ease-out 0s; /* truco para no “pintar” amarillo */
-}
-
-/* ====== REACT-SELECT (classNamePrefix="rs") ====== */
-/* valor seleccionado y texto que escribes */
-.rs__single-value,
-.rs__input,
-.rs__input-container{
-  color: #000 !important;
-}
-
-/* placeholder del select negro */
-.rs__placeholder{
-  color: #000 !important;
-  opacity: 1 !important;
-}
-
-/* etiquetas de multi-value (por si luego usas isMulti) */
-.rs__multi-value__label{
-  color: #000 !important;
-}

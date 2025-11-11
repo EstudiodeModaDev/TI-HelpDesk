@@ -14,9 +14,13 @@ export default function TareasPage() {
   const { monthlyItems, percentaje, cantidadTareas } = useTareas(Tareas);
   return (
     <div className="tareas-page">
-      <FormTarea />
+      <div className="fila-1">
       <ListaTareas/>
-      <ActivityStatusCard percent={percentaje} tasks={monthlyItems} taskThisMonth={cantidadTareas}/>
+      <FormTarea />
+      </div>
+      <div>
+        <ActivityStatusCard percent={percentaje} tasks={monthlyItems} taskThisMonth={cantidadTareas}/>
+      </div>
     </div>
   );
 }

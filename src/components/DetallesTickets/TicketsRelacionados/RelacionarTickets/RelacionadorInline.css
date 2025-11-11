@@ -1,167 +1,151 @@
-/* ===== Tokens base ===== */
-:root{
-  color-scheme: light dark;
-  --relc-bg:#ffffff;
-  --relc-elev:#ffffff;
-  --relc-ink:#0f172a;
-  --relc-muted:#6b7280;
-  --relc-bd:#e5e7eb;
-  --relc-ring:rgba(45,109,246,.42);
-  --relc-accent:#2d6df6;
-  --relc-danger:#ef4444;
-  --relc-ok:#10b981;
-
-  --relc-radius:14px;
-  --relc-radius-sm:10px;
-  --relc-shadow:0 10px 26px rgba(2,6,23,.08);
-  --relc-shadow-pop:0 18px 40px rgba(2,6,23,.12);
+/* =========================================================
+   RELACIONADOR INLINE — tokens-only (oscuro/Claro)
+   ========================================================= */
+.relc{
+  --pad: clamp(12px, 1.8vw, 18px);
+  --gap: clamp(10px, 1.4vw, 16px);
+  background: var(--surface);
+  color: var(--ink);
+  border-radius: var(--radius-3xl, var(--radius));
+  overflow: visible;                /* no bloquear scroll */
+  container-type: inline-size;      /* responsive por espacio real */
 }
 
-@media (prefers-color-scheme: dark){
-  :root{
-  color-scheme: light dark;
-  --relc-bg:#ffffff;
-  --relc-elev:#ffffff;
-  --relc-ink:#0f172a;
-  --relc-muted:#6b7280;
-  --relc-bd:#e5e7eb;
-  --relc-ring:rgba(45,109,246,.42);
-  --relc-accent:#2d6df6;
-  --relc-danger:#ef4444;
-  --relc-ok:#10b981;
+/* Fila principal (modo + combobox / archivo) */
+.relc-row{
+  display: grid;
+  grid-template-columns: minmax(220px, 320px) minmax(260px, 1fr);
+  gap: var(--gap);
+}
 
-  --relc-radius:14px;
-  --relc-radius-sm:10px;
-  --relc-shadow:0 10px 26px rgba(2,6,23,.08);
-  --relc-shadow-pop:0 18px 40px rgba(2,6,23,.12);
+/* Cada control es una FILA auto-contenida */
+.relc-field{
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+.relc-field--grow{ align-self: start; }
+
+/* Etiquetas */
+.relc-field__label, .relc-label{
+  font-weight: 700;
+  color: var(--ink);
+}
+
+/* Nativos (select / input file) */
+.relc-native{
+  appearance: none;
+  width: 100%;
+  background: var(--field-bg);
+  color: var(--ink);
+  border-radius: 12px;
+  padding: 10px 12px;
+  outline: none;
+  transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
+  min-width: 0;
+}
+.relc-native:focus{
+  border-color: color-mix(in oklab, var(--primary) 55%, var(--bd) 45%);
+  box-shadow: 0 0 0 4px var(--ring);
+}
+
+/* Combobox / envoltorio (para React-Select o input compuesto) */
+.relc-combobox{
+  background: color-mix(in oklab, var(--surface) 96%, transparent);
+  border-radius: 12px;
+  padding: 10px;
+  overflow: visible;
+}
+
+/* Enlace utilitario (quitar archivo, etc.) */
+.relc-link{
+  appearance: none;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  color: var(--ink);
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-thickness: 2px;
+}
+
+/* =========================
+   Acciones (botones circulares)
+   ========================= */
+.relc-actions{
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+  justify-content: end;
+  align-items: center;
+  gap: 10px;
+  margin-top: var(--gap);
+}
+
+.relc-btn{
+  appearance: none;
+  border: 1px solid var(--bd);
+  background: var(--field-bg);
+  color: var(--ink);
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: transform .06s ease, filter .15s ease, box-shadow .18s ease;
+}
+
+.relc-btn--circle{
+  inline-size: 40px;
+  block-size: 40px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+/* Variante confirmación: llena con primario */
+.relc-btn--ok{
+  border-color: var(--primary);
+  background: var(--primary);
+  color: var(--primary-ink);
+}
+.relc-btn:hover{ box-shadow: 0 0 0 6px var(--ring); filter: brightness(1.03); }
+.relc-btn:active{ transform: translateY(1px); }
+.relc-btn[disabled]{ opacity: .6; cursor: not-allowed; }
+
+/* Variante “cancelar” como ghost */
+.relc-btn--danger{
+  /* sin rojo: ghost basado en tokens */
+  background: color-mix(in oklab, var(--field-bg) 92%, transparent);
+  border-color: var(--bd);
+  color: var(--ink);
+}
+
+/* =========================================================
+   Responsive por espacio real (container queries)
+   ========================================================= */
+
+/* 2 → 1 columna cuando el espacio es estrecho */
+@container (max-width: 780px){
+  .relc-row{
+    grid-template-columns: 1fr;
+  }
+  .relc-actions{
+    justify-content: stretch;
+    grid-auto-flow: row;
+    grid-auto-columns: 1fr;
+  }
+  .relc-btn--circle{
+    inline-size: 44px;  /* un poco más grande para dianas táctiles */
+    block-size: 44px;
   }
 }
 
-/* ===== Scope y layout ===== */
-.relc{ color:var(--relc-ink); font-family:system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif; }
-.relc.relc--native{ background:var(--relc-bg); }
-
-.relc-row{
-  display:grid;
-  grid-template-columns:minmax(220px,280px) 1fr;
-  gap:12px;
-  align-items:end;
-}
-@media (max-width:640px){ .relc-row{ grid-template-columns:1fr; } }
-
-.relc-field{ display:grid; gap:6px; min-width:0; }
-.relc-field--grow{ width:100%; }
-.relc-field__label{ font-size:.85rem; color:var(--relc-muted); user-select:none; }
-
-/* ===== Select nativo (modo) ===== */
-.relc-native{
-  appearance:none;
-  width:100%;
-  padding:10px 12px;
-  border-radius:var(--relc-radius-sm);
-  border:1px solid var(--relc-bd);
-  background:var(--relc-elev);
-  color:var(--relc-ink);
-  box-shadow:0 1px 0 rgba(2,6,23,.03) inset;
-}
-.relc-native:focus-visible{
-  outline:none;
-  box-shadow:0 0 0 3px var(--relc-ring);
-  border-color:transparent;
-}
-
-/* ===== React-Select overrides (classNamePrefix="rs") ===== */
-.tf-field{ display:grid; gap:6px; }
-.tf-label{ font-size:.85rem; color:var(--relc-muted); }
-
-.rs__control{
-  background:var(--relc-elev) !important;
-  border:1px solid var(--relc-bd) !important;
-  border-radius:var(--relc-radius-sm) !important;
-  min-height:42px !important;
-  box-shadow:none !important;
-}
-.rs__control--is-focused{
-  box-shadow:0 0 0 3px var(--relc-ring) !important;
-  border-color:transparent !important;
-}
-.rs__value-container{ padding:4px 8px !important; }
-.rs__placeholder{ color:var(--relc-muted) !important; }
-.rs__single-value{ color:var(--relc-ink) !important; }
-.rs__input input{ color:var(--relc-ink) !important; }
-
-.rs__indicators{ gap:2px; }
-.rs__indicator{ color:var(--relc-muted) !important; padding:6px !important; }
-.rs__indicator-separator{ background:transparent !important; }
-
-.rs__menu{
-  background:var(--relc-elev) !important;
-  border:1px solid var(--relc-bd);
-  border-radius:var(--relc-radius);
-  box-shadow:var(--relc-shadow-pop);
-  overflow:hidden;
-}
-.rs__menu-list{
-  max-height:min(320px, 50vh) !important;
-}
-
-.rs__option{
-  background:transparent !important;
-  color:var(--relc-ink) !important;
-  padding:10px 12px !important;
-}
-.rs__option--is-focused{
-  background:color-mix(in oklab, var(--relc-accent) 14%, transparent) !important;
-}
-.rs__option--is-selected{
-  background:color-mix(in oklab, var(--relc-accent) 22%, transparent) !important;
-}
-
-/* ===== Actions (botones) ===== */
-.relc-actions{
-  margin-top:12px;
-  display:flex;
-  gap:10px;
-  justify-content:flex-end;
-  align-items:center;
-}
-.relc-btn{
-  appearance:none;
-  border:1px solid var(--relc-bd);
-  background:var(--relc-elev);
-  color:var(--relc-ink);
-  padding:10px 14px;
-  border-radius:var(--relc-radius-sm);
-  cursor:pointer;
-  transition:transform .08s ease, box-shadow .12s ease, border-color .12s ease;
-}
-.relc-btn:hover{ transform:translateY(-1px); box-shadow:var(--relc-shadow); }
-.relc-btn:active{ transform:translateY(0); }
-.relc-btn:disabled{ opacity:.55; cursor:not-allowed; }
-
-.relc-btn--circle{
-  width:42px; height:42px; padding:0;
-  display:inline-grid; place-items:center;
-  border-radius:999px; box-shadow:var(--relc-shadow);
-}
-.relc-btn--danger{
-  border-color:color-mix(in oklab, var(--relc-danger) 40%, var(--relc-bd));
-  color:var(--relc-danger);
-}
-.relc-btn--danger:hover{
-  background:color-mix(in oklab, var(--relc-danger) 14%, transparent);
-}
-.relc-btn--ok{
-  border-color:color-mix(in oklab, var(--relc-ok) 40%, var(--relc-bd));
-  color:var(--relc-ok);
-}
-.relc-btn--ok:hover{
-  background:color-mix(in oklab, var(--relc-ok) 14%, transparent);
-}
-
-/* ===== Scrollbar menú (opcional) ===== */
-.rs__menu-list::-webkit-scrollbar{ width:10px; }
-.rs__menu-list::-webkit-scrollbar-thumb{
-  background:color-mix(in oklab, var(--relc-ink) 20%, transparent);
-  border-radius:999px;
+/* Densidad compacta */
+@container (max-width: 520px){
+  .relc{ --pad: 12px; }
+  .rs__control{ min-height: 40px !important; }
+  .relc-combobox{ padding: 8px; }
 }

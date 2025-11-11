@@ -1,298 +1,254 @@
-/* ================== TOKENS (ajústalos si quieres) ================== */
-:root{
-  --tf-bg: #ffffff;
-  --tf-fg: #111827;
-  --tf-muted: #6b7280;
-  --tf-border: #e5e7eb;
-  --tf-hover: #f3f4f6;
-  --tf-focus: #2563eb;
-  --tf-shadow: 0 8px 24px rgba(0,0,0,.06);
-  --tf-radius: 14px;
-  --tf-gap: 16px;
-  --tf-gap-lg: 20px;
-  --tf-pad: 20px;
+/* =========================================================
+   DOCUMENTAR — formulario con acciones “de esquina”
+   ========================================================= */
+.documentar-form{
+  --pad: clamp(12px, 1.8vw, 18px);
+  --gap: clamp(10px, 1.4vw, 16px);
+
+  background: var(--surface);
+  color: var(--ink);
+  overflow: visible;
+  position: relative;          /* soporte para variante --edge */
+  container-type: inline-size; /* responsive por espacio real */
 }
 
-/* ================== CONTENEDOR PRINCIPAL ================== */
-/* Forzar tema claro de forma persistente y aislada */
-.ticket-form{
-  color-scheme: light !important;   /* fuerza UI clara (inputs nativos, etc.) */
-  isolation: isolate;               /* aísla blending/filtros del exterior */
-  width: 100%;                      /* ocupa todo el ancho disponible */
-  max-width: none;                  /* evita límites implícitos del layout */
-  display: block;
-  box-sizing: border-box;
-
-  background: var(--tf-bg);
-  color: var(--tf-fg);
-  border: 1px solid var(--tf-border);
-  border-radius: var(--tf-radius);
-  box-shadow: var(--tf-shadow);
-  padding: calc(var(--tf-pad) + 4px) calc(var(--tf-pad) + 4px) var(--tf-pad);
+.documentar-title{
+  margin: 0 0 6px 0;
+  font-weight: 800;
+  letter-spacing: .2px;
+  color: var(--ink);
 }
 
-/* Neutraliza modos oscuros globales del sitio/app */
-.dark .ticket-form,
-.dark .ticket-form *{
-  color-scheme: light !important;
-}
-
-/* Título */
-.ticket-form .tf-title{
-  margin: 0 0 var(--tf-gap-lg) 0;
-  font-size: clamp(1.15rem, 1.2vw + .9rem, 1.6rem);
-  line-height: 1.25;
-  font-weight: 700;
-}
-
-/* ================== GRID DEL FORM ================== */
-.tf-grid{
+/* ===== Grid principal: 2 columnas → 1 ===== */
+.documentar-grid{
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr)); /* 2 columnas fluidas */
-  gap: var(--tf-gap-lg);
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.tf-field{
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  min-width: 0; /* evita overflow por contenidos largos */
-}
-
-/* Span 2 columnas */
-.tf-col-2{
-  grid-column: 1 / -1;
-}
-
-/* Etiquetas y estados */
-.tf-label{ font-weight: 600; font-size: .95rem; }
-.hint{ color: var(--tf-muted); font-size: .85rem; }
-.error{ color: #b91c1c; font-size: .85rem; }
-
-/* ================== CONTROLES ================== */
-.tf-input,
-.ticket-form input[type="text"],
-.ticket-form input[type="number"],
-.ticket-form input[type="file"],
-.ticket-form select{
-  appearance: none;
-  width: 100%;
-  min-width: 0;
-  padding: 10px 12px;
-  border: 1px solid var(--tf-border);
-  border-radius: 10px;
-  background: #fff;
-  color: var(--tf-fg);
-  line-height: 1.35;
-  box-sizing: border-box;
-}
-
-.ticket-form select{
-  background-image:
-    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
-  background-repeat: no-repeat;
-  background-position: right 12px center;
-  background-size: 18px 18px;
-  padding-right: 40px;
-}
-
-.tf-input:hover,
-.ticket-form input:hover,
-.ticket-form select:hover{
-  background: var(--tf-hover);
-}
-
-.tf-input:focus,
-.ticket-form input:focus,
-.ticket-form select:focus{
-  outline: none;
-  border-color: var(--tf-focus);
-  box-shadow: 0 0 0 4px rgba(37,99,235,.20);
-}
-
-/* ================== RICHTEXT (contenedor genérico) ================== */
-/* Si tu <RichTextBase64> renderiza un div/iframe, este estilo dará marco claro */
-.ticket-form .rich-text,
-.ticket-form .rt-container,
-.ticket-form [contenteditable="true"]{
-  width: 100%;
-  min-height: 180px;
-  border: 1px solid var(--tf-border);
-  border-radius: 12px;
-  background: #fff;
-  padding: 12px;
-  box-sizing: border-box;
-}
-
-/* ================== ACCIONES (ESQUINAS) ================== */
-/* Secundarios a la izquierda (apilados) y “Guardar” a la derecha */
-.tf-actions{
-  display: flex;
-  gap: 10px;
-  align-items: flex-end;
-  width: 100%;
-  padding-top: 6px;
-  margin-top: 4px;
-}
-
-.btn-escalar{ order: 1; }
-.btn-acta{    order: 2; }
-.btn-save{    order: 3; margin-left: auto; }  /* empuja a la derecha */
-
-/* Apilado suave de secundarios a la izquierda */
-.btn-escalar, .btn-acta{
-  display: inline-flex;
-  width: max-content;
-}
-@media (min-width: 640px){
-  .btn-escalar, .btn-acta{ display: block; }
-  .btn-acta{ margin-top: 8px; }
-}
-
-/* ================== BOTONES ================== */
-button{
-  appearance: none;
-  border: none;
-  cursor: pointer;
-  font-weight: 600;
-  line-height: 1;
-  border-radius: 12px;
-  padding: 12px 14px;
-  box-sizing: border-box;
-  transition: transform .03s ease, box-shadow .15s ease, background .15s ease, opacity .15s ease;
-}
-
-.btn-save{
-  background: var(--tf-focus);
-  color: #fff;
-  box-shadow: 0 8px 18px rgba(37,99,235,.25);
-}
-.btn-save:hover{ transform: translateY(-1px); }
-.btn-save:active{ transform: translateY(0); }
-
-.tf-secondary{
-  background: #fff;
-  color: var(--tf-fg);
-  border: 1px solid var(--tf-border);
-}
-.tf-secondary:hover{ background: var(--tf-hover); }
-
-/* Disabled */
-button[disabled]{ opacity: .6; cursor: not-allowed; box-shadow: none; }
-
-/* ================== RESPONSIVE ================== */
-@media (max-width: 900px){
-  .tf-grid{ grid-template-columns: 1fr; } /* 1 columna en pantallas pequeñas */
-
-  .tf-actions{ flex-wrap: wrap; gap: 8px; }
-  .btn-escalar, .btn-acta{ display: inline-flex; }
-
-  .btn-save{
-    margin-left: 0;
-    margin-top: 4px;
-    width: 100%;           /* botón guardar a todo el ancho en móvil */
-    justify-content: center;
-    text-align: center;
-  }
-}
-
-/* Mantener acciones visibles cuando el contenido es largo */
-.ticket-form .tf-actions{
-  position: sticky;
-  bottom: 0;
-  background: linear-gradient(180deg, rgba(255,255,255,0) 0%, #fff 28%);
-  padding-top: 16px;
+  grid-template-columns: repeat(2, minmax(280px, 1fr));
+  gap: var(--gap);
   margin-top: 8px;
 }
 
-/* 1) Haz que la tarjeta se ESTIRE dentro de padres flex/grid centrados */
-.ticket-form{
-  width: 100%;
-  max-width: none !important;   /* anula max-width heredados */
-  margin: 0 !important;         /* evita centrado por auto margins */
-  flex: 1 1 auto;               /* si el padre es flex */
-  align-self: stretch;          /* grid/flex: ocupar eje cruzado */
-  justify-self: stretch;        /* grid: ocupar eje principal */
-}
-
-/* 2) El form interior también sin límites */
-.ticket-form .tf-grid,
-.ticket-form form{
-  width: 100%;
-  max-width: none !important;
-}
-
-/* 3) (Opcional) Variante "full-bleed" para saltarte contenedores con padding/max-width */
-.ticket-form--bleed{
-  width: 100vw;
-  margin-left: calc(50% - 50vw) !important;  /* sale del contenedor centrado */
-  margin-right: calc(50% - 50vw) !important;
-  border-left: none; border-right: none;     /* opcional: sin borde laterales */
-  border-radius: 0;                          /* opcional: sin radios laterales */
-}
-
-/* ocupar todo el ancho disponible del CONTENEDOR (sin salirse) */
-.ticket-form{
-  width: 100%;
-  max-width: 100% !important;
-  margin: 0 !important;
-  box-sizing: border-box;
-  flex: 1 1 auto;         /* si el padre es flex */
-  align-self: stretch;     /* si el padre es grid/flex */
-  justify-self: stretch;   /* si el padre es grid */
-  overflow-x: hidden;      /* cinturón de seguridad */
-}
-
-/* nada por dentro debería forzar más ancho que el 100% */
-.ticket-form *{
+/* Cada CAMPO es una FILA */
+.documentar-field{
+  display: grid;
+  gap: 6px;
   min-width: 0;
-  max-width: 100%;
+}
+.documentar-col-2{ grid-column: 1 / -1; }
+
+/* Etiquetas */
+.documentar-label{
+  font-weight: 700;
+  color: var(--ink);
 }
 
-/* el form interno también sin límites */
-.ticket-form form,
-.ticket-form .tf-grid{
+/* ===== Inputs nativos ===== */
+.documentar-input,
+.documentar-form input[type="text"],
+.documentar-form input[type="date"],
+.documentar-form input[type="file"],
+.documentar-form select{
+  appearance: none;
   width: 100%;
-  max-width: 100% !important;
+  background: var(--field-bg);
+  color: var(--ink);
+  border: 1px solid var(--bd);
+  border-radius: 12px;
+  padding: 10px 12px;
+  outline: none;
+  transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
   min-width: 0;
 }
 
-/* sticky con ancho seguro (evita que el gradiente cree overflow) */
-.ticket-form .tf-actions{
-  position: sticky;
-  inset-inline: 0;       /* left:0; right:0 en LTR/RTL */
-  max-width: 100%;
-  overflow: hidden;
-  /* Si aún ves desborde, baja o elimina el gradiente: */
-  background: linear-gradient(180deg, rgba(255,255,255,0) 0%, #fff 28%);
+
+.documentar-form input[type="file"]{
+    margin-bottom: 10px;
 }
 
-/* Por si el wrapper global añade padding lateral, evita la barra horizontal */
-html, body, #root { overflow-x: hidden; }
-
-/* ocupa de borde a borde del viewport MENOS el gutter del layout */
-.ticket-form--edge{
-  /* define --gutter con el mismo padding que tenga el contenedor padre */
-  inline-size: min(100%, calc(100dvw - var(--gutter, 16px) * 2));
-  margin-inline: calc(var(--gutter, 16px) * -1);
-  max-inline-size: 100dvw;
-  box-sizing: border-box;
-  border-radius: 0;                /* opcional */
-  border-left: none; border-right: none; /* opcional */
+.documentar-form ::placeholder{
+  color: color-mix(in oklab, var(--muted) 85%, transparent);
+}
+.documentar-input:focus,
+.documentar-form input:focus,
+.documentar-form select:focus{
+  border-color: color-mix(in oklab, var(--primary) 55%, var(--bd) 45%);
+  box-shadow: 0 0 0 4px var(--ring);
 }
 
-/* Gana a cualquier .ticket-form form oscuro */
-.ticket-form .esc-form > form.esc-card,
-.ticket-form .esc-form form.esc-card{
-  background: #fff !important;
-  color: #111827 !important;
-  border: 1px solid rgba(0,0,0,0.08) !important;
-  border-radius: 12px !important;
-  box-shadow: 0 2px 12px rgba(30,41,59,0.08) !important;
+/* ===== Editor enriquecido (RichTextBase64) =====
+   Intenta aplicar alguna de estas clases en tu componente.
+   Si no, el selector :where(...) cubre los contenedores comunes. */
+.documentar-form :where(.rtb,.rtb-box,.richtext,.ql-container){
+  background: var(--field-bg);
+  border: 1px solid var(--bd);
+  border-radius: 12px;
+  padding: 8px;
+  min-height: 140px;
+  overflow: auto;
 }
 
-/* Si algún wrapper del Acta tiene fondo oscuro, blanquear solo ese nivel */
-.ticket-form .esc-form { background: #fff !important; }
-.ticket-form .esc-form .esc-card > * { background: transparent !important; }
+/* Hint/errores */
+.hint{
+  color: var(--muted);
+  font-size: .9rem;
+}
+.error{
+  color: color-mix(in oklab, var(--primary) 40%, var(--ink) 60%);
+  font-weight: 700;
+  font-size: .9rem;
+}
+
+/* =========================================================
+   Acciones (edge + normal)
+   ========================================================= */
+.documentar-actions{
+  display: grid;
+  grid-template-columns: 1fr auto; /* izquierda | derecha */
+  align-items: center;
+  gap: 10px;
+}
+
+/* Botón primario */
+.documentar-submit{
+  appearance: none;
+  border: 1px solid var(--primary);
+  background: var(--primary);
+  color: var(--primary-ink);
+  font-weight: 800;
+  padding: 10px 16px;
+  border-radius: 999px;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: transform .06s ease, filter .15s ease, box-shadow .18s ease;
+}
+.documentar-submit:hover{ box-shadow: 0 0 0 6px var(--ring); filter: brightness(1.03); }
+.documentar-submit:active{ transform: translateY(1px); }
+.documentar-submit[disabled]{ opacity: .6; cursor: not-allowed; }
+
+/* Secundarios ghost (sin color fijo) */
+.documentar-secondary{
+  appearance: none;
+  border: 1px solid var(--bd);
+  background: color-mix(in oklab, var(--field-bg) 92%, transparent);
+  color: var(--ink);
+  font-weight: 800;
+  padding: 10px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: transform .06s ease, filter .15s ease, box-shadow .18s ease;
+}
+.documentar-secondary:hover{ box-shadow: 0 0 0 6px var(--ring); filter: brightness(1.03); }
+.documentar-secondary:active{ transform: translateY(1px); }
+
+/* ===== Variante “de esquina” (desktop) ===== */
+.documentar-form--edge .documentar-actions{
+  /* ancla solo el contenedor de acciones; el resto del form fluye normal */
+  position: absolute;
+  inset-block-end: var(--pad);
+  inset-inline: var(--pad);
+  grid-template-columns: 1fr 1fr; /* dos zonas: izq (sec.) y der (save) */
+}
+
+.btn-save{
+  grid-column: 2;
+  justify-self: end;
+}
+
+/* Evita que las acciones pisen el contenido final del form */
+.documentar-form--edge .documentar-grid{
+  padding-bottom: calc(var(--pad) + 64px);
+}
+
+/* =========================================================
+   Responsive (container queries por espacio real)
+   ========================================================= */
+
+/* 2 → 1 columna y acciones en flujo */
+@container (max-width: 900px){
+  .documentar-grid{ grid-template-columns: 1fr; }
+  .documentar-form--edge .documentar-actions{
+    position: static;    /* vuelve al flujo */
+    inset: auto;
+    grid-template-columns: 1fr; /* apilar */
+    pointer-events: auto;
+    margin-top: 6px;
+  }
+  .documentar-form--edge .documentar-grid{
+    padding-bottom: 0;   /* ya no reservamos espacio extra */
+  }
+  .documentar-submit{ width: 100%; }
+  .documentar-secondary{ width: 100%; }
+}
+
+/* Compacto */
+@container (max-width: 560px){
+  .documentar-form{ --pad: 12px; }
+  .documentar-grid{ gap: 10px; }
+  .documentar-form :where(.rtb,.rtb-box,.richtext,.ql-container){ min-height: 120px; }
+}
+
+
+.btn-action, .btn-action{
+  grid-column: 1;
+  justify-self: start;
+}
+
+.btn-action{ margin: 0; width: 400px;}
+.btn-action{ margin-top: 8px; }
+
+/* Si estás usando la variante --edge, respeta el anclaje */
+.documentar-form--edge .documentar-actions{
+  position: absolute;
+  inset-inline: var(--pad);
+  inset-block-end: var(--pad);
+  grid-template-columns: 1fr auto;
+}
+
+/* Botones secundarios más angostos */
+.btn-action{
+  /* quita el ancho fijo anterior */
+  width: auto;                 /* fallback */
+  inline-size: clamp(160px, 32ch, 260px); /* “un poco menos ancho” y fluido por texto */
+  justify-self: start;
+  margin-top: 8px;
+}
+
+/* Si quieres que ambos secundarios tengan el mismo ancho visual, usa min en vez de clamp: */
+/* .btn-action{ min-inline-size: 220px; inline-size: max-content; } */
+
+/* En móvil ya tienes regla que los pone al 100%, mantenla: */
+@container (max-width: 900px){
+  .btn-action{ inline-size: 100%; }
+}
+
+.documentar-actions{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;                /* si no cabe, salta de línea ordenadamente */
+}
+
+.btn-action{
+  order: 1;                       /* aparecen antes que Guardar */
+  display: inline-flex;
+  inline-size: clamp(160px, 28ch, 340px);  /* un poco más angostos y fluidos */
+}
+
+/* Guardar va al extremo derecho */
+.btn-save{
+  order: 3;                       /* al final del flujo */
+  margin-left: auto;              /* empuja hacia la derecha */
+}
+
+/* Variante --edge: mantenemos el anclaje inferior */
+.documentar-form--edge .documentar-actions{
+  position: absolute;
+  inset-inline: var(--pad);
+  inset-block-end: var(--pad);
+}
+
+/* Responsivo: en contenedor estrecho, apilar a 100% */
+@container (max-width: 900px){
+  .documentar-actions{ justify-content: stretch; }
+  .btn-action, .btn-save{ inline-size: 100%; }
+}

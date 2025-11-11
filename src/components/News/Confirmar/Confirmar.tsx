@@ -49,7 +49,7 @@ function EdmNewsContent({title = "", html = "", inset = { top: 120, right: 16, b
                                       right: toCss(inset.right),
                                       bottom: toCss(inset.bottom),
                                       left: toCss(inset.left),
-                                      background: "#d6d6d6",
+                                      background: "trasparent",
                                       borderRadius: 16,
                                       padding: 12,
                                       display: "flex",

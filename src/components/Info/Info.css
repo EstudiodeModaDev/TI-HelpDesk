@@ -1,114 +1,127 @@
-/* ===== Tokens + soporte modo oscuro ===== */
-:root{
-  color-scheme: light dark;
-  --bg:#ffffff;
-  --bg-elev:#ffffff;
-  --text:#0f172a;
-  --border:#e2e8f0;
-  --shadow:0 1px 2px rgba(2,6,23,.05);
-  --focus:#4f46e5;
-  --focus-ring:rgba(79,70,229,.35);
-}
+/* =========================================================
+   INFO PAGE — contenedor, toolbar y select
+   (usa únicamente los tokens del tema)
+   ========================================================= */
 
-@media (prefers-color-scheme: dark){
-  :root{
-  color-scheme: light dark;
-  --bg:#ffffff;
-  --bg-elev:#ffffff;
-  --text:#0f172a;
-  --border:#e2e8f0;
-  --shadow:0 1px 2px rgba(2,6,23,.05);
-  --focus:#4f46e5;
-  --focus-ring:rgba(79,70,229,.35);
-  }
-}
-
-/* ===== Página (no centrar, arriba) ===== */
 .Info-page{
-  display:grid;
-  grid-auto-flow:row;
-  gap:12px;
-  color:var(--text);
-  width:100%;
-  justify-items:stretch;   /* no centrar */
-  align-content:start;     /* pegar arriba */
+  --pad: clamp(12px, 1.6vw, 18px);
+  --gap: clamp(10px, 1.2vw, 14px);
+
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--bd);
+  border-radius: var(--radius-3xl, var(--radius));
+  box-shadow: var(--shadow);
+  padding: var(--pad);
+  overflow: visible;
+
+  /* Para responsive por espacio real */
+  container-type: inline-size;
 }
 
-/* ===== Toolbar arriba a la derecha ===== */
+/* ================= Toolbar ================= */
 .info-toolbar{
-  display:flex;
-  align-items:center;
-  justify-content:flex-end;   /* todo a la derecha */
-  gap:12px;
-  padding:8px 16px 0 16px;    /* sin fondo “caja” */
-  background:transparent;
-  color:var(--text);
+  position: sticky;
+  top: 0;                /* se pegará dentro del panel */
+  z-index: 10;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: var(--gap);
+
+  padding: 10px;
+  margin-bottom: var(--gap);
+
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in oklab, var(--surface) 92%, transparent),
+      var(--surface)
+    );
+  border: 1px solid var(--bd);
+  border-radius: calc(var(--radius) - 4px);
+  box-shadow: var(--shadow);
 }
+
 .info-toolbar__right{
-  display:flex;
-  align-items:center;
-  gap:8px;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+  gap: 8px;
+  align-items: center;
+  justify-content: end;
 }
 
-/* ===== Select ===== */
+/* ================= Select ================= */
 .info-select{
-  appearance:none;
-  background:var(--bg-elev);
-  color:var(--text);
-  border:1px solid var(--border);
-  border-radius:12px;
-  padding:10px 14px;
-  font-size:.95rem;
-  line-height:1.2;
-  box-shadow:var(--shadow);
-  outline:none;
-  transition:border-color .15s, box-shadow .15s, background-color .15s, color .15s;
+  appearance: none;
+  width: min(320px, 100%);
+
+  background: var(--field-bg);
+  color: var(--ink);
+  border: 1px solid var(--bd);
+  border-radius: 12px;
+  padding: 10px 40px 10px 12px;
+  outline: none;
+
+  /* caret consistente usando tokens */
+  background-image:
+    linear-gradient(45deg, transparent 50%, color-mix(in oklab, var(--ink) 55%, transparent) 50%),
+    linear-gradient(135deg, color-mix(in oklab, var(--ink) 55%, transparent) 50%, transparent 50%),
+    linear-gradient(var(--field-bg), var(--field-bg));
+  background-position:
+    calc(100% - 18px) calc(50% - 3px),
+    calc(100% - 12px) calc(50% - 3px),
+    calc(100% - 2.4rem) 0;
+  background-size: 6px 6px, 6px 6px, 1px 100%;
+  background-repeat: no-repeat;
+
+  transition: border-color .15s ease, box-shadow .15s ease, background .15s ease, filter .15s ease;
 }
+
 .info-select:focus{
-  border-color:var(--focus);
-  box-shadow:0 0 0 3px var(--focus-ring);
+  border-color: color-mix(in oklab, var(--primary) 55%, var(--bd) 45%);
+  box-shadow: 0 0 0 4px var(--ring);
 }
-.info-select::-ms-expand{ display:none; }
-
-/* ===== Espaciado: lo que sigue al toolbar baja un poco ===== */
-.Info-page > .info-toolbar + *{
-  margin-top:12px;  /* espacio entre select y tabla/panel */
+.info-select:disabled{
+  opacity: .7;
+  cursor: not-allowed;
 }
 
-/* ===== Contenedores internos: ancho completo ===== */
-.Info-page .table-wrap,
-.Info-page .info-panel,
-.Info-page table{
-  width:100%;
-  max-width:none;
+/* ================= Contenido embebido ================= */
+/* Si tus subcomponentes (StoreInfoPanel / InfoProveedores) exponen .panel,
+   heredan un estilo base agradable */
+.Info-page :where(.panel){
+  background: color-mix(in oklab, var(--surface-elev) 96%, transparent);
+  border: 1px solid var(--bd);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  padding: 12px;
 }
 
-/* ===== Utilidades opcionales (por si las usas) ===== */
-.info-panel{
-  background:var(--bg-elev);
-  border:1px solid var(--border);
-  border-radius:16px;
-  box-shadow:var(--shadow);
-  padding:16px;
-}
-.info-table{
-  width:100%;
-  border-collapse:separate;
-  border-spacing:0;
-  font-size:.95rem;
-}
-.info-table th, .info-table td{
-  text-align:left;
-  padding:10px 12px;
-  border-bottom:1px solid var(--border);
-}
-.info-table thead th{
-  background:var(--bg-elev);
-  position:sticky; top:0; z-index:1;
+/* ================= Responsive por container ================= */
+/* 1) Compacta toolbar (select a 100%) */
+@container (max-width: 720px){
+  .info-toolbar{
+    grid-template-columns: 1fr;   /* apila */
+    row-gap: 8px;
+  }
+  .info-toolbar__right{
+    justify-content: stretch;
+    grid-auto-flow: row;
+    grid-auto-columns: 1fr;
+  }
+  .info-select{ width: 100%; }
 }
 
-/* ===== Responsive ===== */
-@media (max-width:767px){
-  .info-toolbar{ padding:8px 10px 0 10px; }
-  .info-select{ width:auto; max-width:100%; }
+/* 2) Ultra compacto: reduce paddings */
+@container (max-width: 480px){
+  .Info-page{ --pad: 12px; }
+  .info-toolbar{ padding: 8px; }
+  .info-select{ padding: 8px 38px 8px 10px; border-radius: 10px; }
+}
+
+/* Accesibilidad: menor movimiento si el usuario lo prefiere */
+@media (prefers-reduced-motion: reduce){
+  .info-select, .info-toolbar{ transition: none; }
 }

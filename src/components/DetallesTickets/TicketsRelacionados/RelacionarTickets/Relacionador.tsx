@@ -38,7 +38,7 @@ export default function RelacionadorInline({currentId, onCancel, userMail, isAdm
   const wrapRef = React.useRef<HTMLDivElement | null>(null);
 
   return (
-    <div className="relc relc--native">
+    <div className="relc">
       <div className="relc-row">
         {/* Select modo (nativo) */}
         <label className="relc-field">
@@ -54,8 +54,8 @@ export default function RelacionadorInline({currentId, onCancel, userMail, isAdm
         <div className="relc-field relc-field--grow" ref={wrapRef}>
           <div className="relc-combobox" role="combobox" aria-haspopup="listbox" aria-owns="relc-listbox">
           {(["padre", "hijo"].includes(mode)) ? (
-            <div className="tf-field">
-              <label className="tf-label">Ticket</label>
+            <div className="relc-field">
+              <label className="relc-label">Ticket</label>
               <Select<ticketOption, false>
                 options={tickets}
                 placeholder="Buscar ticket"
@@ -66,9 +66,8 @@ export default function RelacionadorInline({currentId, onCancel, userMail, isAdm
               />
             </div>
           ) : (
-            <div className="tf-field">
-              <label htmlFor="archivo" className="tf-label">Cargar Excel de tickets</label>
-
+            <div className="relc-field">
+              <label htmlFor="archivo" className="relc-label">Cargar Excel de tickets</label>
               <input id="archivo" type="file" className="relc-native" accept=".xlsx,.xls" onChange={(e) => {
                   const f = e.target.files?.[0] ?? null;
                   if (!f) { setField("archivo", null); return; }
@@ -85,7 +84,7 @@ export default function RelacionadorInline({currentId, onCancel, userMail, isAdm
 
               {/* Botón para limpiar selección (opcional) */}
               {state.archivo && (
-                <button type="button" className="tf-link" onClick={() => {
+                <button type="button" className="relc-link" onClick={() => {
                   setField("archivo", null);
                   (document.getElementById("archivo") as HTMLInputElement | null)!.value = "";
                 }}>
@@ -93,11 +92,8 @@ export default function RelacionadorInline({currentId, onCancel, userMail, isAdm
                 </button>
               )}
             </div>
-
           )}
-
           </div>
-
         </div>
       </div>
 

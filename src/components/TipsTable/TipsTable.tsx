@@ -91,8 +91,7 @@ export default function AnnouncementsTable() {
         </table>
 
         <>
-            <button onClick={() => setModalAgregar(true)}>Nuevo anuncio</button>
-            <AnnouncementModal open={modalAgregar} onCancel={() => setModalAgregar(false)} tipos={["Seguridad", "Lanzamiento", "Tip"]}/>
+          <AnnouncementModal open={modalAgregar} onCancel={() => setModalAgregar(false)} tipos={["Seguridad", "Lanzamiento", "Tip"]}/>
         </>
 
       </div>

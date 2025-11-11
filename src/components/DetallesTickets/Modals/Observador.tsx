@@ -1,6 +1,6 @@
 import * as React from "react";
 import Select, { components, type FilterOptionOption, type OptionProps} from "react-select";
-import "./Observador.css";
+import "./ModalsStyles.css";
 import type { UserOption } from "../../../Models/Commons";
 import { useGraphServices } from "../../../graph/GrapServicesContext";
 import type { Ticket } from "../../../Models/Tickets";
@@ -11,9 +11,7 @@ import { useAsignarObservador } from "../../../Funcionalidades/Observador";
 import { useWorkers } from "../../../Funcionalidades/Workers";
 import { useFranquicias } from "../../../Funcionalidades/Franquicias";
 import { TicketsService } from "../../../Services/Tickets.service";
-
-const norm = (s: string) =>
-  (s ?? "").normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase().trim();
+import { norm } from "../../../utils/Commons";
 
 type UserOptionEx = UserOption & { source?: "Empleado" | "Franquicia" };
 
@@ -69,13 +67,11 @@ export default function AsignarObservador({ticket}: {ticket: Ticket}) {
   };
 
   return (
-    <div className="ticket-form">
-      <h2 className="tf-title">Nuevo Ticket</h2>
-
-      <form onSubmit={handleObservador} noValidate className="tf-grid">
+    <div className="dta-form">
+      <form onSubmit={handleObservador} noValidate className="dta-grid">
         {/* Solicitante */}
-        <div className="tf-field">
-          <label className="tf-label">Solicitante</label>
+        <div className="dta-field">
+          <label className="dta-label">Solicitante</label>
           <Select<UserOptionEx, false>
             options={combinedOptions}
             placeholder={loadingWorkers || loadingFranq ? "Cargando opciones…" : "Buscar solicitante…"}
@@ -93,8 +89,8 @@ export default function AsignarObservador({ticket}: {ticket: Ticket}) {
         </div>
 
         {/* Submit */}
-        <div className="tf-actions tf-col-2">
-          <button type="submit" disabled={submitting } className="tf-submit">
+        <div className="dta-actions dta-col-2">
+          <button type="submit" disabled={submitting } className="btn-primary">
             {submitting ? "Asignando..." : "Asignar observador"}
           </button>
         </div>

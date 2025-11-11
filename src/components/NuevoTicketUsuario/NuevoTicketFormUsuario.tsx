@@ -1,4 +1,3 @@
-import "../NuevoTicket/NuevoTicketForm.css";
 import type { FranquiciasService } from "../../Services/Franquicias.service";
 import type { UserOption } from "../../Models/Commons";
 import { useGraphServices } from "../../graph/GrapServicesContext";
@@ -7,6 +6,7 @@ import { UsuariosSPService } from "../../Services/Usuarios.Service";
 import type { TicketsService } from "../../Services/Tickets.service";
 import RichTextBase64 from "../RichTextBase64/RichTextBase64";
 import type { LogService } from "../../Services/Log.service";
+import "../NuevoTicket/NuevoTicketForm.css"
 
 export type UserOptionEx = UserOption & { source?: "Empleado" | "Franquicia" };
 
@@ -21,7 +21,7 @@ export default function NuevoTicketUsuarioForm() {
   const {state, errors, submitting, setField, handleSubmit,} = useNuevoUsuarioTicketForm({ Categorias, SubCategorias, Articulos, Tickets: TicketsSvc, Usuarios: UsuariosSPServiceSvc, Logs: LogsSvc});
 
   return (
-    <div className="ticket-form" data-force-light>
+    <div className="ticket-form">
       <h2 className="tf-title">Nuevo Ticket</h2>
 
       <form onSubmit={(e) => {e.preventDefault(); handleSubmit()}} noValidate className="tf-grid">
@@ -56,14 +56,12 @@ export default function NuevoTicketUsuarioForm() {
               ))}
             </ul>)}
         </div>
-
-        {/* Submit */}
-        <div className="tf-actions tf-col-2">
-          <button type="submit" disabled={submitting} className="tf-submit">
-            {submitting ? "Enviando..." : "Enviar Ticket"}
-          </button>
-        </div>
       </form>
+      <div className="tf-actions tf-col-2">
+        <button type="submit" disabled={submitting} className="btn-primary">
+          {submitting ? "Enviando..." : "Enviar Ticket"}
+        </button>
+      </div>
     </div>
   );
 }

@@ -1,278 +1,137 @@
-/* ========= Tokens (mismos del form anterior) ========= */
-:root{
-  --ink:#0f172a;
-  --muted:#6b7280;
-  --bg:#ffffff;
-  --card:#ffffff;
-  --bd:#e5e7eb;
-  --bd-strong:#d1d5db;
-  --primary:#2563eb;
-  --ring:rgba(37,99,235,.35);
-  --radius:12px;
-  --shadow:0 8px 22px rgba(2,6,23,.06);
-  --input-h:44px;
-}
+/* =========================================================
+   COMPRA FORM — usa tokens globales (dark/light)
+   ========================================================= */
 
-/* ========= Wrapper / Card ========= */
+/* Wrapper del formulario */
 .compra-form{
-  max-width: 1280px;      /* igual de ancho que el otro */
-  margin: 24px auto;
-  padding: 20px;
-  background: var(--card);
-  border: 1px solid var(--bd);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
   color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--bd);
+  border-radius: var(--radius-3xl);
+  box-shadow: var(--shadow);
+
+  inline-size: min(1160px, 100%);
+  margin-inline: auto;
+  padding: clamp(14px, 2.2vw, 22px);
+  overflow-x: clip;
 }
 
-.compra-form > h2 {
-  margin: 0 0 16px;
-  font-size: 1.4rem;
+.compra-form h2{
+  margin: 0 0 10px 0;
+  font-weight: 800;
   letter-spacing: .2px;
+  line-height: 1.25;
 }
 
-
-/* ========= Grid de formulario (3 columnas) ========= */
-.compra-form .form-grid{
+/* =========================
+   Grid de campos
+   ========================= */
+.fc-grid{
   display: grid;
-  grid-template-columns: repeat(3, minmax(320px, 1fr)); /* columnas más generosas */
-  gap: 16px;
+  grid-template-columns: repeat(2, minmax(260px, 1fr));
+  gap: 12px clamp(12px, 2vw, 18px);
 }
 
-/* Span utilitario para filas completas (lo usas en acciones y marcas) */
-.compra-form .col-span-full{ grid-column: 1 / -1; }
-
-/* Responsive */
-@media (max-width: 1200px){
-  .compra-form .form-grid{
-    grid-template-columns: repeat(3, minmax(280px, 1fr));
-  }
-}
 @media (max-width: 900px){
-  .compra-form .form-grid{ grid-template-columns: 1fr; }
-  .compra-form .col-span-full{ grid-column: 1 / -1; }
+  .fc-grid{ grid-template-columns: 1fr; }
 }
 
-/* ========= Campos base ========= */
-.compra-form .field{ grid-column: span 1; }
+.fc-grid > .col-span-full{ grid-column: 1 / -1; }
 
-.compra-form .label{
-  display:block;
-  font-size:.92rem;
-  margin:0 0 6px;
-  color:var(--muted);
-  font-weight:600; /* 👈 Letras más gruesas */
+/* =========================
+   Campo (label + control)
+   ========================= */
+.fc-field{ display: grid; gap: 8px; min-width: 0; }
+
+.fc-field > label{
+  color: var(--muted);
+  font-weight: 600;
+  font-size: .95rem;
 }
 
-.compra-form .control,
-.compra-form select,
-.compra-form input[type="text"],
-.compra-form input[type="number"],
-.compra-form input[type="date"]{
-  width:100%;
-  height:var(--input-h);
-  padding:0 14px;
-  border:1px solid var(--bd);
-  border-radius:10px;
-  background:#fff;
-  color:var(--ink);
-  outline:none;
-  transition:border-color .15s ease, box-shadow .15s ease, background .15s ease;
-  box-sizing:border-box;
-  font-size:.98rem;
+/* =========================
+   Controles nativos
+   ========================= */
+.fc-control, .fc-field input[type="text"], .fc-field input[type="number"], .fc-field input[type="date"], .fc-field select, .fc-field textarea{
+  inline-size: 100%;
+  min-width: 0;
+  height: clamp(38px, 5.5dvh, 46px);
+  padding: 0 12px;
+  border-radius: 12px;
+
+  background: var(--surface-elev);
+  color: var(--ink);
+  border: 1px solid var(--bd);
+
+  outline: none;
+  transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
+  box-sizing: border-box;
 }
-.compra-form .control:hover{ border-color: var(--bd-strong); }
-.compra-form .control:focus{
-  border-color: var(--primary);
+
+.fc-field textarea{
+  padding: 10px 12px;
+  min-height: 120px;
+  resize: vertical;
+}
+
+.fc-field ::placeholder{
+  color: color-mix(in oklab, var(--muted) 70%, transparent);
+}
+
+.fc-field :is(input, select, textarea):focus{
+  border-color: color-mix(in oklab, var(--primary) 55%, var(--bd));
   box-shadow: 0 0 0 4px var(--ring);
 }
 
-/* ========= Flecha hacia abajo en <select> nativos ========= */
-.compra-form select{
-  -webkit-appearance:none;
-  -moz-appearance:none;
-  appearance:none;
-  padding-right:40px;
-  background-repeat:no-repeat;
-  background-position:right 12px center;
-  background-size:18px 18px;
-  background-image:
-    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
-}
-
-/* ========= React-Select (paridad con nativo) ========= */
-.compra-form .rs-override .rs__control{
-  min-height: var(--input-h);
-  height: var(--input-h);
-  border: 1px solid var(--bd) !important;
-  border-radius: 10px !important;
-  background:#fff !important;
-  box-shadow: none !important;
-}
-.compra-form .rs-override .rs__control:hover{
-  border-color: var(--bd-strong) !important;
-}
-.compra-form .rs-override .rs__control--is-focused{
-  border-color: var(--primary) !important;
-  box-shadow: 0 0 0 4px var(--ring) !important;
-}
-.compra-form .rs-override .rs__value-container{
-  padding: 0 14px !important;
-}
-.compra-form .rs-override .rs__indicator-separator{ display:none !important; }
-.compra-form .rs-override .rs__indicators{
-  position: relative;
-  width: 36px;
-  justify-content: center;
-}
-.compra-form .rs-override .rs__dropdown-indicator{ color:#6b7280 !important; }
-.compra-form .rs-override .rs__indicators::after{
-  content:"";
-  position:absolute;
-  right:10px;
-  width:18px; height:18px; pointer-events:none;
-  background-repeat:no-repeat; background-position:center; background-size:18px 18px;
-  background-image:
-    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
-}
-.compra-form .rs-override .rs__menu{
-  border:1px solid var(--bd);
-  border-radius:10px;
-  box-shadow:var(--shadow);
-  overflow:hidden;
-  margin-top:6px;
-}
-.compra-form .rs-override .rs__menu-list{
-  padding:6px 0 !important;
-  max-height:280px;
-}
-.compra-form .rs-override .rs__option{
-  padding:10px 14px !important;
-  font-size:.98rem;
-}
-.compra-form .rs-override .rs__option--is-focused{ background:#f3f4f6 !important; }
-.compra-form .rs-override .rs__option--is-selected{
-  background:#eef2ff !important; color:var(--ink) !important; font-weight:600;
-}
-.compra-form .rs-override .rs__placeholder{ color: var(--muted) !important; }
-.compra-form .rs-override .rs__single-value{ color: var(--ink) !important; }
-.compra-form .rs-override .rs__input-container input{ color: var(--ink) !important; }
-
-/* ========= Caja interna (Distribución por Marca) ========= */
-.compra-form .box{
-  background:#fff;
-  border:1px solid var(--bd);
-  border-radius:10px;
-  padding:12px;
-}
-
-/* Grid de marcas: cómodo en desktop, adaptable en móvil */
-.compra-form .brands-grid{
-  display:grid;
-  grid-template-columns: repeat(6, minmax(120px, 1fr));
-  gap:12px;
-}
-@media (max-width: 1200px){
-  .compra-form .brands-grid{ grid-template-columns: repeat(4, minmax(120px, 1fr)); }
-}
-@media (max-width: 900px){
-  .compra-form .brands-grid{ grid-template-columns: repeat(2, minmax(120px, 1fr)); }
-}
-
-/* ========= Mensajes de error ========= */
-.compra-form .error{
-  display:block;
-  margin-top:6px;
-  color:#b91c1c;           /* rojo-700 */
-  font-size:.85rem;
-  font-weight: 500;
-}
-
-/* ========= Botones (paridad con el otro form) ========= */
-.compra-form .btn{
-  height: 36px;
-  padding: 0 12px;
-  border-radius: 10px;
-  border: 1px solid var(--bd);
-  background: #f8fafc;
-  color: var(--ink);
-  cursor: pointer;
-  transition: transform .05s ease, box-shadow .15s ease, background .15s ease, filter .15s ease;
-}
-.compra-form .btn:hover{
-  background:#eef2ff;
-  border-color: var(--bd-strong);
-}
-.compra-form .btn:active{ transform: translateY(1px); }
-
-.compra-form .btn-primary{
-  background: var(--primary);
-  border-color: var(--primary);
-  color: #fff;
-}
-.compra-form .btn-primary:hover{ filter: brightness(1.05); }
-
-.compra-form .btn-sm{
-  height: 34px;
-  padding: 0 10px;
-}
-
-/* ========= Utilidades ========= */
-.compra-form .flex{ display:flex; }
-.compra-form .items-center{ align-items:center; }
-.compra-form .justify-between{ justify-content:space-between; }
-.compra-form .justify-end{ justify-content:flex-end; }
-.compra-form .gap-2{ gap:.5rem; }
-.compra-form .pt-2{ padding-top:.5rem; }
-.compra-form .mb-2{ margin-bottom:.5rem; }
-.compra-form .text-sm{ font-size:.9rem; }
-.compra-form .font-semibold{ font-weight:600; }
-
-/* ======= Tipografía unificada ======= */
-:root{
-  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Inter", "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-}
-html, body{
-  font-family: var(--font-sans);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;
-}
-
-.registro-container,
-.compra-form{
-  font-family: var(--font-sans);
-}
-
-.registro-container :is(input, select, textarea, button),
-.compra-form :is(input, select, textarea, button){
-  font-family: inherit;
-  font-size: .98rem;
-  letter-spacing: .2px;
-}
-
-.registro-container ::placeholder,
-.compra-form ::placeholder{
-  font-family: inherit;
-  color: var(--muted);
-  opacity: 1;
-}
-
-.rs-override,
-.rs-override *{
-  font-family: var(--font-sans) !important;
-}
-.rs-override .rs__option{
-  font-size: .98rem !important;
-  letter-spacing: .2px;
-}
-
-.btn-registrar,
-.btn-ver-facturas,
-.btn-nuevo-proveedor,
-.compra-form .btn,
-.compra-form .btn-primary{
-  font-family: var(--font-sans);
+/* =========================
+   Errores / ayudas
+   ========================= */
+.error{
+  font-size: .86rem;
+  line-height: 1.25;
+  color: color-mix(in oklab, var(--primary) 35%, var(--ink) 65%);
   font-weight: 600;
-  letter-spacing: .2px;
 }
+
+/* =========================
+   Caja de distribución marcas
+   ========================= */
+.box{
+  background: var(--surface-elev);
+  border: 1px solid var(--bd);
+  border-radius: var(--radius);
+  padding: clamp(10px, 1.6vw, 14px);
+  box-shadow: var(--shadow);
+}
+
+.brands-grid{
+  display: grid;
+  grid-template-columns: repeat(4, minmax(140px, 1fr));
+  gap: 10px;
+}
+
+@media (max-width: 1080px){ .brands-grid{ grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 760px){ .brands-grid{ grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 520px){ .brands-grid{ grid-template-columns: 1fr; } }
+
+.brands-grid .field{ display: grid; gap: 6px; }
+.brands-grid .label{
+  color: var(--muted);
+  font-weight: 600;
+  font-size: .9rem;
+}
+.brands-grid .control{
+  height: clamp(36px, 5dvh, 44px);
+  border-radius: 10px;
+  background: var(--field-bg);
+  color: var(--ink);
+  border: 1px solid var(--bd);
+  padding: 0 10px;
+  outline: none;
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+.brands-grid .control:focus{
+  border-color: color-mix(in oklab, var(--primary) 55%, var(--bd));
+  box-shadow: 0 0 0 4px var(--ring);
+}
+

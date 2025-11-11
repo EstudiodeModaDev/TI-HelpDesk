@@ -84,19 +84,10 @@ export default function Formatos() {
 
   // Pantalla inicial: selector + TyC
   return (
-    <section className="tg-card tg-scope">
-      <label className="tg-label" htmlFor="tg_select">Tipo de solicitud</label>
+    <section className="fp-card fp-scope">
+      <label className="fp-label" htmlFor="fp">Tipo de solicitud</label>
 
-      <select
-        id="tg_select"
-        className="tg-select"
-        value={opcion ?? ""}
-        onChange={(e) => {
-          setOpcion((e.target.value || null) as OpcionSolicitud | null);
-          setAcepta(false);
-          setConfirmado(false);
-        }}
-      >
+      <select id="fp" className="fp-select" value={opcion ?? ""} onChange={(e) => {setOpcion((e.target.value || null) as OpcionSolicitud | null); setAcepta(false); setConfirmado(false);}}>
         <option value="">Selecciona una opción…</option>
         {OPCIONES.map((op) => (
           <option key={op} value={op}>{op}</option>
@@ -104,37 +95,22 @@ export default function Formatos() {
       </select>
 
       {opcion && (
-        <div className="tg-terms">
+        <div className="fp-terms">
           <h3>Términos y condiciones</h3>
 
           {/* Aquí se pintan los TyC según la opción seleccionada */}
-          <div
-            className="tg-terms-text"
-            dangerouslySetInnerHTML={{ __html: TYC_BY_OPCION[opcion] }}
-          />
+          <div className="fp-terms-text" dangerouslySetInnerHTML={{ __html: TYC_BY_OPCION[opcion] }} />
 
-          <label className="tg-check">
-            <input
-              type="checkbox"
-              checked={acepta}
-              onChange={(e) => setAcepta(e.target.checked)}
-            />
+          <label className="fp-check"> 
+            <input type="checkbox" checked={acepta} onChange={(e) => setAcepta(e.target.checked)}/>
             <span>Acepto los términos y condiciones</span>
           </label>
 
-          <div className="tg-actions">
-            <button className="tg-btn-primary" onClick={confirmar} disabled={!acepta}>
+          <div className="fp-actions">
+            <button className="fp-btn-primary" onClick={confirmar} disabled={!acepta}>
               Continuar
             </button>
-            <button
-              className="tg-btn-ghost"
-              type="button"
-              onClick={() => {
-                setOpcion(null);
-                setAcepta(false);
-                setConfirmado(false);
-              }}
-            >
+            <button className="fp-btn-ghost" type="button" onClick={() => {setOpcion(null); setAcepta(false); setConfirmado(false);}} >
               Cancelar
             </button>
           </div>

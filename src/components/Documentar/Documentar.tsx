@@ -45,33 +45,21 @@ export default function Documentar({ ticket, tipo, onDone }: { ticket: Ticket; t
   };
 
   return (
-    <div className="ticket-form ticket-form--edge">
-      <h2 className="tf-title">
-        {showEscalar
-          ? "Escalamiento internet"
-          : showActaEntrega
+    <div className="documentar-form documentar-form--edge">
+      <h2 className="documentar-title">
+        {showEscalar ? "Escalamiento internet"  : showActaEntrega
           ? "Nueva acta de entrega"
           : `Documentar ${tipo} del ticket #${ticket.ID}`}
       </h2>
 
       {/* === SOLO DOCUMENTACIÓN CUANDO showEscalar = false === */}
       {!showEscalar && !showActaEntrega ? (
-        <form
-          onSubmit={(e) => { handleSubmit(e, tipo, ticket, account!);  if (onDone) onDone();}}
-          noValidate
-          className="tf-grid"
-        >
+        <form onSubmit={(e) => { handleSubmit(e, tipo, ticket, account!);  if (onDone) onDone();}} className="documentar-grid">
           {/* Selector de plantilla */}
-          <div className="tf-field tf-col-2">
-            <label className="tf-label" htmlFor="plantilla">Usar plantilla</label>
+          <div className="documentar-field documentar-col-2">
+            <label className="documentar-label" htmlFor="plantilla">Usar plantilla</label>
             <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-              <select
-                id="plantilla"
-                className="tf-input"
-                value={plantillaId}
-                onChange={(e) => onSelectPlantilla(e.target.value)}
-                disabled={submitting || loadingPlantillas || !ListaPlantillas?.length}
-              >
+              <select id="plantilla" className="documentar-input" value={plantillaId} onChange={(e) => onSelectPlantilla(e.target.value)} disabled={submitting || loadingPlantillas || !ListaPlantillas?.length}>
                 <option value="">{loadingPlantillas ? "Cargando plantillas..." : "— Selecciona una plantilla —"}</option>
                 {(ListaPlantillas ?? []).map(p => (
                   <option key={p.Id} value={p.Id}>{p.Title}</option>
@@ -83,52 +71,32 @@ export default function Documentar({ ticket, tipo, onDone }: { ticket: Ticket; t
           </div>
 
           {/* Documentación */}
-          <div className="tf-field tf-col-2">
-            <label className="tf-label">Descripción de {tipo}</label>
-            <RichTextBase64
-              value={state.documentacion}
-              onChange={(html) => setField("documentacion", html)}
-              placeholder="Describe el problema y pega capturas (Ctrl+V)…"
-            />
+          <div className="documentar-field documentar-col-2">
+            <label className="documentar-label">Descripción de {tipo}</label>
+            <RichTextBase64 value={state.documentacion} onChange={(html) => setField("documentacion", html)} placeholder="Describe el problema y pega capturas (Ctrl+V)…"/>
             {errors.documentacion && <small className="error">{errors.documentacion}</small>}
           </div>
 
           {/* Archivo */}
-          <div className="tf-field tf-col-2">
-            <label className="tf-label" htmlFor="archivo">Adjuntar archivo</label>
-            <input
-              id="archivo"
-              type="file"
-              onChange={(e) => setField("archivo", e.target.files?.[0] ?? null)}
-              disabled={submitting}
-              className="tf-input"
-            />
+          <div className="documentar-field documentar-col-2">
+            <label className="documentar-label" htmlFor="archivo">Adjuntar archivo</label>
+             <input id="archivo" type="file" onChange={(e) => setField("archivo", e.target.files?.[0] ?? null)} disabled={submitting} className="documentar-input"/>
             {errors.archivo && <small className="error">{errors.archivo}</small>}
           </div>
 
           {/* Acciones (esquinas) */}
-            <div className="tf-actions tf-col-2">
-              <button type="submit" disabled={submitting} className="tf-submit btn-save">
+            <div className="documentar-actions documentar-col-2">
+              <button type="submit" disabled={submitting} className="btn-save btn-primary">
                 {submitting ? "Enviando..." : "Guardar documentación"}
               </button>
 
               {/* Escalar: esquina inferior izquierda (secundario) */}
-              <button
-                type="button"
-                disabled={submitting}
-                className="tf-secondary btn-escalar"
-                onClick={() => setShowEscalar(true)}
-              >
+              <button type="button" disabled={submitting} className="btn-action btn-secondary" onClick={() => setShowEscalar(true)}>
                 Escalar a proveedor de internet
               </button>
 
               {/* Acta: misma esquina, pero un poco más arriba para no montarse */}
-              <button
-                type="button"
-                disabled={submitting}
-                className="tf-secondary btn-acta"
-                onClick={() => setShowActaEntrega(true)}
-              >
+              <button type="button" disabled={submitting} className="btn-action btn-secondary" onClick={() => setShowActaEntrega(true)}>
                 Generar Acta de Entrega
               </button>
             </div>
@@ -140,16 +108,6 @@ export default function Documentar({ ticket, tipo, onDone }: { ticket: Ticket; t
           {showEscalar && <EscalamientoInternet ticket={ticket} />}
           {showActaEntrega && <InfoActaEntrega ticket={ticket}/>}
 
-          {/* Botón para volver a documentación, en la misma esquina izquierda */}
-          <div className="tf-actions tf-col-2">
-            <button
-              type="button"
-              className="tf-secondary btn-escalar"
-              onClick={() => {setShowEscalar(false); setShowActaEntrega(false)}}
-            >
-              Volver a documentación
-            </button>
-          </div>
         </>
       )}
     </div>

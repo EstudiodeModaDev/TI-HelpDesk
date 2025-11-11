@@ -1,192 +1,217 @@
-/* ==========================================================================
-   ActivityStatusCard – estilos base y tokens
-   ========================================================================== */
+/* =========================================================
+   ACTIVITY STATUS CARD (as-card) — responsive + tokens app
+   ========================================================= */
+.as-card{
+  /* Tokens locales (con fallbacks a los globales) */
+  --as-bg:        var(--surface, #fff);
+  --as-ink:       var(--ink, #0f172a);
+  --as-muted:     var(--muted, #64748b);
+  --as-bd:        var(--bd, #e5e7eb);
+  --as-bd-strong: var(--bd-strong, #d1d5db);
+  --as-shadow:    var(--shadow, 0 8px 22px rgba(0,0,0,.06));
+  --as-radius:    var(--radius-3xl, var(--radius, 12px));
+  --as-primary:   var(--primary, #3b82f6);
+  --as-ring:      var(--ring, rgba(59,130,246,.25));
 
-/* ===== Tokens (puedes mapearlos a tu theme) ===== */
-.as-card {
-  --as-bg: #ffffff;
-  --as-fg: #111827;
-  --as-muted: #6b7280;
-  --as-border: #e5e7eb;
-  --as-shadow: 0 10px 28px rgba(0,0,0,.08);
+  /* Acento opcional por prop style={{ --as-accent }} */
+  --as-accent:    var(--as-accent, var(--as-primary));
 
-  /* Color de acento (stroke del anillo) – se puede sobreescribir via style */
-  --as-accent: #3b82f6;
-  --as-ring-track: #eef2f7;
-}
+  /* Dimensiones fluidas */
+  --as-pad:       clamp(12px, 2.2vw, 18px);
+  --as-gap:       clamp(8px, 1.8vw, 14px);
+  --as-title:     clamp(1rem, 2.4vw, 1.25rem);
+  --as-sub:       clamp(.9rem, 2vw, 1rem);
 
-/* Modo oscuro opcional (si tu app usa .dark en <html> o <body>) */
-.dark .as-card {
-  --as-bg: #0b1220;
-  --as-fg: #e5e7eb;
-  --as-muted: #9ca3af;
-  --as-border: #1f2937;
-  --as-shadow: 0 10px 28px rgba(0,0,0,.45);
-  --as-ring-track: #1e293b;
-}
+  /* Tamaño del anillo fluido (se adapta al ancho disponible) */
+  --as-ring-size: clamp(120px, 26vw, 180px);
+  --as-stroke:    10;                         /* grosor SVG, el TSX pasa strokeWidth={stroke} */
+  --as-center-gap: clamp(6px, 1.4vw, 8px);
 
-/* ==========================================================================
-   Contenedor principal
-   ========================================================================== */
-
-.as-card {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-
-  width: 260px;                 /* aprox. como el mockup */
+  display: grid;
+  gap: var(--as-gap);
+  padding: var(--as-pad);
   background: var(--as-bg);
-  color: var(--as-fg);
-  border: 1px solid var(--as-border);
-  border-radius: 16px;
-  padding: 14px 16px;
-  box-shadow: var(--as-shadow);
-  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-  line-height: 1.25;
+  color: var(--as-ink);
+  border: 1px solid var(--as-bd);
+  border-radius: var(--as-radius);
+  box-shadow: var(--as-shadow);      /* compacto por defecto */
+  container-type: inline-size; /* permite container queries */
+    inline-size: clamp(320px, 90vw, 720px);
+  margin-inline: auto;
 }
 
-/* Título principal */
-.as-title {
-  font-size: 18px;
-  font-weight: 800;
+/* Título */
+.as-title{
   margin: 0;
+  font-size: var(--as-title);
+  font-weight: 800;
+  letter-spacing: -.015em;
+  color: var(--as-ink);
 }
 
-/* ==========================================================================
-   Anillo de progreso (SVG)
-   ========================================================================== */
-
-.as-ring {
+/* ====== Ring de progreso ====== */
+.as-ring{
   position: relative;
+  width: var(--as-ring-size);
+  height: var(--as-ring-size);
   display: grid;
   place-items: center;
-  margin: 4px 0 8px;
+  margin-inline: auto;   /* centra el anillo en cards angostas */
 }
 
-.as-ring-svg {
+.as-ring-svg{
+  width: 100%;
+  height: 100%;
   display: block;
-  transform: rotate(-90deg); /* inicia en la parte superior */
+  transform: rotate(-90deg); /* progreso inicia arriba */
 }
 
-/* pista circular */
-.as-ring-track {
+/* Pista */
+.as-ring-track{
   fill: none;
-  stroke: var(--as-ring-track);
-  stroke-linecap: round;
+  stroke: color-mix(in oklab, var(--as-ink) 10%, transparent);
+  opacity: .4;
 }
 
-/* progreso circular */
-.as-ring-progress {
+/* Progreso */
+.as-ring-progress{
   fill: none;
   stroke: var(--as-accent);
   stroke-linecap: round;
-  transition: stroke-dashoffset 600ms ease;
+  transition: stroke-dashoffset .4s ease;
 }
 
-/* valor en el centro del anillo */
-.as-ring-center {
+/* Centro del anillo */
+.as-ring-center{
   position: absolute;
-  display: inline-flex;
-  align-items: baseline;
-  gap: 2px;
-  font-weight: 800;
+  display: flex;                 /* en vez de grid */
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;                      /* antes era mayor */
+  transform: translateY(-2px)
 }
+.as-ring-value{
+  font-size: clamp(1.5rem, 5.6vw, 1.9rem);
+  line-height: .9;               /* reduce espacio vertical interno */
+  margin-bottom: -2px;           /* cierra la separación con el % */
+  font-variant-numeric: tabular-nums;
 
-.as-ring-value {
-  font-size: 28px;
 }
-
-.as-ring-unit {
-  font-size: 14px;
+.as-ring-unit{
+  margin-top: var(--as-center-gap);
+  font-size: clamp(.75rem, 2.2vw, .85rem);
+  font-weight: 700;
   color: var(--as-muted);
 }
 
-/* ==========================================================================
-   Sección de próximas tareas
-   ========================================================================== */
+/* ====== Sección: próximas tareas ====== */
+.as-section{
+  display: grid;
+  gap: calc(var(--as-gap) - 2px);
+}
+.as-subtitle{
+  margin: 0;
+  font-size: var(--as-sub);
+  font-weight: 800;
+  color: var(--as-ink);
+}
 
-.as-section {
-  display: flex;
-  flex-direction: column;
+.as-tasklist{
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
   gap: 8px;
 }
-
-.as-subtitle {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--as-muted);
-  margin: 0;
-}
-
-.as-tasklist {
-  list-style: none;
-  padding: 0;
-  margin: 0;
+.as-task{
   display: grid;
-  gap: 10px;
+  grid-template-columns: 1fr max-content;
+  gap: 8px 12px;
+  align-items: center;
+  padding: 10px 12px;
+  border: 1px solid var(--as-bd);
+  border-radius: calc(var(--as-radius) - 4px);
+  background: color-mix(in oklab, var(--as-bg) 96%, transparent);
 }
-
-/* Cada tarea: título + fecha en dos líneas */
-.as-task {
-  display: grid;
-  gap: 2px;
-}
-
-.as-task-title {
-  font-size: 14px;
+.as-task-title{
+  min-width: 0;
   font-weight: 700;
+  color: var(--as-ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-
-.as-task-date {
-  font-size: 12px;
-  color: var(--as-muted);
-  display: flex;
-  gap: 6px;
+.as-task-date{
+  display: inline-flex;
   align-items: baseline;
+  gap: 6px;
+  font-variant-numeric: tabular-nums;
+  color: var(--as-muted);
 }
-
-/* Día en grande (ej: “25”) y resto (mes corto y año) */
-.as-task-day {
-  font-weight: 800;
+.as-task-day{
+  font-weight: 900;
+  font-size: 1.05em;
+  color: var(--as-ink);
 }
-.as-task-rest {
+.as-task-rest{
   opacity: .9;
 }
 
-/* Separador sutil (opcional) */
-.as-task + .as-task {
-  padding-top: 8px;
-  border-top: 1px dashed var(--as-border);
-}
-
-/* ==========================================================================
-   Footer / frecuencia
-   ========================================================================== */
-
-.as-footer {
+/* ====== Footer ====== */
+.as-footer{
   display: flex;
+  align-items: center;
   gap: 8px;
-  align-items: baseline;
   padding-top: 6px;
-  border-top: 1px solid var(--as-border);
-  margin-top: 4px;
-}
-
-.as-footer-value {
-  font-size: 18px;
-  font-weight: 900;
-}
-
-.as-footer-text {
-  font-size: 13px;
+  border-top: 1px solid var(--as-bd);
   color: var(--as-muted);
 }
+.as-footer-value{
+  font-size: clamp(1.1rem, 3vw, 1.25rem);
+  color: var(--as-ink);
+  font-weight: 900;
+  line-height: 1;
+}
+.as-footer-text{
+  font-weight: 600;
+}
 
-/* ==========================================================================
-   Responsividad pequeña (si el card se usa más ancho)
-   ========================================================================== */
+/* =======================
+   RESPONSIVE / ADAPTATIVO
+   ======================= */
 
-@media (min-width: 360px) {
-  .as-card { width: 300px; }
-  .as-ring-value { font-size: 32px; }
+/* Si el contenedor es ancho, permite que el anillo y la lista respiren */
+@container (min-width: 520px){
+  .as-card{
+    max-width: 560px; /* puede crecer un poco cuando hay espacio */
+  }
+}
+
+/* En cards MUY angostas, compactamos paddings y tipografía */
+@container (max-width: 360px){
+  .as-card{ --as-pad: 10px; --as-gap: 6px; }
+  .as-task{ padding: 8px 10px; }
+  .as-tasklist{ gap: 6px; }
+}
+
+/* Cuando estés en layouts de 3 columnas, el card encoge sin romper nada.
+   Si lo usas dentro de un grid auto-fit, esto ayuda a remapear el ring. */
+@media (max-width: 820px){
+  .as-card{ --as-ring-size: clamp(110px, 34vw, 160px); }
+}
+@media (max-width: 520px){
+  .as-card{ --as-ring-size: clamp(96px, 42vw, 140px); }
+}
+
+/* Estado hover/foco suave en items */
+.as-task:hover{
+  border-color: var(--as-bd-strong);
+  box-shadow: 0 0 0 4px var(--as-ring);
+}
+
+/* Accesibilidad: reduce animaciones si aplica */
+@media (prefers-reduced-motion: reduce){
+  .as-ring-progress{ transition: none; }
+  .as-task{ transition: none; }
 }

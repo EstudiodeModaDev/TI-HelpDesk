@@ -42,7 +42,7 @@ export default function TablaTickets() {
     <div className="tabla-tickets" data-force-light>
 
       {!ticketSeleccionado && (
-        <div className="filtros">
+        <div className="tickets-filtros">
 
           <input type="text" placeholder="Buscar (resolutor, solicitante, asunto)..." value={search} onChange={(e) => setSearch(e.target.value)}/>
 
@@ -101,9 +101,9 @@ export default function TablaTickets() {
               {filtered.map((ticket) => (
                 <tr key={ticket.ID} onClick={() => setTicketSeleccionado(ticket)} tabIndex={0} onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && setTicketSeleccionado(ticket)}>
                   <td>{ticket.ID}</td>
-                  <td>{ticket.Nombreresolutor}</td>
-                  <td>{ticket.Solicitante}</td>
-                  <td>{ticket.Title!.slice(0, 75)}</td>
+                  <td><span title={ticket.Nombreresolutor}>{ticket.Nombreresolutor}</span></td>
+                  <td><span title={ticket.Solicitante}>{ticket.Solicitante}</span></td>
+                  <td><span title={ticket.Title}>{ticket.Title}</span></td>
                   <td>{toISODateTimeFlex(ticket.FechaApertura) || "–"}</td>
                   <td>{toISODateTimeFlex(ticket.TiempoSolucion) || "N/A"}</td>
                   <td>

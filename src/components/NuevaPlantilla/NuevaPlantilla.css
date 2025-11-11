@@ -1,134 +1,119 @@
-/* =========================
-   Scope: fuerza tema claro local
-   ========================= */
+/* =========================================================
+   PLANTILLAS — responsive, limpio y basado en tokens de la app
+   (usa --surface, --ink, --muted, --border, --primary, --ring,
+    --shadow, --radius, --page-pad, etc. con fallbacks suaves)
+   ========================================================= */
+
+/* ---------- Scope / Aliases (hereda de la app) ---------- */
 .tpl-scope{
-  /* controles nativos (inputs, scrollbars) en claro */
-  color-scheme: light;
+  color-scheme: light; /* el tema real lo manejan tus tokens globales */
 
-  /* tokens SOLO dentro del scope (no afectan a la app) */
-  --bg: #f8fafc;              /* page */
-  --bg-elev: #ffffff;         /* cards/forms */
-  --ink: #0f172a;             /* text */
-  --muted: #64748b;           /* secondary text */
-  --border: #e2e8f0;          /* strokes */
-  --shadow: 0 8px 24px rgba(2,6,23,.06);
+  /* Aliases locales → tokens globales */
+  --tpl-surface:   var(--surface);
+  --tpl-ink:       var(--ink, #0f172a);
+  --tpl-muted:     var(--muted, #64748b);
+  --tpl-border:    var(--border, #e2e8f0);
+  --tpl-shadow:    var(--shadow, 0 10px 30px rgba(0,0,0,.06));
+  --tpl-primary:   var(--primary, #4f46e5);
+  --tpl-on-primary:var(--on-primary, #fff);
+  --tpl-ring:      var(--ring, rgba(79,70,229,.35));
+  --tpl-radius:    var(--radius, 14px);
+  --tpl-pad:       var(--page-pad, 16px);
 
-  --primary: #4f46e5;         /* indigo-600 */
-  --primary-ink: #ffffff;
-  --primary-hover: #4338ca;   /* indigo-700 */
-  --ring: rgba(79,70,229,.35);
-
-  --radius: 14px;
-  --pad: 16px;
-  --gap: 14px;
-  --input-h: 44px;
-  --font: system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif;
+  /* Layout tokens */
+  --tpl-content-max: var(--content-max, 700px);
+  --tpl-editor-min:  var(--editor-min, clamp(320px, 42vh, 560px));
+  --tpl-gap:         var(--gap, 14px);
+  --tpl-input-h:     var(--input-h, 44px);
+  --tpl-font:        var(--font, system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif);
 }
 
-/* Si tu app aplica .dark global, evita herencias extra */
-.tpl-scope *{
-  /* no tocamos colores, sólo evitamos estilos globales agresivos */
-  min-width: 0;
-}
+.tpl-scope[data-theme="dark"]{ color-scheme: dark; }
 
-/* =========================
-   Layout base
-   ========================= */
+/* ---------- Page ---------- */
 .tpl-page{
   min-height: 100dvh;
   display: grid;
-  place-items: center;
-  padding: clamp(12px, 2vw, 24px);
-  background: transparent;     /* deja ver el fondo de tu app */
-  color: var(--ink);
-  font-family: var(--font);
+  place-items: start center;
+  padding: clamp(12px, 2.4vw, 28px);
+  background: var(--tpl-bg);
+  color: var(--tpl-ink);
+  font-family: var(--tpl-font);
 }
 
+/* ---------- Form shell ---------- */
 .tpl-form{
-  /* ancho amplio pero fluido */
-  inline-size: clamp(320px, 92vw, 1200px);
-  max-height: calc(100dvh - 2 * clamp(12px, 2vw, 24px));
-  overflow: auto;
-
-  margin: 0;
-  background: var(--bg-elev);
-  border: 1px solid var(--border);
-  border-radius: calc(var(--radius) + 2px);
-  box-shadow: var(--shadow);
-  padding: clamp(16px, 2.2vw, 28px);
+  inline-size: min(var(--tpl-content-max), 92vw);
+  background: var(--tpl-surface);
+  border: 1px solid var(--tpl-border);
+  border-radius: calc(var(--tpl-radius) + 2px);
+  box-shadow: var(--tpl-shadow);
+  padding: clamp(16px, 2.2vw, 32px);
   display: grid;
-  gap: max(14px, 1.2vw);
+  gap: max(var(--tpl-gap), 1.2vw);
+  container-type: inline-size; /* habilita @container */
 }
 
-/* =========================
-   Título
-   ========================= */
+/* ---------- Title ---------- */
 .tpl-title{
   margin: 0;
   font-size: clamp(1.6rem, 2.4vw, 2.1rem);
-  line-height: 1.15;
   letter-spacing: -0.015em;
-  color: var(--ink);
+  line-height: 1.15;
+  color: var(--tpl-ink);
 }
 
-/* =========================
-   Fieldset
-   ========================= */
-.tpl-field{
-  display: grid;
-  gap: 8px;
-}
-
+/* ---------- Fields ---------- */
+.tpl-field{ display: grid; gap: 8px; }
 .tpl-label{
   font-weight: 700;
-  color: var(--ink);
+  color: var(--tpl-ink);
   line-height: 1.2;
 }
 
-/* =========================
-   Inputs
-   ========================= */
+/* Inputs */
 .tpl-input{
-  height: var(--input-h);
-  padding: 10px 12px;
-  background: var(--bg-elev);
-  color: var(--ink);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
+  block-size: var(--tpl-input-h);
+  padding-inline: clamp(10px, 1.6vw, 14px);
+  background: var(--tpl-surface);
+  color: var(--tpl-ink);
+  border: 1px solid var(--tpl-border);
+  border-radius: var(--tpl-radius);
   outline: none;
   transition: border-color .15s ease, box-shadow .15s ease, background-color .15s ease, color .15s ease;
 }
-.tpl-input::placeholder{ color: var(--muted); }
+.tpl-input::placeholder{ color: color-mix(in oklab, var(--tpl-muted) 85%, transparent); }
 .tpl-input:focus{
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px var(--ring);
+  border-color: var(--tpl-primary);
+  box-shadow: 0 0 0 4px var(--tpl-ring);
 }
 
-/* =========================
-   Editor
-   ========================= */
+/* ---------- Editor ---------- */
 .tpl-editorWrapper{
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border: 1px solid var(--tpl-border);
+  border-radius: var(--tpl-radius);
+  background: var(--tpl-surface);
   overflow: clip;
-  background: var(--bg-elev);
-  min-height: 280px;
-  max-height: 50vh;           /* no tapes el botón con editores largos */
+  min-block-size: var(--tpl-editor-min);
   display: grid;
 }
 .tpl-editorWrapper,
-.tpl-editorWrapper *{
-  color-scheme: light !important; /* fuerza UI del editor en claro */
-}
+.tpl-editorWrapper *{ color-scheme: inherit; }
+
 .tpl-editorWrapper [contenteditable="true"],
 .tpl-editorWrapper iframe{
-  background: var(--bg-elev) !important;
-  color: var(--ink) !important;
+  background: var(--tpl-surface) !important;
+  color: var(--tpl-ink) !important;
+  min-block-size: calc(var(--tpl-editor-min) - 90px); /* deja área útil bajo toolbar */
 }
 
-/* =========================
-   Acciones
-   ========================= */
+/* Hint (texto auxiliar) */
+.tpl-hint{
+  color: var(--tpl-muted);
+  font-size: .9rem;
+}
+
+/* ---------- Actions ---------- */
 .tpl-actions{
   display: flex;
   justify-content: flex-end;
@@ -137,54 +122,43 @@
 
 .tpl-primary{
   appearance: none;
-  -webkit-appearance: none;
-  background: var(--primary);
-  color: var(--primary-ink);
-  border: 1px solid var(--primary-hover);
-  border-radius: var(--radius);
-  padding: 10px 14px;
+  background: var(--tpl-primary);
+  color: var(--tpl-on-primary);
+  border: 1px solid color-mix(in oklab, var(--tpl-primary) 86%, black);
+  border-radius: var(--tpl-radius);
+  padding: 10px 16px;
   font-weight: 700;
-  line-height: 1.2;
   cursor: pointer;
-  box-shadow: var(--shadow);
+  box-shadow: var(--tpl-shadow);
   transition: background .15s ease, border-color .15s ease, box-shadow .15s ease, transform .04s ease;
 }
-.tpl-primary:hover{ background: var(--primary-hover); }
+.tpl-primary:hover{ background: color-mix(in oklab, var(--tpl-primary) 92%, black); }
 .tpl-primary:active{ transform: translateY(1px); }
 .tpl-primary:focus-visible{
   outline: none;
-  box-shadow: 0 0 0 4px var(--ring);
+  box-shadow: 0 0 0 4px var(--tpl-ring);
 }
-.tpl-primary:disabled{
-  opacity: .6;
-  cursor: default;
-  box-shadow: none;
+.tpl-primary:disabled{ opacity: .6; cursor: default; box-shadow: none; }
+
+/* =========================================================
+   Responsive / Container queries
+   ========================================================= */
+
+/* Compactar densidad cuando el contenedor es angosto */
+@container (max-width: 640px){
+  .tpl-form{
+    padding: clamp(14px, 3vw, 20px);
+    gap: 12px;
+  }
+  .tpl-input{ block-size: max(40px, calc(var(--tpl-input-h) - 4px)); }
 }
 
-/* =========================
-   Feedback
-   ========================= */
-.tpl-hint{
-  color: var(--muted);
-  font-size: .85rem;
-}
-.tpl-error{
-  color: #b91c1c;
-  font-weight: 600;
-  font-size: .9rem;
+/* Más respiro tipográfico en contenedores amplios */
+@container (min-width: 920px){
+  .tpl-title{ font-size: clamp(1.8rem, 2vw, 2.2rem); }
 }
 
-/* =========================
-   Responsive
-   ========================= */
-@media (max-width: 640px){
-  .tpl-form{ width: min(100%, 96vw); padding: 14px; gap: 12px; }
-  .tpl-actions{ justify-content: stretch; }
-  .tpl-primary{ width: 100%; }
-}
-@media (min-width: 768px){
-  .tpl-form{ inline-size: clamp(560px, 80vw, 1200px); }
-}
-@media (min-width: 1280px){
-  .tpl-form{ inline-size: clamp(720px, 70vw, 1280px); }
+/* Accesibilidad: reduce motion si aplica */
+@media (prefers-reduced-motion: reduce){
+  .tpl-input, .tpl-primary{ transition: none; }
 }

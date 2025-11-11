@@ -1,18 +1,17 @@
 .users-page{
-  --ink:#0f172a;
-  --muted:#64748b;
-  --bg:#f5f7fb;
-  --card:#fff;
-  --bd:#d1d5db;
-  --bd-strong:#9ca3af;
-  --primary:#243b7a;                 
-  --danger:#b91c1c;
-  --radius:14px;
-  --shadow:0 12px 28px rgba(2,6,23,.08);
-
-  background: transparent;
   padding: 16px;
-  color: var(--ink);
+  --card:      var(--surface);
+  --ink:       var(--ink, #0f172a);
+  --muted:     var(--muted, #64748b);
+  --bd:        var(--border, #e5e7f0);
+  --shadow:    var(--shadow, 0 10px 30px rgba(0,0,0,.08));
+  --radius:    var(--radius, 14px);
+  --primary:   var(--primary, #3b82f6);
+  --ring:      var(--ring, rgba(59,130,246,.28));
+  --danger:     #dc2626;
+  --dangerRing:var(--danger-ring, rgba(220,38,38,.18));
+  --pad:       var(--page-pad, 16px);
+  --gap:       var(--gap, 14px);
 }
 
 .users-header{
@@ -48,7 +47,7 @@
 }
 .icon-btn:hover{ background: #f1f5f9; border-color: var(--bd-strong); }
 .icon-btn:active{ transform: translateY(1px); }
-.icon-btn.danger{ color: var(--danger); border-color: #e5e7eb; background: #fff; }
+.icon-btn.danger{ color: var(--danger); border-color: var(--danger); background: #fff; }
 .icon-btn.danger:hover{ background: #fff1f1; }
 
 .users-search{
@@ -108,8 +107,8 @@
 .users-table thead th{
   position: sticky;
   top: 0;
-  background: #2f4a73;         /* header azul */
-  color: #e8eef8;
+  background: var(--surface);         /* header azul */
+  color: var(--ink);
   padding: 10px 12px;
   text-align: center;
 }
@@ -123,9 +122,6 @@
 
 .users-table tbody tr{ height: auto; }
 
-.users-table tbody tr:nth-child(odd){
-  background: #fff;
-}
 
 .cell-name{
   white-space: normal;          

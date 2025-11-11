@@ -1,62 +1,101 @@
-.modal-overlay {
+/* ===== Modal (usa tokens globales) ===== */
+.modal-overlay{
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.4);
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: color-mix(in oklab, var(--ink, #0f172a) 30%, transparent);
   z-index: 999;
 }
 
-.modal-container {
-  background: #fff;
-  padding: 25px 30px;
-  border-radius: 12px;
-  width: 400px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+/* Card del modal */
+.modal-container{
+  background: var(--surface, #ffffff);
+  color: var(--ink, #0f172a);
+  border: 1px solid var(--bd, #e5e7eb);
+  border-radius: var(--radius-3xl, var(--radius, 12px));
+  padding: clamp(16px, 2.2vw, 24px);
+  width: min(440px, 92vw);
+  box-shadow: var(--shadow, 0 6px 20px rgba(0,0,0,.15));
 }
 
-.modal-form label {
+/* Formulario */
+.modal-form label{
   display: flex;
   flex-direction: column;
-  margin-bottom: 15px;
-  font-weight: 500;
+  gap: 6px;
+  margin-bottom: 12px;
+  font-weight: 600;
+  color: var(--ink, #0f172a);
 }
 
-.modal-form input {
-  padding: 8px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  margin-top: 5px;
+.modal-form input{
+  appearance: none;
+  border: 1px solid var(--bd, #e5e7eb);
+  background: var(--field-bg, #ffffff);
+  color: var(--ink, #0f172a);
+  border-radius: 10px;
+  padding: 10px 12px;
+  outline: none;
+  transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
+  min-width: 0;
+}
+.modal-form input::placeholder{ color: color-mix(in oklab, var(--muted, #6b7280) 85%, transparent); }
+.modal-form input:hover{ border-color: var(--bd-strong, #d1d5db); }
+.modal-form input:focus{
+  border-color: color-mix(in oklab, var(--primary, #3b82f6) 55%, var(--bd, #e5e7eb) 45%);
+  box-shadow: 0 0 0 4px var(--ring, rgba(59,130,246,.25));
 }
 
-.modal-buttons {
+/* Botonera */
+.modal-buttons{
   display: flex;
   justify-content: flex-end;
   gap: 10px;
+  margin-top: 6px;
 }
 
-.modal-buttons button {
-  padding: 8px 14px;
-  border: none;
-  border-radius: 6px;
+/* Botón primario */
+.modal-buttons .btn-primary{
+  appearance: none;
+  border: 1px solid var(--primary, #3b82f6);
+  background: var(--primary, #3b82f6);
+  color: var(--primary-ink, #fff);
+  font-weight: 700;
+  padding: 10px 14px;
+  border-radius: 10px;
   cursor: pointer;
+  box-shadow: var(--shadow, 0 6px 20px rgba(0,0,0,.12));
+  transition: transform .05s ease, filter .15s ease, box-shadow .18s ease;
+}
+.modal-buttons .btn-primary:hover{ box-shadow: 0 0 0 6px var(--ring, rgba(59,130,246,.25)); filter: brightness(1.03); }
+.modal-buttons .btn-primary:active{ transform: translateY(1px); }
+
+/* Botón secundario */
+.modal-buttons .btn-cancelar{
+  appearance: none;
+  border: 1px solid var(--bd, #e5e7eb);
+  background: color-mix(in oklab, var(--field-bg, #ffffff) 92%, transparent);
+  color: var(--ink, #0f172a);
+  font-weight: 700;
+  padding: 10px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: transform .05s ease, filter .15s ease, box-shadow .18s ease, border-color .15s;
+}
+.modal-buttons .btn-cancelar:hover{ border-color: var(--bd-strong, #d1d5db); box-shadow: 0 0 0 4px var(--ring, rgba(59,130,246,.15)); }
+.modal-buttons .btn-cancelar:active{ transform: translateY(1px); }
+
+/* Texto de error */
+.error-text{
+  color: color-mix(in oklab, var(--primary, #3b82f6) 35%, var(--ink, #0f172a) 65%);
+  font-size: .92rem;
+  margin-bottom: 8px;
 }
 
-.modal-buttons button:first-child {
-  background-color: #0078d4;
-  color: white;
-}
-
-.btn-cancelar {
-  background-color: #ccc;
-}
-
-.error-text {
-  color: red;
-  font-size: 0.9rem;
-  margin-bottom: 10px;
+/* Accesibilidad / responsive */
+@media (prefers-reduced-motion: reduce){
+  .modal-form input,
+  .modal-buttons .btn-primary,
+  .modal-buttons .btn-cancelar{ transition: none; }
 }

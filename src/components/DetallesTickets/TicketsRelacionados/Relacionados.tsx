@@ -94,11 +94,11 @@ export default function TicketsAsociados({title = "Tickets Asociados", ticket, e
                     <span className="ta-list__dash" aria-hidden>-</span>
                     {onSelect ? (
                       <button type="button" className="ta-link ta-link--button" onClick={(e) => handleClick(e, padre)}>
-                        {padre.Title} <span className="ta-link__muted">- ID: {padre.ID}</span>
+                        {padre.Title} <span className="ta-link__muted"> {" → "} ID: {padre.ID}</span>
                       </button>
                     ) : (
                       <a className="ta-link" href={href(padre.ID ?? "")}>
-                        {padre.Title} <span className="ta-link__muted">- ID: {padre.ID}</span>
+                        {padre.Title} <span className="ta-link__muted">{" → "} ID: {padre.ID}</span>
                       </a>
                     )}
                   </li>
@@ -118,11 +118,11 @@ export default function TicketsAsociados({title = "Tickets Asociados", ticket, e
                       <span className="ta-list__dash" aria-hidden>-</span>
                       {onSelect ? (
                         <button type="button" className="ta-link ta-link--button" onClick={(e) => handleClick(e, t)}>
-                          {t.Title} <span className="ta-link__muted">- ID: {t.ID}</span>
+                          {t.Title} <span className="ta-link__muted">{" → "} ID: {t.ID}</span>
                         </button>
                       ) : (
                         <a className="ta-link" href={href(t.ID ?? "")}>
-                          {t.Title} <span className="ta-link__muted">- ID: {t.ID}</span>
+                          {t.Title} <span className="ta-link__muted">{" → "} ID: {t.ID}</span>
                         </a>
                       )}
                     </li>

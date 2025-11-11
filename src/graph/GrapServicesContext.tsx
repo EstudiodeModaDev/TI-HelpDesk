@@ -222,7 +222,7 @@ export const GraphServicesProvider: React.FC<ProviderProps> = ({ children, confi
     const Tareas               = new TareasService(graph, hd.hostname,     hd.sitePath,  lists.Tareas);
     const Inventario           = new InventarioService(graph, hd.hostname, hd.sitePath,  lists.Inventario);
     const DistribucionFactura  = new DistribucionFacturaService(graph, hd.hostname, hd.sitePath, lists.DistribucionFactura);
-    const TipsInicio                 = new TipsService(graph, hd.hostname, hd.sitePath, lists.TipsInicio)
+    const TipsInicio           = new TipsService(graph, hd.hostname, hd.sitePath, lists.TipsInicio)
 
     // TEST
     const PazYSalvos           = new PazSalvosService(graph, test.hostname, test.sitePath, lists.PazYSalvos);

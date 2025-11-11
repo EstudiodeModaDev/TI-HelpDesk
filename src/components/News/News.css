@@ -1,41 +1,40 @@
 /* =========================
-   Scope + Tokens Light/Dark
+   Scope + Tokens (hereda de la app)
    ========================= */
 .an-scope{
-  /* controla UI nativa (inputs/scrollbars) */
+  /* UI nativa (inputs/scrollbars) */
   color-scheme: light;
-  --bg: #f8fafc;
-  --bg-elev: #ffffff;
-  --ink: #0f172a;
-  --muted: #64748b;
-  --border: #e2e8f0;
-  --shadow: 0 8px 24px rgba(2,6,23,.06);
 
-  --primary: #4f46e5;
-  --primary-ink: #ffffff;
-  --primary-hover: #4338ca;
-  --ring: rgba(79,70,229,.35);
+  /* Aliases locales → tokens globales (sin colores fijos) */
+  --bg:            var(--surface);
+  --bg-elev:       var(--surface);
+  --ink:           var(--ink, #0f172a);
+  --muted:         var(--muted, #64748b);
+  --border:        var(--bd, #e2e8f0);
+  --shadow:        var(--shadow, 0 8px 24px rgba(2,6,23,.06));
 
-  --radius: 14px;
-  --pad: 16px;
-  --gap: 14px;
-  --input-h: 44px;
-  --font: system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif;
+  --primary:       var(--primary, #4f46e5);
+  --primary-ink:   var(--on-primary, #ffffff);
+  --primary-hover: var(--primary-hover, color-mix(in oklab, var(--primary) 86%, black));
+  --ring:          var(--ring, rgba(79,70,229,.35));
+
+  --danger:        var(--danger, #dc2626);
+  --danger-ring:   var(--danger-ring, rgba(220,38,38,.18));
+
+  --radius:        var(14px);
+  --pad:           var(--page-pad, 16px);
+  --gap:           var(--gap, 14px);
+  --input-h:       var(--input-h, 44px);
+  --font:          var(--font, system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif);
+  --content-max: var(--content-max, 1500px);      /* ⬅️ ancho máximo del form */
+  --editor-min:  var(--editor-min, clamp(320px, 42vh, 560px));
+
 }
 
+/* El tema oscuro lo resuelve tu sistema de tokens globales.
+   Aquí solo forzamos el color-scheme del navegador. */
 .an-scope[data-theme="dark"]{
   color-scheme: dark;
-  --bg: #0e141b;
-  --bg-elev: #0f1821;
-  --ink: #e6edf5;
-  --muted: #9fb0c7;
-  --border: #233142;
-  --shadow: 0 10px 30px rgba(0,0,0,.25);
-
-  --primary: #60a5fa;
-  --primary-ink: #0a1220;
-  --primary-hover: #3b82f6;
-  --ring: rgba(96,165,250,.35);
 }
 
 /* =========================
@@ -46,13 +45,13 @@
   display: grid;
   place-items: center;
   padding: clamp(12px, 2vw, 24px);
-  background: transparent;
+  background: transparent;      /* deja ver el page-bg global */
   color: var(--ink);
   font-family: var(--font);
 }
 
 .an-form{
-  inline-size: clamp(320px, 92vw, 1200px);      /* responsive fluido */
+  inline-size: min(var(--content-max), 100vw);
   max-block-size: calc(100dvh - 2 * clamp(12px, 2vw, 24px));
   overflow: auto;
 
@@ -61,6 +60,7 @@
   border-radius: calc(var(--radius) + 2px);
   box-shadow: var(--shadow);
   padding: clamp(16px, 2.2vw, 28px);
+
   display: grid;
   gap: max(14px, 1.2vw);
 }
@@ -99,7 +99,7 @@
   box-shadow: 0 0 0 3px var(--ring);
 }
 
-/* Fila 2 columnas para fechas */
+/* Filas */
 .an-row{
   display: grid;
   gap: var(--gap);
@@ -130,8 +130,8 @@
   color: var(--ink) !important;
 }
 .an-editorWrapper.is-invalid{
-  border-color: #dc2626;
-  box-shadow: 0 0 0 3px rgba(220,38,38,.12);
+  border-color: var(--danger);
+  box-shadow: 0 0 0 3px var(--danger-ring);
 }
 
 /* Acciones */
@@ -163,12 +163,12 @@
   opacity: .6; cursor: default; box-shadow: none;
 }
 
-/* Feedback */
+/* Feedback (usa tokens) */
 .an-error{
-  color: #b91c1c; /* claro */
+  color: var(--danger);
   font-weight: 600;
   font-size: .9rem;
 }
 .an-scope[data-theme="dark"] .an-error{
-  color: #fecaca; /* contraste en dark */
+  color: color-mix(in oklab, var(--danger) 84%, white);
 }

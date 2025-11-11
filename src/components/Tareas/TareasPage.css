@@ -1,127 +1,76 @@
-/* ==========================================================================
-   1) Scope + tokens (forzamos tema claro con tus variables)
-   ========================================================================== */
-
-.tareas-page,
-.tareas-page .ft-scope,
-.tareas-page .lt-scope{
-  color-scheme: light;
-  isolation: isolate;
-
-  --bg: #ffffff;
-  --surface: #ffffff;
-  --border: #e5e7eb;
-  --ink: #0f172a;
-  --muted: #64748b;
-  --field-bg: #f8fafc;
-  --field-bg-disabled: #f1f5f9;
-  --ring: rgba(37, 99, 235, .35);
-  --primary: #2563eb;
-  --primary-ink: #ffffff;
-  --danger: #dc2626;
-  --radius: 14px;
-  --shadow: 0 12px 28px rgba(2, 6, 23, .08);
-
-  /* Layout tokens */
-  --gap: 24px;
-  --pad: 18px;
-  --col-left: 340px;
-  --col-right: 300px;
-}
-
-/* Mantiene los mismos valores en modo oscuro */
-@media (prefers-color-scheme: dark){
-  .tareas-page,
-  .tareas-page .ft-scope,
-  .tareas-page .lt-scope{
-    --bg: #ffffff !important;
-    --surface: #ffffff !important;
-    --border: #e5e7eb !important;
-    --ink: #0f172a !important;
-    --muted: #64748b !important;
-    --field-bg: #f8fafc !important;
-    --field-bg-disabled: #f1f5f9 !important;
-    --ring: rgba(37, 99, 235, .35) !important;
-    --primary: #2563eb !important;
-    --primary-ink: #ffffff !important;
-    --danger: #dc2626 !important;
-    --radius: 14px !important;
-    --shadow: 0 12px 28px rgba(2, 6, 23, .08) !important;
-  }
-}
-
-/* ==========================================================================
-   2) Estructura principal
-   ========================================================================== */
-
-/* Fondo general limpio (sin color, sin sombra) */
+/* ===============================
+   Layout Tareas (centrado)
+   =============================== */
 .tareas-page{
-  background: transparent;
-  color: var(--ink);
-  padding: 24px;
-  box-sizing: border-box;
-  min-height: 100vh;
+  --pad: clamp(12px, 2vw, 18px);
+  --gap: clamp(12px, 1.8vw, 16px);
+  --radius: var(--radius, 14px);
+  --bd: var(--border, #e5e7eb);
+  --card: var(--surface, #fff);
+  --ink: var(--ink, #0f172a);
+
   display: grid;
-  grid-template-columns: var(--col-left) 1fr var(--col-right);
+  grid-template-columns: 1fr;   /* contenedor en una columna */
   gap: var(--gap);
-  align-items: start;
-}
-
-/* ==========================================================================
-   3) Paneles (los 3 hijos principales)
-   ========================================================================== */
-
-.tareas-page > *{
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
   padding: var(--pad);
+  align-items: start;
+  container-type: inline-size;
+  overflow-x: hidden;
+
+}
+
+/* ====== Fila 1: SIEMPRE 2 columnas + centradas ====== */
+.tareas-page .fila-1{
+  grid-column: 1 / -1;
+  display: grid;
+  /* Tracks con ancho máximo para poder centrarlos */
+  grid-template-columns: repeat(2, minmax(280px, 520px));
+  gap: var(--gap);
+  align-items: center;
+
+  /* CENTRADO HORIZONTAL de los tracks */
+  justify-content: center;     /* centra el conjunto de columnas */
+  justify-items: stretch;      /* cada item ocupa su track */
+
+  /* Si no hay ancho suficiente, scroll suave */
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x proximity;
+  padding-bottom: 4px;
+    overflow: hidden;
+}
+
+/* Encaje al hacer scroll */
+.tareas-page .fila-1 > *{ scroll-snap-align: start; }
+
+/* ====== Fila 2: Status centrado y a todo el ancho útil ====== */
+.tareas-page .fila-2{
+  display: grid;
+  place-content: center; /* centra la celda en el grid */
+  padding-inline: var(--pad);
+  overflow: visible;
+}
+
+/* Card look opcional (todo via tokens) */
+.tareas-page .fila-1 > *,
+.tareas-page .fila-2 > *{
+  background: var(--card);
+  color: var(--ink);
   min-width: 0;
-  width: 100%;             /* todos mismo ancho en su grid cell */
-  box-sizing: border-box;
+  width: 100%;
+  max-width: 1200px;            /* armoniza con los tracks */
+
 }
 
-/* Laterales sticky */
-.tareas-page > :nth-child(1),
-.tareas-page > :nth-child(3){
-  position: sticky;
-  top: 20px;
-}
-
-/* Ajuste visual del panel central */
-.tareas-page > :nth-child(2){
-  padding: calc(var(--pad) + 4px);
-}
-
-/* ==========================================================================
-   4) Responsividad
-   ========================================================================== */
-
-/* 2 columnas (form + lista) y resumen abajo */
-@media (max-width: 1023px){
+/* ===============================
+   Ajustes para pantallas estrechas
+   =============================== */
+@container (max-width: 640px){
   .tareas-page{
-    grid-template-columns: var(--col-left) 1fr;
-    grid-template-areas:
-      "left center"
-      "right right";
+    --pad: clamp(8px, 3vw, 12px);
+    --gap: clamp(8px, 2.5vw, 12px);
   }
-  .tareas-page > :nth-child(1){ grid-area: left; }
-  .tareas-page > :nth-child(2){ grid-area: center; }
-  .tareas-page > :nth-child(3){
-    grid-area: right;
-    position: static;
-    margin-top: var(--gap);
-  }
-}
-
-/* 1 columna apilado */
-@media (max-width: 767px){
-  .tareas-page{
-    grid-template-columns: 1fr;
-  }
-  .tareas-page > *{
-    position: static;
-    width: 100%;
+  .tareas-page .fila-1{
+    grid-template-columns: repeat(2, minmax(260px, 440px)); /* siguen 2, pero más compactas */
   }
 }

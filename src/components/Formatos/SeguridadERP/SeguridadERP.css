@@ -1,163 +1,208 @@
-/* ========= Paleta y tokens globales (fallback) ========= */
-:root{
-  --card-bg:#fff; --card-bd:#e5e7eb; --ink:#0f172a; --muted:#6b7280;
-  --primary:#2d6df6; --primary-ink:#fff; --ring:rgba(45,109,246,.42);
-  --radius:14px; --shadow:0 12px 28px rgba(2,6,23,.08);
-}
-@media (prefers-color-scheme: dark){
-  :root{
-    --card-bg:#0f172a; --card-bd:#1f2937; --ink:#e5e7eb; --muted:#9ca3af;
-    --shadow:0 16px 34px rgba(0,0,0,.35);
-  }
+/* =========================================================
+   ERP — Solicitud de perfiles/permiso (tokens-only)
+   ========================================================= */
+
+/* Scope / reset suave */
+.erp-scope, .erp-scope *{
+  box-sizing: border-box;
+  min-width: 0;
 }
 
-/* ========= Scope: forzar tema CLARO solo en ERP ========= */
-.erp-scope{
-  /* bloquea modo oscuro automático */
-  color-scheme: light;
-  isolation: isolate;
-
-  /* tokens fijos para claro */
-  --card-bg:#ffffff;
-  --card-bd:#e5e7eb;
-  --ink:#0f172a;
-  --muted:#6b7280;
-  --primary:#2d6df6;
-  --primary-ink:#ffffff;
-  --ring:rgba(45,109,246,.42);
-  --radius:14px;
-  --shadow:0 12px 28px rgba(2,6,23,.08);
-}
-
-/* asegura que, aunque el SO esté en dark, el scope siga claro */
-@media (prefers-color-scheme: dark){
-  .erp-scope{
-    --card-bg:#ffffff !important;
-    --card-bd:#e5e7eb !important;
-    --ink:#0f172a !important;
-    --muted:#6b7280 !important;
-    --primary:#2d6df6 !important;
-    --primary-ink:#ffffff !important;
-    --ring:rgba(45,109,246,.42) !important;
-    --shadow:0 12px 28px rgba(2,6,23,.08) !important;
-    background:#ffffff !important;
-  }
-}
-
-/* ========= Card ========= */
+/* Contenedor tarjeta */
 .erp-card{
-  background:var(--card-bg);
-  border:1px solid var(--card-bd);
-  border-radius:var(--radius);
-  box-shadow:var(--shadow);
-  padding:18px;
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--bd);
+  border-radius: var(--radius, 18px);
+  box-shadow: var(--shadow);
+  padding: clamp(14px, 2vw, 18px);
+  display: grid;
+  gap: clamp(12px, 1.8vw, 16px);
+  container-type: inline-size;
 }
 
+/* Título */
 .erp-title{
-  margin:0 0 14px; 
-  text-align:center; 
-  color:var(--ink); 
-  font-weight:800;
+  margin: 0;
+  font-weight: 800;
+  letter-spacing: .2px;
+  color: var(--ink);
+  font-size: clamp(18px, 2vw, 22px);
 }
 
-/* ========= Tabla (grid) ========= */
-.erp-table{ display:grid; gap:10px; }
-.erp-header, .erp-row{
-  display:grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr 1.1fr 1.1fr 1.2fr 110px;
-  gap:10px; 
-  align-items:center;
+/* =============================
+   Tabla responsive (grid)
+   ============================= */
+.erp-table{
+  border: 1px solid var(--bd);
+  border-radius: 12px;
+  overflow: auto;                 /* scroll si no cabe */
+  background: color-mix(in oklab, var(--surface-elev) 95%, transparent);
 }
+
+/* 8 columnas base */
+.erp-header,
+.erp-row{
+  display: grid;
+  grid-template-columns:
+    minmax(180px, 1.1fr)  /* Nombre del perfil */
+    minmax(160px, 1fr)    /* Método general */
+    minmax(160px, 1fr)    /* Método específico */
+    minmax(180px, 1.2fr)  /* Permiso específico */
+    minmax(180px, 1.1fr)  /* Usuario (nombre) */
+    minmax(200px, 1.1fr)  /* Usuario (correo) */
+    minmax(200px, 1.2fr)  /* Observaciones */
+    minmax(120px, .6fr);  /* Acciones */
+  gap: 0;                  /* separadores con bordes */
+  min-width: 1024px;       /* evita compactar columnas */
+}
+
+/* Header */
 .erp-header{
-  color:var(--muted); 
-  font-weight:700; 
-  font-size:.95rem;
-  padding-bottom:4px; 
-  border-bottom:1px dashed var(--card-bd);
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--surface);
+  border-bottom: 2px solid var(--bd);
 }
-.erp-cell{ width:100%; }
-
-/* ========= Campos ========= */
-.erp-input, .erp-select{
-  width:100%; 
-  min-height:38px; 
-  padding:8px 10px;
-  border:1px solid var(--card-bd); 
-  border-radius:10px;
-  background:transparent; 
-  color:var(--ink);
-  outline:none; 
-  box-sizing:border-box;
-  transition:border-color .2s, box-shadow .2s;
-}
-.erp-input:focus, .erp-select:focus{
-  border-color:var(--primary);
-  box-shadow:0 0 0 3px var(--ring);
+.erp-header .erp-cell{
+  font-weight: 800;
+  color: var(--ink);
+  padding: 10px 12px;
 }
 
-/* ⇨ Asegura fondo claro de inputs/selects dentro del scope */
-.erp-scope .erp-input,
-.erp-scope .erp-select{
-  background:#fff !important;
-  color:var(--ink) !important;
-  border-color:var(--card-bd) !important;
+/* Filas */
+.erp-row{
+  background: color-mix(in oklab, var(--surface) 98%, transparent);
+  border-bottom: 1px solid var(--bd);
 }
-.erp-scope .erp-input::placeholder{ color:var(--muted) !important; }
+.erp-row:last-child{ border-bottom: 0; }
 
-/* ========= Acciones por fila ========= */
-.erp-cell--acciones{ text-align:center; }
-
-/* ========= Botones ========= */
-.erp-actions{ 
-  display:flex; 
-  gap:10px; 
-  justify-content:center; 
-  margin-top:12px; 
+/* Celdas */
+.erp-cell{
+  padding: 8px 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
+.erp-cell--acciones{
+  justify-content: flex-end;
+}
+
+/* Inputs de celda */
+.erp-input{
+  width: 100%;
+  background: var(--field-bg);
+  color: var(--ink);
+  border: 1px solid var(--bd);
+  border-radius: 10px;
+  padding: 8px 10px;
+  outline: none;
+  transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
+}
+.erp-input::placeholder{
+  color: color-mix(in oklab, var(--muted) 85%, transparent);
+}
+.erp-input:focus{
+  border-color: color-mix(in oklab, var(--primary) 55%, var(--bd) 45%);
+  box-shadow: 0 0 0 4px var(--ring);
+  background: var(--field-bg);
+}
+
+/* =============================
+   Acciones / Botones
+   ============================= */
+.erp-actions{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
 .erp-btn{
-  border:1px solid var(--card-bd); 
-  background:#fff; 
-  color:var(--ink);
-  border-radius:10px; 
-  padding:10px 14px; 
-  cursor:pointer;
-  transition: filter .15s, box-shadow .2s, transform .05s, background .15s;
+  appearance: none;
+  border: 1px solid var(--bd);
+  background: color-mix(in oklab, var(--field-bg) 92%, transparent);
+  color: var(--ink);
+  font-weight: 800;
+  padding: 10px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: transform .06s ease, filter .15s ease, box-shadow .18s ease;
 }
-.erp-btn:hover{ filter:brightness(.98); }
+.erp-btn:hover{ box-shadow: 0 0 0 6px var(--ring); filter: brightness(1.03); }
 .erp-btn:active{ transform: translateY(1px); }
-.erp-btn:disabled{ opacity:.6; cursor:not-allowed; }
 
-/* variantes */
 .erp-btn--primary{
-  background:var(--primary); 
-  color:var(--primary-ink); 
-  border-color:transparent;
-  box-shadow:0 8px 20px rgba(45,109,246,.35);
+  border-color: var(--primary);
+  background: var(--primary);
+  color: var(--primary-ink);
 }
-.erp-btn--primary:hover{ filter:brightness(.96); box-shadow:0 10px 24px rgba(45,109,246,.40); }
-
 .erp-btn--ghost{
-  background:transparent; 
-  color:var(--ink); 
-  border:1px solid var(--card-bd);
+  border-color: var(--bd);
+  background: color-mix(in oklab, var(--field-bg) 92%, transparent);
 }
 
-/* ⇨ Asegura estilos de botones claros dentro del scope */
-.erp-scope .erp-btn{ background:#fff; color:var(--ink); border-color:var(--card-bd); }
-.erp-scope .erp-btn--primary{ background:var(--primary); color:var(--primary-ink); border-color:transparent; }
-.erp-scope .erp-btn--ghost{ background:transparent; color:var(--ink); border-color:var(--card-bd); }
-
-/* ========= Error ========= */
+/* Estado envío / error */
+.erp-btn[disabled]{ opacity: .6; cursor: not-allowed; }
 .erp-error{
-  margin-top:8px; 
-  background:#fde8e8; 
-  border:1px solid #f5c2c2;
-  color:#7a1f1f; 
-  padding:10px 12px; 
-  border-radius:10px;
+  color: color-mix(in oklab, var(--primary) 40%, var(--ink) 60%);
+  font-weight: 700;
 }
 
-/* ========= Responsive ========= */
-@media (max-width: 1200px){
-  .erp-header, .erp-row{ grid-template-columns: 1fr 1fr; }
+/* =============================
+   Adaptativo (container queries)
+   ============================= */
+
+/* Compacta paddings y alturas en contenedores medianos */
+@container (max-width: 1200px){
+  .erp-cell{ padding: 6px 8px; }
+  .erp-input{ padding: 8px 10px; }
+}
+
+/* Vista tipo “cards” por fila en contenedores angostos */
+@container (max-width: 860px){
+  .erp-header{ display: none; }
+  .erp-row{
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+    padding: 10px;
+    border-bottom: 1px solid var(--bd);
+  }
+  .erp-cell{
+    display: grid;
+    grid-template-columns: 160px 1fr;
+    align-items: center;
+    gap: 8px;
+    padding: 0;
+  }
+  .erp-cell::before{
+    content: attr(role) attr(data-label);
+  }
+  /* Mejores labels: define data-label en HTML vía JS o con CSS por nth-child */
+  .erp-row .erp-cell:nth-child(1)::before{ content: "Nombre del perfil"; color: var(--muted); font-weight: 700; }
+  .erp-row .erp-cell:nth-child(2)::before{ content: "Método general"; color: var(--muted); font-weight: 700; }
+  .erp-row .erp-cell:nth-child(3)::before{ content: "Método específico"; color: var(--muted); font-weight: 700; }
+  .erp-row .erp-cell:nth-child(4)::before{ content: "Permiso específico"; color: var(--muted); font-weight: 700; }
+  .erp-row .erp-cell:nth-child(5)::before{ content: "Usuario (nombre)"; color: var(--muted); font-weight: 700; }
+  .erp-row .erp-cell:nth-child(6)::before{ content: "Usuario (correo)"; color: var(--muted); font-weight: 700; }
+  .erp-row .erp-cell:nth-child(7)::before{ content: "Observaciones"; color: var(--muted); font-weight: 700; }
+  .erp-row .erp-cell:nth-child(8){
+    grid-template-columns: 1fr; 
+    justify-content: flex-end;
+  }
+  .erp-cell--acciones{
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+}
+
+/* Aún más compacto: botones full-width */
+@container (max-width: 560px){
+  .erp-actions{ justify-content: stretch; }
+  .erp-btn{ width: 100%; }
 }

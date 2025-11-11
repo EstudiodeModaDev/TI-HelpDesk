@@ -8,7 +8,7 @@ export default function ComprasPage() {
   const [mostrarLista, setmostrarLista] = React.useState<boolean>(true); // ← por defecto FORM
 
   return (
-    <div className="compra-wrap force-light" data-darkreader-ignore>
+    <div className="compra-wrap">
 
       {!mostrarLista ? (
         <section id="compras-form" aria-labelledby="compras-form-title">

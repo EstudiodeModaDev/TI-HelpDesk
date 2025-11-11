@@ -1,246 +1,101 @@
-/* =========================
-   0) TOKENS / THEMING
-   ========================= */
+/* =========================================================
+   COMPRAS PAGE — usa tokens globales (dark/light)
+   ========================================================= */
 
-/* Por defecto: claro */
-:root{
-  --bg: #f6f8fc;
-  --surface: #ffffff;
-  --ink: #0f172a;
-  --muted: #64748b;
-  --border: #d1d5db;
-  --shadow: 0 10px 28px rgba(2,6,23,.08);
-
-  --primary: #2563eb;
-  --primary-ink: #ffffff;
-
-  --success: #16a34a;
-  --warning: #d97706;
-  --danger:  #b91c1c;
-
-  --radius: 14px;
-  --gap: 14px;
-  --pad: 16px;
-  --font: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-  --container-max: 1280px; 
-  --container-pad: clamp(12px, 3vw, 24px);
+/* Utilidad de accesibilidad (para tus h2 con sr-only) */
+.sr-only{
+  position: absolute !important;
+  inline-size: 1px !important;
+  block-size: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0 0 0 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
 }
 
-/* Oscuro (habilita con .theme-dark en body o en un contenedor ancestro) */
-.theme-dark{
-  --bg: #f6f8fc;
-  --surface: #ffffff;
-  --ink: #0f172a;
-  --muted: #64748b;
-  --border: #d1d5db;
-  --shadow: 0 10px 28px rgba(2,6,23,.08);
-
-  --primary: #2563eb;
-  --primary-ink: #ffffff;
-
-  --success: #16a34a;
-  --warning: #d97706;
-  --danger:  #b91c1c;
-
-  --radius: 14px;
-  --gap: 14px;
-  --pad: 16px;
-  --font: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-}
-
-.force-light, .force-light * { 
-  /* Reinyecta variables del tema claro cuando el ancestro sea oscuro */
-  --bg: #f6f8fc;
-  --surface: #ffffff;
-  --ink: #0f172a;
-  --muted: #64748b;
-  --border: #d1d5db;
-  --shadow: 0 10px 28px rgba(2,6,23,.08);
-  --primary: #2563eb;
-  --primary-ink: #ffffff;
-  --success: #16a34a;
-  --warning: #d97706;
-  --danger:  #b91c1c;
-  --radius: 14px;
-  --gap: 14px;
-  --pad: 16px;
-  --font: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-}
-
-.force-dark, .force-dark * {
-  --bg: #0f141a;
-  --surface: #131a22;
-  --ink: #e5eef9;
-  --muted: #9fb0c7;
-  --border: #1f2a36;
-  --shadow: 0 10px 28px rgba(0,0,0,.35);
-  --primary: #3b82f6;
-  --primary-ink: #0b1220;
-  --success: #22c55e;
-  --warning: #f59e0b;
-  --danger:  #ef4444;
-  --radius: 14px;
-  --gap: 14px;
-  --pad: 16px;
-  --font: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-}
-
-/* =========================
-   1) LAYOUT / CONTENEDOR
-   ========================= */
-
+/* ---------- Wrapper general ---------- */
 .compra-wrap{
-  font-family: var(--font);
   color: var(--ink);
   background: transparent;
-  padding: var(--pad);
   display: grid;
-  gap: var(--gap);
-  inline-size: min(var(--container-max), 100% - 2 * var(--container-pad));
+  gap: clamp(12px, 2.2vw, 20px);
+
+  /* centrado y sin desbordes de 1–2px por la barra vertical */
+  inline-size: clamp(90px, 900, 1500);
   margin-inline: auto;
-  padding: var(--container-pad);
+  padding-inline: clamp(12px, 3vw, 28px);
+  padding-block: clamp(10px, 2vw, 20px);
+
+  overflow-x: clip;   /* evita scroll horizontal por sombras/bordes */
 }
 
-/* Secciones con misma “card” base */
-#compras-form, #compras-tabla{
+/* Quita márgenes verticales de secciones dentro del wrapper */
+.compra-wrap > section{
+  margin: 0;
+}
+
+/* ---------- Panel base (aplica a form y tabla) ---------- */
+.compra-wrap > section{
   background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border: 1px solid var(--bd);
+  border-radius: var(--radius-3xl);
   box-shadow: var(--shadow);
-  padding: clamp(12px, 1.8vw, 20px);
-  transition: background .2s ease, border-color .2s ease, color .2s ease;
+  /* el contenido interno define si scrollea; aquí no forzamos */
+  overflow: visible;
+
+  /* relleno cómodo y responsivo */
+  padding: clamp(14px, 2.2vw, 22px);
+  /* animación sutil al alternar paneles */
+  animation: compras-fade-slide .18s ease both;
 }
 
-/* SR-only si no lo tienes aún */
-.sr-only{
-  position:absolute!important; width:1px; height:1px;
-  padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;
+@keyframes compras-fade-slide{
+  from{ opacity: .0; transform: translateY(6px); }
+  to  { opacity: 1;  transform: translateY(0); }
 }
 
-/* =========================
-   2) TOOLBAR / BOTONES (opcionales)
-   ========================= */
-
-.btn{
-  appearance: none;
-  border: 1px solid var(--border);
-  background: var(--surface);
-  color: var(--ink);
-  border-radius: 10px;
-  padding: 8px 12px;
-  font-size: 0.95rem;
-  line-height: 1;
-  cursor: pointer;
-  transition: transform .06s ease, background .15s ease, border-color .15s ease;
-}
-.btn:hover{ background: color-mix(in srgb, var(--surface) 88%, var(--ink) 12%); }
-.btn:active{ transform: translateY(1px); }
-
-.btn-primary{
-  background: var(--primary);
-  color: var(--primary-ink);
-  border-color: color-mix(in srgb, var(--primary) 70%, #000 30%);
-}
-.btn-primary:hover{
-  background: color-mix(in srgb, var(--primary) 86%, #fff 14%);
+/* ---------- Zonas internas (opcionales) ---------- */
+/* Si tu Tabla/Formulario ya traen padding propio, puedes ajustar aquí */
+#compras-form .panel-body,
+#compras-tabla .panel-body{
+  padding: 0; /* deja que los hijos decidan */
 }
 
-/* Etiquetas y campos genéricos del formulario dentro del card */
-.form-grid{
-  display: grid;
-  grid-template-columns: repeat(12, 1fr);
-  gap: 12px;
+/* Si quieres que solo la tabla tenga scroll vertical interno y
+   el encabezado quede fijo dentro de ese panel, crea un contenedor así:
+   (útil si tu TablaCompras no lo maneja por dentro) */
+#compras-tabla .tabla-scroll{
+  max-block-size: clamp(420px, 60vh, 720px);
+  overflow: auto;
+  scrollbar-width: thin;
 }
-.form-item{
-  grid-column: span 6;
-  display: grid;
-  grid-template-columns: 140px 1fr;
-  align-items: center;
-  gap: 8px;
-}
-.form-item label{
-  color: var(--muted);
-  font-size: .9rem;
-}
-.form-item input,
-.form-item select,
-.form-item textarea{
-  width: 100%;
-  padding: 10px 12px;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  background: color-mix(in srgb, var(--surface) 96%, var(--ink) 4%);
-  color: var(--ink);
+
+/* ---------- Botones / focus dentro del panel (heredan tokens) ---------- */
+.compra-wrap button:focus-visible,
+.compra-wrap [tabindex]:focus-visible,
+.compra-wrap input:focus,
+.compra-wrap select:focus,
+.compra-wrap textarea:focus{
   outline: none;
-}
-.form-item input:focus,
-.form-item select:focus,
-.form-item textarea:focus{
-  border-color: color-mix(in srgb, var(--primary) 60%, var(--border) 40%);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 25%, transparent);
+  box-shadow: 0 0 0 4px var(--ring);
+  border-color: color-mix(in oklab, var(--primary) 55%, var(--bd));
 }
 
-/* =========================
-   3) TABLAS (TablaCompras)
-   ========================= */
-
-.table{
-  width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
-  overflow: hidden;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-}
-.table thead th{
-  text-align: left;
-  font-weight: 600;
-  font-size: .92rem;
-  color: var(--muted);
-  background: color-mix(in srgb, var(--surface) 92%, var(--ink) 8%);
-  padding: 10px 12px;
-  border-bottom: 1px solid var(--border);
-}
-.table tbody td{
-  padding: 10px 12px;
-  border-bottom: 1px solid var(--border);
-}
-.table tbody tr:hover{
-  background: color-mix(in srgb, var(--surface) 88%, var(--ink) 12%);
-}
-.table tbody tr:last-child td{
-  border-bottom: none;
+/* ---------- Responsivo fino ---------- */
+@media (max-width: 960px){
+  .compra-wrap{
+    padding-inline: 14px;
+  }
+  .compra-wrap > section{
+    padding: 14px;
+  }
 }
 
-/* Badges */
-.badge{
-  display: inline-block;
-  padding: 4px 8px;
-  border-radius: 999px;
-  font-size: .78rem;
-  border: 1px solid var(--border);
-  background: color-mix(in srgb, var(--surface) 92%, var(--ink) 8%);
+/* ---------- Seguridad: no permitir que hijos se pasen de ancho ---------- */
+.compra-wrap *{
+  box-sizing: border-box;
+  max-width: 100%;
+  min-width: 0;
 }
-.badge.success{ border-color: color-mix(in srgb, var(--success) 55%, var(--border) 45%); }
-.badge.warn{ border-color: color-mix(in srgb, var(--warning) 55%, var(--border) 45%); }
-.badge.danger{ border-color: color-mix(in srgb, var(--danger) 55%, var(--border) 45%); }
-
-/* =========================
-   4) RESPONSIVE
-   ========================= */
-@media (max-width: 980px){
-  .form-item{ grid-template-columns: 1fr; }
-}
-@media (max-width: 720px){
-  .form-grid{ grid-template-columns: 1fr; }
-  .form-item{ grid-column: 1 / -1; }
-}
-
-/* =========================
-   5) ANIMACIONES SUTILES
-   ========================= */
-#compras-form, #compras-tabla{
-  opacity: 1; transform: translateY(0);
-  will-change: transform, opacity;
-}
-#compras-form[hidden], #compras-tabla[hidden]{ display: none; }

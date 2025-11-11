@@ -178,7 +178,7 @@ function tipoToClass(tipo?: string) {
   const t = (tipo ?? "").toLowerCase();
   if (t.includes("solución") || t.includes("solucion")) return "solucion";
   if (t.includes("seguimiento")) return "seguimiento";
-  if (t.includes("reasign")) return "reasignacion";
+  if (t.includes("creacion")) return "creacion";
   if (t.includes("cierre") || t.includes("cerrado")) return "cierre";
   if (t.includes("sistema")) return "sistema";
   return "default";

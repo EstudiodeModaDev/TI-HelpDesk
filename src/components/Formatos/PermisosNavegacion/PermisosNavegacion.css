@@ -1,206 +1,306 @@
-/* ========= Tokens ========= */
-:root{
-  --card-bg:#fff; --card-bd:#e5e7eb;
-  --ink:#0f172a; --muted:#6b7280;
-  --primary:#22b08f; --primary-ink:#fff; --ring:rgba(34,176,143,.35);
-  --radius:14px; --shadow:0 12px 28px rgba(2,6,23,.08);
-}
-@media (prefers-color-scheme: dark){
-  :root{
-    --card-bg:#0f172a; --card-bd:#1f2937;
-    --ink:#e5e7eb; --muted:#9ca3af;
-    --shadow:0 16px 34px rgba(0,0,0,.35);
-  }
+/* =========================================================
+   PN — Permisos de navegación (tokens-only)
+   ========================================================= */
+
+/* Scope / reset suave */
+.pn-scope, .pn-scope *{
+  box-sizing: border-box;
+  min-width: 0;
+  font: inherit;
 }
 
-/* ========= Card ========= */
-
-/* ========= Scope: forzar tema CLARO solo en PN ========= */
-.pn-scope{
-  /* bloquea modo oscuro automático dentro del scope */
-  color-scheme: light;
-  isolation: isolate;
-
-  /* tokens fijos (tema claro) */
-  --card-bg:#ffffff; --card-bd:#e5e7eb;
-  --ink:#0f172a; --muted:#6b7280;
-  --primary:#22b08f; --primary-ink:#ffffff; --ring:rgba(34,176,143,.35);
-  --shadow:0 12px 28px rgba(2,6,23,.08);
-}
-
-/* Opcional: si hay estilos “oscuros” más específicos,
-   re-afirma los tokens también dentro del media query */
-@media (prefers-color-scheme: dark){
-  .pn-scope{
-    --card-bg:#ffffff; --card-bd:#e5e7eb;
-    --ink:#0f172a; --muted:#6b7280;
-    --primary:#22b08f; --primary-ink:#ffffff; --ring:rgba(34,176,143,.35);
-    --shadow:0 12px 28px rgba(2,6,23,.08);
-  }
-}
-
+/* Card principal */
 .pn-card{
-  background:var(--card-bg);
-  border:1px solid var(--card-bd);
-  border-radius:var(--radius);
-  box-shadow:var(--shadow);
-  padding:18px;
-  overflow:visible;             /* evita cortar el scroll interno */
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--bd);
+  border-radius: var(--radius, 18px);
+  box-shadow: var(--shadow);
+  padding: clamp(14px, 2vw, 18px);
+  display: grid;
+  gap: clamp(12px, 1.8vw, 16px);
+  container-type: inline-size;
 }
 
+/* Título */
 .pn-title{
-  margin:0 0 12px;
-  text-align:center;
-  color:var(--ink);
-  font-weight:800;
+  margin: 0;
+  font-weight: 800;
+  letter-spacing: .2px;
+  color: var(--ink);
+  font-size: clamp(18px, 2vw, 22px);
 }
 
-/* ========= Tabla ========= */
-.pn-table{ display:grid; row-gap:14px; }
-
-/* MISMA plantilla para header y filas (desktop/tablet) */
-.pn-header, .pn-row{
-  display:grid;
-  grid-template-columns:
-    1.1fr                     /* Empleado */
-    1.2fr                     /* Autoriza */
-    repeat(9, minmax(80px, 94px)) /* 9 checks flexibles */
-    1.65fr                    /* Otro (URL) */
-    110px;                    /* Acciones */
-  column-gap:18px;            /* más separación */
-  align-items:center;
+/* =============================
+   Tabla-grid responsive
+   ============================= */
+.pn-table{
+  border: 1px solid var(--bd);
+  border-radius: 12px;
+  overflow: auto; /* scroll si no cabe */
+  background: color-mix(in oklab, var(--surface-elev) 95%, transparent);
 }
 
+/* Columnas:
+   1) Empleado
+   2) Jefe / Quien autoriza
+   3..N) COLS dinámicas (checkbox)
+   N+1) Otro (link)
+   N+2) Acciones
+*/
+.pn-header,
+.pn-row{
+  display: grid;
+  grid-auto-flow: column;
+  /* Base mínima para no compactar las primeras/últimas columnas */
+  grid-auto-columns: minmax(120px, 1fr);
+  column-gap: 0;  /* los separadores los damos con bordes */
+  min-width: 1024px; /* evita que se aplaste todo en layouts angostos */
+}
+
+/* Afinamos anchos típicos de columnas clave */
+.pn-header > .pn-cell:nth-child(1),
+.pn-row   > .pn-cell:nth-child(1){ min-width: 220px; }       /* Empleado */
+.pn-header > .pn-cell:nth-child(2),
+.pn-row   > .pn-cell:nth-child(2){ min-width: 240px; }       /* Jefe */
+.pn-header > .pn-cell:last-child,
+.pn-row   > .pn-cell:last-child{   min-width: 140px; }       /* Acciones */
+.pn-header > .pn-cell:nth-last-child(2),
+.pn-row   > .pn-cell:nth-last-child(2){ min-width: 260px; }  /* Otro (link) */
+
+/* Header pegajoso */
 .pn-header{
-  color:var(--muted);
-  font-weight:700;
-  font-size:.8rem;            /* un poco más pequeña */
-  letter-spacing:.1px;
-  padding:4px 0 10px;
-  border-bottom:1px dashed var(--card-bd);
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--surface);
+  border-bottom: 2px solid var(--bd);
+}
+.pn-header .pn-cell{
+  font-weight: 800;
+  color: var(--ink);
+  padding: 10px 12px;
 }
 
-.pn-cell{ width:100%; }
+/* Filas */
+.pn-row{
+  background: color-mix(in oklab, var(--surface) 98%, transparent);
+  border-bottom: 1px solid var(--bd);
+}
+.pn-row:last-child{ border-bottom: 0; }
 
+/* Celdas */
+.pn-cell{
+  padding: 8px 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 .pn-cell--center{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:0 2px;
+  justify-content: center;
+}
+.pn-cell--acciones{
+  justify-content: flex-end;
 }
 
-/* texto encabezado de los checks */
-.pn-head{
-  display:flex;
-  align-items:flex-end;
-  justify-content:center;
-  text-align:center;
-  font-size:.8rem;
-  line-height:1.1;
-  white-space:normal;
-  word-break:break-word;
-  hyphens:auto;
-  padding-bottom:2px;
-  text-wrap:balance;
-}
+/* No-wrap helper (para headers con saltos controlados) */
+.pn-nowrap{ white-space: nowrap; }
 
-/* ========= Controles ========= */
+/* =============================
+   Campos
+   ============================= */
 .pn-input{
-  width:100%;
-  min-height:38px;
-  padding:8px 10px;
-  border:1px solid var(--card-bd);
-  border-radius:10px;
-  background:transparent;
-  color:var(--ink);
-  outline:none;
-  box-sizing:border-box;
-  transition:border-color .2s, box-shadow .2s;
+  width: 100%;
+  background: var(--field-bg);
+  color: var(--ink);
+  border: 1px solid var(--bd);
+  border-radius: 10px;
+  padding: 8px 10px;
+  outline: none;
+  transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
 }
-.pn-input:focus{ border-color:var(--primary); box-shadow:0 0 0 3px var(--ring); }
-
-.pn-row input[type="checkbox"]{
-  width:18px; height:18px;
-  display:block; margin:auto;
-  accent-color: var(--primary);
+.pn-input::placeholder{
+  color: color-mix(in oklab, var(--muted) 85%, transparent);
+}
+.pn-input:focus{
+  border-color: color-mix(in oklab, var(--primary) 55%, var(--bd) 45%);
+  box-shadow: 0 0 0 4px var(--ring);
 }
 
-/* ========= Botones ========= */
+/* Checkboxes: centrados y con tamaño amigable */
+.pn-cell--center input[type="checkbox"]{
+  inline-size: 18px;
+  block-size: 18px;
+  accent-color: var(--primary); /* usa token para el check */
+}
+
+/* =============================
+   Acciones / botones
+   ============================= */
 .pn-actions{
-  display:flex; gap:12px; justify-content:center; margin-top:12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
 }
+
 .pn-btn{
-  border:1px solid var(--card-bd);
-  background:#fff; color:var(--ink);
-  border-radius:10px; padding:10px 14px; cursor:pointer;
-  transition: filter .15s, box-shadow .2s, transform .05s;
+  appearance: none;
+  border: 1px solid var(--bd);
+  background: color-mix(in oklab, var(--field-bg) 92%, transparent);
+  color: var(--ink);
+  font-weight: 800;
+  padding: 10px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: transform .06s ease, filter .15s ease, box-shadow .18s ease;
 }
-.pn-btn:hover{ filter:brightness(.98); }
+.pn-btn:hover{ box-shadow: 0 0 0 6px var(--ring); filter: brightness(1.03); }
 .pn-btn:active{ transform: translateY(1px); }
-.pn-btn:disabled{ opacity:.6; cursor:not-allowed; }
+
 .pn-btn--primary{
-  background:var(--primary); color:var(--primary-ink); border-color:transparent;
-  box-shadow:0 8px 20px rgba(34,176,143,.35);
+  border-color: var(--primary);
+  background: var(--primary);
+  color: var(--primary-ink);
 }
 .pn-btn--ghost{
-  background:transparent; color:var(--ink); border:1px solid var(--card-bd);
+  border-color: var(--bd);
+  background: color-mix(in oklab, var(--field-bg) 92%, transparent);
 }
+.pn-btn[disabled]{ opacity: .6; cursor: not-allowed; }
 
-/* ========= Error ========= */
+/* Estado de error */
 .pn-error{
-  margin-top:8px; background:#fde8e8; border:1px solid #f5c2c2;
-  color:#7a1f1f; padding:10px 12px; border-radius:10px;
+  color: color-mix(in oklab, var(--primary) 40%, var(--ink) 60%);
+  font-weight: 700;
 }
 
-/* =================================================
-   RESPONSIVE
-   ================================================= */
+/* =============================
+   Adaptativo (container queries)
+   ============================= */
 
-/* 1) <= 1240px: scroll horizontal + header sticky */
-@media (max-width: 1240px){
-  .pn-table{
-    overflow-x:auto;
-    -webkit-overflow-scrolling: touch;
-    border-radius:12px;
-  }
-  .pn-header, .pn-row{ min-width: 1120px; } /* ajusta si lo necesitas */
-  .pn-header{
-    position: sticky; top: 0; z-index: 2;
-    background: var(--card-bg);
-  }
+/* Compáctalo un poco en anchos medianos */
+@container (max-width: 1200px){
+  .pn-cell{ padding: 6px 8px; }
+  .pn-input{ padding: 8px 10px; }
 }
 
-/* 2) <= 820px: vista apilada (tarjetas) */
-@media (max-width: 820px){
-  .pn-table{ overflow:visible; }
-  .pn-header{ display:none; }
+/* Vista tipo “cards” para contenedores angostos.
+   Nota: como las columnas de permisos son dinámicas, las mostramos
+   en una grilla compacta sin etiquetas por celda. */
+@container (max-width: 860px){
+  .pn-header{ display: none; }
 
   .pn-row{
-    grid-template-columns: 1fr 1fr;
-    column-gap:12px; row-gap:10px;
-    padding:12px;
-    border:1px solid var(--card-bd);
-    border-radius:12px;
-    background: var(--card-bg);
-    box-shadow: 0 6px 18px rgba(2,6,23,.06);
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    padding: 10px;
+    border-bottom: 1px solid var(--bd);
   }
-  /* Empleado y Autoriza a todo el ancho */
+
+  /* Empleado y Jefe: par etiqueta/valor */
   .pn-row .pn-cell:nth-child(1),
-  .pn-row .pn-cell:nth-child(2){ grid-column: 1 / -1; }
+  .pn-row .pn-cell:nth-child(2),
+  .pn-row .pn-cell:nth-last-child(2), /* Otro (link) */
+  .pn-row .pn-cell:last-child{        /* Acciones */
+    display: grid;
+    grid-template-columns: 160px 1fr;
+    align-items: center;
+    gap: 8px;
+    padding: 0;
+  }
 
-  .pn-cell--center{ justify-content:flex-start; }
+  .pn-row .pn-cell:nth-child(1)::before{ content: "Empleado"; color: var(--muted); font-weight: 700; }
+  .pn-row .pn-cell:nth-child(2)::before{ content: "Jefe / Autoriza"; color: var(--muted); font-weight: 700; }
+  .pn-row .pn-cell:nth-last-child(2)::before{ content: "Otro (link)"; color: var(--muted); font-weight: 700; }
 
-  /* URL a todo el ancho (penúltima celda) */
-  .pn-row .pn-cell:nth-last-child(2){ grid-column: 1 / -1; }
+  /* Bloque de permisos dinámicos: ocupa una fila y presenta un grid de checks */
+  .pn-row{
+    --perm-start: 3; /* desde la tercera celda hasta antes de “Otro (link)” */
+  }
 
-  /* Acciones al final */
+  /* Agrupa todas las celdas de permisos en una grilla fluida */
+  .pn-row .pn-cell:nth-child(n + 3):not(:nth-last-child(-n + 2)){
+    /* Convertimos cada celda de permisos en “solo el control” para que quepa mejor */
+    justify-content: center;
+    padding: 0;
+  }
+
+  /* Crea un contenedor visual para los permisos dinámicos usando row-gap y wrap natural */
+  .pn-row{
+    row-gap: 6px;
+  }
+  /* Opcional: si quieres una línea separadora previa a “Otro (link)” en móvil */
+  .pn-row .pn-cell:nth-last-child(2){
+    border-top: 1px dashed var(--bd);
+    padding-top: 8px;
+    margin-top: 2px;
+  }
+
+  /* Acciones al final, full ancho del lado derecho */
   .pn-row .pn-cell:last-child{
-    grid-column: 1 / -1; display:flex; justify-content:flex-end;
+    grid-template-columns: 1fr;
+    justify-content: flex-end;
   }
 }
 
-/* 3) micro-ajuste en headers para pantallas medianas */
-@media (max-width: 1480px){
-  .pn-header, .pn-head{ font-size:.78rem; }
-  .pn-header{ column-gap:16px; }
+/* Más compacto: botones 100% */
+@container (max-width: 560px){
+  .pn-actions{ justify-content: stretch; }
+  .pn-btn{ width: 100%; }
 }
+
+/* ----- MISMAS COLUMNAS PARA HEADER Y FILAS ----- */
+/* 1) Quitamos grid-auto-flow/auto-columns y definimos template fijo */
+.pn-header,
+.pn-row{
+  display: grid;
+  /* Empleado | Jefe | (repeat COLS) | Otro(link) | Acciones */
+  grid-template-columns:
+    minmax(220px, 1fr)          /* Empleado */
+    minmax(240px, 1fr)          /* Jefe / autoriza */
+    repeat(var(--pn-cols, 8), minmax(120px, 1fr))  /* columnas dinámicas */
+    minmax(260px, 1fr)          /* Otro (link) */
+    minmax(140px, max-content); /* Acciones */
+}
+
+/* 2) Quita estas reglas antiguas si las tienes */
+ /* grid-auto-flow: column; */
+ /* grid-auto-columns: minmax(120px, 1fr); */
+ /* min-width: 1024px;  <-- opcional mantener si quieres forzar scroll */
+
+/* 3) Forzamos ancho mínimo total para permitir scroll horizontal si no cabe */
+.pn-table{
+  overflow: auto;
+}
+.pn-header,
+.pn-row{
+  min-width: 1024px; /* mantén el scroll si es necesario */
+}
+
+/* ----- CONTENCIÓN Y ALINEACIÓN ----- */
+.pn-cell{
+  padding: 8px 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow: hidden;           /* evita que los controles “se monten” */
+}
+
+.pn-input{
+  width: 100%;
+  max-width: 100%;
+}
+
+/* checkboxes centrados */
+.pn-cell--center{ justify-content: center; }
+.pn-cell--center input[type="checkbox"]{ inline-size: 18px; block-size: 18px; accent-color: var(--primary); }
+
+/* header sticky sobre filas (z-index) */
+.pn-header{ position: sticky; top: 0; z-index: 2; background: var(--surface); border-bottom: 2px solid var(--bd); }
+
+/* acciones a la derecha */
+.pn-cell--acciones{ justify-content: flex-end; }

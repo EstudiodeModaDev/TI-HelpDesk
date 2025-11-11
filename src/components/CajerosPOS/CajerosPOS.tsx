@@ -23,25 +23,25 @@ export default function CajerosPOSForm({ services }: Props) {
   const { state, setField, errors, submitting, handleSubmit } = useCajerosPOS(services);
 
   return (
-    <div className="detalle-ticket">
+    <div className="cajeros-pos">
       <h2>Creación de usuario POS</h2>
 
       <form   onSubmit={(e) => {handleSubmit(e);}} noValidate>
 
-        <div className="fila">
-          <div className="campo">
+        <div className="cp-fila">
+          <div className="cp-campo">
             <label>Solicitante</label>
             <input type="text" value={state.solicitante} onChange={(e) => setField("solicitante", e.target.value)}/>
           </div>
-          <div className="campo">
+          <div className="cp-campo">
             <label>Correo solicitante</label>
             <input type="text" value={state.CorreoTercero} onChange={(e) => setField("CorreoTercero", e.target.value)}/>
           </div>
         </div>
 
         {/* Fila 2: Cédula y CO */}
-        <div className="fila">
-          <div className="campo">
+        <div className="cp-fila">
+          <div className="cp-campo">
             <label>Cédula</label>
             <input type="text" value={state.Cedula} onChange={(e) => setField("Cedula", e.target.value)} placeholder="Documento del usuario"/>
             { (errors as any).Cedula && (
@@ -49,7 +49,7 @@ export default function CajerosPOSForm({ services }: Props) {
             )}
           </div>
 
-          <div className="campo">
+          <div className="cp-campo">
             <label>CO</label>
             <input type="text" value={state.CO} onChange={(e) => setField("CO", e.target.value)} placeholder="Centro Operativo / Código"/>
             { (errors as any).CO && (
@@ -60,8 +60,8 @@ export default function CajerosPOSForm({ services }: Props) {
 
         {/* Fila 3: Compañía y Usuario POS */}
 
-        <div className="fila">
-          <div className="campo">
+        <div className="cp-fila">
+          <div className="cp-campo">
             <label>Compañía</label>
             <Select<Option, false>
               classNamePrefix="rs"
@@ -88,7 +88,7 @@ export default function CajerosPOSForm({ services }: Props) {
 
         {/* Acción */}
         <div style={{ marginTop: 10 }}>
-          <button type="submit" className="btn-volver" disabled={submitting}>
+          <button type="submit" className="btn-primary" disabled={submitting}>
             {submitting ? "Procesando…" : "Crear usuario POS"}
           </button>
         </div>

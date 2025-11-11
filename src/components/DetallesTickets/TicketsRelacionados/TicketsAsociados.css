@@ -1,176 +1,192 @@
 /* =========================================================
-   TA Panel — tokens de Daniel (oscuro por defecto, respeta
-   :root[data-theme="light"])
+   TICKETS ASOCIADOS — Panel, header y listas (tokens-only)
    ========================================================= */
-
-/* ---- Contenedor principal (card) ---- */
 .ta-panel{
+  --pad: clamp(12px, 1.8vw, 18px);
+  --gap: clamp(10px, 1.4vw, 16px);
+
   background: var(--surface);
   color: var(--ink);
-  padding: var(--page-pad);
-  max-width: 100%;
-  border: 1px solid var(--bd);
-  border-radius: var(--radius);
+  border-radius: var(--radius-3xl, var(--radius));
   box-shadow: var(--shadow);
+  overflow: visible;                 /* no bloquear scroll ni sticky */
+  container-type: inline-size; 
+  margin-bottom: 10px;
 }
 
-/* ---- Header ---- */
+/* =================== Header =================== */
 .ta-header{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap: 1.25rem;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 10px;
 }
 
-.ta-header__left{
-  display:flex;
-  align-items:center;
-  gap:.5rem;
-}
-
+.ta-header__left{ min-width: 0; }
 .ta-title{
-  margin:0;
-  color: var(--ink);
-  font-size: 1.125rem;
+  margin: 0;
+  font-size: clamp(1rem, 2.2vw, 1.25rem);
   font-weight: 800;
-  line-height: 1.2;
-}
-
-/* Icon button */
-.ta-iconbtn{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  width: 32px; height: 32px;
-  line-height: 0;
-  background: transparent;
-  color: color-mix(in oklab, var(--ink) 72%, transparent);
-  cursor: pointer;
-  border-radius: 999px;
-  border: 1px solid transparent;
-  transition: background .15s ease, color .15s ease, border-color .15s ease, box-shadow .15s ease;
-}
-.ta-iconbtn:hover{
-  background: color-mix(in oklab, var(--field-bg) 70%, var(--surface));
   color: var(--ink);
-  border-color: color-mix(in oklab, var(--bd) 70%, transparent);
-  box-shadow: 0 0 0 3px color-mix(in oklab, var(--ring) 40%, transparent);
+  letter-spacing: .2px;
 }
-.ta-iconbtn .ta-icon{ width: 18px; height: 18px; pointer-events: none; }
 
-/* Ver todos / links superiores */
+/* Botón/enlace de acción */
 .ta-seeall{
-  color: var(--primary);
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--primary);
+  background: var(--primary);
+  color: var(--primary-ink);
+  font-weight: 800;
   text-decoration: none;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: transform .06s ease, filter .15s ease, box-shadow .18s ease;
+}
+.ta-seeall:hover{ box-shadow: 0 0 0 6px var(--ring); filter: brightness(1.03); }
+.ta-seeall:active{ transform: translateY(1px); }
+
+/* =================== Estados =================== */
+.ta-skeleton{
+  width: 100%;
+  border-radius: 12px;
+  background:
+    linear-gradient(90deg,
+      color-mix(in oklab, var(--ink) 6%, transparent) 0%,
+      color-mix(in oklab, var(--ink) 12%, transparent) 20%,
+      color-mix(in oklab, var(--ink) 6%, transparent) 40%);
+  background-size: 200% 100%;
+  animation: ta-shimmer 1.2s linear infinite;
+}
+@keyframes ta-shimmer{
+  to { background-position: -200% 0; }
+}
+
+.ta-error{
+  margin: 8px 0;
+  color: color-mix(in oklab, var(--primary) 40%, var(--ink) 60%);
   font-weight: 700;
-  font-size: .95rem;
-  transition: color .2s ease, text-decoration-color .2s ease, background .2s ease;
-  border-radius: 8px;
-  padding: 2px 4px;
-}
-.ta-seeall:hover{
-  color: color-mix(in oklab, var(--primary) 80%, var(--ink));
-  text-decoration: underline;
-  text-underline-offset: 2px;
-  background: color-mix(in oklab, var(--surface) 90%, transparent);
 }
 
-/* ---- Body (grid) ---- */
+/* =================== Cuerpo =================== */
 .ta-body{
-  display:grid;
-  grid-template-columns: 1fr;
-  gap: calc(1.25rem * 1.25);
-  margin-top: 1rem;
-}
-@media (min-width: 820px){
-  .ta-body{
-    grid-template-columns: 1fr 1fr;
-    gap: 3rem;
-  }
+  display: grid;
+  grid-template-columns: repeat(2, minmax(260px, 1fr));
+  gap: var(--gap);
+  padding-top: 12px;
 }
 
-/* ---- Columnas y etiquetas ---- */
-.ta-column{ min-width: 0; }
+.ta-column{
+  background: color-mix(in oklab, var(--surface) 96%, transparent);
+  border: 1px solid var(--bd);
+  border-radius: 12px;
+  padding: 12px;
+  overflow: visible;
+}
 
 .ta-label{
-  margin: 0 0 .5rem;
-  color: var(--muted);
+  margin: 0 0 6px 0;
+  color: var(--ink);
   font-weight: 700;
-  user-select: none;
 }
 
-/* ---- Lista de enlaces ---- */
-.ta-list{ list-style: none; padding: 0; margin: 0; }
+.ta-empty{
+  margin: 6px 0 0;
+  color: var(--muted);
+}
+
+/* =================== Lista =================== */
+.ta-list{
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
 
 .ta-list__item{
-  display:flex;
-  align-items: baseline;
-  gap:.5rem;
-  line-height: 1.6;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 8px;
+  min-width: 0; /* truncado confiable */
+
+  border-radius: 10px;
+  background: color-mix(in oklab, var(--surface) 98%, transparent);
 }
 
 .ta-list__dash{
-  color: color-mix(in oklab, var(--ink) 45%, transparent); /* separador tenue */
-  flex: 0 0 auto;
+  color: var(--muted);
+  user-select: none;
 }
 
+/* Enlace y versión botón */
 .ta-link{
-  color: var(--primary);
+  color: var(--ink);
   text-decoration: none;
-  border-radius: 8px;
-  padding: 2px 4px;
-  transition: color .15s ease, background .15s ease, text-decoration-color .15s ease, box-shadow .15s ease;
+  font-weight: 700;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .ta-link:hover{
-  color: color-mix(in oklab, var(--primary) 82%, var(--ink));
   text-decoration: underline;
+  text-decoration-thickness: 2px;
   text-underline-offset: 2px;
-  background: color-mix(in oklab, var(--surface) 90%, transparent);
 }
 
-.ta-link__muted{ color: var(--muted); }
-
-/* ---- Estado vacío ---- */
-.ta-empty{
-  margin: .25rem 0 0;
-  color: color-mix(in oklab, var(--ink) 92%, transparent);
-}
-
-/* ---- Accesibilidad (focus) ---- */
-.ta-iconbtn:focus-visible,
-.ta-seeall:focus-visible,
-.ta-link:focus-visible,
-.ta-link--button:focus-visible{
-  outline: 3px solid var(--ring);
-  outline-offset: 2px;
-  border-radius: 8px;
-}
-
-/* ---- Botón con apariencia de enlace ---- */
 .ta-link--button{
   appearance: none;
-  background: none;
-  border: none;
-  padding: 2px 4px;
-  margin: 0;
-  font: inherit;
-  color: var(--primary);
+  background: transparent;
+  border: 0;
+  padding: 0;
   cursor: pointer;
+  color: rgb(86, 161, 211);
+  font: inherit;
   text-align: left;
-  border-radius: 8px;
-  transition: color .15s ease, background .15s ease, text-decoration-color .15s ease;
 }
-.ta-link--button:hover{
-  color: color-mix(in oklab, var(--primary) 82%, var(--ink));
-  text-decoration: underline;
-  text-underline-offset: 2px;
-  background: color-mix(in oklab, var(--surface) 90%, transparent);
+.ta-link--button:hover{ text-decoration: underline; }
+
+.ta-link__muted{ color: var(--muted); font-weight: 600; }
+
+/* =================== Relacionador inline =================== */
+.ta-relacionador-wrap{
+  margin-top: 12px;
+  background: color-mix(in oklab, var(--surface) 96%, transparent);
+  border-radius: 12px;
+  padding: 12px;
+  overflow: visible;
 }
 
-/* ---- Pequeños ajustes opcionales para temas claros ---- */
-:root[data-theme="light"] .ta-list__dash{
-  color: color-mix(in oklab, var(--ink) 35%, transparent);
+/* =========================================================
+   Responsive por espacio real (container queries)
+   ========================================================= */
+
+/* 2 → 1 columna si el panel queda estrecho */
+@container (max-width: 780px){
+  .ta-header{
+    grid-template-columns: 1fr;
+    row-gap: 8px;
+  }
+  .ta-seeall{
+    justify-self: start; /* botón debajo del título */
+  }
+
+  .ta-body{
+    grid-template-columns: 1fr;
+  }
 }
-:root[data-theme="light"] .ta-iconbtn:hover{
-  box-shadow: 0 0 0 3px color-mix(in oklab, var(--ring) 55%, transparent);
+
+/* Densidad más compacta en móvil/embebido */
+@container (max-width: 520px){
+  .ta-panel{ --pad: 12px; }
+  .ta-list__item{ padding: 8px; }
+  .ta-title{ font-size: clamp(.95rem, 4vw, 1.1rem); }
 }

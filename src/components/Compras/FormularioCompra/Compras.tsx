@@ -59,13 +59,13 @@ export default function CompraFormulario({submitting = false, onClick}: Props) {
   }, [state.cargarA]);
 
   return (
-    <div className="compra-form white-silo compra-wrap" data-darkreader-ignore>
+    <div className="compra-wrap" >
       <h2>{"Registro de Compras"}</h2>
-      <form className="form-grid" onSubmit={(e) => { handleSubmit(e)}}>
+      <form className="fc-grid" onSubmit={(e) => { handleSubmit(e)}}>
         {/* Tipo */}
-        <div className="field">
-          <label className="label">Tipo</label>
-          <select className="control" value={state.tipoCompra} onChange={(e) => setField("tipoCompra", e.target.value as TipoCompra)}>
+        <div className="fc-field">
+          <label>Tipo</label>
+          <select className="fc-control" value={state.tipoCompra} onChange={(e) => setField("tipoCompra", e.target.value as TipoCompra)}>
             <option value="Producto">Producto</option>
             <option value="Servicio">Servicio</option>
             <option value="Alquiler">Alquiler</option>
@@ -74,8 +74,8 @@ export default function CompraFormulario({submitting = false, onClick}: Props) {
         </div>
 
         {/* Solicitante */}
-        <div className="field">
-          <label className="label">Solicitante</label>
+        <div className="fc-field">
+          <label>Solicitante</label>
           <Select<UserOptionEx, false, GroupBase<UserOptionEx>>
             classNamePrefix="rs"
             className="rs-override"
@@ -92,20 +92,15 @@ export default function CompraFormulario({submitting = false, onClick}: Props) {
         </div>
 
         {/* Fecha */}
-        <div className="field">
-          <label className="label">Fecha de solicitud</label>
-          <input
-            type="date"
-            className="control"
-            value={state.fechaSolicitud}
-            onChange={(e) => setField("fechaSolicitud", e.target.value)}
-          />
+        <div className="fc-field">
+          <label>Fecha de solicitud</label>
+          <input type="date" className="control" value={state.fechaSolicitud} onChange={(e) => setField("fechaSolicitud", e.target.value)}  />
           {errors.fechaSolicitud && <small className="error">{errors.fechaSolicitud}</small>}
         </div>
 
         {/*Tipificacion*/}
-        <div className="field">
-          <label className="label">Tipo de Item</label>
+        <div className="fc-field">
+          <label>Tipo de Item</label>
           <select name="Items" value={state.codigoItem} onChange={(e) => {const codigo = e.target.value;
                                                                     setField("codigoItem", codigo); 
                                                                     const item = Items.find(i => String(i.codigo) === String(codigo));
@@ -122,17 +117,17 @@ export default function CompraFormulario({submitting = false, onClick}: Props) {
         </div>
 
         {/* Producto/Servicio/Alquiler */}
-        <div className="field">
-          <label className="label">
+        <div className="fc-field">
+          <label>
             {state.tipoCompra === "Producto" ? "Producto" : state.tipoCompra === "Servicio" ? "Servicio" : "Alquiler"}
           </label>
-          <input className="control" value={state.productoServicio} onChange={(e) => setField("productoServicio", e.target.value)} placeholder={`Nombre de ${state.tipoCompra.toLowerCase()}`}/>
+          <input className="fc-control" value={state.productoServicio} onChange={(e) => setField("productoServicio", e.target.value)} placeholder={`Nombre de ${state.tipoCompra.toLowerCase()}`}/>
           {errors.productoServicio && <small className="error">{errors.productoServicio}</small>}
         </div>
 
         {/* CO (Centros Operativos) - react-select */}
-        <div className="field">
-          <label className="label">CO</label>
+        <div className="fc-field">
+          <label>CO</label>
           <Select<COOption, false>
             classNamePrefix="rs"
             className="rs-override"
@@ -151,9 +146,9 @@ export default function CompraFormulario({submitting = false, onClick}: Props) {
         </div>
 
         {/* UN */}
-        <div className="field">
-          <label className="label">UN</label>
-          <select className="control" value={state.un} onChange={(e) => setField("un", e.target.value)}>
+        <div className="fc-field">
+          <label>UN</label>
+          <select className="fc-control" value={state.un} onChange={(e) => setField("un", e.target.value)}>
             <option value="">Seleccione UN</option>
             {UNOptions.map((o) => (
               <option key={o.value} value={o.value}>{o.label}</option>
@@ -163,8 +158,8 @@ export default function CompraFormulario({submitting = false, onClick}: Props) {
         </div>
 
         {/* C. Costo (react-select) */}
-        <div className="field">
-          <label className="label">C. Costo</label>
+        <div className="fc-field">
+          <label>C. Costo</label>
           <Select<CCOption, false>
             classNamePrefix="rs"
             className="rs-override"
@@ -184,8 +179,8 @@ export default function CompraFormulario({submitting = false, onClick}: Props) {
         </div>
 
         {/* Motivo */}
-        <div className="field">
-          <label className="label">Motivo</label>
+        <div className="fc-field">
+          <label>Motivo</label>
           <select className="control" value={state.motivo} onChange={(e) => setField("motivo", e.target.value)}>
             <option value="">Seleccione motivo</option>
             {Motivos.map((o) => (
@@ -196,9 +191,9 @@ export default function CompraFormulario({submitting = false, onClick}: Props) {
         </div>
 
         {/* Cargar a */}
-        <div className="field">
-          <label className="label">Cargar a</label>
-          <select className="control" value={state.cargarA} onChange={(e) => setField("cargarA", e.target.value as CargarA)}>
+        <div className="fc-field">
+          <label>Cargar a</label>
+          <select className="fc-control" value={state.cargarA} onChange={(e) => setField("cargarA", e.target.value as CargarA)}>
             <option value="CO">CO</option>
             <option value="Marca">Marca</option>
           </select>
@@ -234,7 +229,7 @@ export default function CompraFormulario({submitting = false, onClick}: Props) {
 
         {/* No. CO */}
         {state.cargarA === "CO" ? (
-          <div className="field">
+          <div className="fc-field">
             <label className="label">No. CO</label>
             <input className="control" value={state.co?.value} placeholder="Ej. 12345"/>
           </div>) : <div></div>}
@@ -263,7 +258,7 @@ export default function CompraFormulario({submitting = false, onClick}: Props) {
           </button>
         </div>
       </form>
-      <button type="button" className="btn-ver" onClick={() => onClick(true)}>📄 Registrar compra</button>
+      <button type="button" className="btn-secondary" onClick={() => onClick(true)}>📄 Ver compras registradas</button>
     </div>
   );
 }

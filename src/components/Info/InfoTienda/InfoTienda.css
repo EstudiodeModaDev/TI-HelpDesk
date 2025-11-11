@@ -1,305 +1,200 @@
-/* ========== Tokens y resets locales ========== */
-:root {
-  --it-bg: #ffffff;
-  --it-ink: #0f172a;
-  --it-ink-muted: #475569;
-  --it-border: #e2e8f0;
-  --it-border-strong: #cbd5e1;
-  --it-accent: #4f46e5;    /* Indigo-600 */
-  --it-accent-ink: #ffffff;
-  --it-row-alt: #f8fafc;   /* slate-50 */
-  --it-row-hover: #eef2ff; /* indigo-50 */
-  --it-shadow: 0 8px 24px rgba(2, 6, 23, 0.08);
-  --it-radius: 14px;
-  --it-ring: 0 0 0 3px rgba(79, 70, 229, 0.35);
+/* =========================================================
+   STORE INFO — buscador + tabla con header sticky
+   ========================================================= */
+.store-info{
+  --pad: clamp(14px, 2vw, 20px);
+  --gap: clamp(10px, 1.6vw, 16px);
+
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--bd);
+  border-radius: var(--radius-3xl, var(--radius));
+  box-shadow: var(--shadow);
+  padding: var(--pad);
+  container-type: inline-size; /* container queries por ancho real */
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --it-bg: #ffffff;
-    --it-ink: #0f172a;
-    --it-ink-muted: #475569;
-    --it-border: #e2e8f0;
-    --it-border-strong: #cbd5e1;
-    --it-accent: #4f46e5;    /* Indigo-600 */
-    --it-accent-ink: #ffffff;
-    --it-row-alt: #f8fafc;   /* slate-50 */
-    --it-row-hover: #eef2ff; /* indigo-50 */
-    --it-shadow: 0 8px 24px rgba(2, 6, 23, 0.08);
-    --it-radius: 14px;
-    --it-ring: 0 0 0 3px rgba(79, 70, 229, 0.35);
-  }
+/* ================= Título ================= */
+.store-info > h3{
+  margin: 0 0 8px 0;
+  color: var(--ink);
+  font-weight: 800;
+  letter-spacing: -.015em;
 }
 
-/* ========== Ámbito opcional (recomendado) ========== */
-/* Añade className="store-info" al <section> si quieres encapsular */
-.store-info { color: var(--it-ink); }
-
-/* ========== Título ==========
-
-.store-info h1 {
-  letter-spacing: -0.02em;
+/* ================= Acciones (buscador + botón) ================= */
+.store-actions{
+  margin-top: 6px;
+}
+.store-actions__left{
+  display: grid;
+  grid-template-columns: 1fr max-content;
+  gap: 10px;
+  align-items: center;
 }
 
-/* ========== Formulario de acciones (input + botón + select) ========== */
-.store-info input[type="text"], .store-info select {
-  background: #fff;
-  border: 1px solid var(--it-border);
-  color: var(--it-ink);
+.store-actions input[type="text"]{
+  appearance: none;
+  width: 100%;
+  background: var(--field-bg);
+  color: var(--ink);
+  border: 1px solid var(--bd);
   border-radius: 12px;
-  transition: box-shadow .15s ease, border-color .15s ease;
-}
-
-.store-info input[type="text"]:focus, .store-info select:focus {
+  padding: 12px 14px;
   outline: none;
-  border-color: var(--it-accent);
-  box-shadow: var(--it-ring);
+  transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
+  min-width: 0;
+  box-shadow: var(--shadow);
+}
+.store-actions input::placeholder{
+  color: color-mix(in oklab, var(--muted) 85%, transparent);
+}
+.store-actions input:focus{
+  border-color: color-mix(in oklab, var(--primary) 55%, var(--bd) 45%);
+  box-shadow: 0 0 0 4px var(--ring);
 }
 
-/* Botón primario (refuerza el hover/focus) */
-.store-info button[type="submit"] {
+.store-actions button{
+  appearance: none;
+  border: 1px solid var(--primary);
+  background: var(--primary);
+  color: var(--primary-ink);
+  font-weight: 800;
+  padding: 12px 16px;
   border-radius: 12px;
-  box-shadow: var(--it-shadow);
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: transform .06s ease, filter .15s ease, box-shadow .18s ease;
+}
+.store-actions button:hover{ box-shadow: 0 0 0 6px var(--ring); filter: brightness(1.03); }
+.store-actions button:active{ transform: translateY(1px); }
+.store-actions button:disabled{ opacity: .6; cursor: not-allowed; }
+
+/* ================= Alertas ================= */
+.alert-error{
+  border: 1px solid color-mix(in oklab, var(--primary) 40%, var(--bd) 60%);
+  background: color-mix(in oklab, var(--field-bg) 92%, transparent);
+  color: var(--ink);
+  border-radius: 12px;
+  padding: 10px 12px;
+  box-shadow: var(--shadow);
 }
 
-.store-info button[type="submit"]:focus-visible {
-  outline: none;
-  box-shadow: var(--it-ring);
+/* ================= Card / Tabla ================= */
+.card{
+  background: color-mix(in oklab, var(--surface-elev) 96%, transparent);
+  border: 1px solid var(--bd);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
 }
 
-/* ========== Icono inline: .i-lucide-check ==========
-   Icono por máscara SVG para no depender de librerías */
-.i-lucide-check {
-  width: 1.1em;
-  height: 1.1em;
-  display: inline-block;
-  background: currentColor;
-  -webkit-mask: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M20 6L9 17l-5-5' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
-          mask: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M20 6L9 17l-5-5' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+.store-scroll{
+  overflow: auto;             /* horizontal y vertical si hace falta */
+  max-height: min(60vh, 900px);
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in oklab, var(--ink) 24%, transparent) transparent;
+}
+.store-scroll::-webkit-scrollbar{ height: 10px; width: 10px; }
+.store-scroll::-webkit-scrollbar-thumb{
+  background: color-mix(in oklab, var(--ink) 24%, transparent);
+  border-radius: 999px;
 }
 
-/* ========== Alertas / errores ========== */
-.store-info .alert-error {
-  border: 1px solid #fecaca;   /* red-200 */
-  background: #fef2f2;         /* red-50 */
-  color: #991b1b;              /* red-800 */
-  border-radius: 10px;
-  padding: .75rem 1rem;
+/* Cabecera sticky */
+.store-scroll thead th{
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--surface);
+  color: var(--ink);
+  border-bottom: 2px solid var(--bd);
+  padding: 10px 12px;
+  font-weight: 800;
+  text-align: left;
+  white-space: nowrap;
 }
 
-@media (prefers-color-scheme: dark) {
-  .store-info .alert-error {
-    border-color: #7f1d1d;
-    background: #450a0a;
-    color: #fecaca;
-  }
+/* Celdas / filas */
+.store-scroll tbody td{
+  color: var(--ink);
+  border-bottom: 1px solid var(--bd);
+  padding: 10px 12px;
+  vertical-align: top;
+}
+.store-scroll tbody tr:nth-child(odd){
+  background: color-mix(in oklab, var(--surface) 96%, var(--bd));
+}
+.store-scroll tbody tr:hover{
+  background: color-mix(in oklab, var(--field-bg) 90%, transparent);
 }
 
-/* ========== Card / tabla contenedora ========== */
-.store-info .card {
-  background: var(--it-bg);
-  border: 1px solid var(--it-border);
-  border-radius: var(--it-radius);
-  box-shadow: var(--it-shadow);
+/* Evita desborde por textos largos */
+.store-scroll td, .store-scroll th{
+  max-width: 480px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   overflow: hidden;
 }
 
-.store-info table {
-  width: 100%;
-  border-collapse: collapse;
-  color: var(--it-ink);
-  font-size: 0.95rem;
-  line-height: 1.5;
+/* Fuerza ancho mínimo de la tabla para no comprimir columnas demasiado */
+.store-scroll table{
+  min-width: 960px; /* ajusta si tu dataset necesita más ancho */
 }
 
-.store-info tbody tr:nth-child(even) {
-  background: var(--it-row-alt);
+/* ================= Responsive (container) ================= */
+@container (max-width: 840px){
+  .store-actions__left{ grid-template-columns: 1fr; }
+  .store-actions button{ width: 100%; }
+}
+@container (max-width: 520px){
+  .store-info{ --pad: 12px; }
+  .store-scroll table{ min-width: 720px; }
+  .store-scroll thead th, .store-scroll tbody td{ padding: 8px 10px; }
 }
 
-.store-info tbody tr:hover {
-  background: var(--it-row-hover);
+/* Accesibilidad: reduce animaciones */
+@media (prefers-reduced-motion: reduce){
+  .store-actions input,
+  .store-actions button{ transition: none; }
 }
 
-/* Celda de encabezado (primera columna, sticky) */
-.store-info th[scope="row"] {
-  position: sticky; /* ya lo trae el JSX, reforzamos compat */
-  left: 0;
+/* ===== Parche anti-montaje para StoreInfo ===== */
+
+/* Aísla el panel: nada de hijos sobre el título */
+.store-info{
+  position: relative;
+  isolation: isolate;            /* bloquea overlays externos */
+}
+
+/* Asegura que el título queda por encima del contenido scroll */
+.store-info > h3{
+  position: relative;
+  z-index: 2;
+}
+
+/* La “card” es el plano del contenido; recorta cualquier overlay */
+.card{
+  position: relative;
   z-index: 1;
-  background: linear-gradient(90deg, var(--it-row-alt), var(--it-row-alt));
-  color: var(--it-ink-muted);
-  font-weight: 700;
-  width: 280px;
-  border-right: 1px solid var(--it-border);
-  box-shadow: 6px 0 12px -8px rgba(2, 6, 23, 0.18); /* sombra al separarse */
+  overflow: hidden;               /* evita que asome el scrollbar/overlay en esquinas */
+  border-radius: 16px;            /* respeta tu radio */
 }
 
-/* Bordes inferiores suaves */
-.store-info th[scope="row"], .store-info td {
-  border-bottom: 1px solid var(--it-border);
-  padding: .75rem 1rem;
-  vertical-align: top;
+/* El área con scroll queda debajo del título y dentro de la card */
+.store-scroll{
+  position: relative;
+  z-index: 1;
+  padding-top: 2px;               /* separa visualmente header/scrollbar del borde superior */
+  scrollbar-gutter: stable both-edges; /* reserva gutter y evita solape */
 }
 
-/* Valor vacío/N/A: estilo sutil (opcional, detectado por texto) */
-.store-info td:has(> code),
-
-.store-info td:has(> kbd) { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
-
-.store-info td:where(:has(> *)) { color: var(--it-ink); }
-
-.store-info .store-scroll {
-  overflow: auto;
+/* Header sticky garantizado por encima de filas */
+.store-scroll thead th{
+  position: sticky;
+  top: 0;
+  z-index: 3;                     /* sobre filas y sobre el scrollbar interno */
+  background: var(--surface);     /* sin transparencias que “dejen ver” debajo */
 }
 
-/* Scrollbar (webkit) */
-.store-info .store-scroll::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
-.store-info .store-scroll::-webkit-scrollbar-thumb {
-  background: var(--it-border-strong);
-  border-radius: 10px;
-}
-.store-info .store-scroll::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-/* ========== Tip / texto auxiliar ========== */
-.store-info .tip {
-  color: var(--it-ink-muted);
-  font-size: 0.78rem;
-}
-
-/* ========== Accesibilidad: sr-only por si no usas Tailwind ========== */
-.sr-only {
-  position: absolute !important;
-  width: 1px; height: 1px;
-  padding: 0; margin: -1px;
-  overflow: hidden; clip: rect(0,0,0,0);
-  white-space: nowrap; border: 0;
-}
-
-/* ========== Estados de foco visibles para filas (teclado) ========== */
-.store-info tr:focus-within {
-  outline: none;
-  box-shadow: var(--it-ring);
-}
-
-/* ========== Badges opcionales para valores especiales (si decides aplicarlos) ========== */
-.store-info .badge {
-  display: inline-block;
-  padding: .2rem .5rem;
-  border-radius: 999px;
-  font-size: .75rem;
-  line-height: 1;
-  border: 1px solid var(--it-border-strong);
-}
-
-.store-info .badge--muted { background: var(--it-row-alt); color: var(--it-ink-muted); }
-
-.store-info .badge--ok { background: #ecfdf5; border-color: #a7f3d0; color: #065f46; }
-
-.store-info .badge--warn { background: #fff7ed; border-color: #fed7aa; color: #9a3412; }
-
-.store-info .badge--danger { background: #fef2f2; border-color: #fecaca; color: #991b1b; }
-/* Barra de acciones: izquierda y derecha */
-.store-actions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 12px;
-  margin-top: 1.5rem; /* sustituye mt-6 si quieres */
-  margin-bottom: 1.5rem;
-}
-
-.store-actions__left {
-  display: flex;
-  align-items: stretch;
-  gap: 12px;
-  flex: 1 1 auto;   /* ocupa todo el espacio disponible */
-}
-
-.store-actions__left input[type="text"] {
-  flex: 1 1 auto;   /* el input crece */
-  min-width: 220px;
-}
-
-.store-actions__right {
-  margin-left: auto; /* empuja a la derecha */
-  display: flex;
-  align-items: center;
-}
-
-/* En pantallas pequeñas, que se apile normal */
-@media (max-width: 767px) {
-  .store-actions {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  .store-actions__right {
-    margin-left: 0;
-  }
-}
-
-/* ========== Compactación responsiva ========== */
-@media (max-width: 680px) {
-  .store-info th[scope="row"] { width: 200px; }
-  .store-info table { font-size: 0.9rem; }
-}
-
-/* === Forzar esquema claro SOLO en StoreInfo === */
-.store-info, .store-info *{
-  color-scheme: light !important;
-}
-
-/* Inputs y selects siempre claros en este scope */
-.store-info input[type="text"], .store-info select{
-  background: #ffffff !important;
-  color: #0f172a !important;
-  border: 1px solid var(--it-border) !important;
-  border-radius: 12px;
-}
-
-/* Placeholder y autofill (Chrome/Edge) */
-.store-info input::placeholder{ color: var(--it-ink-muted); }
-
-.store-info input[type="text"]:-webkit-autofill{
-  -webkit-box-shadow: 0 0 0 1000px #ffffff inset !important;
-  -webkit-text-fill-color: #0f172a !important;
-}
-
-/* === Botón 'Buscar' siempre claro dentro de .store-info === */
-.store-info button[type="submit"], .store-info button[type="submit"] *{
-  color-scheme: light !important;   /* neutraliza UI nativa en dark */
-}
-
-.store-info button[type="submit"]{
-  appearance: none;
-  -webkit-appearance: none;
-  background: #4f46e5 !important;   /* indigo-600 */
-  color: #ffffff !important;
-  border: 1px solid #4338ca;         /* indigo-700 */
-  border-radius: 12px;
-  box-shadow: var(--it-shadow);
-  transition: background .15s ease, box-shadow .15s ease, border-color .15s ease;
-}
-
-.store-info button[type="submit"]:hover{
-  background: #4338ca !important;    /* indigo-700 */
-}
-
-.store-info button[type="submit"]:focus-visible{
-  outline: none;
-  box-shadow: var(--it-ring);
-  border-color: #4338ca;
-}
-
-.store-info button[type="submit"]:disabled{
-  opacity: .6;
-  cursor: default;
-}
-
-/* Asegura que el ícono use el color del texto (blanco) */
-.store-info button[type="submit"] .i-lucide-check{
-  color: currentColor;
-}
+/* Suaviza y reduce el alto del scrollbar para que no “salte” */
+.store-scroll::-webkit-scrollbar{ height: 8px; }

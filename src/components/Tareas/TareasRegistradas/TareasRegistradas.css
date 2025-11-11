@@ -4,23 +4,14 @@
 .lt-scope{
   color-scheme: light !important;
   isolation: isolate;
-  --bg: #ffffff;
-  --card: #ffffff;
-  --card-soft: #fafbff;
-  --ink: #0f172a;
-  --muted: #6b7280;
-  --muted-2: #94a3b8;
-  --bd: #e6e8f0;
-  --bd-soft: #eef2ff;
-  --primary: #2563eb;
-  --primary-weak: rgba(37,99,235,.12);
+  --bg: var(--surface);
+  --card: var(--surface);
   --ok: #22c55e;
   --warn: #f59e0b;
   --danger: #ef4444;
-  --pill-bg: #f3f4f6;
   --radius-xl: 18px;
   --radius-lg: 14px;
-  --shadow: 0 10px 30px rgba(2,6,23,.08);
+    border-radius: var(--radius-3xl, var(--radius, 12px));
 }
 
 /* neutraliza dark global si existe */
@@ -31,10 +22,10 @@
    =======================================================*/
 .lt-card{
   background: var(--bg);
-  border: 1px solid var(--bd);
   border-radius: 20px;
-  box-shadow: var(--shadow);
   padding: 16px 14px 12px;
+  max-height: 500px;
+  overflow-y: scroll;
 }
 
 /* =========================================================
@@ -185,7 +176,7 @@
 
 /* fecha “neutra” */
 .lt-date{
-  color: var(--muted-2);
+  color: var(--muted);
   font-weight: 700;
   margin-left: 10px;
 }
@@ -225,3 +216,4 @@
   align-items: center;
   gap: 10px 12px;
 }
+

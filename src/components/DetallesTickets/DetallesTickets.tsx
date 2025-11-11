@@ -3,9 +3,9 @@ import type { Ticket } from "../../Models/Tickets";
 import "./DetalleTicket.css";
 import TicketHistorial from "../Seguimiento/Seguimiento";
 import HtmlContent from "../Renderizador/Renderizador";
-import Recategorizar from "./ModalRecategorizar/Recategorizar";
-import Reasignar from "./Reasignar/Reasignar";
-import AsignarObservador from "./Observador/Observador";
+import Recategorizar from "./Modals/Recategorizar";
+import Reasignar from "./Modals/Reasignar";
+import AsignarObservador from "./Modals/Observador";
 import TicketsAsociados from "./TicketsRelacionados/Relacionados";
 import { ParseDateShow } from "../../utils/Date";
 import Trunc from "../Trunc/trunc";
@@ -27,7 +27,6 @@ type Props = {
 /* ================== Componente ================== */
 export type Opcion = { value: string; label: string };
 
-
 function Row({label, children, className = "",}: {label: string; children: React.ReactNode; className?: string;}) {
   return (
     <div className={`cd-row ${className}`}>
@@ -36,6 +35,7 @@ function Row({label, children, className = "",}: {label: string; children: React
     </div>
   );
 }
+
 export function CaseDetail({ ticket, onVolver, role }: Props) {
   const {loadAttachments, rows} = useTicketsAttachments(ticket.ID ?? "");
   // === Estado local del ticket seleccionado
@@ -79,9 +79,7 @@ export function CaseDetail({ ticket, onVolver, role }: Props) {
       {/* ===== Header ===== */}
       <header className="cd-header">
         <h2 className="cd-title">Caso – ID {selected.ID}</h2>
-        <button type="button" className="btn-volver" onClick={onVolver}>
-          ← Volver
-        </button>
+        <button type="button" className="btn-primary" onClick={onVolver}>← Volver</button>
       </header>
 
       {/* ===== GRID ===== */}
@@ -103,7 +101,7 @@ export function CaseDetail({ ticket, onVolver, role }: Props) {
         <Row className="pos-categoria" label="Categoría">
           {canRecategorizar ? (
             <button type="button" className="as-text" onClick={() => setShowRecat(true)}>
-              <Trunc text={categoria || "–"} lines={1} />
+              <Trunc text={categoria || "–"} lines={1}/>
             </button>
           ) : (
             <Trunc text={categoria || "–"} lines={1} />
@@ -125,14 +123,9 @@ export function CaseDetail({ ticket, onVolver, role }: Props) {
         {/* Fila 3: personas */}
         <div className="cd-people pos-people">
           <div className="cd-people-item">
-            <div className="cd-people-label">Actor</div>
-            <div className="cd-people-value">—</div>
-          </div>
-
-          <div className="cd-people-item">
             <div className="cd-people-label">Solicitante</div>
             <div className="cd-people-value">
-              <Trunc text={selected.Solicitante} lines={1} />
+              {selected.Solicitante}
             </div>
           </div>
 
@@ -140,15 +133,11 @@ export function CaseDetail({ ticket, onVolver, role }: Props) {
             <div className="cd-people-label">Observador</div>
             <div className="cd-people-value">
               {canRecategorizar ? (
-                <button
-                  type="button"
-                  className="as-text"
-                  onClick={() => setShowObservador(true)}
-                >
-                  <Trunc text={selected.Observador || "–"} lines={1} />
+                <button type="button" className="as-text" onClick={() => setShowObservador(true)}>
+                  {selected.Observador || "–"}
                 </button>
               ) : (
-                <Trunc text={selected.Observador || "—"} lines={1} />
+                selected.Observador || "—"
               )}
             </div>
           </div>
@@ -157,12 +146,8 @@ export function CaseDetail({ ticket, onVolver, role }: Props) {
             <div className="cd-people-label">Resolutor</div>
             <div className="cd-people-value">
               {canRecategorizar ? (
-                <button
-                  type="button"
-                  className="as-text"
-                  onClick={() => setShowReasig(true)}
-                >
-                  <Trunc text={selected.Nombreresolutor || "–"} lines={1} />
+                <button type="button" className="as-text" onClick={() => setShowReasig(true)}>
+                  {selected.Nombreresolutor || "–"}
                 </button>
               ) : (
                 <Trunc text={selected.Nombreresolutor || "–"} lines={1} />
@@ -174,7 +159,7 @@ export function CaseDetail({ ticket, onVolver, role }: Props) {
         {/* Fila 4: Título */}
         <Row className="pos-titulo" label="Título">
           {/* 2 líneas en móvil para mejor legibilidad */}
-          <Trunc text={selected.Title} lines={2} />
+          {selected.Title}
         </Row>
 
         {/* Fila 5: Descripción (HTML truncada en móvil vía .html-trunc) */}
@@ -223,7 +208,7 @@ export function CaseDetail({ ticket, onVolver, role }: Props) {
 
       {/* ===== Botón de Seguimiento ===== */}
       <div>
-        <button type="button" className="btn-volver" onClick={() => setShowSeg((v) => !v)} >
+        <button type="button" className="btn-secondary" onClick={() => setShowSeg((v) => !v)} >
           {showSeg ? "Ocultar seguimiento" : "Seguimiento ticket"}
         </button>
       </div>
@@ -254,7 +239,6 @@ export function CaseDetail({ ticket, onVolver, role }: Props) {
         <div className="modal-overlay" role="dialog" aria-modal="true" aria-label="Reasignar ticket">
           <div className="modal-card">
             <div className="modal-head">
-              <h3>Reasignar ticket #{selected.ID}</h3>
               <button type="button" className="modal-close" onClick={() => setShowReasig(false)} aria-label="Cerrar">
                 ✕
               </button>

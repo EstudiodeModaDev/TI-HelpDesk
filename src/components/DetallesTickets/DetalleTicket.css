@@ -6,8 +6,7 @@
 .case-detail{
   background: var(--surface);
   color: var(--ink);
-  border: 1px solid var(--bd);
-  border-radius: var(--radius);
+  border-radius: var(--radius-3xl, var(--radius));
   box-shadow: var(--shadow);
   padding: clamp(10px, 2.2vw, 16px);
 }
@@ -44,12 +43,12 @@
   margin: 0;
 }
 .cd-label{
-  background: color-mix(in oklab, var(--field-bg) 65%, var(--surface));
+  background: rgb(158, 156, 156);
   border: 1px solid var(--bd);
   border-radius: 10px;
   padding: 10px 12px;
   font-weight: 800;
-  color: color-mix(in oklab, var(--ink) 85%, transparent);
+  color: black;
   min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 .cd-value{
@@ -122,8 +121,8 @@
   background: color-mix(in oklab, var(--surface-elev) 92%, var(--surface));
 }
 .cd-people-label{
-  background: color-mix(in oklab, var(--field-bg) 60%, var(--surface));
-  color: var(--ink);
+  background: rgb(158, 156, 156);
+  color: black;
   padding:8px 10px; font-weight:800;
   border-bottom:1px solid var(--bd);
 }
@@ -236,4 +235,112 @@
 /* =================== Preferencias de movimiento =================== */
 @media (prefers-reduced-motion: reduce){
   *{ animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; }
+}
+
+/* =========================================================
+   MODAL GENÉRICO — overlay + card (tokens-only)
+   ========================================================= */
+
+/* Capa completa con fondo semitransparente basado en tokens */
+.modal-overlay{
+  position: fixed;
+  inset: 0;
+  z-index: 999; /* por encima de cards y toolbars */
+  display: grid;
+  place-items: center;
+  padding: clamp(12px, 3vw, 24px);
+  background:
+    radial-gradient(1200px 800px at 20% -10%, transparent 0%, transparent 35%, transparent 100%),
+    color-mix(in oklab, var(--ink) 8%, transparent); /* “backdrop” sin color nuevo */
+  backdrop-filter: blur(2px);
+  overflow: auto;           /* si el dialogo es alto, se scrollea el overlay */
+}
+
+/* Tarjeta del modal */
+.modal-card{
+  width: min(960px, 100%);
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--bd);
+  border-radius: var(--radius-3xl, var(--radius));
+  box-shadow: var(--shadow);
+  overflow: hidden;         /* redondeo limpio en cabecera/pie */
+  transform: translateY(0); /* base para animación */
+  container-type: inline-size;
+  animation: modal-in 180ms cubic-bezier(.22,.9,.2,1);
+}
+
+/* Cabecera */
+.modal-head{
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  background: color-mix(in oklab, var(--surface) 92%, transparent);
+  border-bottom: 1px solid var(--bd);
+}
+.modal-head h3{
+  margin: 0;
+  font-size: clamp(1rem, 2.3vw, 1.2rem);
+  font-weight: 800;
+  letter-spacing: .2px;
+  color: var(--ink);
+}
+
+/* Botón cerrar */
+.modal-close{
+  appearance: none;
+  inline-size: 40px;
+  block-size: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  border: 1px solid var(--bd);
+  background: var(--field-bg);
+  color: var(--ink);
+  font-size: 1.1rem;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: transform .06s ease, filter .15s ease, box-shadow .18s ease;
+}
+.modal-close:hover{ box-shadow: 0 0 0 6px var(--ring); filter: brightness(1.03); }
+.modal-close:active{ transform: translateY(1px); }
+
+/* Cuerpo (contenedor del formulario/hijo) */
+.modal-body{
+  padding: 16px;
+  background: var(--surface);
+  max-block-size: min(72vh, 860px); /* altura máx. razonable */
+  overflow: auto;                   /* scroll interno si se necesita */
+}
+
+/* =========================================================
+   Responsive por espacio real del modal
+   ========================================================= */
+@container (max-width: 680px){
+  .modal-body{ padding: 12px; }
+  .modal-close{ inline-size: 44px; block-size: 44px; } /* diana táctil mayor */
+}
+
+/* =========================================================
+   Animaciones (respetando prefers-reduced-motion)
+   ========================================================= */
+@keyframes modal-in{
+  from{ transform: translateY(6px); opacity: .0; }
+  to  { transform: translateY(0);   opacity: 1;  }
+}
+@media (prefers-reduced-motion: reduce){
+  .modal-card{ animation: none; }
+  .modal-overlay{ backdrop-filter: none; }
+}
+
+/* =========================================================
+   Accesibilidad y foco
+   ========================================================= */
+.modal-overlay:focus { outline: none; }
+.modal-card :focus{
+  outline: none;
+  box-shadow: 0 0 0 4px var(--ring);
+  border-color: color-mix(in oklab, var(--primary) 55%, var(--bd) 45%);
 }

@@ -10,7 +10,6 @@ const SERVICIOS_CATALOG: Array<{ key: keyof Servicios; label: string }> = [
   { key: "office",          label: "Office" },
   { key: "erp",             label: "ERP" },
   { key: "pedidos",         label: "Sistema de Pedidos" },
-  { key: "adminpos",        label: "Admin POS" },
   { key: "posprincipal",    label: "POS Principal" },
   { key: "impresoras",      label: "Impresoras" },
   { key: "generictransfer", label: "Generic Transfer" },

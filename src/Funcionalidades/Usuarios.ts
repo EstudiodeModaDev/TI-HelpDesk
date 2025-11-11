@@ -141,17 +141,18 @@ export function useUsuarios(usuariosSvc: UsuariosSPService) {
   const mapUsuariosToOptions = React.useCallback((list: UsuariosSP[]): UserOption[] => {
     return (list ?? [])
       .map((u) => {
-        const nombre = String((u as any).Title ?? "—");
+        const nombre = String((u as any).Title ?? "—").trim();
         const correo = String((u as any).Correo ?? "").trim();
-        const rol    = String((u as any).Rol ?? "");
-        const id     = String((u as any).ID);
+        const id     = String((u as any).ID ?? "");
+
+        // label como "Nombre - correo" (si hay correo)
+        const label  = correo ? `${nombre} - ${correo}` : nombre;
+
         return {
-          value: correo || id,   // correo como clave estable
-          label: nombre,
+          value: correo || id,   // usa correo como clave estable; fallback id
+          label,
           id,
           email: correo || undefined,
-          jobTitle: rol || undefined,
-          // OJO: UserOption no tiene "source". Si quieres "source", crea UserOptionEx en el front.
         } as UserOption;
       })
       .sort((a, b) => a.label.localeCompare(b.label));

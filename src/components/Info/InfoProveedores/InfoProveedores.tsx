@@ -10,23 +10,23 @@ export default function InfoProveedores() {
 
 
   return (
-    <section className="store-info w-full max-w-[1100px] mx-auto p-6 md:p-10">
-      <h3 className="text-3xl md:text-4xl font-bold tracking-tight">Proveedores de internet</h3>
+    <section className="proveedor-info">
+      <h3 className="pi-title">Proveedores de internet</h3>
 
-      <form className="store-actions">
+      <form className="pi-actions">
         {/* 👉 Desplegable a la derecha */}
-        <div className="store-actions__right">
-          <label className="sr-only" htmlFor="proveedor">Proveedor</label>
-          <select id="proveedor" className="px-4 py-3 text-sm shadow-sm" aria-label="Proveedor" onChange={(e) => setFilterMode(e.target.value)}>
+        <div className="pi-actions__right">
+          <label className="pi-only" htmlFor="proveedor">Proveedor</label>
+          <select id="proveedor" className="pi-select" aria-label="Proveedor" onChange={(e) => setFilterMode(e.target.value)}>
             <option value="tigo">Tigo</option>
             <option value="claro">Claro</option>
           </select>
         </div>
       </form>
 
-      <div className="card mt-6 overflow-hidden">
-        <div className="store-scroll">
-          <table className="w-full border-collapse">
+      <div className="pi-card">
+        <div className="pi-scroll">
+          <table className="pi-table">
             <thead>
               <tr>
                 <th>Nivel</th>

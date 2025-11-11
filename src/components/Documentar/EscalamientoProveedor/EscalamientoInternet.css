@@ -1,90 +1,43 @@
-/* ===== EscalamientoInternet.css ===== */
+/* ===== EscalamientoInternet.css (tokens-only) ===== */
 
-/* 1) Núcleo: forzar SIEMPRE tema claro dentro del scope */
-.esc-form{
-  color-scheme: light !important;     /* inputs nativos en claro */
-  isolation: isolate;                 /* aísla filtros/mezclas del exterior */
-  --bg: #ffffff;
-  --text: #111827;
-  --muted: #6b7280;
-  --border: #e5e7eb;
-  --border-strong: #d1d5db;
-  --primary: #2563eb;
-  --primary-ink: #ffffff;
-  --ring: rgba(37, 99, 235, 0.35);
-  --error: #b91c1c;
-  --radius: 14px;
-
-  width: 100%;
-  max-width: 100%;
-  padding: 20px;
-  box-sizing: border-box;
-  background: var(--bg) !important;
-  color: var(--text);
-  line-height: 1.4;
-}
-
-/* 1.1) Ajuste fino de tokens cuando el ancestro global es oscuro */
-.dark .esc-form{
-  color-scheme: light !important;     /* reafirma claro dentro de layouts oscuros */
-  --border: #dfe3e8;                  /* micro-tuning de contrastes */
-  --border-strong: #cfd6dd;
-  --muted: #667085;
-}
-
-/* Neutraliza dark mode global de frameworks o del html */
-.dark .esc-form,
-.dark .esc-form *{
-  color-scheme: light !important;
-}
-
-/* 2) Reset suave dentro del scope */
+/* 0) Reset suave dentro del scope */
 .esc-form, .esc-form *{
   box-sizing: border-box;
   min-width: 0;
 }
 
-/* 3) Título */
+/* 1) Título */
 .esc-title{
   margin: 0 0 12px 0;
-  font-size: 28px;
+  font-size: clamp(20px, 2.2vw, 28px);
   font-weight: 800;
   letter-spacing: .2px;
-  color: #0f172a;
+  color: var(--ink);
 }
 
-/* 4) Buscador */
+/* 2) Buscador (input + botón) */
 .esc-search{
   display: grid;
   grid-template-columns: 1fr auto;
   gap: 12px;
   margin-bottom: 16px;
 }
-.esc-button{
-  padding: 10px 16px;
-  border: 1px solid var(--border);
-  background: #f8fafc;
-  border-radius: 10px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: box-shadow .15s ease, transform .02s ease, border-color .15s ease, background .15s ease;
-}
+
 .esc-button:hover{
-  border-color: var(--border-strong);
-  box-shadow: 0 0 0 4px var(--ring);
+  border-color: color-mix(in oklab, var(--primary) 55%, var(--bd) 45%);
+  box-shadow: 0 0 0 6px var(--ring);
 }
 .esc-button:active{ transform: translateY(1px); }
 
-/* 5) Card del formulario */
+/* 3) Card del formulario */
 .esc-card{
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 18px;
-  box-shadow: 0 8px 24px rgba(0,0,0,.06);
+  background: var(--surface);
+  color: var(--ink);
+  border-radius: var(--radius, 18px);
+  box-shadow: var(--shadow);
 }
 
-/* 6) Grid del formulario */
+/* 4) Grid del formulario */
 .esc-grid{
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -93,33 +46,31 @@
 .esc-field{ display: flex; flex-direction: column; gap: 6px; }
 .esc-col-2{ grid-column: span 2; }
 
-/* 7) Inputs / Selects compartidos */
+/* 5) Inputs / Selects (comparten estilos) */
 .esc-input{
   width: 100%;
-  background: #ffffff !important;     /* SIEMPRE blanco */
-  color: var(--text) !important;
-  border: 1px solid var(--border);
-  border-radius: 10px;
+  background: var(--field-bg) !important;
+  color: var(--ink) !important;
+  border: 1px solid var(--bd);
+  border-radius: 12px;
   padding: 10px 12px;
   outline: none;
   transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
-  -webkit-appearance: none;
-     -moz-appearance: none;
-          appearance: none;
+  appearance: none;
 }
-.esc-input::placeholder{ color: var(--muted); }
+.esc-input::placeholder{ color: color-mix(in oklab, var(--muted) 82%, transparent); }
 .esc-input:focus{
-  border-color: var(--primary);
+  border-color: color-mix(in oklab, var(--primary) 55%, var(--bd) 45%);
   box-shadow: 0 0 0 4px var(--ring);
-  background: #ffffff !important;
+  background: var(--field-bg) !important;
 }
 
-/* Select: elimina flecha fea en algunos navegadores y mantiene look blanco */
+/* Select: caret mediante background con tokens */
 select.esc-input{
   background-image:
-    linear-gradient(45deg, transparent 50%, #6b7280 50%),
-    linear-gradient(135deg, #6b7280 50%, transparent 50%),
-    linear-gradient(#ffffff, #ffffff);
+    linear-gradient(45deg, transparent 50%, color-mix(in oklab, var(--ink) 55%, transparent) 50%),
+    linear-gradient(135deg, color-mix(in oklab, var(--ink) 55%, transparent) 50%, transparent 50%),
+    linear-gradient(var(--field-bg), var(--field-bg));
   background-position:
     calc(100% - 18px) calc(50% - 3px),
     calc(100% - 12px) calc(50% - 3px),
@@ -129,75 +80,63 @@ select.esc-input{
   padding-right: 2.6rem;
 }
 
-/* 8) Etiquetas y errores */
+/* 6) Etiquetas y errores */
 .esc-field > label{
   font-size: 13px;
-  font-weight: 600;
-  color: #0f172a;
+  font-weight: 700;
+  color: var(--ink);
 }
 .error{
-  color: var(--error);
+  color: color-mix(in oklab, var(--primary) 40%, var(--ink) 60%);
   font-size: 12px;
   margin-top: 2px;
 }
 
-/* 9) Adjuntos */
-.esc-attachments{
-  margin-top: 14px;
-}
+/* 7) Adjuntos */
+.esc-attachments{ margin-top: 14px; }
 .esc-attachments-title{
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-weight: 700;
-  margin-bottom: 8px;
-  color: #0f172a;
+  display: inline-flex; align-items: center; gap: 6px;
+  font-weight: 800; margin-bottom: 8px; color: var(--ink);
 }
-.esc-asterisk{ color: var(--error); }
+.esc-asterisk{ color: color-mix(in oklab, var(--primary) 50%, var(--ink) 50%); }
 .esc-attachments-box{
-  border: 1px dashed var(--border-strong);
+  border: 1px dashed var(--bd);
   border-radius: 12px;
   padding: 14px;
-  background: #ffffff;
+  background: var(--surface);
+  color: var(--ink);
 }
 .esc-muted{ color: var(--muted); }
 .esc-files{
-  list-style: none;
-  padding: 0;
-  margin: 0 0 10px 0;
-  display: grid;
-  gap: 6px;
+  list-style: none; padding: 0; margin: 0 0 10px 0;
+  display: grid; gap: 6px;
 }
 .esc-files li{
   padding: 8px 10px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: #fff;
+  border: 1px solid var(--bd);
+  border-radius: 10px;
+  background: color-mix(in oklab, var(--surface) 96%, transparent);
+  color: var(--ink);
 }
 .esc-upload{
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-weight: 600;
-  border: 1px solid var(--border);
-  padding: 10px 12px;
-  border-radius: 10px;
-  cursor: pointer;
-  user-select: none;
-  background: #f8fafc;
+  display: inline-flex; align-items: center; gap: 8px;
+  font-weight: 700;
+  border: 1px solid var(--bd);
+  padding: 10px 12px; border-radius: 12px;
+  cursor: pointer; user-select: none;
+  background: color-mix(in oklab, var(--surface) 94%, transparent);
+  color: var(--ink);
   transition: box-shadow .15s ease, border-color .15s ease, transform .02s ease;
 }
 .esc-upload:hover{
-  border-color: var(--border-strong);
-  box-shadow: 0 0 0 4px var(--ring);
+  border-color: color-mix(in oklab, var(--primary) 55%, var(--bd) 45%);
+  box-shadow: 0 0 0 6px var(--ring);
 }
 .esc-upload:active{ transform: translateY(1px); }
 
-/* 10) Acciones */
+/* 8) Acciones */
 .esc-actions{
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 16px;
+  display: flex; justify-content: flex-end; margin-top: 16px;
 }
 .esc-primary{
   padding: 12px 18px;
@@ -205,35 +144,29 @@ select.esc-input{
   background: var(--primary);
   color: var(--primary-ink);
   border-radius: 12px;
-  font-weight: 700;
+  font-weight: 800;
   cursor: pointer;
   transition: box-shadow .15s ease, transform .02s ease, filter .15s ease;
 }
 .esc-primary:hover{ box-shadow: 0 0 0 6px var(--ring); filter: brightness(1.03); }
 .esc-primary:active{ transform: translateY(1px); }
-.esc-primary:disabled{
-  opacity: .6;
-  cursor: not-allowed;
-  box-shadow: none;
-  filter: none;
-}
+.esc-primary:disabled{ opacity: .6; cursor: not-allowed; box-shadow: none; filter: none; }
 
-/* 11) Autofill Chrome (evita amarillo/oscuro) */
+/* 9) Autofill */
 .esc-input:-webkit-autofill,
 .esc-input:-webkit-autofill:hover,
 .esc-input:-webkit-autofill:focus{
-  -webkit-text-fill-color: var(--text);
-  -webkit-box-shadow: 0 0 0px 1000px #ffffff inset;
+  -webkit-text-fill-color: var(--ink);
+  -webkit-box-shadow: 0 0 0px 1000px var(--field-bg) inset;
   transition: background-color 9999s ease-out 0s;
 }
 
-/* 11.1) Datepicker WebKit: asegúrate de que no se “apague” */
+/* 10) Datepicker WebKit */
 .esc-form input[type="date"]::-webkit-calendar-picker-indicator{
-  filter: none !important;
-  opacity: 1 !important;
+  filter: none !important; opacity: 1 !important;
 }
 
-/* 12) Responsivo */
+/* 11) Responsivo */
 @media (max-width: 860px){
   .esc-grid{ grid-template-columns: 1fr; }
   .esc-col-2{ grid-column: auto; }
@@ -241,17 +174,16 @@ select.esc-input{
   .esc-primary{ width: 100%; }
 }
 
-/* 13) Seguridad extra: si algún contenedor fuerza dark, lo neutralizamos igual */
-:root[color-scheme="dark"] .esc-form,
-html[data-theme="dark"] .esc-form{
-  color-scheme: light !important;
-  background: #ffffff !important;
-}
-
-/* 14) (Opcional) Scrollbars claros y consistentes */
+/* 12) Scrollbars (opcionales) basados en tokens */
 .esc-form{
-  scrollbar-color: #cfd8e3 #ffffff;  /* Firefox */
+  scrollbar-color: color-mix(in oklab, var(--ink) 22%, transparent)
+                   color-mix(in oklab, var(--surface) 94%, transparent);
 }
 .esc-form::-webkit-scrollbar{ height: 10px; width: 10px; }
-.esc-form::-webkit-scrollbar-thumb{ background: #cfd8e3; border-radius: 8px; }
-.esc-form::-webkit-scrollbar-track{ background: #ffffff; }
+.esc-form::-webkit-scrollbar-thumb{
+  background: color-mix(in oklab, var(--ink) 22%, transparent);
+  border-radius: 8px;
+}
+.esc-form::-webkit-scrollbar-track{
+  background: color-mix(in oklab, var(--surface) 94%, transparent);
+}

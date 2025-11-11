@@ -45,31 +45,21 @@ const ProveedorModal: React.FC<ProveedorModalProps> = ({ isOpen, onClose, onSave
         <form onSubmit={handleSubmit} className="modal-form">
           <label>
             Nombre:
-            <input
-              type="text"
-              value={nombre}
-              onChange={(e) => setNombre(e.target.value)}
-              placeholder="Nombre del proveedor"
-            />
+            <input type="text" value={nombre}  onChange={(e) => setNombre(e.target.value)} placeholder="Nombre del proveedor"/>
           </label>
 
           <label>
             NIT:
-            <input
-              type="text"
-              value={nit}
-              onChange={(e) => setNit(e.target.value)}
-              placeholder="NIT del proveedor"
-            />
+            <input type="text" value={nit} onChange={(e) => setNit(e.target.value)} placeholder="NIT del proveedor"/>
           </label>
 
           {error && <p className="error-text">{error}</p>}
 
           <div className="modal-buttons">
-            <button type="submit" disabled={loading}>
+            <button type="submit" disabled={loading} className="btn-primary">
               {loading ? "Guardando..." : "Guardar"}
             </button>
-            <button type="button" onClick={onClose} className="btn-cancelar">
+            <button type="button" onClick={onClose} className="btn-secondary">
               Cancelar
             </button>
           </div>
