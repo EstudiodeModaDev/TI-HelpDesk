@@ -80,6 +80,7 @@ export function useTips(TipsSvc?: TipsService) {
                 const func = await TipsSvc.get(id)
                 await TipsSvc.update(id, {Activa: !func.Activa});
                 alert("Se han ajustado los tips")
+                loadTips();
             }
         } catch (e: any) {
             setTips([]);

@@ -54,11 +54,6 @@
   gap: 10px;
   color: var(--ink);
 }
-.tf-checkbox input{
-  inline-size: 18px;
-  block-size: 18px;
-  accent-color: var(--primary); /* usa token */
-}
 
 /* ===== Inputs nativos ===== */
 .tf-input,
@@ -148,3 +143,36 @@
   .tf-grid{ gap: 10px; }
   .rtb-box{ min-height: 120px; }
 }
+
+.tf-inline{
+  display: grid;
+  grid-template-columns: max-content 220px; /* label + date */
+  align-items: center;
+  gap: var(--gap);
+}
+
+/* Asegura buen tamaño del date */
+.tf-inline .tf-input[type="date"],
+.tf-inline input[type="date"]{
+  min-width: 180px;
+  width: 100%;
+}
+
+/* Que el checkbox y su texto siempre se vean juntos */
+.tf-checkbox{
+  display: inline-grid;
+  grid-auto-flow: column;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Responsive: si no cabe, cae a 1 columna */
+@container (max-width: 640px){
+  .tf-inline{
+    grid-template-columns: 1fr;
+  }
+  .tf-inline .tf-checkbox{
+    justify-self: start;
+  }
+}
+

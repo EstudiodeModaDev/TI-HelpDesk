@@ -179,10 +179,10 @@ export default function NuevoTicketForm() {
           </div>
 
           {/* Fecha de apertura (opcional) */}
-          <div className="tf-field tf-col-2">
+          <div className="tf-field tf-col-2 tf-inline">
             <label className="tf-checkbox">
-              <input type="checkbox" checked={state.usarFechaApertura} onChange={(ev) => setField("usarFechaApertura", ev.target.checked)} disabled={submitting}/>
-              <span>Escoger fecha de apertura</span>
+              <input type="checkbox" checked={state.usarFechaApertura} onChange={(ev) => setField("usarFechaApertura", ev.target.checked)} disabled={submitting} className="tf-checkbox"/>
+              <span>Escoger fecha de apertura</span>           
             </label>
           </div>
 
@@ -260,7 +260,7 @@ export default function NuevoTicketForm() {
 
           {/* Submit */}
           <div className="tf-actions tf-col-2">
-            <button type="submit" disabled={submitting || loadingCatalogos} className="btn-primary">
+            <button type="submit" disabled={submitting || loadingCatalogos} className="btn btn-primary-final">
               {submitting ? "Enviando..." : "Enviar Ticket"}
             </button>
           </div>

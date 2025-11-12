@@ -194,7 +194,7 @@ export async function getAccessToken(opts?: {
 export async function logout(): Promise<void> {
   await initMSAL();
   const account = ensureActiveAccount();
-  await msal.logoutRedirect({ account });
+  await msal.logoutRedirect({ account, postLogoutRedirectUri: "https://solvi.estudiodemoda.com.co/" });
 }
 
 /* ===========================

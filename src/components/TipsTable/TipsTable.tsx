@@ -4,12 +4,6 @@ import { useGraphServices } from "../../graph/GrapServicesContext";
 import { useTips } from "../../Funcionalidades/Anuncementes";
 import AnnouncementModal from "./ModalAgregar/ModalAgregar";
 
-
-export type AnnouncementsTableProps = {
-  //onToggleActive?: (row: AnnouncementRow, next: boolean) => void | Promise<void>;
-  //onClickTitle?: (row: AnnouncementRow) => void;
-};
-
 export default function AnnouncementsTable() {
     const [query, setQuery] = React.useState("");
     const [tipo, setTipo] = React.useState<string>("todos");
@@ -19,7 +13,7 @@ export default function AnnouncementsTable() {
 
     React.useEffect(() => {
         loadTips();
-    }, [loadTips]);3
+    }, [loadTips]);
 
     const tipos = React.useMemo(() => {
         const s = new Set<string>();

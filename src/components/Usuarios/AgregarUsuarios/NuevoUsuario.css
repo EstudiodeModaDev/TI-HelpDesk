@@ -69,34 +69,6 @@
   margin-top: 8px;
 }
 
-.nt-btn{
-  min-width: 180px;
-  height: 44px;
-  border-radius: 12px;
-  border: 1px solid var(--bd, #d1d5db);
-  background: #fff;
-  color: var(--ink, #0f172a);
-  cursor: pointer;
-  font-weight: 600;
-  transition: transform .06s ease, background .15s ease, border-color .15s ease, color .15s ease;
-}
-.nt-btn:disabled{ opacity: .65; cursor: not-allowed; }
-
-.nt-btn.ghost{
-  background: #fff;
-  border-color: var(--bd, #d1d5db);
-  box-shadow: inset 0 -2px 0 rgba(2,6,23,.06);
-}
-.nt-btn.ghost:hover{ background: #f1f5f9; }
-
-.nt-btn.primary{
-  background: #e3ebf9;           /* similar al tono de tus botones azules suaves */
-  border-color: #b9c7e6;
-  color: #0b1b5a;
-  box-shadow: inset 0 -2px 0 rgba(2,6,23,.06);
-}
-.nt-btn.primary:hover{ background: #d8e3f8; border-color: #9fb2e3; }
-.nt-btn.primary:active{ transform: translateY(1px); }
 
 @media (max-width: 640px){
   .nt-form{ padding: 20px 16px 18px; }

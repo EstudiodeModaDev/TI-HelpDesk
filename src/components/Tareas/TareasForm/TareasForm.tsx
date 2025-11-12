@@ -147,7 +147,7 @@ export default function FormTarea() {
 
         {/* Acciones */}
         <div className="ft-actions">
-          <button type="submit" className="ft-btn">Crear tarea</button>
+          <button type="submit" className="ft-btn btn-primary">Crear tarea</button>
         </div>
       </form>
     </section>

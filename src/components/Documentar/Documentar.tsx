@@ -48,18 +48,17 @@ export default function Documentar({ ticket, tipo, onDone }: { ticket: Ticket; t
     <div className="documentar-form documentar-form--edge">
       <h2 className="documentar-title">
         {showEscalar ? "Escalamiento internet"  : showActaEntrega
-          ? "Nueva acta de entrega"
-          : `Documentar ${tipo} del ticket #${ticket.ID}`}
+          ? "Nueva acta de entrega": null}
       </h2>
 
       {/* === SOLO DOCUMENTACIÓN CUANDO showEscalar = false === */}
       {!showEscalar && !showActaEntrega ? (
         <form onSubmit={(e) => { handleSubmit(e, tipo, ticket, account!);  if (onDone) onDone();}} className="documentar-grid">
           {/* Selector de plantilla */}
-          <div className="documentar-field documentar-col-2">
-            <label className="documentar-label" htmlFor="plantilla">Usar plantilla</label>
+          <div className="documentar-field documentar-col-2 platilla-field">
+            <label className="documentar-label platilla-label" htmlFor="plantilla">Usar plantilla</label>
             <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-              <select id="plantilla" className="documentar-input" value={plantillaId} onChange={(e) => onSelectPlantilla(e.target.value)} disabled={submitting || loadingPlantillas || !ListaPlantillas?.length}>
+              <select id="plantilla" className="documentar-input platilla-input" value={plantillaId} onChange={(e) => onSelectPlantilla(e.target.value)} disabled={submitting || loadingPlantillas || !ListaPlantillas?.length}>
                 <option value="">{loadingPlantillas ? "Cargando plantillas..." : "— Selecciona una plantilla —"}</option>
                 {(ListaPlantillas ?? []).map(p => (
                   <option key={p.Id} value={p.Id}>{p.Title}</option>
@@ -67,7 +66,6 @@ export default function Documentar({ ticket, tipo, onDone }: { ticket: Ticket; t
               </select>
               {errorPlantillas && <small className="error">{errorPlantillas}</small>}
             </div>
-            <small className="hint">Al seleccionar, se insertará el contenido de la plantilla en el editor.</small>
           </div>
 
           {/* Documentación */}
@@ -91,12 +89,12 @@ export default function Documentar({ ticket, tipo, onDone }: { ticket: Ticket; t
               </button>
 
               {/* Escalar: esquina inferior izquierda (secundario) */}
-              <button type="button" disabled={submitting} className="btn-action btn-secondary" onClick={() => setShowEscalar(true)}>
+              <button type="button" disabled={submitting} className="btn btn-secondary" onClick={() => setShowEscalar(true)}>
                 Escalar a proveedor de internet
               </button>
 
               {/* Acta: misma esquina, pero un poco más arriba para no montarse */}
-              <button type="button" disabled={submitting} className="btn-action btn-secondary" onClick={() => setShowActaEntrega(true)}>
+              <button type="button" disabled={submitting} className="btn btn-secondary" onClick={() => setShowActaEntrega(true)}>
                 Generar Acta de Entrega
               </button>
             </div>

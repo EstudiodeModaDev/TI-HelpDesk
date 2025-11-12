@@ -4,6 +4,9 @@
 .documentar-form{
   --pad: clamp(12px, 1.8vw, 18px);
   --gap: clamp(10px, 1.4vw, 16px);
+  border: 1px solid var(--bd);
+  padding: 15px;
+  border-radius: 20px;
 
   background: var(--surface);
   color: var(--ink);
@@ -48,7 +51,7 @@
 .documentar-form input[type="file"],
 .documentar-form select{
   appearance: none;
-  width: 100%;
+  width: auto;
   background: var(--field-bg);
   color: var(--ink);
   border: 1px solid var(--bd);
@@ -213,9 +216,6 @@
   margin-top: 8px;
 }
 
-/* Si quieres que ambos secundarios tengan el mismo ancho visual, usa min en vez de clamp: */
-/* .btn-action{ min-inline-size: 220px; inline-size: max-content; } */
-
 /* En móvil ya tienes regla que los pone al 100%, mantenla: */
 @container (max-width: 900px){
   .btn-action{ inline-size: 100%; }
@@ -252,3 +252,30 @@
   .documentar-actions{ justify-content: stretch; }
   .btn-action, .btn-save{ inline-size: 100%; }
 }
+
+.platilla-field{
+  display: flex;
+  align-items: center;
+  gap: 10px;                 /* espacio entre label y el bloque del select */
+}
+
+/* El bloque del select + error ocupa el resto */
+.platilla-field > div{
+  display: flex;
+  align-items: center;
+  gap: 8px;                  /* espacio entre select y error */
+  flex: 1 1 auto;
+  min-width: 0;              /* evita saltos raros con textos largos */
+}
+
+/* El label no se parte */
+.platilla-label{
+  margin: 0;
+  white-space: nowrap;
+}
+
+/* El select crece y no rompe */
+.platilla-input{
+  width: 400px !important;
+}
+

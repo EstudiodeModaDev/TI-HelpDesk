@@ -21,7 +21,6 @@ html, body{
   grid-template-columns: var(--sb-w, var(--sb-w-open)) minmax(0,1fr);
   grid-template-areas:"sidebar content";
   gap:16px;
-  /* padding removido y gestionado por content/page-viewport */
   min-height:90dvh;
   align-items:stretch;
   transition:grid-template-columns .22s ease;
@@ -31,7 +30,7 @@ html, body{
 .content--withSidebar{
   grid-area:content;
   display:grid;
-  place-items:stretch;
+
   min-width:0; min-height:0;
   overflow:hidden;
   padding-inline: var(--page-pad);    /* gutters */
@@ -42,7 +41,7 @@ html, body{
   width: min(100%, var(--page-max));
   min-height: calc(90dvh - 32px);
   display:grid;
-  place-items:stretch;
+
   min-width:0;
   padding: 20px 0;                    /* top/bottom */
   padding-inline: var(--page-pad);    /* gutters */
@@ -203,7 +202,6 @@ html, body{
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-end;
-  align-items: center;
   gap: 8px;
   row-gap: 10px;
 
@@ -235,147 +233,164 @@ input, select, textarea{
 }
 ::placeholder{ color: color-mix(in oklab, var(--muted) 88%, transparent); }
 
+/* ===============================
+   BASE
+   =============================== */
 .btn{
-  appearance:none; border:1px solid var(--primary);
-  background: var(--primary); color: var(--primary-ink);
-  padding:10px 14px; border-radius: 999px; font-weight:700;
-  box-shadow: 0 0 0 0 rgba(0,0,0,0);
-  transition: box-shadow .18s ease, transform .06s ease, filter .15s ease;
-}
-.btn:hover{ box-shadow: 0 0 0 6px var(--ring); filter: brightness(1.02); }
-.btn:active{ transform: translateY(1px); }
-.btn[disabled]{ opacity:.6; cursor:not-allowed; }
+  --btn-bg: transparent;
+  --btn-fg: var(--ink);
+  --btn-bd: var(--bd);
+  --btn-ring: var(--ring);
 
-/* =========================================
-   Botón de tema (pill con icono + texto)
-   ========================================= */
-.theme-btn{
   display: inline-grid;
   grid-auto-flow: column;
   align-items: center;
-  gap: 8px;
+  justify-content: center;
+  gap: 10px;
 
-  height: 40px;
-  padding: 0 14px;
-  border-radius: 999px;
-
-  background: var(--surface);
-  color: var(--ink);
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow);
-
+  padding: 10px 14px;
+  border: 1px solid var(--btn-bd);
+  border-radius: var(--radius, 18px);
+  background: var(--btn-bg);
+  color: var(--btn-fg);
   font: inherit;
   font-weight: 700;
   letter-spacing: .2px;
+  text-decoration: none;
   cursor: pointer;
-  user-select: none;
 
-  transition: filter .15s ease, transform .06s ease,
-              border-color .16s ease, box-shadow .16s ease, background .16s ease;
+  transition: background .18s ease, color .18s ease,
+              border-color .18s ease, box-shadow .18s ease,
+              transform .06s ease;
+  min-height: 40px;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
-.theme-btn__icon{
-  font-size: 16px;
-  line-height: 1;
-  display: grid;
+
+.btn-final:focus-visible{
+  outline: none;
+  box-shadow: 0 0 0 4px var(--btn-ring);
+}
+.btn-final:active{ transform: translateY(1px); }
+.btn-final[disabled]{
+  opacity: .55;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Icono opcional dentro del botón */
+.btn .i{ inline-size:18px; block-size:18px; display:inline-block; }
+
+/* ===============================
+   TAMAÑOS
+   =============================== */
+.btn-xs{ padding: 6px 10px; font-weight: 600; border-radius: calc(var(--radius,18px) - 6px); min-height: 32px; }
+.btn-m { padding: 10px 14px; } /* default */
+.btn-xl{ padding: 14px 22px; font-size: 1.05rem; }
+
+/* Full width opcional */
+.btn-block{ width: 100%; }
+
+/* ===============================
+   VARIANTES
+   =============================== */
+
+/* Primario (usa tokens de marca) */
+.btn-primary-final{
+  --btn-bg: var(--primary);
+  --btn-fg: var(--primary-ink, var(--ink));
+  --btn-bd: color-mix(in oklab, var(--primary) 70%, var(--bd) 30%);
+}
+.btn-primary-final:hover{
+  --btn-bg: color-mix(in oklab, var(--primary) 88%, var(--surface) 12%);
+  --btn-bd: color-mix(in oklab, var(--primary) 80%, var(--bd) 20%);
+}
+.btn-primary-final:active{
+  --btn-bg: color-mix(in oklab, var(--primary) 78%, var(--surface) 22%);
+}
+
+
+/* Secundario sólido (contraste neutro) */
+.btn-secondary-final{
+  --btn-bg: var(--surface-elev);
+  --btn-fg: var(--ink);
+  --btn-bd: var(--bd);
+}
+.btn-secondary-final:hover{
+  --btn-bg: color-mix(in oklab, var(--surface-elev) 85%, var(--ink) 15%);
+
+}
+.btn-secondary-final:active{
+  --btn-bg: color-mix(in oklab, var(--surface-elev) 78%, var(--ink) 22%);
+}
+
+
+/* Transparente (ghost) — sin fondo, con tinta de marca */
+.btn-transparent-final{
+  --btn-bg: transparent;
+  --btn-fg: color-mix(in oklab, var(--primary) 86%, var(--ink) 14%);
+  --btn-bd: color-mix(in oklab, var(--primary) 45%, var(--bd) 55%);
+  border-color: transparent;
+}
+.btn-transparent-final:hover{
+  --btn-bg: color-mix(in oklab, var(--primary) 14%, transparent);
+}
+.btn-transparent-final:active{
+  --btn-bg: color-mix(in oklab, var(--primary) 22%, transparent);
+}
+
+.btn-terciary{
+  /* Default ter*/
+  --btn-bg: color-mix(in oklab, rgb(138, 136, 136) 12%, var(--surface) 88%);
+  --btn-fg: color-mix(in oklab, var(--ink) 96%, var(--muted) 4%);
+  --btn-bd: color-mix(in oklab, var(--bd) 70%, var(--ink) 30%);
+}
+
+.btn-terciary:not([disabled]):hover{
+  --btn-bg: color-mix(in oklab, var(--ink) 18%, var(--surface) 82%);
+  --btn-bd: color-mix(in oklab, var(--bd) 65%, var(--ink) 35%);
+}
+
+.btn-terciary:not([disabled]):active{
+  --btn-bg: color-mix(in oklab, var(--ink) 24%, var(--surface) 76%);
+}
+
+/* =========================================
+   BOTÓN CIRCULAR (icon button)
+   Mezclar con: .btn-final + variante + tamaño
+   Ej: .btn-final btn-primary-final btn-circle btn-circle--lg
+   ========================================= */
+.btn-circle{
+  /* hereda variables de .btn-final / variantes */
+  padding: 0;                 /* el tamaño lo dan width/height */
+  border-radius: 999px;       /* círculo perfecto */
+  width: 42px; height: 42px;  /* tamaño por defecto (md) */
+  aspect-ratio: 1;            /* por seguridad */
+  display: inline-grid;
   place-items: center;
+  line-height: 1;             /* centra el icono */
 }
-.theme-btn:hover{
-  filter: brightness(1.03);
-  border-color: color-mix(in oklab, var(--border) 65%, var(--ink) 35%);
-  box-shadow: 0 0 0 6px var(--ring);
+
+/* Tamaños */
+.btn-circle--sm{ width: 20px; height: 20px; }
+.btn-circle--md{ width: 42px; height: 42px; }   /* default */
+.btn-circle--lg{ width: 52px; height: 52px; }
+.btn-circle--xl{ width: 60px; height: 60px; }
+
+/* Icono interior (SVG o img) */
+.btn-circle .i{
+  inline-size: 18px;
+  block-size: 18px;
+  pointer-events: none;
 }
-.theme-btn:active{
-  transform: translateY(1px);
-  filter: brightness(1.01);
-}
-.theme-btn:focus-visible{
+
+/* Accesibilidad: ring claro */
+.btn-circle:focus-visible{
   outline: none;
-  box-shadow: 0 0 0 6px var(--ring);
-}
-.theme-btn[disabled]{
-  opacity: .6;
-  cursor: not-allowed;
-  box-shadow: none;
-}
-.theme-btn.is-compact{
-  height: 34px;
-  padding: 0 10px;
-  gap: 6px;
-  font-weight: 700;
-}
-.theme-btn.is-compact .theme-btn__icon{ font-size: 14px; }
-
-/* =========================================
-   Botón ghost (texto + icono, fondo transparente)
-   ========================================= */
-.sb-btn{
-  display: inline-grid;
-  grid-auto-flow: column;
-  align-items: center;
-  gap: 8px;
-
-  height: 40px;
-  padding: 0 12px;
-  border-radius: var(--radius);
-
-  font: inherit;
-  font-weight: 800;
-  letter-spacing: .2px;
-  cursor: pointer;
-  user-select: none;
-
-  background: transparent;
-  color: var(--ink);
-  border: 1px solid transparent;
-  transition: background .16s ease, color .16s ease, border-color .16s ease,
-              transform .06s ease, box-shadow .16s ease, filter .15s ease;
-}
-.sb-btn svg{ display:block; }
-
-.sb-btn--ghost{
-  background: color-mix(in oklab, var(--surface) 8%, transparent);
-  border-color: color-mix(in oklab, var(--border) 40%, transparent);
-}
-.sb-btn--ghost:hover{
-  background: color-mix(in oklab, var(--surface) 16%, transparent);
-  border-color: color-mix(in oklab, var(--border) 70%, transparent);
-  box-shadow: 0 0 0 6px var(--ring);
-}
-.sb-btn--ghost:active{
-  transform: translateY(1px);
-  filter: brightness(1.02);
-}
-.sb-btn--ghost:focus-visible{
-  outline: none;
-  box-shadow: 0 0 0 6px var(--ring);
+  box-shadow: 0 0 0 4px var(--btn-ring);
 }
 
-/* Variantes semánticas */
-.sb-btn--primary{
-  background: var(--primary);
-  color: var(--primary-ink);
-  border-color: var(--primary);
-  box-shadow: 0 10px 24px color-mix(in oklab, var(--primary) 28%, transparent);
-}
-.sb-btn--primary:hover{ box-shadow: 0 0 0 6px var(--ring); }
-.sb-btn--primary:active{ transform: translateY(1px); }
 
-.sb-btn[disabled],
-.sb-btn--ghost[disabled]{
-  opacity: .6;
-  cursor: not-allowed;
-  box-shadow: none;
-}
-.sb-btn.is-compact{
-  height: 34px;
-  padding: 0 10px;
-  gap: 6px;
-}
-
-/* Ajuste responsive de botones */
-@media (max-width: 520px){
-  .theme-btn, .sb-btn{ height: 36px; padding-inline: 10px; }
-}
 
 /* ==========================================================================
    5) TABLAS Y TEXTO
@@ -476,17 +491,6 @@ input, select, textarea{
 .panel,
 .ticket-form,
 .tf-grid { box-shadow: none !important; filter: none !important; }
-
-.theme-btn,
-.sb-btn,
-.sb-btn--ghost { box-shadow: none !important; }
-
-.theme-btn:focus-visible,
-.sb-btn:focus-visible{
-  box-shadow: none !important;
-  outline: 2px solid color-mix(in oklab, var(--ink) 40%, transparent);
-  outline-offset: 2px;
-}
 
 .tf-submit { box-shadow: none !important; }
 .tf-input:focus,

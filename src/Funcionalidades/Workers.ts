@@ -49,6 +49,7 @@ function mapGraphUser(u: any, i: number): Worker {
 
 function mapSPRowToWorker(r: any): Worker {
   const f = r?.fields ?? r ?? {};
+  console.log(f)
   return {
     id: String(r.ID ?? r.Id ?? f.ID ?? f.Id ?? ''),
     displayName: String(

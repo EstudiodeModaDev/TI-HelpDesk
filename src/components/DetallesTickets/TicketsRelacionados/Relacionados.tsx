@@ -60,13 +60,12 @@ export default function TicketsAsociados({title = "Tickets Asociados", ticket, e
       <header className="ta-header">
         <div className="ta-header__left">
           <h2 className="ta-title">{title}</h2>
+          {isPrivileged &&
+            <a className="btn btn-circle btn-circle--sm" onClick={showRel ? closeRelacionador : openRelacionador} aria-label="Relacionar nuevo">+</a>
+          }
         </div>
 
-          {isPrivileged &&
-            <a className="ta-seeall" onClick={showRel ? closeRelacionador : openRelacionador} aria-label="Relacionar nuevo">
-              Relacion nuevo
-            </a>
-          }
+
       </header>
 
       {/* ===== Contenido ===== */}
@@ -115,7 +114,7 @@ export default function TicketsAsociados({title = "Tickets Asociados", ticket, e
                 ) : (
                   <>
                     <p className="ta-label">
-                      Padre de {shoAll? hijos.length : Math.min(3, hijos.length)}/{hijos.length}:
+                      Padre de {shoAll? hijos.length : Math.min(2, hijos.length)}/{hijos.length}:
                     </p>
 
                     {hijos.length > 5 && (
@@ -133,7 +132,7 @@ export default function TicketsAsociados({title = "Tickets Asociados", ticket, e
                 <>
                   {!shoAll ? (
                     <ul className="ta-list">
-                      {hijos.slice(0, 3).map((t) => (
+                      {hijos.slice(0, 2).map((t) => (
                         <li key={t.ID} className="ta-list__item">
                           <span className="ta-list__dash" aria-hidden>-</span>
                           <button type="button" className="ta-link ta-link--button" onClick={(e) => handleClick(e, t)}>

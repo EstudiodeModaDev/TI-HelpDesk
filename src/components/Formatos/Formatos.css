@@ -113,39 +113,6 @@
   flex-wrap: wrap;
 }
 
-/* Botón primario */
-.fp-btn-primary{
-  appearance: none;
-  border: 1px solid var(--primary);
-  background: var(--primary);
-  color: var(--primary-ink);
-  font-weight: 800;
-  padding: 10px 16px;
-  border-radius: 999px;
-  cursor: pointer;
-  box-shadow: var(--shadow);
-  transition: transform .06s ease, filter .15s ease, box-shadow .18s ease;
-}
-.fp-btn-primary:hover{ box-shadow: 0 0 0 6px var(--ring); filter: brightness(1.03); }
-.fp-btn-primary:active{ transform: translateY(1px); }
-.fp-btn-primary:disabled{ opacity: .6; cursor: not-allowed; }
-
-/* Botón ghost (secundario) */
-.fp-btn-ghost{
-  appearance: none;
-  border: 1px solid var(--bd);
-  background: color-mix(in oklab, var(--field-bg) 92%, transparent);
-  color: var(--ink);
-  font-weight: 800;
-  padding: 10px 14px;
-  border-radius: 999px;
-  cursor: pointer;
-  box-shadow: var(--shadow);
-  transition: transform .06s ease, filter .15s ease, box-shadow .18s ease;
-}
-.fp-btn-ghost:hover{ box-shadow: 0 0 0 6px var(--ring); filter: brightness(1.03); }
-.fp-btn-ghost:active{ transform: translateY(1px); }
-
 /* =======================
    Responsive por contenedor
    ======================= */
@@ -153,4 +120,30 @@
   .fp-actions{ justify-content: stretch; }
   .fp-btn-primary, .fp-btn-ghost{ width: 100%; }
   .fp-terms-text{ max-height: 40vh; }
+}
+
+.fp-group{
+  display: flex;
+  align-items: center;
+  gap: 15px
+}
+
+/* El bloque del select + error ocupa el resto */
+.fp-group > div{
+  display: flex;
+  align-items: center;
+  gap: 8px;                  /* espacio entre select y error */
+  flex: 1 1 auto;
+  min-width: 0;              /* evita saltos raros con textos largos */
+}
+
+/* El label no se parte */
+.fp-label{
+  margin: 0;
+  white-space: nowrap;
+}
+
+/* El select crece y no rompe */
+.fp-select{
+  width: 300px !important;
 }

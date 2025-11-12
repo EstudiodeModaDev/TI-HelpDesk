@@ -84,45 +84,6 @@
   margin-top: var(--gap);
 }
 
-.relc-btn{
-  appearance: none;
-  border: 1px solid var(--bd);
-  background: var(--field-bg);
-  color: var(--ink);
-  font-weight: 800;
-  cursor: pointer;
-  box-shadow: var(--shadow);
-  transition: transform .06s ease, filter .15s ease, box-shadow .18s ease;
-}
-
-.relc-btn--circle{
-  inline-size: 40px;
-  block-size: 40px;
-  border-radius: 999px;
-  display: grid;
-  place-items: center;
-  font-size: 1.1rem;
-  line-height: 1;
-}
-
-/* Variante confirmación: llena con primario */
-.relc-btn--ok{
-  border-color: var(--primary);
-  background: var(--primary);
-  color: var(--primary-ink);
-}
-.relc-btn:hover{ box-shadow: 0 0 0 6px var(--ring); filter: brightness(1.03); }
-.relc-btn:active{ transform: translateY(1px); }
-.relc-btn[disabled]{ opacity: .6; cursor: not-allowed; }
-
-/* Variante “cancelar” como ghost */
-.relc-btn--danger{
-  /* sin rojo: ghost basado en tokens */
-  background: color-mix(in oklab, var(--field-bg) 92%, transparent);
-  border-color: var(--bd);
-  color: var(--ink);
-}
-
 /* =========================================================
    Responsive por espacio real (container queries)
    ========================================================= */
@@ -136,10 +97,6 @@
     justify-content: stretch;
     grid-auto-flow: row;
     grid-auto-columns: 1fr;
-  }
-  .relc-btn--circle{
-    inline-size: 44px;  /* un poco más grande para dianas táctiles */
-    block-size: 44px;
   }
 }
 

@@ -245,7 +245,8 @@ html, body, #root {
 .dash-filters .date{
   background: var(--field-bg); color: var(--ink);
   border:1px solid var(--border);
-  border-radius:10px; padding:6px 8px; height:34px;
+  border-radius:10px; padding:6px 8px; height:20px;
+  margin-right: 5px;
 }
 
 /* =========================

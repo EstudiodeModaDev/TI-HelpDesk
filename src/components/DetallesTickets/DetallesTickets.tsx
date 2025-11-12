@@ -60,6 +60,7 @@ export function CaseDetail({ ticket, onVolver, role }: Props) {
   const [showRecat, setShowRecat] = React.useState(false);
   const [showReasig, setShowReasig] = React.useState(false);
   const [showObservador, setShowObservador] = React.useState(false);
+  const [showBotton, setShowBotton] = React.useState(true)
 
   const canRecategorizar = hasRecatRole?.(role) ?? false;
 
@@ -78,7 +79,10 @@ export function CaseDetail({ ticket, onVolver, role }: Props) {
     <section className="case-detail">
       {/* ===== Header ===== */}
       <header className="cd-header">
-        <h2 className="cd-title">Caso – ID {selected.ID}</h2>
+        <h2 className="cd-title">Caso – ID {selected.ID} </h2>
+        <span className={`cd-badge ${selected.Estadodesolicitud === "Cerrado" ? "is-closed" : selected.Estadodesolicitud === "En Atención" ? "is-open" : "is-out"}`} title={selected.Estadodesolicitud ?? ""}>
+          {selected.Estadodesolicitud}
+        </span>
         <button type="button" className="btn-primary" onClick={onVolver}>← Volver</button>
       </header>
 
@@ -110,14 +114,6 @@ export function CaseDetail({ ticket, onVolver, role }: Props) {
 
         <Row className="pos-ans" label="ANS">
           <Trunc text={selected.ANS ?? "N/A"} lines={1} />
-        </Row>
-
-        <Row className="pos-estado" label="Estado">
-          <div className="cd-inline">
-            <span className={`cd-badge ${selected.Estadodesolicitud === "Cerrado" ? "is-closed" : "is-open"}`} title={selected.Estadodesolicitud ?? ""}>
-              {selected.Estadodesolicitud}
-            </span>
-          </div>
         </Row>
 
         {/* Fila 3: personas */}
@@ -207,16 +203,19 @@ export function CaseDetail({ ticket, onVolver, role }: Props) {
       </div>
 
       {/* ===== Botón de Seguimiento ===== */}
-      <div>
-        <button type="button" className="btn-secondary" onClick={() => setShowSeg((v) => !v)} >
-          {showSeg ? "Ocultar seguimiento" : "Seguimiento ticket"}
-        </button>
-      </div>
+      {showBotton ?
+        <div>
+          <button type="button" className="btn btn-secondary-final" onClick={() => {setShowSeg((v) => !v); setShowBotton(false)}} >
+            {showSeg ? "Ocultar seguimiento" : "Seguimiento ticket"}
+          </button>
+        </div> : null
+      }
+      
 
       {/* ===== Historial (toggle) ===== */}
       {showSeg && (
         <div className="seccion">
-          <TicketHistorial role={role ?? "Usuario"} onVolver={() => setShowSeg(false)} ticketId={selected.ID!} ticket={selected}/>
+          <TicketHistorial role={role ?? "Usuario"} onVolver={() => setShowSeg(false)} ticketId={selected.ID!} ticket={selected} onAdd={() => setShowBotton(true)}/>
         </div>
       )}
 

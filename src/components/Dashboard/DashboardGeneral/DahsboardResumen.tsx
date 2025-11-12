@@ -263,7 +263,7 @@ function StatusBars({total, at, late, inprog,}: {total: number; at: number; late
 
   const rows = [
     { color: "#10b981", label: "A tiempo", value: at, width: pct(at) },
-    { color: "#ef4444", label: "Fuera de tiempo", value: late, width: pct(late) },
+    { color: "#ef4444", label: "Vencidos", value: late, width: pct(late) },
     { color: "#06b6d4", label: "En curso", value: inprog, width: pct(inprog) },
   ];
 

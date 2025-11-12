@@ -2,13 +2,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap');
 
 /* ====== DARK ====== */
-:root{
-  /* Marca / aguamarina */
-  --brand-600:#176d72;     /* sidebar base */
-  --brand-700:#0f686c;     /* sidebar más oscuro */
-  --brand-500:#1e7e83;     /* chips/badges */
-  --brand-400:#23a3a3;     /* realces sutiles */
-
+:root[data-theme="dark"]{
   /* Superficies y texto (contenido) */
   --page-bg: radial-gradient(1200px 800px at 20% -10%, #0e3d3f 0%, #0b2327 35%, #0b171a 100%);
   --surface:#0f1a1d;       /* paneles/cards */
@@ -59,8 +53,12 @@
 }
 
 /* ====== LIGHT ====== */
-:root[data-theme="light"]{
-  /* Conserva sidebar aguamarina */
+:root{
+  --brand-600:#176d72;    
+  --brand-700:#0f686c;    
+  --brand-500:#1e7e83;    
+  --brand-400:#23a3a3;    
+
   --sb-bg:var(--brand-600);
   --sb-bg-2:var(--brand-700);
   --sb-text:#eaf6f6;
@@ -194,3 +192,56 @@ h1, h2, h3, h4, h5, h6{
     background-color: #f9f9f9;
   }
 }
+
+input[type="checkbox"]{
+  appearance: none;
+  -webkit-appearance: none;
+  inline-size: 18px;
+  block-size: 18px;
+  border-radius: 4px;
+  border: 1px solid var(--bd);
+  background: var(--field-bg);              /* fondo SIN marcar */
+  display: grid;
+  place-content: center;
+  margin: 0;
+  cursor: pointer;
+  transition: background .15s ease, border-color .15s ease, box-shadow .15s ease;
+}
+
+/* Foco accesible */
+input[type="checkbox"]:focus-visible{
+  outline: none;
+  box-shadow: 0 0 0 4px var(--ring);
+}
+
+/* Estado marcado: aquí pones el color de fondo */
+input[type="checkbox"]:checked{
+  background: var(--primary);               /* fondo AL marcar */
+  border-color: color-mix(in oklab, var(--primary) 70%, var(--bd) 30%);
+  font-size: 1px;
+}
+
+/* “Tick” dibujado con CSS */
+input[type="checkbox"]::after{
+  content: "";
+  inline-size: 10px;
+  block-size: 6px;
+  border: 2px solid var(--primary-ink, var(--ink));
+  border-top: 0;
+  border-right: 0;
+  transform: rotate(-45deg) scale(0);
+  transition: transform .12s ease;
+}
+
+input[type="checkbox"]:checked::after{
+  transform: rotate(-45deg) scale(1);
+}
+
+
+.content--withSidebar,
+.page-viewport{
+  align-content: start;
+  align-items: start;
+  justify-items: stretch;
+}
+

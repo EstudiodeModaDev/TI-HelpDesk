@@ -9,7 +9,6 @@
   background: var(--surface, #fff);
   color: var(--ink, #0f172a);
   border-radius: var(--radius-3xl, var(--radius, 12px));
-  box-shadow: var(--shadow, 0 8px 22px rgba(0,0,0,.06));
   padding: var(--pad);
   max-width: 420px;       /* 👈 tarjeta angosta */
   width: 100%;
@@ -56,7 +55,6 @@
   border: 1px solid var(--bd, #e5e7eb);
   border-radius: var(--radius-sm);
   outline: none;
-  transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
   min-width: 0;
 }
 .ft-field input::placeholder{ color: color-mix(in oklab, var(--muted, #64748b) 80%, transparent); }
@@ -106,19 +104,12 @@
   margin-top: 4px;
 }
 .ft-btn{
-  flex: 1;                        /* 👈 ocupa todo el ancho */
-  height: var(--h-btn);
-  padding: 0 12px;
+  flex: 1;                       
   border-radius: var(--radius-sm);
-  border: 1px solid var(--primary, #3b82f6);
-  background: var(--primary, #3b82f6);
   color: var(--primary-ink, #fff);
-  font-weight: 800;
+  font-weight: 400;
   cursor: pointer;
-  box-shadow: var(--shadow, 0 8px 22px rgba(0,0,0,.06));
-  transition: transform .06s ease, filter .15s ease, box-shadow .18s ease;
 }
-.ft-btn:hover{ box-shadow: 0 0 0 4px var(--ring, rgba(59,130,246,.25)); filter: brightness(1.03); }
 .ft-btn:active{ transform: translateY(1px); }
 
 /* Errores mini */

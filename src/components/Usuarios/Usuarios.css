@@ -5,13 +5,14 @@
   --muted:     var(--muted, #64748b);
   --bd:        var(--border, #e5e7f0);
   --shadow:    var(--shadow, 0 10px 30px rgba(0,0,0,.08));
-  --radius:    var(--radius, 14px);
+  --radius: 15px;
   --primary:   var(--primary, #3b82f6);
   --ring:      var(--ring, rgba(59,130,246,.28));
   --danger:     #dc2626;
   --dangerRing:var(--danger-ring, rgba(220,38,38,.18));
-  --pad:       var(--page-pad, 16px);
-  --gap:       var(--gap, 14px);
+  --pad:       clamp(10px, 2vw, 16px);
+  --gap:       clamp(10px, 1.8vw, 14px);  
+  --ring:      var(--ring, color-mix(in oklab, var(--primary, #3b82f6) 25%, transparent));
 }
 
 .users-header{
@@ -92,8 +93,9 @@
   border: 1px solid var(--bd);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
-  max-height: 80vh;     
-  overflow: auto;
+  padding: var(--pad);
+  overflow-x: auto;              /* 🔑 no se “rompe” en pantallas estrechas */
+  scrollbar-gutter: stable both-edges;
 }
 
 

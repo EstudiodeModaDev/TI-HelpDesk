@@ -85,14 +85,15 @@ export default function Formatos() {
   // Pantalla inicial: selector + TyC
   return (
     <section className="fp-card fp-scope">
-      <label className="fp-label" htmlFor="fp">Tipo de solicitud</label>
-
-      <select id="fp" className="fp-select" value={opcion ?? ""} onChange={(e) => {setOpcion((e.target.value || null) as OpcionSolicitud | null); setAcepta(false); setConfirmado(false);}}>
-        <option value="">Selecciona una opción…</option>
-        {OPCIONES.map((op) => (
-          <option key={op} value={op}>{op}</option>
-        ))}
-      </select>
+      <div className="fp-group">
+        <label className="fp-label" htmlFor="fp">Tipo de solicitud</label>
+        <select id="fp" className="fp-select" value={opcion ?? ""} onChange={(e) => {setOpcion((e.target.value || null) as OpcionSolicitud | null); setAcepta(false); setConfirmado(false);}}>
+          <option value="">Selecciona una opción…</option>
+          {OPCIONES.map((op) => (
+            <option key={op} value={op}>{op}</option>
+          ))}
+        </select>
+      </div>
 
       {opcion && (
         <div className="fp-terms">
@@ -107,10 +108,10 @@ export default function Formatos() {
           </label>
 
           <div className="fp-actions">
-            <button className="fp-btn-primary" onClick={confirmar} disabled={!acepta}>
+            <button className="btn btn-primary btn-xs" onClick={confirmar} disabled={!acepta}>
               Continuar
             </button>
-            <button className="fp-btn-ghost" type="button" onClick={() => {setOpcion(null); setAcepta(false); setConfirmado(false);}} >
+            <button className="btn btn-secondary btn-xs" type="button" onClick={() => {setOpcion(null); setAcepta(false); setConfirmado(false);}} >
               Cancelar
             </button>
           </div>

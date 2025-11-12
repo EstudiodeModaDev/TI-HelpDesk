@@ -43,7 +43,7 @@
   margin: 0;
 }
 .cd-label{
-  background: rgb(221, 218, 218);
+  background: rgb(231, 229, 229);
   border: 1px solid var(--bd);
   border-radius: 10px;
   padding: 5px 15px;
@@ -52,7 +52,8 @@
   min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
   min-width: none;
   height: auto;
-  justify-content: center;
+  align-items: center;
+  display: flex;
 }
 .cd-value{
   background: color-mix(in oklab, var(--surface-elev) 90%, var(--surface));
@@ -86,12 +87,18 @@
   color: var(--ink);
 }
 .cd-badge.is-open{
-  background: color-mix(in oklab, var(--primary) 16%, var(--surface));
+  background: color-mix(in oklab, var(--primary) 30%, var(--surface));
   border-color: color-mix(in oklab, var(--primary) 35%, var(--bd));
   color: color-mix(in oklab, var(--primary-ink) 80%, var(--ink));
 }
 .cd-badge.is-closed{
-  background: color-mix(in oklab, var(--ink) 8%, transparent);
+  background: color-mix(in oklab, green 30%, transparent);
+  border-color: var(--bd);
+  color: var(--ink);
+}
+
+.cd-badge.is-out{
+  background: color-mix(in oklab, red 30%, transparent);
   border-color: var(--bd);
   color: var(--ink);
 }
@@ -129,7 +136,7 @@
   background: color-mix(in oklab, var(--surface-elev) 92%, var(--surface));
 }
 .cd-people-label{
-  background: rgb(221, 218, 218);
+  background: rgb(231, 229, 229);;
   color: black;
   font-weight:600;
   border-bottom:1px solid var(--bd);

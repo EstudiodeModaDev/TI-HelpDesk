@@ -99,10 +99,10 @@ export default function RelacionadorInline({currentId, onCancel, userMail, isAdm
 
       {/* Acciones */}
       <div className="relc-actions">
-        <button type="button" className="relc-btn relc-btn--circle relc-btn--danger" onClick={onCancel} title="Cancelar" aria-label="Cancelar">
+        <button type="button" className="btn btn-circle btn-secondary" onClick={onCancel} title="Cancelar" aria-label="Cancelar">
           ×
         </button>
-        <button type="button" className="relc-btn relc-btn--circle relc-btn--ok" 
+        <button type="button" className="btn btn-circle btn-primary" 
           onClick={async (e) => {
             e.preventDefault();           
             try {

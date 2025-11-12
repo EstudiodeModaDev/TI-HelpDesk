@@ -46,8 +46,8 @@ export default function StoreInfoPanel() {
 
       <form onSubmit={(e) => { e.preventDefault(); loadQuery(); }} className="store-actions">
         <div className="store-actions__left">
-          <input type="text" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Buscar por nombre de la tienda o identificador de servicio..." className="flex-1 px-4 py-3 text-base shadow-sm" aria-label="Buscar tienda"/>          
-          <button type="submit" disabled={loading} className="inline-flex items-center justify-center gap-2 px-5 py-3 text-sm font-semibold bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-60">
+          <input type="text" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Buscar por nombre de la tienda o identificador de servicio..." className="info-select" aria-label="Buscar tienda"/>          
+          <button type="submit" disabled={loading} className="btn btn-primary-final btn-xs">
             <span className="i-lucide-check mr-1" aria-hidden />
             {loading ? "Buscando…" : "Buscar"}
           </button>
