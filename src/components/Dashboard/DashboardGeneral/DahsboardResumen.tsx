@@ -35,7 +35,7 @@ export default function DashboardResumen() {
   const { Tickets } = useGraphServices() as ReturnType<typeof useGraphServices> & {
     TicketService: TicketsService;
   };
-  const { totalCasos, totalEnCurso, totalFinalizados, totalFueraTiempo, porcentajeCumplimiento, topCategorias, range, totalCategorias, resolutores, Fuentes, casosPorDia, loading, 
+  const { totalCasos, totalEnCurso, totalFinalizados, totalFueraTiempo, porcentajeCumplimiento, topSolicitante, range, totalCategorias, resolutores, Fuentes, casosPorDia, loading, 
     obtenerTotal, obtenerTop5, setRange, obtenerTotalCategoria, obtenerTotalResolutor, obtenerFuentes,obtenerCasosPorDia, } = useDashboard(Tickets);
 
   // carga inicial
@@ -83,8 +83,8 @@ export default function DashboardResumen() {
         </div>
 
         <div className="panel">
-          <h4>Top 5 categorías</h4>
-          <TopCategorias data={topCategorias} total={totalCasos} />
+          <h4>Top 5 solicitante</h4>
+          <TotalBarras data={topSolicitante} total={totalCasos} />
         </div>
       </aside>
 
@@ -96,8 +96,8 @@ export default function DashboardResumen() {
             <input className="date" type="date" value={range.to} onChange={(e) => setRange({ ...range, to: e.target.value })}/>
           </div>
         </header>
-        <h4 className="cats__title">Total Casos por Categoria</h4>  
-        <CategoriasChart data={totalCategorias} />
+        <h4 className="cats__title">Top 5 Categorias</h4>  
+        <CategoriasChart data={totalCategorias} maxBars={5}/>
 
         <section className="resolutores">
           <h4>Resolutores</h4>
@@ -284,7 +284,7 @@ function StatusBars({total, at, late, inprog,}: {total: number; at: number; late
 }
 
 // Barras Top 5 categorías
-function TopCategorias({data,}: {data: TopCategoria[]; total: number;}) {
+function TotalBarras({data,}: {data: TopCategoria[]; total: number;}) {
   if (!data?.length) {
     return <div className="hint">Sin datos para el período seleccionado</div>;
   }
@@ -298,7 +298,7 @@ function TopCategorias({data,}: {data: TopCategoria[]; total: number;}) {
         return (
           <li key={c.nombre} className="topcats-row">
             <div className="topcats-left">
-              <span className="topcats-name" title={c.nombre}>{c.nombre}</span>
+              <span className="topcats-name" title={c.nombre}>{c.nombre.slice(0, 17)}...</span>
             </div>
             <div className="topcats-bar">
               <div className="topcats-fill" style={{ width: `${w}%` }} />

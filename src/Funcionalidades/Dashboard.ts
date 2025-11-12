@@ -20,6 +20,7 @@ export function useDashboard(TicketsSvc: TicketsService) {
     const [range, setRange] = React.useState<DateRange>({ from: today, to: today });
     const [topCategorias, setTopCategorias] = React.useState<TopCategoria[]>([]);
     const [totalCategorias, setTotalCateogria] = React.useState<TopCategoria[]>([]);
+    const [topSolicitante, setTop5Solicitante] = React.useState<TopCategoria[]>([]);
     const [casosPorDia, setCasosPorDia] = React.useState<DailyPoint[]>([]);
     const [Fuentes, setFuentes] = React.useState<Fuente[]>([]);
    
@@ -74,7 +75,7 @@ export function useDashboard(TicketsSvc: TicketsService) {
         const filter = buildFilterTickets(mode)
         //Todos los casos
         const casos = (await TicketsSvc.getAll({filter: filter.filter, top: 12000})).items;
-         const total = Array.isArray(casos) ? casos.length : Array.isArray((casos as any)?.value) ? (casos as any).value.length : 0;
+        const total = Array.isArray(casos) ? casos.length : Array.isArray((casos as any)?.value) ? (casos as any).value.length : 0;
 
         //Casos finalizados
         const casosFinalizados = (await TicketsSvc.getAll({filter: filter.filter + " and fields/Estadodesolicitud eq 'Cerrado'", top:12000})).items;
@@ -91,6 +92,19 @@ export function useDashboard(TicketsSvc: TicketsService) {
         //Porcentaje de cumplimiento
         const porcentajeCumplimiento = total > 0 ? ((totalFinalizados) / total) : 0;
 
+        const countBySolicitante = (key: (t: Ticket)=>string) => {
+          const m = new Map<string, number>()
+          for (const t of casos) {
+            const k = key(t) || "(En blanco)"
+            m.set(k, (m.get(k) ?? 0) + 1)
+          }
+          return Array.from(m, ([nombre, total]) => ({ nombre, total }))
+            .sort((a,b)=>b.total-a.total)
+        }
+        const allSolicitantes = countBySolicitante(t => String((t as any).Solicitante).trim())
+        const top5Solicitante = allSolicitantes.slice(0,5)
+        
+        setTop5Solicitante(top5Solicitante)
         setPorcentajeCumplimiento(porcentajeCumplimiento);
         setTotalCasos(total);
         setTotalFinalizados(totalFinalizados);
@@ -144,6 +158,8 @@ export function useDashboard(TicketsSvc: TicketsService) {
         setLoading(false);
       }
     }, [TicketsSvc, buildFilterTickets]);
+
+    
 
     const obtenerTotalCategoria = React.useCallback(async (mode: string) => {
       setLoading(true);
@@ -351,7 +367,7 @@ export function useDashboard(TicketsSvc: TicketsService) {
 
   return {
     obtenerTotal, setRange, obtenerTop5, obtenerTotalCategoria, obtenerTotalResolutor, obtenerFuentes, obtenerCasosPorDia,
-    totalCasos, error, loading, totalEnCurso, totalFinalizados, totalFueraTiempo, porcentajeCumplimiento, topCategorias, range, totalCategorias, resolutores, Fuentes, casosPorDia
+    totalCasos, error, loading, totalEnCurso, totalFinalizados, totalFueraTiempo, porcentajeCumplimiento, topCategorias, range, totalCategorias, resolutores, Fuentes, casosPorDia, topSolicitante
   };
 }
 

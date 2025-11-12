@@ -89,7 +89,7 @@ export function CaseDetail({ ticket, onVolver, role }: Props) {
           <Trunc text={ParseDateShow(selected.FechaApertura ?? "") ?? "—"} />
         </Row>
 
-        <Row className="pos-solucion" label="Fecha de solución">
+        <Row className="pos-solucion" label="Fecha de Solución">
           <Trunc text={ParseDateShow(selected.TiempoSolucion ?? "") ?? "—"} />
         </Row>
 
@@ -125,7 +125,7 @@ export function CaseDetail({ ticket, onVolver, role }: Props) {
           <div className="cd-people-item">
             <div className="cd-people-label">Solicitante</div>
             <div className="cd-people-value">
-              {selected.Solicitante}
+              <Trunc text={selected.Solicitante} lines={1} maxLenght={30}/>
             </div>
           </div>
 
@@ -134,7 +134,7 @@ export function CaseDetail({ ticket, onVolver, role }: Props) {
             <div className="cd-people-value">
               {canRecategorizar ? (
                 <button type="button" className="as-text" onClick={() => setShowObservador(true)}>
-                  {selected.Observador || "–"}
+                  <Trunc text={selected.Observador || "–"} lines={1} maxLenght={30}/>
                 </button>
               ) : (
                 selected.Observador || "—"
@@ -147,7 +147,7 @@ export function CaseDetail({ ticket, onVolver, role }: Props) {
             <div className="cd-people-value">
               {canRecategorizar ? (
                 <button type="button" className="as-text" onClick={() => setShowReasig(true)}>
-                  {selected.Nombreresolutor || "–"}
+                  <Trunc text={selected.Nombreresolutor || "–"} lines={1} maxLenght={30}/>
                 </button>
               ) : (
                 <Trunc text={selected.Nombreresolutor || "–"} lines={1} />

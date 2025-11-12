@@ -39,26 +39,34 @@
 .cd-row{
   display: grid;
   grid-template-columns: clamp(var(--cd-label-min), var(--cd-label-ideal), var(--cd-label-max)) minmax(0,1fr);
-  gap: 10px;
+  gap: 5px;
   margin: 0;
 }
 .cd-label{
-  background: rgb(158, 156, 156);
+  background: rgb(221, 218, 218);
   border: 1px solid var(--bd);
   border-radius: 10px;
-  padding: 10px 12px;
-  font-weight: 800;
+  padding: 5px 15px;
+  font-weight: 600;
   color: black;
   min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  min-width: none;
+  height: auto;
+  justify-content: center;
 }
 .cd-value{
   background: color-mix(in oklab, var(--surface-elev) 90%, var(--surface));
   border: 1px solid var(--bd);
   border-radius: 10px;
   padding: 10px 12px;
-  min-height: 36px;
+  min-height: 0;
+  max-height: 20px;
   display: flex; align-items: center; gap: 8px;
   color: var(--ink);
+}
+
+.pos-descr .cd-value{
+  max-height: none;
 }
 
 /* Pastillas y badges */
@@ -72,7 +80,7 @@
 }
 .cd-badge{
   display:inline-block; padding:6px 10px; border-radius:999px;
-  font-weight:800; font-size:12px; white-space: nowrap;
+  font-weight:400; font-size:12px; white-space: nowrap;
   border: 1px solid var(--bd);
   background: color-mix(in oklab, var(--surface) 92%, transparent);
   color: var(--ink);
@@ -123,13 +131,14 @@
 .cd-people-label{
   background: rgb(221, 218, 218);
   color: black;
-  font-weight:800;
+  font-weight:600;
   border-bottom:1px solid var(--bd);
-  height:30px;
-  padding-left: 10px;
+  height: auto;
+  padding: 0px 15px;
+  
 }
 .cd-people-value{
-  padding:8px 10px; min-height:10px; display:flex; align-items:center;
+  padding-left:15px; padding-top: 2px; min-height:0px; display:flex; align-items:center;
 }
 
 /* Bloque derecho (título, descripción, casos) */
