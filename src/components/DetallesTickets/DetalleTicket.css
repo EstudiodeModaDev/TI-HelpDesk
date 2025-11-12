@@ -23,7 +23,7 @@
 .cd-grid{
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
-  gap: clamp(8px, 1.6vw, 16px) clamp(10px, 1.8vw, 16px);
+  gap: clamp(6px, 1.2vw, 12px) clamp(8px, 1.4vw, 12px);
   grid-auto-rows: min-content;
 }
 

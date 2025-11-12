@@ -109,7 +109,7 @@ export function CaseDetail({ ticket, onVolver, role }: Props) {
         </Row>
 
         <Row className="pos-ans" label="ANS">
-          <Trunc text={selected.ANS ?? "—"} lines={1} />
+          <Trunc text={selected.ANS ?? "N/A"} lines={1} />
         </Row>
 
         <Row className="pos-estado" label="Estado">

@@ -50,6 +50,9 @@
   --chart-tooltip-bg: var(--surface);
   --chart-tooltip-bd: var(--border);
   --chart-tooltip-ink: var(--ink);
+  --sb-track: rgba(255,255,255,.08);
+  --sb-thumb: rgba(255,255,255,.30);
+  --sb-thumb-hover: rgba(255,255,255,.55);
 
   /* Alias */
   --bd: var(--border);
@@ -94,7 +97,40 @@
   --chart-tooltip-ink: var(--ink);
 
   --bd: var(--border);
+  --sb-width: ;              /* grosor */
+  --sb-radius: 10px;             /* redondeo */
+  --sb-track: rgba(0,0,0,.08);   /* carril */
+  --sb-thumb: rgba(0,0,0,.28);   /* pulgar */
+  --sb-thumb-hover: rgba(0,0,0,.45);
 }
+
+/* Global */
+::-webkit-scrollbar{
+  width: 7px;
+  height: 5px; /* horizontal */
+}
+
+::-webkit-scrollbar-thumb{
+  background: var(--sb-thumb);
+  border-radius: var(--sb-radius);
+  border: 2px solid transparent;       /* “acolchado” */
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:hover{
+  background: var(--sb-thumb-hover);
+}
+
+/* Si quieres solo en un contenedor específico */
+.scroll-area::-webkit-scrollbar{ width: var(--sb-width); height: var(--sb-width); }
+.scroll-area::-webkit-scrollbar-track{ background: var(--sb-track); }
+.scroll-area::-webkit-scrollbar-thumb{
+  background: var(--sb-thumb);
+  border-radius: var(--sb-radius);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
 
 a {
   font-weight: 500;

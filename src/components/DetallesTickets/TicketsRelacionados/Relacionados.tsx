@@ -28,6 +28,7 @@ export default function TicketsAsociados({title = "Tickets Asociados", ticket, e
   // ====== Relacionador (UI) ======
   const [showRel, setShowRel] = React.useState(false);
   const [loadingOpts, setLoadingOpts] = React.useState(false);
+  const [shoAll, setShowAll] = React.useState<boolean>(false)
   
 
   async function openRelacionador() {
@@ -108,28 +109,60 @@ export default function TicketsAsociados({title = "Tickets Asociados", ticket, e
 
             {/* Hijos */}
             <section className="ta-column">
-              <p className="ta-label">Padre de {hijos.length}:</p>
+              <div className="encabezado">
+                {hijos.length === 0 ? (
+                  <p className="ta-label">Padre de:</p>
+                ) : (
+                  <>
+                    <p className="ta-label">
+                      Padre de {shoAll? hijos.length : Math.min(3, hijos.length)}/{hijos.length}:
+                    </p>
+
+                    {hijos.length > 5 && (
+                      <button className="ta-link ta-link--button" aria-live="polite" onClick={() => setShowAll(!shoAll)}>
+                        {shoAll ? "Ver resumen" : "Ver todos"}
+                      </button>
+                    )}
+                  </>
+                )}
+              </div>
+
               {hijos.length === 0 ? (
                 <p className="ta-empty">{emptyChildrenText}</p>
               ) : (
-                <ul className="ta-list">
-                  {hijos.map((t) => (
-                    <li key={t.ID} className="ta-list__item">
-                      <span className="ta-list__dash" aria-hidden>-</span>
-                      {onSelect ? (
-                        <button type="button" className="ta-link ta-link--button" onClick={(e) => handleClick(e, t)}>
-                          {t.Title} <span className="ta-link__muted">{" → "} ID: {t.ID}</span>
-                        </button>
-                      ) : (
-                        <a className="ta-link" href={href(t.ID ?? "")}>
-                          {t.Title} <span className="ta-link__muted">{" → "} ID: {t.ID}</span>
-                        </a>
-                      )}
-                    </li>
-                  ))}
-                </ul>
+                <>
+                  {!shoAll ? (
+                    <ul className="ta-list">
+                      {hijos.slice(0, 3).map((t) => (
+                        <li key={t.ID} className="ta-list__item">
+                          <span className="ta-list__dash" aria-hidden>-</span>
+                          <button type="button" className="ta-link ta-link--button" onClick={(e) => handleClick(e, t)}>
+                            {t.Title} <span className="ta-link__muted">{" → "} ID: {t.ID}</span>
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <ul className="ta-list">
+                      {hijos.map((t) => (
+                        <li key={t.ID} className="ta-list__item">
+                          <span className="ta-list__dash" aria-hidden>-</span>
+                          <button
+                            type="button"
+                            className="ta-link ta-link--button"
+                            onClick={(e) => handleClick(e, t)}
+                          >
+                            {t.Title} <span className="ta-link__muted">{" → "} ID: {t.ID}</span>
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </>
               )}
             </section>
+
+
           </div>
         </>
       )}
