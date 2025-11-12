@@ -2,7 +2,13 @@
 @import url('https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap');
 
 /* ====== DARK ====== */
-:root[data-theme="dark"]{
+:root{
+  /* Marca / aguamarina */
+  --brand-600:#176d72;     /* sidebar base */
+  --brand-700:#0f686c;     /* sidebar más oscuro */
+  --brand-500:#1e7e83;     /* chips/badges */
+  --brand-400:#23a3a3;     /* realces sutiles */
+
   /* Superficies y texto (contenido) */
   --page-bg: radial-gradient(1200px 800px at 20% -10%, #0e3d3f 0%, #0b2327 35%, #0b171a 100%);
   --surface:#0f1a1d;       /* paneles/cards */
@@ -53,12 +59,8 @@
 }
 
 /* ====== LIGHT ====== */
-:root{
-  --brand-600:#176d72;    
-  --brand-700:#0f686c;    
-  --brand-500:#1e7e83;    
-  --brand-400:#23a3a3;    
-
+:root[data-theme="light"]{
+  /* Conserva sidebar aguamarina */
   --sb-bg:var(--brand-600);
   --sb-bg-2:var(--brand-700);
   --sb-text:#eaf6f6;
