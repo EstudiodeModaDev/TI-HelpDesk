@@ -45,12 +45,7 @@ export function useDocumentarTicket(services: Svc) {
 
   const notifyFlow = new FlowClient("https://defaultcd48ecd97e154f4b97d9ec813ee42b.2c.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/a21d66d127ff43d7a940369623f0b27d/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=0ptZLGTXbYtVNKdmIvLdYPhw1Wcqb869N3AOZUf2OH4")
 
-  const handleSubmit = async (
-    e: React.FormEvent,
-    tipo: "solucion" | "seguimiento",
-    ticket: Ticket,
-    account: AccountInfo
-  ) => {
+  const handleSubmit = async (e: React.FormEvent, tipo: "solucion" | "seguimiento", ticket: Ticket, account: AccountInfo) => {
     e.preventDefault();
     if (!validate()) return;
     setSubmitting(true);

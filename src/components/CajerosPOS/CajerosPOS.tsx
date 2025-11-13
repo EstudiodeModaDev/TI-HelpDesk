@@ -31,11 +31,11 @@ export default function CajerosPOSForm({ services }: Props) {
         <div className="cp-fila">
           <div className="cp-campo">
             <label>Solicitante</label>
-            <input type="text" value={state.solicitante} onChange={(e) => setField("solicitante", e.target.value)}/>
+            <input type="text" value={state.solicitante}/>
           </div>
           <div className="cp-campo">
             <label>Correo solicitante</label>
-            <input type="text" value={state.CorreoTercero} onChange={(e) => setField("CorreoTercero", e.target.value)}/>
+            <input type="text" value={state.CorreoTercero}/>
           </div>
         </div>
 
@@ -63,16 +63,14 @@ export default function CajerosPOSForm({ services }: Props) {
         <div className="cp-fila">
           <div className="cp-campo">
             <label>Compañía</label>
-            <Select<Option, false>
-              options={companiaOptions}
-              placeholder="Selecciona"
-              value={companiaOptions.find(o => o.value === state.Compañia) ?? null}
-              onChange={(opt: SingleValue<Option>) =>
-                setField("Compañia", opt?.value ?? "")
-              }
-              classNamePrefix="rs"
-               isClearable
-                        />
+              <Select<Option, false>
+                options={companiaOptions}
+                placeholder= "Selecciona una compañia"
+                value={companiaOptions.find(o => o.value === state.Compañia) ?? null}
+                onChange={(opt: SingleValue<Option>) => setField("Compañia", opt?.value ?? "")}
+                classNamePrefix="rs"
+                isClearable
+              />
 
             {(errors as any).Compañia && (
               <small style={{ color: "#b91c1c" }}>

@@ -112,8 +112,8 @@ export function useCajerosPOS(services: Svc) {
         Cedula: "",
         CO: "",
         Compañia: "",
-        CorreoTercero: "",
-        solicitante: "",
+        CorreoTercero: account?.username ?? "",
+        solicitante: account?.name ?? "",
         usuario: "",
       });
       setErrors({});

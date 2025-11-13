@@ -64,7 +64,7 @@
   --sb-bg:var(--brand-600);
   --sb-bg-2:var(--brand-700);
   --sb-text:#eaf6f6;
-  --sb-muted:#cfe7e5;
+  --sb-muted:#c7d4d3;
   --sb-pill:rgba(255,255,255,.12);
   --sb-hover:rgba(255,255,255,.10);
   --sb-shadow:0 14px 30px rgba(2,6,23,.10);
@@ -247,3 +247,44 @@ input[type="checkbox"]:checked::after{
   justify-items: stretch;
 }
 
+/* ==========================================================================
+   THEME GLOBAL REACT-SELECT  (classNamePrefix="rs")
+   (versión más reciente unificada)
+   ========================================================================== */
+.rs__control{
+  --rs-h: 44px !important;
+  min-height: var(--rs-h) !important;
+  border-radius: 12px !important;
+  border: 1px solid black !important;
+  background: var(--panel, var(--field-bg)) !important;
+  color: var(--fg, var(--ink)) !important;
+  box-shadow: none !important;
+  transition: border-color .15s ease, box-shadow .15s ease, background .15s ease, opacity .15s ease !important;
+}
+.rs__value-container{ padding: 6px 10px !important; gap: 6px !important }
+.rs__single-value,
+.rs__input-container{ color: var(--fg, var(--ink)) !important; }
+.rs__placeholder{ color: color-mix(in oklab, var(--mut, var(--muted)) 80%, transparent) !important; }
+.rs__control--is-focused{
+  border-color: color-mix(in oklab, var(--pri, var(--primary)) 55%, var(--bd) 45%) !important;
+  box-shadow: 0 0 0 4px var(--ring) !important;
+}
+.rs__indicators{ gap: 4px; }
+.rs__indicator{
+  color: color-mix(in oklab, var(--fg, var(--ink)) 85%, transparent) !important;
+  fill: currentColor !important;
+  transition: opacity .15s ease;
+}
+.rs__indicator-separator{
+  background: color-mix(in oklab, var(--bd) 85%, transparent) !important;
+}
+.rs__clear-indicator:hover,
+.rs__dropdown-indicator:hover{ opacity: .85 !important; }
+
+.rs__menu{
+  background: var(--surface-elev) !important;
+  color: var(--fg, var(--ink)) !important;
+  border: 1px solid var(--bd) !important;
+  border-radius: var(--r, var(--radius)) !important;
+  box-shadow: var(--shadow) !important;
+}

@@ -187,7 +187,7 @@ export default function NuevoTicketForm() {
           </div>
 
           {state.usarFechaApertura && (
-            <div className="tf-field tf-col-2">
+            <div className="tf-field">
               <label className="tf-label" htmlFor="fechaApertura">Fecha de apertura</label>
               <input id="fechaApertura" type="date" value={state.fechaApertura ?? ""} onChange={(e) => setField("fechaApertura", e.target.value || null)} disabled={submitting} className="tf-input"/>
               {errors.fechaApertura && <small className="error">{errors.fechaApertura}</small>}
@@ -195,7 +195,7 @@ export default function NuevoTicketForm() {
           )}
 
           {/* Fuente */}
-          <div className="tf-field tf-col-2">
+          <div className="tf-field">
             <label className="tf-label" htmlFor="fuente">Fuente Solicitante</label>
             <select id="fuente" value={state.fuente} onChange={(e) => setField("fuente", e.target.value as typeof state.fuente)} disabled={submitting} className="tf-input">
               <option value="">Seleccione una fuente</option>
@@ -209,9 +209,9 @@ export default function NuevoTicketForm() {
           </div>
 
           {/* Motivo */}
-          <div className="tf-field tf-col-2">
+          <div className="tf-field">
             <label className="tf-label" htmlFor="motivo">Asunto</label>
-            <input id="motivo" type="text" placeholder="Ingrese el motivo" value={state.motivo} onChange={(e) => setField("motivo", e.target.value)} disabled={submitting} className="tf-input"/>
+            <input id="motivo" type="text" placeholder="Ingrese el motivo" value={state.motivo} onChange={(e) => setField("motivo", e.target.value)} disabled={submitting} className="tf-input" maxLength={300}/>
             {errors.motivo && <small className="error">{errors.motivo}</small>}
           </div>
 

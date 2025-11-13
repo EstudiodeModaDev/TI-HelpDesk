@@ -180,7 +180,7 @@ export function useNuevoTicketForm(services: Svc) {
         Nombreresolutor: state.resolutor?.label,
         Correoresolutor: state.resolutor?.email,
         Solicitante: state.solicitante?.label,
-        CorreoSolicitante: state.solicitante?.email,
+        CorreoSolicitante: state.solicitante?.value,
         Estadodesolicitud: "En Atención",
         ANS: ANS
       };
