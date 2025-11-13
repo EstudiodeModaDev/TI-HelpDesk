@@ -252,16 +252,25 @@ input[type="checkbox"]:checked::after{
    (versión más reciente unificada)
    ========================================================================== */
 .rs__control{
-  --rs-h: 44px !important;
+  --rs-h: 20px !important;
+  --rs-mh: 40px !important;
   min-height: var(--rs-h) !important;
+  max-height: var(--rs-mh) !important;
   border-radius: 12px !important;
   border: 1px solid black !important;
   background: var(--panel, var(--field-bg)) !important;
   color: var(--fg, var(--ink)) !important;
   box-shadow: none !important;
   transition: border-color .15s ease, box-shadow .15s ease, background .15s ease, opacity .15s ease !important;
+  align-items: center !important;
+  display: flex !important;
 }
-.rs__value-container{ padding: 6px 10px !important; gap: 6px !important }
+.rs__value-container{
+  padding-block: 4px !important;
+  padding-inline: 12px !important;
+  gap: 6px !important;
+  align-items: center !important;
+}
 .rs__single-value,
 .rs__input-container{ color: var(--fg, var(--ink)) !important; }
 .rs__placeholder{ color: color-mix(in oklab, var(--mut, var(--muted)) 80%, transparent) !important; }
@@ -287,4 +296,10 @@ input[type="checkbox"]:checked::after{
   border: 1px solid var(--bd) !important;
   border-radius: var(--r, var(--radius)) !important;
   box-shadow: var(--shadow) !important;
+}
+
+.rs__input,
+.rs__input-container{
+  margin: 0 !important;
+  padding: 0 !important;
 }

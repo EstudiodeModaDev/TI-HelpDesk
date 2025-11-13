@@ -107,8 +107,6 @@ export default function NuevoTicketForm() {
         <div className="rs-opt">
           <div className="rs-opt__text">
             <span className="rs-opt__title">{label}</span>
-            {(data as any).email && <span className="rs-opt__meta">{(data as any).email}</span>}
-            {(data as any).jobTitle && <span className="rs-opt__meta">{(data as any).jobTitle}</span>}
           </div>
           {data.source && <span className="rs-opt__tag">{data.source}</span>}
         </div>
