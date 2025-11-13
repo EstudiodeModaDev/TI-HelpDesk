@@ -18,7 +18,7 @@ export default function FormTarea() {
   const { Tareas, Franquicias: FranquiciasSvc } = useGraphServices() as ReturnType<typeof useGraphServices> & {
       Tareas: TareasService;
     };
-  const { handleSubmit, errors, setField, state } = useTareas(Tareas);
+  const { handleSubmit, errors, setField, state, reloadAll } = useTareas(Tareas);
   const {workersOptions, loadingWorkers, error: usersError, } = useWorkers({ onlyEnabled: true });
   const { franqOptions, loading: loadingFranq, error: franqError,} = useFranquicias(FranquiciasSvc);
 
@@ -71,16 +71,23 @@ export default function FormTarea() {
     <section className="ft-scope ft-card" role="region" aria-labelledby="ft_title">
       <h2 id="ft_title" className="ft-title">Nueva Tarea</h2>
 
-      <form className="ft-form" onSubmit={handleSubmit} noValidate>
+      <form className="ft-form" onSubmit={(e) => {handleSubmit(e); reloadAll()}} noValidate>
         {/* Asunto */}
         <div className="ft-field">
           <label className="ft-label" htmlFor="titulo">Asunto *</label>
-          <input id="titulo" name="titulo" type="text" placeholder="Ingrese el asunto del recordatorio" value={state.titulo} onChange={(e) => setField("titulo", e.target.value)} autoComplete="off" required aria-required="true" aria-describedby={errors.titulo ? "err-titulo" : undefined}/>
+          <input id="titulo" name="titulo" type="text" placeholder="Ingrese el asunto del recordatorio (100 caracteres max)" value={state.titulo} onChange={(e) => setField("titulo", e.target.value)} autoComplete="off" required aria-required="true" aria-describedby={errors.titulo ? "err-titulo" : undefined} maxLength={100}/>
+          <small id="err-titulo"> {state.titulo.length}/100</small>
           {errors.titulo && (
             <small id="err-titulo" className="error">
               {errors.titulo}
             </small>
           )}
+        </div>
+
+        <div className="ft-field">
+          <label className="ft-label" htmlFor="descripcion">Descripcion *</label>
+          <input id="descripcion" name="descripcion" type="text" placeholder="Ingrese una Nota (300 caracteres max)" value={state.Nota} onChange={(e) => setField("Nota", e.target.value)} autoComplete="off" required aria-required="true" aria-describedby={errors.titulo ? "err-Nota" : undefined} maxLength={300}/>
+          <small id="err-titulo"> {state.Nota.length}/300</small>
         </div>
 
         {/* Solicitante */}
@@ -92,6 +99,31 @@ export default function FormTarea() {
             placeholder={loadingSelect ? "Cargando opciones…" : "Buscar solicitante…"}
             value={(state.solicitante as UserOptionEx | null) ?? null}
             onChange={(opt) => setField("solicitante", opt ?? null)}
+            classNamePrefix="rs"
+            isDisabled={loadingSelect}
+            isLoading={loadingSelect}
+            filterOption={userFilter}
+            getOptionValue={(o) => String(o.value ?? (o as any).email ?? o.label)}
+            getOptionLabel={(o) => o.label}
+            components={{ Option }}
+            noOptionsMessage={() =>
+              selectError ? "Error cargando opciones" : "Sin coincidencias"
+            }
+            isClearable
+          />
+          {errors.solicitante && (
+            <small className="error">{errors.solicitante}</small>
+          )}
+        </div>
+
+      <div className="ft-field">
+          <label className="ft-label" htmlFor="encargado">Encargado</label>
+          <Select<UserOptionEx, false>
+            inputId="encargado"
+            options={combinedOptions}
+            placeholder={loadingSelect ? "Cargando opciones…" : "Buscar solicitante…"}
+            value={(state.Encargado as UserOptionEx | null) ?? null}
+            onChange={(opt) => setField("Encargado", opt ?? null)}
             classNamePrefix="rs"
             isDisabled={loadingSelect}
             isLoading={loadingSelect}

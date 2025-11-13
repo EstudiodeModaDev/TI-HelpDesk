@@ -124,10 +124,7 @@ export function useWorkers(options: Options = {}) {
     return (list ?? [])
       .map((u) => ({
         value: (u.mail || String(u.id) || '').trim(),
-        label: u.displayName || u.mail || '—',
-        id: u.id != null ? String(u.id) : undefined,
-        email: u.mail,
-        jobTitle: u.jobTitle,
+        label: u.displayName || '-',
       }))
       .sort((a, b) => a.label.localeCompare(b.label));
   }, []);

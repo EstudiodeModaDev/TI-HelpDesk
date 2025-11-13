@@ -12,6 +12,7 @@
   padding: var(--pad);
   max-width: 420px;       /* 👈 tarjeta angosta */
   width: 100%;
+  box-shadow: none !important;
 }
 
 .ft-title{
@@ -61,7 +62,6 @@
 .ft-field :is(input,select):hover{ border-color: var(--bd-strong, #d1d5db); }
 .ft-field :is(input,select):focus{
   border-color: color-mix(in oklab, var(--primary, #3b82f6) 60%, var(--bd, #e5e7eb) 40%);
-  box-shadow: 0 0 0 3px var(--ring, rgba(59,130,246,.25));
 }
 
 /* Select caret nativo */
@@ -124,4 +124,69 @@
   .ft-field :is(input,select),
   .ft-btn,
   .ft-field .rs__control{ transition: none !important; }
+}
+
+/* ===========================
+   MODAL FT — overlay + diálogo
+   =========================== */
+.ft-modal{
+  position: fixed;
+  inset: 0;                         /* top:0; right:0; bottom:0; left:0 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;                    /* margen interior */
+  z-index: 1300;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .18s ease;
+}
+
+.ft-modal.is-open{
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Fondo oscurecido */
+.ft-modal__backdrop{
+  position: absolute;
+  inset: 0;
+  background: rgba(15,23,42,.72);   /* overlay oscuro */
+  backdrop-filter: blur(2px);       /* opcional, puedes quitarlo */
+}
+
+/* Contenedor del cuadro */
+.ft-modal__dialog{
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 480px;
+  max-height: 90vh;
+  display: flex;
+}
+
+/* Reutiliza tu tarjeta */
+.ft-modal .ft-scope{
+  max-width: 100%;
+  width: 100%;
+  overflow-y: auto;
+  
+  box-shadow: var(--shadow);
+}
+
+/* Botón de cerrar opcional (esquina) */
+.ft-modal__close{
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 4px;
+  line-height: 1;
+  font-size: 18px;
+}
+.ft-modal__close:hover{
+  color: var(--ink);
 }

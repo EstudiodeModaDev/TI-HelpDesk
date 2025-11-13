@@ -52,6 +52,8 @@ export function useTareas(TareaSvc: TareasService) {
     fecha: "",
     hora: "",
     solicitante: null,
+    Nota: "",
+    Encargado: null
   });
   const [errors, setErrors] = React.useState<TareasError>({});
 
@@ -164,11 +166,13 @@ export function useTareas(TareaSvc: TareasService) {
         Cantidaddediasalarma: Number(state.diasRecordatorio ?? 0),
         Estado: "Pendiente",
         Quienlasolicita: state.solicitante?.label ?? "",
-        Reportadapor: account?.name ?? "",
-        ReportadaporCorreo: (account as any)?.username ?? (account as any)?.email ?? "",
+        Reportadapor: state.Encargado ? state.Encargado.label ?? "": account?.name ?? "", 
+        ReportadaporCorreo: state.Encargado ? state.Encargado.value ?? "": account?.username ?? "", 
         Title: state.titulo,
         Fechadelanota: fechaNota,      
-        Fechadesolicitud: fechaHoraEvento
+        Fechadesolicitud: fechaHoraEvento,
+        Nota: state.Nota,
+
       };
 
       await TareaSvc.create(payload);
@@ -180,6 +184,8 @@ export function useTareas(TareaSvc: TareasService) {
         fecha: "",
         hora: "",
         solicitante: null,
+        Nota: "",
+        Encargado: null
       });
       await loadTasks();
       // opcional: setFilterMode("Pendientes");

@@ -85,7 +85,6 @@
   border: 1px solid var(--bd);
   border-radius: var(--radius-xl);
   padding: 14px 16px 12px;
-  box-shadow: 0 1px 0 var(--bd-soft) inset;
 }
 
 .lt-item__head{

@@ -5,22 +5,14 @@ import { toISODateTimeFlex } from "../../../utils/Date";
 import { useConfirm } from "../../ModalDelete/ConfirmProvider";
 import "./TareasRegistradas.css";
 
-export default function ListaTareas() {
-  const { Tareas } =
-    useGraphServices() as ReturnType<typeof useGraphServices> & { Tareas: TareasService };
+type Props = {
+  onOpen: () => void;
+};
 
-  const {
-    rows,
-    setFilterMode,
-    filterMode,
-    deleteTask,
-    iniciarTarea,
-    finalizarTarea,
-    // reloadAll, // tu hook ya recarga tras acciones; no lo necesitamos aquí
-  } = useTareas(Tareas);
-
+export default function ListaTareas({onOpen}: Props) {
+  const { Tareas } = useGraphServices() as ReturnType<typeof useGraphServices> & { Tareas: TareasService };
+  const { rows, setFilterMode, filterMode, deleteTask, iniciarTarea, finalizarTarea,} = useTareas(Tareas);
   const confirm = useConfirm();
-
   async function handleDelete(t: { Id: string; Title?: string }) {
     const ok = await confirm({
       title: "Eliminar tarea",
@@ -46,30 +38,16 @@ export default function ListaTareas() {
       <section className="lt-card">
         <header className="lt-header">
           <nav className="lt-tabs" aria-label="Filtros de tareas" role="tablist">
-            <button
-              className={`lt-tab ${filterMode === "Pendientes" ? "is-active" : ""}`}
-              role="tab"
-              aria-selected={filterMode === "Pendientes"}
-              onClick={() => setFilterMode("Pendientes")}
-            >
+            <button className={`lt-tab ${filterMode === "Pendientes" ? "is-active" : ""}`} role="tab" aria-selected={filterMode === "Pendientes"} onClick={() => setFilterMode("Pendientes")}>
               Pendientes
             </button>
-            <button
-              className={`lt-tab ${filterMode === "Iniciadas" ? "is-active" : ""}`}
-              role="tab"
-              aria-selected={filterMode === "Iniciadas"}
-              onClick={() => setFilterMode("Iniciadas")}
-            >
+            <button className={`lt-tab ${filterMode === "Iniciadas" ? "is-active" : ""}`} role="tab" aria-selected={filterMode === "Iniciadas"} onClick={() => setFilterMode("Iniciadas")}>
               Iniciadas
             </button>
-            <button
-              className={`lt-tab ${filterMode === "Finalizadas" ? "is-active" : ""}`}
-              role="tab"
-              aria-selected={filterMode === "Finalizadas"}
-              onClick={() => setFilterMode("Finalizadas")}
-            >
+            <button className={`lt-tab ${filterMode === "Finalizadas" ? "is-active" : ""}`} role="tab" aria-selected={filterMode === "Finalizadas"} onClick={() => setFilterMode("Finalizadas")}>
               Finalizadas
             </button>
+            <a className="btn btn-circle btn-circle--sm" onClick={onOpen} aria-label="Nueva tarea">+</a>
           </nav>
           <h2 className="lt-title">Mis Tareas</h2>
         </header>
@@ -79,18 +57,13 @@ export default function ListaTareas() {
             <article key={t.Id} className="lt-item" role="listitem">
               <div className="lt-item__head">
                 <h3 className="lt-item__title">{t.Title}</h3>
-                <span
-                  className={`lt-badge ${String(t.Estado ?? "")
-                    .toLowerCase()
-                    .replace(/\s+/g, "-")}`}
-                  title={t.Estado ?? ""}
-                  aria-label={`Estado: ${t.Estado ?? "—"}`}
-                >
-                  ● {t.Estado ?? "—"}
+                <span className={`lt-badge ${String(t.Estado ?? "").toLowerCase().replace(/\s+/g, "-")}`} title={t.Estado ?? ""} aria-label={`Estado: ${t.Estado ?? "—"}`} >
+                    {t.Estado ?? "—"}
                 </span>
               </div>
 
               <ul className="lt-meta">
+                <li><strong>Nota:</strong> {t.Nota}</li>
                 <li><strong>Responsable:</strong> {t.Reportadapor}</li>
                 <li><strong>Solicitada por:</strong> {t.Quienlasolicita}</li>
                 {t.Fechadesolicitud && (

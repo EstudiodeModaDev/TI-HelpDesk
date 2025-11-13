@@ -6,6 +6,8 @@ export type NuevaTarea = {
   fecha?: string; // yyyy-mm-dd
   hora?: string;  // hh:mm
   diasRecordatorio: number;
+  Nota: string
+  Encargado: UserOption | null;
 };
 
 export type Tarea = {
@@ -18,6 +20,7 @@ export type Tarea = {
   ReportadaporCorreo: string;
   Estado: string;
   Cantidaddediasalarma: number;
+  Nota: string
 };
 
 export type TareasError = Partial<Record<keyof NuevaTarea, string>>;

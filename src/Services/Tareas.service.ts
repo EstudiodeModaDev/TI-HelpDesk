@@ -80,6 +80,7 @@ export class TareasService {
       ReportadaporCorreo: f.ReportadaporCorreo ?? '',
       Fechadelanota: f.Fechadelanota,
       Fechadesolicitud: f.Fechadesolicitud,
+      Nota: f.Nota
     };
   }
 

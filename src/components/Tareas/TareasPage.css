@@ -37,7 +37,7 @@
   overscroll-behavior-x: contain;
   scroll-snap-type: x proximity;
   padding-bottom: 4px;
-    overflow: hidden;
+  overflow: hidden;
 }
 
 /* Encaje al hacer scroll */
