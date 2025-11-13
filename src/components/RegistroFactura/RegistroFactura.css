@@ -1,301 +1,275 @@
-/* ========= Contenedor ========= */
+/* =========================================================
+   REGISTRO FACTURAS — contenedor principal
+   ========================================================= */
+
 .registro-container{
-  max-width: 1800px;
-  min-width: 0px;
-  margin: 24px auto;
-  padding: 20px;
-  background: var(--surface, #fff);
-  border: 1px solid var(--bd, #e5e7eb);
-  border-radius: var(--radius, 12px);
-  box-shadow: var(--shadow, 0 8px 22px rgba(2,6,23,.06));
-  color: var(--ink, #0f172a);
+  --pad: clamp(16px, 2.4vw, 24px);
+  --gap: 16px;
+
+  background: var(--surface, #0f141a);
+  border-radius: var(--radius-3xl, 22px);
+  border: 1px solid color-mix(in oklab, var(--border, #1f2a36) 80%, transparent);
+  box-shadow: var(--shadow, 0 18px 40px rgba(0,0,0,.35));
+  color: var(--ink, #e5eef9);
+
+  padding: var(--pad);
+  margin-inline: auto;
+  width: min(100%, 1200px);
+  box-sizing: border-box;
 }
+
 .registro-container > h2{
-  margin: 0 0 16px;
-  font-size: 1.4rem;
+  margin: 0 0 16px 0;
+  font-weight: 800;
   letter-spacing: .2px;
-  color: var(--ink, #0f172a);
 }
 
-/* ========= Form & grid ========= */
-.registro-form{ width: 100%; }
-.form-grid{
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0px, 1fr));
-  gap: 16px;
-}
-@media (max-width: 1200px){ .form-grid{ grid-template-columns: repeat(3, minmax(280px, 1fr)); } }
-@media (max-width: 900px){  .form-grid{ grid-template-columns: 1fr; } }
+/* =========================================================
+   MODO DISTRIBUCIÓN + CONECTOR
+   ========================================================= */
+.btn-distribucion{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 
-.campo, .form-group{ grid-column: span 1; }
+  padding: 10px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--border, #1f2a36);
+  background: var(--surface-elev, #131a22);
+  color: var(--ink, #e5eef9);
 
-/* ========= Etiquetas ========= */
-.campo label,
-.form-group > label{
-  display:block;
-  font-size:.92rem;
-  margin:0 0 6px;
-  color: var(--muted, #6b7280);
-  font-weight:600;
-}
-
-/* ========= Inputs base ========= */
-:root{ --input-h: 44px; } /* usa tu token si ya tienes uno */
-
-.campo input[type="text"],
-.campo input[type="number"],
-.campo input[type="date"],
-.campo textarea,
-.campo select,
-.form-group select,
-#compraSelect,
-#proveedor-select{
-  width:100%;
-  height:var(--input-h);
-  padding:0 14px;
-  border:1px solid var(--bd, #e5e7eb);
-  border-radius: 10px;
-  background: var(--field-bg, #fff);
-  color: var(--ink, #0f172a);
-  outline:none;
-  transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
-  box-sizing:border-box;
-  font-size:.98rem;
-  box-shadow: var(--shadow, 0 8px 22px rgba(2,6,23,.06));
+  font: inherit;
+  font-weight: 700;
+  letter-spacing: .2px;
+  cursor: pointer;
+  transition: background .18s ease, border-color .18s ease,
+              color .18s ease, transform .06s ease,
+              box-shadow .18s ease;
+  min-height: 38px;
+  -webkit-tap-highlight-color: transparent;
 }
 
-/* Textarea */
-.campo textarea{
-  min-height:72px;
-  padding-top:10px;
-  padding-bottom:10px;
-  resize:vertical;
-}
-
-/* Hover / Focus SOLO en hijos directos */
-.campo > :is(input, select, textarea):hover{ border-color: var(--bd-strong, #d1d5db); }
-.form-group > select:hover,
-#compraSelect:hover,
-#proveedor-select:hover{ border-color: var(--bd-strong, #d1d5db); }
-
-.campo > :is(input, select, textarea):focus{
-  border-color: var(--primary, #2563eb);
-  box-shadow: 0 0 0 4px var(--ring, rgba(37,99,235,.35));
-}
-.form-group > select:focus,
-#compraSelect:focus,
-#proveedor-select:focus{
-  border-color: var(--primary, #2563eb);
-  box-shadow: 0 0 0 4px var(--ring, rgba(37,99,235,.35));
-}
-
-/* Disabled */
-.campo :is(input, select, textarea):disabled{
-  background: color-mix(in oklab, var(--field-bg, #fff) 80%, var(--surface, #fff));
-  color: color-mix(in oklab, var(--muted, #6b7280) 70%, var(--ink, #0f172a));
-  cursor:not-allowed;
-}
-
-/* ========= Flecha select nativo (usa --muted) ========= */
-.campo select,
-.form-group select,
-#compraSelect,
-#proveedor-select{
-  -webkit-appearance:none; -moz-appearance:none; appearance:none;
-  padding-right:40px;
-  background-repeat:no-repeat;
-  background-position:right 12px center;
-  background-size:18px 18px;
-}
-
-.botones-container{
-  grid-column: 1 / -1;
-  display:flex;
-  gap:12px;
-  margin-top:6px;
-}
-.btn-registrar,
-.btn-ver-facturas,
-.btn-nuevo-proveedor{
-  height:42px;
-  padding:0 14px;
-  border-radius:10px;
-  border:1px solid var(--bd, #e5e7eb);
-  background: color-mix(in oklab, var(--surface, #fff) 92%, var(--field-bg, #fff));
-  color: var(--ink, #0f172a);
-  cursor:pointer;
-  transition: transform .05s ease, box-shadow .15s ease, background .15s ease, filter .15s ease;
-  box-shadow: var(--shadow, 0 8px 22px rgba(2,6,23,.06));
-}
-.btn-registrar{
-  background: var(--primary, #2563eb);
-  color: var(--primary-ink, #fff);
-  border-color: var(--primary, #2563eb);
-}
-.btn-registrar:hover{ filter: brightness(1.05); }
+.btn-volver:hover,
+.btn-cancelar:hover,
+.btn-nuevo-proveedor:hover,
+.btn-registrar:hover,
 .btn-ver-facturas:hover,
-.btn-nuevo-proveedor:hover{
-  background: color-mix(in oklab, var(--primary, #2563eb) 8%, var(--surface, #fff));
-  border-color: var(--bd-strong, #d1d5db);
+.btn-distribucion:hover{
+  background: color-mix(in oklab, var(--surface-elev) 85%, var(--ink) 15%);
 }
+
+.btn-volver:active,
+.btn-cancelar:active,
+.btn-nuevo-proveedor:active,
 .btn-registrar:active,
 .btn-ver-facturas:active,
-.btn-nuevo-proveedor:active{
+.btn-distribucion:active{
   transform: translateY(1px);
 }
-.form-group.mb-3{ margin-bottom:6px; }
-.form-group .btn-nuevo-proveedor{ margin-top:8px; }
 
-/* ========= React-Select (classNamePrefix="rs" + className="rs-override") ========= */
-.rs-override .rs__control{
-  min-height: var(--input-h);
-  height: var(--input-h);
-  border: 1px solid var(--bd, #e5e7eb) !important;
-  border-radius: 10px !important;
-  background: var(--field-bg, #fff) !important;
-  box-shadow: none !important;
-  overflow: hidden;
-}
-.rs-override .rs__control:hover{ border-color: var(--bd-strong, #d1d5db) !important; }
-.rs-override .rs__control--is-focused{
-  border-color: var(--primary, #2563eb) !important;
-  box-shadow: 0 0 0 4px var(--ring, rgba(37,99,235,.35)) !important;
-}
-.rs-override .rs__value-container{ padding: 0 12px !important; }
-.rs-override .rs__indicators{ width:auto; padding-right:8px; justify-content:flex-end; }
-.rs-override .rs__indicator-separator{ display:none !important; }
-.rs-override .rs__indicators::after{ content:none !important; display:none !important; }
-.rs-override .rs__dropdown-indicator{ padding:0 !important; }
-.rs-override .rs__dropdown-indicator svg{ display:block; }
+/* Variantes por intención */
 
-.rs-override .rs__input input,
-.rs-override .rs__input input:focus,
-.rs-override .rs__input input:focus-visible{
-  outline:none !important;
-  box-shadow:none !important;
+.btn-volver{
+  background: color-mix(in oklab, var(--field-bg) 94%, transparent);
+}
+
+.btn-cancelar{
+  --danger: color-mix(in oklab, var(--primary, #ef4444) 40%, var(--border) 60%);
+  border-color: var(--danger);
+  color: var(--danger);
   background: transparent;
-  color: var(--ink, #0f172a);
+}
+.btn-cancelar:hover{
+  background: color-mix(in oklab, var(--danger) 12%, transparent);
 }
 
-.rs-override .rs__menu{
-  border:1px solid var(--bd, #e5e7eb);
-  border-radius:10px;
-  box-shadow: var(--shadow, 0 8px 22px rgba(2,6,23,.06));
-  overflow:hidden;
-  margin-top:6px;
-  background: var(--surface, #fff);
+.btn-registrar{
+  border-color: color-mix(in oklab, var(--primary) 75%, var(--border) 25%);
+  background: var(--primary);
+  color: var(--primary-ink, #0f172a);
 }
-.rs-override .rs__menu-list{ padding:6px 0 !important; max-height:280px; }
-.rs-override .rs__option{ padding:10px 14px !important; font-size:.98rem; color: var(--ink, #0f172a); }
-.rs-override .rs__option--is-focused{
-  background: color-mix(in oklab, var(--field-bg, #fff) 92%, transparent) !important;
+.btn-registrar:hover{
+  background: color-mix(in oklab, var(--primary) 88%, var(--surface) 12%);
 }
-.rs-override .rs__option--is-selected{
-  background: color-mix(in oklab, var(--primary, #2563eb) 14%, var(--surface, #fff)) !important;
-  color: var(--ink, #0f172a) !important;
-  font-weight:600;
+
+.btn-ver-facturas{
+  background: color-mix(in oklab, var(--surface-elev) 90%, var(--primary) 10%);
 }
-.rs-override .rs__placeholder{ color: var(--muted, #6b7280) !important; }
-.rs-override .rs__single-value{ color: var(--ink, #0f172a) !important; }
-.rs-override .rs__input-container input{ color: var(--ink, #0f172a) !important; }
 
-/* ========= Posicionamientos especiales ========= */
-.form-group.mb-3 span{ font-size:.95rem; }
-.form-group.mb-3 span[style*="red"]{ font-weight:600; }
+.btn-distribucion{
+  background: color-mix(in oklab, var(--surface-elev) 92%, var(--muted) 8%);
+}
 
-.form-group:has(#compraSelect){ grid-column: 1 / -1; }
+/* Bloque de fechas para el conector */
 
-.form-group:has(#proveedor-select){
-  grid-column: 1 / -1;
+.selector-fechas-container{
+  margin-top: 14px;
+  padding: 12px 14px;
+  border-radius: var(--radius, 18px);
+  border: 1px solid color-mix(in oklab, var(--border) 80%, transparent);
+  background: color-mix(in oklab, var(--surface-elev) 96%, transparent);
   display: grid;
-  grid-template-columns: 1fr auto;
-  column-gap: 12px;
-  align-items: end;
+  grid-template-columns: repeat(2, minmax(0,1fr));
+  gap: 12px 16px;
 }
-.form-group:has(#proveedor-select) > label{
+
+.selector-label{
+  display: grid;
+  gap: 4px;
+  font-size: .9rem;
+}
+
+.selector-label input[type="date"]{
+  background: var(--field-bg, #131a22);
+  color: var(--ink);
+  border-radius: 999px;
+  border: 1px solid var(--border, #1f2a36);
+  padding: 6px 12px;
+  font: inherit;
+}
+
+.selector-botones{
   grid-column: 1 / -1;
-  margin: 0 0 6px;
-}
-.form-group:has(#proveedor-select) > select{ grid-column: 1 / 2; }
-.form-group:has(#proveedor-select) > .btn-nuevo-proveedor{
-  grid-column: 2 / 3;
-  height: var(--input-h);
-}
-
-.campo:has(input[name="FechaEmision"]) { grid-column: auto; }
-.campo:has(input[name="NoFactura"])     { grid-column: auto; }
-.campo:has(input[name="Title"])         { grid-column: auto; }
-
-.campo:has(.rs-override){
-  grid-column: auto;
   display: flex;
-  flex-direction: column;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* =========================================================
+   FORMULARIO DE REGISTRO
+   ========================================================= */
+
+.registro-form{
+  margin-top: 10px;
+  display: grid;
+  gap: 16px;
+}
+
+/* Grid principal de campos */
+.form-grid{
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0,1fr));
+  gap: 14px 18px;
+}
+
+/* Campo genérico */
+.campo,
+.form-group{
+  display: grid;
   gap: 4px;
 }
-.campo:has(.rs-override) > label{ margin-bottom: 0; font-weight: 600; }
 
-.campo:has(textarea[name="DescripItems"]){ grid-column: auto; }
-.campo:has(input[name="ValorAnIVA"])    { grid-column: auto; }
-.campo:has(textarea[name="DetalleFac"]) { grid-column: auto; }
-.campo:has(input[name="FecEntregaCont"]){ grid-column: auto; }
-.campo:has(input[name="DocERP"])        { grid-column: auto; }
-.campo:has(textarea[name="Observaciones"]){ grid-column: 1 / -1; }
-
-/* Responsive: proveedor apilado */
-@media (max-width: 900px){
-  .campo, .form-group,
-  .form-group:has(#compraSelect),
-  .form-group:has(#proveedor-select),
-  .campo:has(textarea[name="Observaciones"]),
-  .botones-container{ grid-column: 1 / -1; }
-
-  .form-group:has(#proveedor-select){
-    grid-template-columns: 1fr;
-    row-gap: 8px;
-  }
-  .form-group:has(#proveedor-select) > .btn-nuevo-proveedor{ width: 100%; }
-}
-
-/* ========= Selector de fechas: usa tokens ========= */
-.selector-fechas-container {
-  margin-top: 1rem;
-  padding: 1rem;
-  border: 1px solid var(--bd, #e5e7eb);
-  border-radius: 8px;
-  background: color-mix(in oklab, var(--field-bg, #fff) 94%, transparent);
-  color: var(--ink, #0f172a);
-  box-shadow: var(--shadow, 0 8px 22px rgba(2,6,23,.06));
-  width: fit-content;
-}
-.selector-label {
-  display: block;
-  margin-bottom: 0.5rem;
+.campo label,
+.form-group > label,
+.form-group > div > label{
+  font-size: .9rem;
   font-weight: 600;
-  color: var(--muted, #6b7280);
+  display: grid;
+  gap: 4px;
 }
-.selector-label input[type="date"] { margin-left: .5rem; }
 
-.selector-botones { display: flex; gap: .5rem; margin-top: .5rem; }
+/* Inputs base (no pisa los de otros módulos porque solo afecta dentro del form) */
+.registro-form input[type="text"],
+.registro-form input[type="date"],
+.registro-form textarea,
+.registro-form select{
+  background: var(--field-bg, #0f141a);
+  color: var(--ink, #e5eef9);
+  border-radius: 12px;
+  border: 1px solid var(--border, #1f2a36);
+  padding: 8px 10px;
+  font: inherit;
+  outline: none;
+  transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
+}
 
-.btn-volver,
-.btn-cancelar{
-  padding: .4rem .8rem;
-  border: 1px solid var(--bd, #e5e7eb);
-  cursor: pointer;
-  border-radius: 999px;
-  background: color-mix(in oklab, var(--surface, #fff) 92%, var(--field-bg, #fff));
-  color: var(--ink, #0f172a);
-  box-shadow: var(--shadow, 0 8px 22px rgba(2,6,23,.06));
+.registro-form input:focus,
+.registro-form textarea:focus,
+.registro-form select:focus{
+  border-color: color-mix(in oklab, var(--primary) 60%, var(--border) 40%);
+  box-shadow: 0 0 0 3px var(--ring, rgba(59,130,246,.25));
 }
-.btn-volver{
-  background: var(--primary, #2563eb);
-  color: var(--primary-ink, #fff);
-  border-color: var(--primary, #2563eb);
+
+/* Select de proveedor + botón nuevo proveedor en línea */
+.form-group.mb-3{
+  grid-template-columns: minmax(0,1.5fr) max-content;
+  align-items: end;
+  gap: 10px;
 }
-.btn-cancelar{
-  /* usa “danger” derivado del tema mezclando primary con ink */
-  background: color-mix(in oklab, var(--primary, #2563eb) 12%, var(--surface, #fff));
-  color: var(--ink, #0f172a);
+
+/* Mensajes de error */
+.error{
+  color: color-mix(in oklab, var(--primary, #ef4444) 60%, var(--ink) 40%);
+  font-size: .78rem;
 }
-.btn-volver:hover{ filter: brightness(1.03); }
-.btn-cancelar:hover{ background: color-mix(in oklab, var(--primary, #2563eb) 18%, var(--surface, #fff)); }
+
+/* Observaciones */
+.registro-form textarea{
+  resize: vertical;
+  min-height: 70px;
+}
+
+/* =========================================================
+   BOTONES INFERIORES
+   ========================================================= */
+
+.botones-container{
+  margin-top: 6px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* En pantallas pequeñas, que los botones puedan ocupar toda la fila */
+@media (max-width: 720px){
+  .botones-container{
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .botones-container > button{
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+
+
+/* =========================================================
+   RESPONSIVE LAYOUT
+   ========================================================= */
+
+@media (max-width: 1024px){
+  .form-grid{
+    grid-template-columns: repeat(2, minmax(0,1fr));
+  }
+  .form-group.mb-3{
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px){
+  .registro-container{
+    padding: 14px;
+  }
+  .form-grid{
+    grid-template-columns: 1fr;
+  }
+  .selector-fechas-container{
+    grid-template-columns: 1fr;
+  }
+}
+
+.btn-medium{
+    display: block !important;      /* o flex */
+  width: 50% !important;         /* ocupa todo el ancho del contenedor */
+  max-width: none !important;
+  margin-top: 5px; 
+}
+
+.btn-personalized{
+  margin: 5px;
+  width: 300px !important;
+  max-width: none !important;
+}
+

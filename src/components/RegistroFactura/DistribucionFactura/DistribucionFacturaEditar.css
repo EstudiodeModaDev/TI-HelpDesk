@@ -105,29 +105,3 @@
   transition: background-color 0.25s, transform 0.15s;
 }
 
-.btn-guardar {
-  background-color: #4CAF50;
-}
-
-.btn-guardar:hover {
-  background-color: #3e8e41;
-  transform: translateY(-2px);
-}
-
-.btn-cancelar {
-  background-color: #999;
-}
-
-.btn-cancelar:hover {
-  background-color: #777;
-  transform: translateY(-2px);
-}
-
-.btn-eliminar {
-  background-color: #e53935;
-}
-
-.btn-eliminar:hover {
-  background-color: #c62828;
-  transform: translateY(-2px);
-}

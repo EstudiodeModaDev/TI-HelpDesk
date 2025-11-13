@@ -178,22 +178,13 @@ export default function FacturasLista({ onVolver }: { onVolver: () => void }) {
                     </span>
                   </td>
                   <td>
-                    <button
-                      className="btn-editar"
-                      title="Editar factura"
-                      onClick={() => setFacturaEdit(factura)}
-                    >
+                    <button className="btn btn-primary btn-xs" title="Editar factura" onClick={() => setFacturaEdit(factura)}>
                       ✏️
                     </button>
 
                     {/* NUEVO: mostrar botón para ver distribución solo si existe IdDistrubuida */}
                     {factura.IdDistrubuida ? (
-                      <button
-                        className="btn-ver-dist"
-                        title="Ver distribución"
-                        onClick={() => abrirModalDistribucion(factura.IdDistrubuida)}
-                        style={{ marginLeft: 8 }}
-                      >
+                      <button className="btn btn-secondary-final btn-xs" title="Ver distribución" onClick={() => abrirModalDistribucion(factura.IdDistrubuida)} style={{ marginLeft: 8 }}>
                         📊
                       </button>
                     ) : null}
@@ -211,7 +202,7 @@ export default function FacturasLista({ onVolver }: { onVolver: () => void }) {
         </table>
       </div>
 
-      <button className="btn-volver-fijo" onClick={onVolver}>
+      <button className="btn btn-secondary-final btn-large" onClick={onVolver}>
         🔽 Registrar factura
       </button>
 

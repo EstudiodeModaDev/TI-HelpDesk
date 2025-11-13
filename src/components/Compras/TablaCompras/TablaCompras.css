@@ -1,20 +1,21 @@
 /* =========================================================
-   TABLA COMPRAS — tokens globales (dark/light)
+   TABLA COMPRAS — estilo tipo Tickets
    ========================================================= */
 
 .tabla-compras{
+  --pad: clamp(14px, 2.2vw, 22px);
+  --gap: 12px;
+
   color: var(--ink);
-  border-radius: var(--radius-3xl);
-  inline-size: auto;
+  border-radius: var(--radius-3xl, 18px);
+  inline-size: 100%;
+  max-inline-size: 1400px;
   margin-inline: auto;
-  padding: clamp(14px, 2.2vw, 22px);
-  overflow: visible;
+  padding: var(--pad);
   box-sizing: border-box;
-  height: 700px;
 }
 
-.tabla-compras *{ box-sizing: border-box; }
-
+/* Título */
 .tabla-compras h2{
   margin: 0 0 12px 0;
   font-weight: 800;
@@ -22,36 +23,42 @@
 }
 
 /* ------------------------ Filtros ------------------------ */
+
 .tc-filtros{
-  --h: 44px;
+  --h: 46px;
+
   display: grid;
   grid-auto-flow: column;
-  grid-auto-columns: 1fr max-content max-content 1fr max-content max-content;
+  grid-auto-columns: 2fr max-content max-content max-content max-content;
   gap: 10px;
   align-items: center;
 
   margin-bottom: 14px;
-  padding: 10px;
-  border-radius: var(--radius);
+  padding: 10px 12px;
+  border-radius: var(--radius, 18px);
   background: color-mix(in oklab, var(--surface-elev) 94%, transparent);
-  border: 1px solid color-mix(in oklab, var(--bd) 75%, transparent);
+  border: 1px solid color-mix(in oklab, var(--bd, var(--border)) 75%, transparent);
   box-shadow: 0 10px 22px color-mix(in oklab, var(--surface) 20%, transparent);
 }
 
-.tc-filtros input[type="text"], .tc-filtros input[type="date"]{
+.tc-filtros input[type="text"],
+.tc-filtros input[type="date"]{
   height: var(--h);
-  border-radius: 12px;
+  border-radius: 999px;
   background: var(--field-bg);
   color: var(--ink);
-  border: 1px solid var(--bd);
-  padding: 0 12px;
+  border: 1px solid var(--bd, var(--border));
+  padding: 0 14px;
   outline: none;
   transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
   min-width: 0;
+  font: inherit;
 }
+
 .tc-filtros input::placeholder{
   color: color-mix(in oklab, var(--muted) 70%, transparent);
 }
+
 .tc-filtros input:focus{
   border-color: color-mix(in oklab, var(--primary) 55%, var(--bd));
   box-shadow: 0 0 0 4px var(--ring);
@@ -63,8 +70,12 @@
   color: var(--muted);
 }
 
+/* Botones pequeños dentro del filtro */
+.tc-filtros .btn{
+  border-radius: 999px;
+}
 
-
+/* Responsive filtros */
 @media (max-width: 1100px){
   .tc-filtros{
     grid-auto-flow: row;
@@ -78,52 +89,60 @@
 }
 
 /* ------------------------- Tabla ------------------------- */
+
 .tc-wrap{
-  border: 1px solid color-mix(in oklab, var(--bd) 75%, transparent);
-  border-radius: var(--radius);
-  background: color-mix(in oklab, var(--surface) 96%, transparent);
+  background: var(--surface);
+  border: 1px solid var(--bd, var(--border));
+  border-radius: var(--radius-3xl, 18px);
   box-shadow: var(--shadow);
-    
-  display: block;
-  max-inline-size: 100%;
-  overflow: auto;                 /* scroll x/y cuando haga falta */
-  -webkit-overflow-scrolling: touch;         /* scroll x/y si hace falta */
+  padding: 4px 0 0 0;
+  overflow-x: auto;
+  scrollbar-gutter: stable both-edges;
 }
 
+/* Tabla interior */
 .tc-wrap table{
-
-  table-layout: fixed;
+  width: 100%;
+  min-inline-size: 1040px; /* ancho base como tickets */
   border-collapse: separate;
   border-spacing: 0;
   background: transparent;
-  font-size: .98rem;
+  font-size: .96rem;
 }
 
+/* Header */
 .tc-wrap thead{
   position: sticky;
   top: 0;
-  z-index: 1;
+  z-index: 2;
+  background: var(--surface);
 }
 
 .tc-wrap thead th{
-  background: linear-gradient(180deg,
-      color-mix(in oklab, var(--surface-elev) 94%, transparent) 0%,
-      color-mix(in oklab, var(--surface-elev) 86%, transparent) 100%);
-  color: color-mix(in oklab, var(--ink) 92%, transparent);
-  padding: 12px 14px;
+  background: color-mix(in oklab, var(--surface-elev) 94%, transparent);
+  color: color-mix(in oklab, var(--ink) 95%, transparent);
+  padding: 12px 18px;
   font-weight: 800;
   letter-spacing: .2px;
-  border-bottom: 1px solid color-mix(in oklab, var(--bd) 65%, transparent);
+  border-bottom: 1px solid color-mix(in oklab, var(--bd) 70%, transparent);
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   user-select: none;
-  margin-right: 5px;
+  text-align: left;
 }
-.tc-wrap thead th:first-child{ border-top-left-radius: calc(var(--radius) + 2px); }
-.tc-wrap thead th:last-child { border-top-right-radius: calc(var(--radius) + 2px); }
 
+.tc-wrap thead th:first-child{
+  border-top-left-radius: var(--radius-3xl, 18px);
+}
+.tc-wrap thead th:last-child{
+  border-top-right-radius: var(--radius-3xl, 18px);
+}
+
+/* Celdas */
 .tc-wrap tbody td{
-  padding: 12px 14px;
-  color: color-mix(in oklab, var(--ink) 92%, transparent);
+  padding: 12px 18px;
+  color: color-mix(in oklab, var(--ink) 96%, transparent);
   border-bottom: 1px solid color-mix(in oklab, var(--bd) 60%, transparent);
   white-space: nowrap;
   overflow: hidden;
@@ -131,18 +150,65 @@
 }
 
 /* Zebra + hover */
-.tc-wrap tbody tr{ transition: background-color .15s ease, box-shadow .15s ease; }
-.tc-wrap tbody tr:nth-child(odd)  td{ background: color-mix(in oklab, var(--field-bg) 80%, transparent); }
-.tc-wrap tbody tr:nth-child(even) td{ background: color-mix(in oklab, var(--field-bg) 86%, transparent); }
+.tc-wrap tbody tr{
+  transition: background-color .15s ease;
+}
+.tc-wrap tbody tr:nth-child(odd)  td{
+  background: color-mix(in oklab, var(--field-bg) 90%, transparent);
+}
+.tc-wrap tbody tr:nth-child(even) td{
+  background: color-mix(in oklab, var(--field-bg) 82%, transparent);
+}
 .tc-wrap tbody tr:hover td{
-  background: color-mix(in oklab, var(--primary) 12%, var(--field-bg));
-  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--primary) 28%, var(--bd));
+  background: color-mix(in oklab, var(--primary) 10%, var(--field-bg));
 }
 
-/* ------------------------- Badges ------------------------ */
+/* Labels dentro de celdas (para el title completo) */
+.tc-wrap tbody td > label{
+  display: inline-block;
+  max-inline-size: 100%;
+  white-space: inherit;
+  overflow: inherit;
+  text-overflow: inherit;
+}
+
+/* Columna ID un poco más estrecha */
+.tc-wrap th:first-child,
+.tc-wrap td:first-child{
+  width: 6ch;
+}
+
+/* Columna Acciones: deja que crezca y que el texto pueda saltar */
+.tc-wrap th:last-child{
+  text-align: center;
+}
+.tc-wrap td:last-child{
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+}
+
+/* Contenedor de los botones de acciones */
+.tc-wrap td:last-child > div{
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: nowrap;   /* no se bajan de línea */
+}
+/* Botones de acciones más compactos dentro de la tabla */
+.tc-wrap td:last-child .btn{
+  font-size: .88rem;
+  padding-inline: 10px;
+  min-height: 32px;
+  border-radius: 999px;
+}
+
+/* ------------------------- Badges (estado completado) ---- */
+
 .badge{
   display: inline-block;
-  padding: 6px 10px;
+  padding: 6px 12px;
   border-radius: 999px;
   font-weight: 700;
   letter-spacing: .2px;
@@ -155,12 +221,12 @@
   background: color-mix(in oklab, var(--primary) 26%, transparent);
 }
 
-
-
-/* ------------------------- Compactación vertical --------- */
+/* Compactar un poco en pantallas bajas */
 @media (max-height: 720px){
   .tc-wrap thead th,
-  .tc-wrap tbody td{ padding: 10px 12px; }
+  .tc-wrap tbody td{
+    padding-block: 10px;
+  }
 }
 
 /* Scrollbars sutiles */
@@ -169,141 +235,25 @@
   scrollbar-width: thin;
 }
 
-/* 1) NUNCA uses margin en th/td: quítalo */
-.tc-wrap thead th{
-  margin-right: 0 !important;            /* ← clave */
-  width: auto;
-  border-right: 1px solid color-mix(in oklab, var(--bd) 55%, transparent);
-}
-.tc-wrap thead th:last-child{ border-right: none; }
-
-/* 2) Evita que la tabla se comprima y se desalineen los encabezados */
-.tc-wrap table{
-  min-inline-size: 1120px;               /* fuerza ancho base */
-  inline-size: 100%;
-  table-layout: fixed;                   /* ya lo tienes */
-  border-collapse: separate;             /* ya lo tienes */
-  border-spacing: 0;                     /* asegura cero gaps */
-}
-
-/* 3) Mantén el sticky header alineado con el body */
-.tc-wrap thead{
-  position: sticky;
-  top: 0;
-  z-index: 2;                            /* un poco más alto por si hay sombras */
-  background: color-mix(in oklab, var(--surface) 100%, transparent);
-}
-
-/* 4) Misma caja y padding en th/td (sin márgenes) */
-.tc-wrap thead th,
-.tc-wrap tbody td{
-  box-sizing: border-box;
-  padding: 12px 14px;
-  white-space: nowrap;
-}
-
-/* 5) Columna de Acciones: no recortar botones */
-.tc-wrap th:last-child,
+/* Columna Acciones */
 .tc-wrap td:last-child{
-  width: 200px;
-  min-width: 180px;
-}
-.tc-wrap td:last-child{
+  white-space: normal;   /* el texto del botón puede saltar si lo necesita */
   overflow: visible;
   text-overflow: clip;
 }
-.tc-wrap td:last-child > div{
+
+/* Contenedor de botones de acciones EN LÍNEA */
+.tc-actions{
   display: inline-flex;
-  gap: 8px;
+  align-items: center;
+  gap: 8px;          /* espacio entre botones */
+  flex-wrap: nowrap; /* no se bajan de línea */
 }
 
-
-
-/* Quita separadores con bordes en el header */
-.tc-wrap thead th{
-  /* lo demás igual que tienes */
-  border-right: none !important;          /* ← fuera el borde */
-  background-clip: padding-box;           /* evita halos en radios */
-}
-
-/* Dibuja el separador visual sin afectar layout */
-.tc-wrap thead th:not(:last-child){
-  box-shadow: inset -1px 0 0 color-mix(in oklab, var(--bd) 55%, transparent);
-}
-
-/* Opcional: separador suave también abajo del header */
-.tc-wrap thead{
-  box-shadow: inset 0 -1px 0 color-mix(in oklab, var(--bd) 65%, transparent);
-}
-
-/* Asegura que el sticky header no “salte” por sombras/bordes */
-.tc-wrap thead{ z-index: 2; }
-.tc-wrap thead th,
-.tc-wrap tbody td{
-  box-sizing: border-box;                 /* iguala cajas */
-}
-
-/* ====== Repartir anchos: 1ª fija, resto iguales ====== */
-.tc-wrap{
-  /* Ancho fijo de la 1ª columna (ID) y nº de columnas restantes */
-  --idw: 7.5ch;    /* ajusta: 6–8ch suele ir bien */
-  --cols: 9;       /* total columnas - 1 (sin la 1ª). Tienes 10 → 9 */
-}
-
-/* Primera columna (ID) fija */
-.tc-wrap th:first-child,
-.tc-wrap td:first-child{
-  width: var(--idw);
-  min-width: var(--idw);
-  max-width: var(--idw);
-  text-align: center;
-}
-
-/* Todas las demás exactamente iguales */
-.tc-wrap th:not(:first-child),
-.tc-wrap td:not(:first-child){
-  width: calc((100% - var(--idw)) / var(--cols));
-  min-width: calc((100% - var(--idw)) / var(--cols));
-  max-width: calc((100% - var(--idw)) / var(--cols));
-}
-
-/* Importante: nada de márgenes en th/td y misma caja */
-.tc-wrap thead th,
-.tc-wrap tbody td{
-  margin: 0 !important;
-  box-sizing: border-box;
-}
-
-/* Mantén los separadores del header sin desplazar layout */
-.tc-wrap thead th{ border-right: none !important; }
-.tc-wrap thead th:not(:last-child){
-  box-shadow: inset -1px 0 0 color-mix(in oklab, var(--bd) 55%, transparent);
-}
-
-/* Si antes diste ancho especial a la última columna (Acciones), elimínalo */
-.tc-wrap th:last-child,
-.tc-wrap td:last-child{
-  width: auto;
-  min-width: 1000px;
-  max-width: 0px;
-  overflow: hidden;            /* evita que empuje la tabla */
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-/* Si los botones de Acciones necesitan respirar, compénsalos dentro */
-.tc-wrap td:last-child > div{
-  display: inline-flex;
-  gap: 8px;
-  max-width: 100%;
-}
-
-.tc-wrap th:nth-child(5), .tc-wrap td:nth-child(5), .tc-wrap th:nth-child(6), .tc-wrap td:nth-child(6) .tc-wrap th:nth-child(8), .tc-wrap td:nth-child(8){
-  width: 8ch;            /* columnas compactas */
-  max-width: 10ch;
-}
-
-.tc-wrap th:nth-child(7), .tc-wrap td:nth-child(7) .tc-wrap th:nth-child(8), .tc-wrap td:nth-child(8){
-  width: 20ch;            /* columnas compactas */
-  max-width: 20ch;
+/* Botones un poco más compactos */
+.tc-actions .btn{
+  font-size: .88rem;
+  padding-inline: 10px;
+  min-height: 32px;
+  border-radius: 999px;
 }

@@ -39,7 +39,7 @@ export default function TablaTickets() {
   }, [rows, search]);
 
   return (
-    <div className="tabla-tickets" data-force-light>
+    <div className="tabla-tickets">
 
       {!ticketSeleccionado && (
         <div className="tickets-filtros">

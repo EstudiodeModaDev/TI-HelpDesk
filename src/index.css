@@ -108,6 +108,7 @@
 ::-webkit-scrollbar{
   width: 7px;
   height: 5px; /* horizontal */
+
 }
 
 ::-webkit-scrollbar-thumb{
@@ -115,10 +116,12 @@
   border-radius: var(--sb-radius);
   border: 2px solid transparent;       /* “acolchado” */
   background-clip: padding-box;
+  
 }
 
 ::-webkit-scrollbar-thumb:hover{
   background: var(--sb-thumb-hover);
+  
 }
 
 /* Si quieres solo en un contenedor específico */
@@ -129,6 +132,7 @@
   border-radius: var(--sb-radius);
   border: 2px solid transparent;
   background-clip: padding-box;
+  
 }
 
 
@@ -136,6 +140,7 @@ a {
   font-weight: 500;
   color: #646cff;
   text-decoration: inherit;
+  
 }
 a:hover {
   color: #535bf2;

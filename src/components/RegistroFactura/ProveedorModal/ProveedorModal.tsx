@@ -56,7 +56,7 @@ const ProveedorModal: React.FC<ProveedorModalProps> = ({ isOpen, onClose, onSave
           {error && <p className="error-text">{error}</p>}
 
           <div className="modal-buttons">
-            <button type="submit" disabled={loading} className="btn-primary">
+            <button type="submit" disabled={loading} className="btn btn-primary-final">
               {loading ? "Guardando..." : "Guardar"}
             </button>
             <button type="button" onClick={onClose} className="btn-secondary">

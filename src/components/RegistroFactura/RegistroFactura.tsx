@@ -121,76 +121,69 @@ export default function RegistroFactura() {
   <div className="registro-container">
     {/* ✅ Si se pide mostrar el formulario de Distribución, lo mostramos */}
     {mostrarDistribucion ? (
-     <>
-      <button
-        type="button"
-        className="btn-volver"
-        onClick={() => setMostrarDistribucion(false)}
-      >
-        🔙 Volver al registro de factura
-      </button>
+      <>
+        {/* CONTENEDOR EN FILA */}
+        <div className="acciones-top">
+          <button type="button" className="btn btn-secondary-final btn-personalized" onClick={() => setMostrarDistribucion(false)}>
+            🔙 Volver al registro de factura
+          </button>
 
-      {/* 🔹 Bloque para el conector con selectores de fecha */}
-      {!mostrarFechas ? (
-        <button
-          type="button"
-          className="btn-volver"
-          onClick={() => setMostrarFechas(true)}
-        >
-          📅 Prueba conector
-        </button>
-      ) : (
-        <div className="selector-fechas-container">
-          <label className="selector-label">
-            Fecha inicial:
-            <input
-              type="date"
-              value={initialDate}
-              onChange={(e) => setInitialDate(e.target.value)}
-            />
-          </label>
-
-          <label className="selector-label">
-            Fecha final:
-            <input
-              type="date"
-              value={finalDate}
-              onChange={(e) => setFinalDate(e.target.value)}
-            />
-          </label>
-
-          <div className="selector-botones">
-            <button
-              type="button"
-              className="btn-volver"
-              onClick={async () => {
-                if (!initialDate || !finalDate) {
-                  alert("⚠️ Debes seleccionar ambas fechas.");
-                  return;
-                }
-                await handleConector(initialDate, finalDate);
-                setMostrarFechas(false);
-                setInitialDate("");
-                setFinalDate("");
-              }}
-            >
-              ✅ Ejecutar conector
+          {!mostrarFechas && (
+            <button type="button" className= "btn btn-secondary-final btn-personalized" onClick={() => setMostrarFechas(true)}>
+              📅 Prueba conector
             </button>
-
-            <button
-              type="button"
-              className="btn-cancelar"
-              onClick={() => {
-                setMostrarFechas(false);
-                setInitialDate("");
-                setFinalDate("");
-              }}
-            >
-              ❌ Cancelar
-            </button>
-          </div>
+          )}
         </div>
-      )}
+
+        {/* Cuando se muestran las fechas */}
+        {mostrarFechas && (
+          <div className="selector-fechas-container">
+            <label className="selector-label">
+              Fecha inicial:
+              <input
+                type="date"
+                value={initialDate}
+                onChange={(e) => setInitialDate(e.target.value)}
+              />
+            </label>
+
+            <label className="selector-label">
+              Fecha final:
+              <input
+                type="date"
+                value={finalDate}
+                onChange={(e) => setFinalDate(e.target.value)}
+              />
+            </label>
+
+            <div className="selector-botones">
+              <button type="button" className="btn btn-primary btn-personalized btn-xs"
+                onClick={async () => {
+                  if (!initialDate || !finalDate) {
+                    alert("⚠️ Debes seleccionar ambas fechas.");
+                    return;
+                  }
+                  await handleConector(initialDate, finalDate);
+                  setMostrarFechas(false);
+                  setInitialDate("");
+                  setFinalDate("");
+                }}
+              >
+                ✅ Ejecutar conector
+              </button>
+
+              <button type="button" className="btn btn-secondary-final btn-xs"
+                onClick={() => {
+                  setMostrarFechas(false);
+                  setInitialDate("");
+                  setFinalDate("");
+                }}
+              >
+                ❌ Cancelar
+              </button>
+            </div>
+          </div>
+        )}
 
         <DistribucionFactura />
       </>
@@ -200,13 +193,12 @@ export default function RegistroFactura() {
 
         {!mostrarLista ? (
           <form className="registro-form" onSubmit={handleSubmit}>
-            <div className="form-grid">
-              {/* relacionamiento con compras  */}
-              <div className="form-group mb-3">
+            <div className="fila-compra-proveedor">
+              <div className="campo">
                 <label htmlFor="compraSelect">Seleccionar compra relacionada:</label>
                 <select
                   id="compraSelect"
-                  className="form-control"
+                  className="proveedor-select"
                   value={selectedCompra}
                   onChange={(e) => handleCompraSeleccionada(e.target.value)}
                 >
@@ -219,9 +211,9 @@ export default function RegistroFactura() {
                 </select>
               </div>
 
-              {/* 🔹 Desplegable de proveedores */}
-              <div className="form-group mb-3">
-                <div>
+              {/* 🔹 Desplegable de proveedores + botón en la misma línea */}
+              <div className="form-group fila-compra-proveedor__proveedor">
+                <div className="form-group__field">
                   <label htmlFor="proveedor-select">Proveedor:</label>
                   {loading ? (
                     <span>Cargando...</span>
@@ -244,27 +236,22 @@ export default function RegistroFactura() {
                   <small className="error">{errors.Proveedor}</small>
                 </div>
 
-                {/* 🔹 Botón para abrir modal (se implementará más adelante) */}
+                {/* 🔹 Botón para abrir modal */}
                 <button
                   type="button"
-                  className="btn-nuevo-proveedor"
+                  className="btn btn-terciary btn-sm form-group__btn"
                   onClick={() => setIsModalOpen(true)}
                 >
                   + Nuevo proveedor
                 </button>
               </div>
-
+            </div>
+            <div className="form-grid">
               {/* 📆 Fecha de emisión */}
               <div className="campo">
                 <label>
                   Fecha de emisión
-                  <input
-                    type="date"
-                    name="FechaEmision"
-                    value={formData.FechaEmision}
-                    onChange={handleChange}
-                    required
-                  />
+                  <input type="date" name="FechaEmision" value={formData.FechaEmision} onChange={handleChange} required/>
                   <small className="error">{errors.FechaEmision}</small>
                 </label>
               </div>
@@ -273,13 +260,7 @@ export default function RegistroFactura() {
               <div className="campo">
                 <label>
                   No. Factura
-                  <input
-                    type="text"
-                    name="NoFactura"
-                    value={formData.NoFactura}
-                    onChange={handleChange}
-                    required
-                  />
+                  <input type="text" name="NoFactura" value={formData.NoFactura} onChange={handleChange} required/>
                 </label>
               </div>
 
@@ -287,14 +268,7 @@ export default function RegistroFactura() {
               <div className="campo">
                 <label>
                   NIT
-                  <input
-                    type="text"
-                    name="Title"
-                    value={formData.Title}
-                    onChange={handleChange}
-                    required
-                    readOnly
-                  />
+                  <input type="text" name="Title" value={formData.Title}  onChange={handleChange} required readOnly/>
                   <small className="error">{errors.Proveedor}</small>
                 </label>
               </div>
@@ -304,7 +278,6 @@ export default function RegistroFactura() {
                 <label>Ítem (Código + descripción)</label>
                 <Select
                   classNamePrefix="rs"
-                  className="rs-override"
                   options={Items.map((op) => ({
                     value: op.codigo,
                     label: `${op.codigo} - ${op.descripcion}`,
@@ -348,12 +321,7 @@ export default function RegistroFactura() {
               <div className="campo">
                 <label>
                   Valor antes iva (en pesos)
-                  <input
-                    type="text"
-                    inputMode="numeric"
-                    name="ValorAnIVA"
-                    placeholder="Ej: 100.000,00"
-                    value={String(displayValor)}
+                  <input type="text" inputMode="numeric" name="ValorAnIVA" placeholder="Ej: 100.000,00" value={String(displayValor)} 
                     onChange={(e) => {
                       const raw = e.target.value;
                       const f = formatPesosEsCO(raw);
@@ -382,7 +350,6 @@ export default function RegistroFactura() {
                 <label>Centro de Costos (C.C)</label>
                 <Select
                   classNamePrefix="rs"
-                  className="rs-override"
                   options={ccOptions.map((cc) => ({value: cc.value, label: `${cc.value} - ${cc.label}`, }))}
                   placeholder="Buscar centro de costo…"
                   isClearable
@@ -414,7 +381,6 @@ export default function RegistroFactura() {
                 <label>Centro Operativo (C.O)</label>
                 <Select
                   classNamePrefix="rs"
-                  className="rs-override"
                   options={COOptions.map((co) => ({
                     value: co.value,
                     label: `${co.value} - ${co.label}`,
@@ -449,7 +415,6 @@ export default function RegistroFactura() {
                 <label>Unidad de Negocio (U.N)</label>
                 <Select
                   classNamePrefix="rs"
-                  className="rs-override"
                   options={UNOptions.map((un) => ({
                     value: un.value,
                     label: `${un.value} - ${un.label}`,
@@ -491,12 +456,7 @@ export default function RegistroFactura() {
               <div className="campo">
                 <label>
                   Fecha de entrega contabilidad
-                  <input
-                    type="date"
-                    name="FecEntregaCont"
-                    value={formData.FecEntregaCont ?? ""}
-                    onChange={handleChange}
-                  />
+                  <input type="date" name="FecEntregaCont" value={formData.FecEntregaCont ?? ""} onChange={handleChange}/>
                 </label>
               </div>
 
@@ -513,36 +473,22 @@ export default function RegistroFactura() {
             <div className="campo">
               <label>
                 Observaciones
-                <textarea
-                  name="Observaciones"
-                  rows={2}
-                  value={formData.Observaciones}
-                  onChange={handleChange}
-                  placeholder="Escribe observaciones si aplica..."
-                />
+                <textarea name="Observaciones" rows={2} value={formData.Observaciones} onChange={handleChange} placeholder="Escribe observaciones si aplica..." />
               </label>
             </div>
 
             {/* Botones */}
             <div className="botones-container">
-              <button type="submit" className="btn-registrar">
+              <button type="submit" className="btn btn-primary-final">
                 ✅  Registrar Factura
               </button>
 
-              <button
-                type="button"
-                className="btn-ver-facturas"
-                onClick={() => setMostrarLista(true)}
-              >
+              <button type="button" className="btn btn-secondary-final" onClick={() => setMostrarLista(true)}>
                 📄 Mostrar Facturas
               </button>
 
               {/* botón para abrir DistribucionFactura */}
-              <button
-                type="button"
-                className="btn-distribucion"
-                onClick={() => setMostrarDistribucion(true)}
-              >
+              <button type="button" className="btn-distribucion" onClick={() => setMostrarDistribucion(true)}>
                 📦 Distribuir Factura
               </button>
             </div>

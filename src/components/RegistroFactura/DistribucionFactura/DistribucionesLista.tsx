@@ -40,7 +40,7 @@ const DistribucionesLista: React.FC<DistribucionesListaProps> = ({ onVolver }) =
     <div className="distribuciones-lista-container">
       <div className="d-flex justify-content-between align-items-center mb-3">
         <h4 className="mb-0">📋 Distribuciones registradas</h4>
-        <button className="btn btn-secondary" onClick={onVolver}>
+        <button className="btn btn-secondary btn-personalized" onClick={onVolver}>
           🔙 Volver al formulario
         </button>
       </div>
@@ -72,7 +72,7 @@ const DistribucionesLista: React.FC<DistribucionesListaProps> = ({ onVolver }) =
             <tbody>
               {distribuciones.map((item) => (
                 <tr key={item.Id ?? item.NoFactura}>
-                  <td>{item.Proveedor}</td>
+                  <td >{item.Proveedor}</td>
                   <td>{item.Title}</td>
                   <td>{item.NoFactura}</td>
                   <td>{formatearFecha(item.FechaEmision)}</td>
@@ -82,9 +82,7 @@ const DistribucionesLista: React.FC<DistribucionesListaProps> = ({ onVolver }) =
                   <td>{item.CosTotCEDI?.toLocaleString("es-CO", { style: "currency", currency: "COP" })}</td>
                   <td>{item.CosTotServAdmin?.toLocaleString("es-CO", { style: "currency", currency: "COP" })}</td>
                   <td className="text-center">
-                    <button
-                      className="btn btn-sm btn-outline-primary"
-                      onClick={() => setEditando(item)}
+                    <button className="btn btn-sm btn-outline-primary" onClick={() => setEditando(item)}
                     >
                       ✏️ Editar
                     </button>

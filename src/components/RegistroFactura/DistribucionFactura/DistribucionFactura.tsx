@@ -267,7 +267,7 @@ const mensajePredeterminado = `Detalle de impresiones en ${mesActual}`;
     <div className="distribucion-container">
       <div className="d-flex justify-content-between align-items-center mb-3">
         <h2>📦 Distribución de Factura</h2>
-        <button className="btn btn-primary" onClick={() => setMostrarLista(true)}>
+        <button className="btn btn-primary btn-large btn-xs" onClick={() => setMostrarLista(true)}>
           📋 Ver distribuciones registradas
         </button>
       </div>

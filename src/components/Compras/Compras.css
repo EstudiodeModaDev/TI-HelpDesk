@@ -20,14 +20,8 @@
   color: var(--ink);
   background: transparent;
   display: grid;
-  gap: clamp(12px, 2.2vw, 20px);
-
-  /* centrado y sin desbordes de 1–2px por la barra vertical */
   inline-size: clamp(90px, 900, 1500);
   margin-inline: auto;
-  padding-inline: clamp(12px, 3vw, 28px);
-  padding-block: clamp(10px, 2vw, 20px);
-
   overflow-x: clip;   /* evita scroll horizontal por sombras/bordes */
 }
 
@@ -38,16 +32,8 @@
 
 /* ---------- Panel base (aplica a form y tabla) ---------- */
 .compra-wrap > section{
-  background: var(--surface);
-  border: 1px solid var(--bd);
   border-radius: var(--radius-3xl);
-  box-shadow: var(--shadow);
-  /* el contenido interno define si scrollea; aquí no forzamos */
   overflow: visible;
-
-  /* relleno cómodo y responsivo */
-  padding: clamp(14px, 2.2vw, 22px);
-  /* animación sutil al alternar paneles */
   animation: compras-fade-slide .18s ease both;
 }
 
@@ -63,9 +49,6 @@
   padding: 0; /* deja que los hijos decidan */
 }
 
-/* Si quieres que solo la tabla tenga scroll vertical interno y
-   el encabezado quede fijo dentro de ese panel, crea un contenedor así:
-   (útil si tu TablaCompras no lo maneja por dentro) */
 #compras-tabla .tabla-scroll{
   max-block-size: clamp(420px, 60vh, 720px);
   overflow: auto;

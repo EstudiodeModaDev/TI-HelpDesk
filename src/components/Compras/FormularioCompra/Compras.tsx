@@ -235,8 +235,8 @@ export default function CompraFormulario({submitting = false, onClick}: Props) {
           </div>) : <div></div>}
 
         {/* Acciones */}
-        <div className="col-span-full flex items-center justify-end gap-2 pt-2">
-          <button type="reset" className="btn btn-sm"
+        <div className="fc-actions">
+          <button type="reset" className="btn btn-terciary btn-sm"
             onClick={() => setState((s) => ({
               ...s,
               productoServicio: "",
@@ -253,12 +253,12 @@ export default function CompraFormulario({submitting = false, onClick}: Props) {
           >
             Limpiar
           </button>
-          <button type="submit" className="btn btn-primary btn-sm" disabled={submitting}>
+          <button type="submit" className="btn btn-primary-final btn-sm" disabled={submitting}>
             Guardar
           </button>
         </div>
       </form>
-      <button type="button" className="btn-secondary" onClick={() => onClick(true)}>📄 Ver compras registradas</button>
+      <button type="button" className="btn btn-secondary-final btn-sm btn-large" onClick={() => onClick(true)}>📄 Ver compras registradas</button>
     </div>
   );
 }

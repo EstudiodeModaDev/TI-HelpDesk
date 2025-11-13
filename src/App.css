@@ -263,6 +263,7 @@ input, select, textarea{
               border-color .18s ease, box-shadow .18s ease,
               transform .06s ease;
   min-height: 40px;
+  max-width: 200px !important;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
 }
@@ -284,7 +285,7 @@ input, select, textarea{
 /* ===============================
    TAMAÑOS
    =============================== */
-.btn-xs{ padding: 6px 10px; font-weight: 600; border-radius: calc(var(--radius,18px) - 6px); min-height: 32px; }
+.btn-xs{ padding: 6px 10px !important; font-weight: 600; border-radius: calc(var(--radius,18px) - 6px); min-height: 32px; }
 .btn-m { padding: 10px 14px; } /* default */
 .btn-xl{ padding: 14px 22px; font-size: 1.05rem; }
 

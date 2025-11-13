@@ -34,8 +34,8 @@ export default function TablaCompras({onClick}:Props) {
         <input type="date" value={range.from} onChange={(e) => setRange({ ...range, from: e.target.value })} title="Desde"/>
         <span>→</span>
         <input type="date" value={range.to} onChange={(e) => setRange({ ...range, to: e.target.value })} title="Hasta"/>
-        <button type="button" onClick={applyRange} title="Aplicar rango" className="btn-primary"> Aplicar </button>
-        <button type="button" onClick={resetFiltrosLocal} title="Limpiar búsqueda" className="btn-secondary"> Limpiar </button>
+        <button type="button" onClick={applyRange} title="Aplicar rango" className="btn btn-primary btn-xs"> Aplicar </button>
+        <button type="button" onClick={resetFiltrosLocal} title="Limpiar búsqueda" className="btn btn-secondary-final btn-xs"> Limpiar </button>
       </div>
  
       {/* Estados */}
@@ -48,16 +48,16 @@ export default function TablaCompras({onClick}:Props) {
         <table>
           <thead>
             <tr>
-              <th>ID</th>
-              <th>Solicitada por</th>
-              <th>Fecha de solicitud</th>
-              <th>Dispositivo</th>
-              <th>CO</th>
-              <th>UN</th>
-              <th>Centro de costos</th>
-              <th>Cargar A</th>
-              <th>Estado</th>
-              <th>Acciones</th>
+              <th><span title="ID">ID</span></th>
+              <th><span title="Solicitada por">Solicitada por</span></th>
+              <th><span title="Fecha de solicitud">Fecha de solicitud</span></th>
+              <th><span title="Dispositivo">Dispositivo</span></th>
+              <th><span title="CO">CO</span></th>
+              <th><span title="UN">UN</span></th>
+              <th><span title="Centro de costos">Centro de costos</span></th>
+              <th><span title="Cargar A">Cargar A</span></th>
+              <th><span title="Estado">Estado</span></th>
+              <th><span title="Acciones">Acciones</span></th>
             </tr>
           </thead>
           <tbody>
@@ -74,18 +74,26 @@ export default function TablaCompras({onClick}:Props) {
                 <td><label title={compra.Estado}>{compra.Estado}</label></td>
                 <td>
                   {["completado", "completada"].includes((compra?.Estado ?? "").toLowerCase()) && !((compra?.Title ?? "").toLowerCase().includes("contrato")) ? (
-                    <span className="badge badge-success" aria-label="Compra completada"> La compra ya ha sido completada</span>
+                    <span className="badge badge-success" aria-label="Compra completada">
+                      La compra ya ha sido completada
+                    </span>
                   ) : (
-                  <div>
-                    <button type="button" onClick={(e) => {e.stopPropagation(); handleNext(compra?.Id ?? ""); setTicketCompra(compra.IdCreado);}} aria-label={`Siguiente paso para compra ${compra?.Id ?? ""}`} className="btn">
+                    <div className="tc-actions">
+                      <button type="button" aria-label={`Siguiente paso para compra ${compra?.Id ?? ""}`} className="btn btn-secondary-final btn-xs"onClick={(e) => {
+                                                                                                                                                                      e.stopPropagation();
+                                                                                                                                                                      handleNext(compra?.Id ?? "");
+                                                                                                                                                                      setTicketCompra(compra.IdCreado);
+                                                                                                                                                                    }}>
                         Siguiente paso
-                    </button>
+                      </button>
+
                       {["producto", "alquiler"].includes((compra?.Title ?? "").trim().toLowerCase()) && (
-                        <button type="button" onClick={(e) => {e.stopPropagation(); setOpenModal(true)}} className="btn-secondary">
+                        <button type="button" onClick={(e) => { e.stopPropagation(); setOpenModal(true);}} className="btn btn-terciary btn-xs">
                           Inscribir
                         </button>
                       )}
-                  </div>)}
+                    </div>
+                  )}
                 </td>
               </tr>
             ))}
@@ -93,7 +101,7 @@ export default function TablaCompras({onClick}:Props) {
         </table>
  
         <div className="pager">
-          <button type="button" className="btn-secondary" onClick={() => onClick(false)}>➕ Registrar compra</button>
+          <button type="button" className="btn btn-secondary-final" onClick={() => onClick(false)}>➕ Registrar compra</button>
           <span className="flex-spacer" />
  
           {/* Derecha: SOLO si hay registros */}

@@ -2,6 +2,8 @@
    COMPRA FORM — usa tokens globales (dark/light)
    ========================================================= */
 
+
+   
 /* Wrapper del formulario */
 .compra-form{
   color: var(--ink);
@@ -30,6 +32,9 @@
   display: grid;
   grid-template-columns: repeat(2, minmax(260px, 1fr));
   gap: 12px clamp(12px, 2vw, 18px);
+  background: var(--surface);
+  border-radius: 30px;
+  padding: 40px;
 }
 
 @media (max-width: 900px){
@@ -135,3 +140,13 @@
   box-shadow: 0 0 0 4px var(--ring);
 }
 
+.fc-actions button{
+  margin-left: 5px;
+}
+
+.btn-large{
+    display: block !important;      /* o flex */
+  width: 100% !important;         /* ocupa todo el ancho del contenedor */
+  max-width: none !important;
+  margin-top: 5px; 
+}

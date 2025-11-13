@@ -55,22 +55,6 @@
   margin-top: 6px;
 }
 
-/* Botón primario */
-.modal-buttons .btn-primary{
-  appearance: none;
-  border: 1px solid var(--primary, #3b82f6);
-  background: var(--primary, #3b82f6);
-  color: var(--primary-ink, #fff);
-  font-weight: 700;
-  padding: 10px 14px;
-  border-radius: 10px;
-  cursor: pointer;
-  box-shadow: var(--shadow, 0 6px 20px rgba(0,0,0,.12));
-  transition: transform .05s ease, filter .15s ease, box-shadow .18s ease;
-}
-.modal-buttons .btn-primary:hover{ box-shadow: 0 0 0 6px var(--ring, rgba(59,130,246,.25)); filter: brightness(1.03); }
-.modal-buttons .btn-primary:active{ transform: translateY(1px); }
-
 /* Botón secundario */
 .modal-buttons .btn-cancelar{
   appearance: none;
