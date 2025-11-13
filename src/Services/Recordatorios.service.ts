@@ -39,6 +39,8 @@ export class RecordatoriosService {
         ReportadaporCorreo: f.ReportadaporCorreo,
         Estado: f.Estado,
         Cantidaddediasalarma: f.Cantidaddediasalarma,
+        Nota: f.Nota,
+        
     };
   }
 
