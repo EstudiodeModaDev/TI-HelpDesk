@@ -8,7 +8,6 @@
   --as-muted:     var(--muted, #64748b);
   --as-bd:        var(--bd, #e5e7eb);
   --as-bd-strong: var(--bd-strong, #d1d5db);
-  --as-shadow:    var(--shadow, 0 8px 22px rgba(0,0,0,.06));
   --as-radius:    var(--radius-3xl, var(--radius, 12px));
   --as-primary:   var(--primary, #3b82f6);
   --as-ring:      var(--ring, rgba(59,130,246,.25));
@@ -34,7 +33,6 @@
   color: var(--as-ink);
   border: 1px solid var(--as-bd);
   border-radius: var(--as-radius);
-  box-shadow: var(--as-shadow);      /* compacto por defecto */
   container-type: inline-size; /* permite container queries */
     inline-size: clamp(320px, 90vw, 720px);
   margin-inline: auto;

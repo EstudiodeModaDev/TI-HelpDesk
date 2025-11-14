@@ -80,14 +80,17 @@
 /* ================================
    ✂️ TEXTO CON PUNTOS SUSPENSIVOS
    ================================ */
-.one-line-ellipsis {
-  display: inline-block;
-  max-width: 200px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
+.table th,
+.table td {
+  padding: 8px 6px;
+  text-align: center;
+  border-bottom: 1px solid #e0e0e0;
+  vertical-align: middle;
 
+  white-space: nowrap;        /* una sola línea */
+  overflow: hidden;           /* esconde lo que sobresale */
+  text-overflow: ellipsis;    /* … al final */
+}
 /* ================================
    🔘 AJUSTES OPCIONALES
    ================================ */

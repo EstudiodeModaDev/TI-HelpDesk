@@ -11,7 +11,7 @@ type RoleDecision = { role: string; source: "default" | "usuarios" | "group" | "
 
 export function useUserRole(email?: string | null) {
   const opts: UseRoleOpts = {
-    groupRules: [{ groupId: "ca8b6719-431a-498a-ba9f-2c58242b1403", role: "Jefe de zona" }],
+    groupRules: [{ groupId: "ca8b6719-431a-498a-ba9f-2c58242b1403", role: "Jefe de zona" }, { groupId: "937d53c8-536f-4d7c-9047-122480da727c", role: "Tecnico" }],
   };
 
   const { Usuarios, Graph } = useGraphServices() as { Usuarios: any; Graph?: any };

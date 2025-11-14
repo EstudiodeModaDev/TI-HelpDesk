@@ -24,8 +24,6 @@
   background: var(--bg);
   border-radius: 20px;
   padding: 16px 14px 12px;
-  max-height: 500px;
-  overflow-y: scroll;
 }
 
 /* =========================================================
@@ -75,6 +73,10 @@
   gap: 12px;
   margin-top: 6px;
   padding: 6px 4px 12px;
+
+  max-height: 420px;   /* ajusta la altura que quieras */
+  overflow-y: auto;    /* scroll solo aquí */
+
 }
 
 /* =========================================================
