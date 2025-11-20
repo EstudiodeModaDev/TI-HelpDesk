@@ -40,6 +40,7 @@ import type { AnunciosService } from "./Services/Anuncios.service";
 import { logout } from "./auth/msal";
 import AnnouncementsTable from "./components/TipsTable/TipsTable";
 import { useTheme } from "./Funcionalidades/Theme";
+//import UsuariosApp from "./components/Usuarios copy/Acceso";
 
 /* ============================================================
    Tipos de navegación y contexto de visibilidad
@@ -84,6 +85,7 @@ const NAV: MenuItem[] = [
       { id: "anuncios", label: "Anuncios", to: <CrearAnuncio />, roles: ["Administrador", "Tecnico"], icon: <img src={newsIcon} className="sb-icon" /> },
       { id: "plantillas", label: "Plantillas", icon: <img src={templateIcon} className="sb-icon" />, to: <CrearPlantilla />, roles: ["Administrador", "Tecnico"] },
       { id: "usuarios", label: "Usuarios", icon: <img src={usersIcon} className="sb-icon" />, to: <UsuariosPanel />, roles: ["Administrador"] },
+     // { id: "acceso", label: "Acceso", to: <UsuariosApp />, roles: ["Administrador", "Tecnico"] },
       { id: "tips", label: "Tips", icon: <img src={infoIcon} className="sb-icon" />, to: <AnnouncementsTable />, roles: ["Administrador", "Tecnico"] },
     ],
   },

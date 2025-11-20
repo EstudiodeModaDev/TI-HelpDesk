@@ -117,7 +117,7 @@ export default function TicketsAsociados({title = "Tickets Asociados", ticket, e
                       Padre de {shoAll? hijos.length : Math.min(2, hijos.length)}/{hijos.length}:
                     </p>
 
-                    {hijos.length > 5 && (
+                    {hijos.length > 3 && (
                       <button className="ta-link ta-link--button" aria-live="polite" onClick={() => setShowAll(!shoAll)}>
                         {shoAll ? "Ver resumen" : "Ver todos"}
                       </button>
