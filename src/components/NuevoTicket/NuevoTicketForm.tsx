@@ -41,6 +41,13 @@ export default function NuevoTicketForm() {
     onlyEnabled: true,
   });
   const { UseruserOptions, loading, error } = useUsuarios(UsuariosSPServiceSvc!);
+  const opcionesFuentes = [
+    { value: "Correo", label: "Correo" }, 
+    { value: "Disponibilidad", label: "Disponibilidad" },
+    { value: "Teams", label: "Teams" },
+    { value: "WhatsApp", label: "WhatsApp" },
+    { value: "Presencial", label: "Presencial" },
+  ];
 
   // ====== Combinar usuarios con franquicias
   const combinedOptions: UserOptionEx[] = React.useMemo(() => {
@@ -195,14 +202,14 @@ export default function NuevoTicketForm() {
           {/* Fuente */}
           <div className="tf-field">
             <label className="tf-label" htmlFor="fuente">Fuente Solicitante</label>
-            <select id="fuente" value={state.fuente} onChange={(e) => setField("fuente", e.target.value as typeof state.fuente)} disabled={submitting} className="tf-input">
-              <option value="">Seleccione una fuente</option>
-              <option value="Correo">Correo</option>
-              <option value="Disponibilidad">Disponibilidad</option>
-              <option value="Teams">Teams</option>
-              <option value="WhatsApp">WhatsApp</option>
-              <option value="En persona">Presencial</option>
-            </select>
+            
+
+
+            <Select inputId="nomina" options={opcionesFuentes} classNamePrefix="rs" placeholder="Selecciona tipo de nómina..."
+              value={opcionesFuentes.find(o => o.value === state.fuente) ?? null}
+              onChange={(opt) => {setField("fuente", opt?.label ?? ""); }}
+              isClearable
+            />
             {errors.fuente && <small className="error">{errors.fuente}</small>}
           </div>
 

@@ -24,7 +24,7 @@ export default function NuevoTicketUsuarioForm() {
     <div className="ticket-form">
       <h2 className="tf-title">Nuevo Ticket</h2>
 
-      <form onSubmit={(e) => {e.preventDefault(); handleSubmit()}} noValidate className="tf-grid">
+      <form noValidate className="tf-grid">
 
         {/* Motivo */}
         <div className="tf-field tf-col-2 tf-narrow">
@@ -59,7 +59,7 @@ export default function NuevoTicketUsuarioForm() {
       </form>
       <br />
       <div className="tf-actions tf-col-2">
-        <button type="submit" disabled={submitting} className="btn-primary">
+        <button type="submit" disabled={submitting} className="btn-primary" onClick={(e) => {e.preventDefault(); handleSubmit()}}>
           {submitting ? "Enviando..." : "Enviar Ticket"}
         </button>
       </div>

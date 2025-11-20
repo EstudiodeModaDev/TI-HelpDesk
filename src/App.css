@@ -278,6 +278,7 @@ input, select, textarea{
   cursor: not-allowed;
   pointer-events: none;
 }
+.btn:active{border-color: transparent;}
 
 /* Icono opcional dentro del botón */
 .btn .i{ inline-size:18px; block-size:18px; display:inline-block; }
@@ -354,6 +355,7 @@ input, select, textarea{
 
 .btn-terciary:not([disabled]):active{
   --btn-bg: color-mix(in oklab, var(--ink) 24%, var(--surface) 76%);
+  border-color: transparent;
 }
 
 /* =========================================

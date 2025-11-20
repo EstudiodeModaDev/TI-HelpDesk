@@ -35,6 +35,7 @@
   display: grid;
   gap: 6px;
   min-width: 0; /* evita que textos largos rompan el grid */
+  overflow: visible;
 }
 
 /* Span de 2 columnas cuando se requiera (ya lo usas) */
@@ -71,6 +72,10 @@
   outline: none;
   transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
   min-width: 0;
+}
+
+#fuente{
+  overflow: visible !important;
 }
 
 .ticket-form ::placeholder{

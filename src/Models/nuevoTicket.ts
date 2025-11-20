@@ -7,7 +7,7 @@ export type FormState = {
   resolutor: UserOption | null;
   usarFechaApertura: boolean;
   fechaApertura: string | null; // YYYY-MM-DD
-  fuente: "correo" | "teams" | "whatsapp" | "presencial" | "";
+  fuente: string;
   motivo: string;
   descripcion: string;
   categoria: string;
