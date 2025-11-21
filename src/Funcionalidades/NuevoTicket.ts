@@ -193,12 +193,13 @@ export function useNuevoTicketForm(services: Svc) {
         } else {
           // 1) Buscar resolutor por correo (top 1)
           const opts: GetAllOpts = {
-            filter: `Correo eq '${email}'`,
+            filter: `fields/Correo eq '${email}'`,
             top: 1,
           };
 
           const rows = await Usuarios.getAll(opts);
           const resolutorRow = rows?.[0];
+          console.table(resolutorRow)
 
           if (!resolutorRow) {
             console.warn("No se encontró resolutor con ese correo:", email);
@@ -208,7 +209,7 @@ export function useNuevoTicketForm(services: Svc) {
             const next = prev + 1;
 
             // 3) Hacer update (espera Promise)
-            const updated = await Usuarios.update(String(resolutorRow.ID), {
+            const updated = await Usuarios.update(String(resolutorRow.Id), {
               Numerodecasos: next,
             });
 
@@ -236,7 +237,9 @@ export function useNuevoTicketForm(services: Svc) {
 
         //Crear Log
         Logs.create({Actor: "Sitema", Descripcion:  `Se ha creado un nuevo ticket para el siguiente requerimiento: ${idTexto}`, CorreoActor: "", Tipo_de_accion:"Creacion", Title: idTexto})
-      
+
+        setSubmitting(false);
+       
           // Notificar solicitante
         if (solicitanteEmail) {
           const title = `Asignación de Caso - ${idTexto}`;
@@ -289,13 +292,13 @@ export function useNuevoTicketForm(services: Svc) {
             console.error("[Flow] Error enviando a resolutor:", err);
           }
         }
-
+      
         //Limpiar formularior
         setState({solicitante: null, resolutor: null, usarFechaApertura: false, fechaApertura: null, fuente: "", motivo: "", descripcion: "", categoria: "", subcategoria: "", articulo: "",  ANS: "", archivo: null,})
         setErrors({})
       }
       } finally {
-        setSubmitting(false);
+        
       }
     };
 
