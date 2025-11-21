@@ -230,6 +230,22 @@ export function useTickets(TicketsSvc: TicketsService, userMail: string, isAdmin
     loadCantidadResolutor()
   }, [loadFirstPage, loadCantidadResolutor]);
 
+  const updateSelectedTicket = React.useCallback(async (id: string) => {
+    setLoading(true); setError(null);
+    try {
+      const ticket  = await TicketsSvc.get(id)
+      return ticket
+    } catch (e: any) {
+      setError(e?.message ?? "Error cargando tickets");
+      setRows([]);
+      setNextLink(null);
+      setPageIndex(1);
+    } finally {
+      setLoading(false);
+    }
+  }, [TicketsSvc, buildFilter, sorts]);
+
+
   // siguiente página: seguir el nextLink tal cual
   const hasNext = !!nextLink;
 
@@ -250,7 +266,6 @@ export function useTickets(TicketsSvc: TicketsService, userMail: string, isAdmin
 
   // recargas por cambios externos
   const applyRange = React.useCallback(() => { loadFirstPage(); }, [loadFirstPage]);
-  const reloadAll  = React.useCallback(() => { loadFirstPage(); }, [loadFirstPage]);
 
   const sortFieldToOData: Record<SortField, string> = {
     id: 'Id',
@@ -303,7 +318,7 @@ export function useTickets(TicketsSvc: TicketsService, userMail: string, isAdmin
 
   return {
     rows, ticketsAbiertos, loading, ticketsFueraTiempo, error, pageSize, pageIndex, hasNext, filterMode,sorts, range, state,
-    nextPage, setPageSize, setFilterMode, setRange, applyRange, reloadAll, toggleSort, setField, toTicketOptions, setState, handleConfirm, sendFileToFlow
+    nextPage, setPageSize, setFilterMode, setRange, applyRange, loadFirstPage, toggleSort, setField, toTicketOptions, setState, handleConfirm, sendFileToFlow, updateSelectedTicket
   };
 }
 

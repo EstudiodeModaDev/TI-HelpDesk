@@ -15,7 +15,7 @@ import EscalamientoInternet from "./EscalamientoProveedor/Escalamiento";
 import InfoActaEntrega from "./ActaEntrega/InformacionCaso/InfoActa";
 import type { ComprasService } from "../../Services/Compras.service";
 
-export default function Documentar({ ticket, tipo, onDone }: { ticket: Ticket; tipo: "solucion" | "seguimiento"; onDone?: () => void | Promise<void>}) {
+export default function Documentar({ ticket, tipo, onDone }: { ticket: Ticket; tipo: "solucion" | "seguimiento"; onDone: () => void | Promise<void>}) {
   const { Tickets: TicketsSvc, Logs: LogsSvc, Plantillas: PlantillasSvc, Compras} =
     (useGraphServices() as ReturnType<typeof useGraphServices> & {
       Franquicias: FranquiciasService;
@@ -53,7 +53,7 @@ export default function Documentar({ ticket, tipo, onDone }: { ticket: Ticket; t
 
       {/* === SOLO DOCUMENTACIÓN CUANDO showEscalar = false === */}
       {!showEscalar && !showActaEntrega ? (
-        <form onSubmit={(e) => { handleSubmit(e, tipo, ticket, account!);  if (onDone) onDone();}} className="documentar-grid">
+        <form className="documentar-grid">
           {/* Selector de plantilla */}
           <div className="documentar-field documentar-col-2 platilla-field">
             <label className="documentar-label platilla-label" htmlFor="plantilla">Usar plantilla</label>
@@ -84,7 +84,10 @@ export default function Documentar({ ticket, tipo, onDone }: { ticket: Ticket; t
 
           {/* Acciones (esquinas) */}
             <div className="documentar-actions documentar-col-2">
-              <button type="submit" disabled={submitting} className="btn-save btn-primary">
+              <button type="button" disabled={submitting} className="btn-save btn-primary" onClick={async   (e) => { 
+                                                                                                   await handleSubmit(e, tipo, ticket, account!);  
+                                                                                                    await onDone(); 
+                                                                                                  }}>
                 {submitting ? "Enviando..." : "Guardar documentación"}
               </button>
 

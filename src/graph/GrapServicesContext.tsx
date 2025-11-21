@@ -156,7 +156,7 @@ const DEFAULT_CONFIG: UnifiedConfig = {
     Inventario: "Inventario",
     DistribucionFactura: "DistribucionFactura",
     TipsInicio: "TipsInicio",
-    Ausencias: "Asencias",
+    Ausencias: "Ausencias",
 
     // TEST
     PazYSalvos: "Paz y salvos",

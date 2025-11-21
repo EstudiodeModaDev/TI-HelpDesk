@@ -3,7 +3,8 @@ export type ausencia = {
     Title: string;
     Fechadeinicio: string;
     Fechayhora: string;
-    Descripcion: string
+    Descripcion: string;
+    NombreSolicitante: string
 }
 
-export type FormErrors = Partial<Record<keyof ausencia, string>>;
+export type AusenciaErrors = Partial<Record<keyof ausencia, string>>;

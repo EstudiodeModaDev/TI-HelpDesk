@@ -1,26 +1,26 @@
 import * as React from "react";
 import { useState, } from "react";
-import { FlowClient } from "./FlowClient";
 import type { AusenciaService } from "../Services/Ausencia.service";
 import type { ausencia, AusenciaErrors } from "../Models/Ausencia";
+import { useAuth } from "../auth/authContext";
 
 
-type Svc = {Ausencias?: AusenciaService;}; 
+type Svc = {Ausencias: AusenciaService;}; 
 
-export function useNuevoTicketForm(services: Svc) {
+export function useAusencias(services: Svc) {
 
     const { Ausencias } = services;
+    const {account} = useAuth()
+    const todayISO = new Date().toISOString();
     const [state, setState] = useState<ausencia>({
         Descripcion: "",
-        Fechadeinicio: "",
-        Fechayhora: "",
-        Title: ""
+        Fechadeinicio: todayISO,
+        Fechayhora: todayISO,
+        Title: account?.username ?? "",
+        NombreSolicitante: account?.name ?? ""
     });
     const [errors, setErrors] = useState<AusenciaErrors>({});
     const [submitting, setSubmitting] = useState(false);
-
-    // ---- Instancia del servicio de Flow (useRef para no depender de React.*)
-    const notifyFlow = new FlowClient("https://defaultcd48ecd97e154f4b97d9ec813ee42b.2c.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/a21d66d127ff43d7a940369623f0b27d/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=0ptZLGTXbYtVNKdmIvLdYPhw1Wcqb869N3AOZUf2OH4")
 
     /* ============================
         Helpers de formulario
@@ -33,13 +33,17 @@ export function useNuevoTicketForm(services: Svc) {
         if (!state.Fechadeinicio) e.Fechadeinicio = "Seleccione la fecha";
         if (!state.Fechayhora) e.Fechayhora = "Seleccione la fecha";
         if (!state.Descripcion) e.Descripcion = "Seleccione una descripción";
+        if(state.Fechadeinicio > state.Fechayhora) {
+                                                    e.Fechadeinicio = "La fecha de inicio debe ser menor a la fecha final"; 
+                                                    e.Fechayhora= "La fecha de inicio debe ser menor a la fecha final"
+                                                }
         setErrors(e);
         return Object.keys(e).length === 0;
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!validate()) return;
+        if (!validate()) {return};
 
         setSubmitting(true);
         try {
@@ -48,15 +52,18 @@ export function useNuevoTicketForm(services: Svc) {
                 Fechadeinicio: state.Fechadeinicio, 
                 Fechayhora: state.Fechayhora,
                 Title: state.Title,
+                NombreSolicitante: state.NombreSolicitante
             }
-            Ausencias?.create(payload)
-            alert("Se ha solicitado la aprobación de su ausencia, se le notificara la decisión")
-        } catch{
-
+            const ausenciaCreada = await Ausencias.create(payload)
+            alert("Se ha solicitado la aprobación de su ausencia, se le notificara la decisión con ID " + ausenciaCreada.Id)
+        } catch (error){
+                console.error("Error creando la ausencia", error);
+                alert("Ocurrió un error solicitando la ausencia. Intenta de nuevo.");
+            
         } finally {
             setSubmitting(false)
         }
-        };
+    };
 
   return {
     state, errors, submitting, handleSubmit, setField

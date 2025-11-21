@@ -158,3 +158,15 @@ export function toGraphDateOnly(
 export function toDate(d: string | Date){(d instanceof Date ? d : new Date(d))};
 
 export const formatYYYYMMDD = (d: Date) => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+
+export const toIsoFromDateTime = (dateStr: string, timeStr: string): string => {
+  const [year, month, day] = dateStr.split("-").map(Number);   // "2025-11-21"
+  const [hour, minute] = timeStr.split(":").map(Number);       // "17:30"
+
+  // Esto interpreta la fecha/hora como LOCAL y luego toISOString()
+  // la convierte a UTC (que es lo que SharePoint espera).
+  const d = new Date(year, month - 1, day, hour, minute, 0);
+
+  return d.toISOString(); // ej: "2025-11-21T22:30:00.000Z"
+};
+

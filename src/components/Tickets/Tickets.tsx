@@ -23,7 +23,7 @@ export default function TablaTickets() {
   const userRole = useUserRole(userMail)
   const isPrivileged = userRole.role === "Administrador" || userRole.role === "Tecnico" || userRole.role === "Técnico";
   const { Tickets } = useGraphServices();
-  const {ticketsAbiertos, ticketsFueraTiempo, rows, loading, error, filterMode, range, pageSize, pageIndex, hasNext, sorts, setFilterMode, setRange, setPageSize, nextPage, reloadAll,  toggleSort} = useTickets(Tickets, userMail, isAdmin.isAdmin);
+  const {ticketsAbiertos, ticketsFueraTiempo, rows, loading, error, filterMode, range, pageSize, pageIndex, hasNext, sorts, setFilterMode, setRange, setPageSize, updateSelectedTicket, nextPage, loadFirstPage,  toggleSort} = useTickets(Tickets, userMail, isAdmin.isAdmin);
 
   // Búsqueda local SOLO sobre la página visible (si quieres global, hay que mover a OData)
   const [search, setSearch] = React.useState("");
@@ -38,6 +38,24 @@ export default function TablaTickets() {
     });
   }, [rows, search]);
 
+  const handleTicketChanged = React.useCallback(() => {
+    loadFirstPage();
+  }, [loadFirstPage]);
+
+  React.useEffect(() => {
+    if (!ticketSeleccionado) return;
+
+    const load = async () => {
+
+      // Si no está en la página, consultar el backend
+      const updatedRemote = await updateSelectedTicket(ticketSeleccionado.ID ?? "");
+      if (updatedRemote) {
+        setTicketSeleccionado(updatedRemote);
+      }
+    };
+
+    load();
+  }, [rows]); 
   return (
     <div className="tabla-tickets">
 
@@ -61,11 +79,11 @@ export default function TablaTickets() {
       {/* Estados */}
       {loading && <p>Cargando tickets…</p>}
       {error && <p style={{ color: "#b91c1c" }}>{error}</p>}
-      {!loading && !error && filtered.length === 0 && <p>No hay tickets para los filtros seleccionados.</p>}
+      {!loading && !error && filtered.length === 0 && !ticketSeleccionado && <p>No hay tickets para los filtros seleccionados.</p>}
 
       {/* Tabla o Detalle */}
       {ticketSeleccionado ? (
-        <CaseDetail onVolver={() => setTicketSeleccionado(null)} ticket={ticketSeleccionado} role={userRole.role} />
+        <CaseDetail onVolver={() => setTicketSeleccionado(null)} ticket={ticketSeleccionado} role={userRole.role} onDocumentar={handleTicketChanged}/>
       ) : (
         <div className="table-wrap">
           <table>
@@ -117,7 +135,7 @@ export default function TablaTickets() {
           {/* Paginación servidor: Anterior = volver a primera página (loadFirstPage), Siguiente = nextLink */}
           {filtered.length > 0 && (
             <div className="paginacion">
-              <button onClick={reloadAll} disabled={loading || pageIndex <= 1}>
+              <button onClick={loadFirstPage} disabled={loading || pageIndex <= 1}>
                 Anterior
               </button>
               <span>Página {pageIndex}</span>

@@ -14,15 +14,14 @@ type Props = {
   role: string;
   ticketId: string | number;
   onVolver: () => void;
-  onAddClick?: (m: Log) => void;
-  onViewClick?: (m: Log) => void;
   onAdd: () => void;
   defaultTab?: Tab;
   className?: string;
-  ticket: Ticket
+  ticket: Ticket;
+  onAddClick: () => void
 };
 
-export default function TicketHistorial({role, ticketId, onVolver, defaultTab = "solucion", className, ticket, onAdd}: Props) {
+export default function TicketHistorial({role, ticketId, onVolver, defaultTab = "solucion", className, ticket, onAdd, onAddClick}: Props) {
   const [tab, setTab] = React.useState<Tab>(defaultTab);
   const [mode, setMode] = React.useState<Mode>("detalle"); 
   const isPrivileged = role === "Administrador" || role === "Tecnico" || role === "Técnico";
@@ -75,7 +74,7 @@ export default function TicketHistorial({role, ticketId, onVolver, defaultTab = 
 
         {!ticket && <p style={{ opacity: 0.7, padding: 16 }}>Cargando ticket…</p>}
         {ticket && (
-          <Documentar key={`doc-${tab}-${ticketId}`} ticket={ticket} tipo={tab}/>
+          <Documentar key={`doc-${tab}-${ticketId}`} ticket={ticket} tipo={tab} onDone={() => {onAdd(); onAddClick()}}/>
         )}
       </div>
     );
@@ -99,14 +98,14 @@ export default function TicketHistorial({role, ticketId, onVolver, defaultTab = 
             <button type="button" onClick={() => { setTab("seguimiento"); setMode("documentar"); }}  className={`th-tab ${tab === "seguimiento" ? "th-tab--active" : ""}`}>
               Seguimiento
             </button>
-            <button type="button" onClick={() => { setTab("solucion"); setMode("documentar");}} className={`th-tab ${tab === "solucion" ? "th-tab--active" : ""}`}>
+            <button type="button" onClick={() => { setTab("solucion"); setMode("documentar"); onAdd()}} className={`th-tab ${tab === "solucion" ? "th-tab--active" : ""}`}>
               Solución
             </button>
           </div>
         )}
 
         <div style={{ marginLeft: "auto" }}>
-          <button type="button" className="btn btn-terciary btn-xs" onClick={() => {onVolver(); onAdd()}}>
+          <button type="button" className="btn btn-terciary btn-xs" onClick={() => {onVolver();}}>
             <span className="th-back-icon" aria-hidden>←</span> Volver
           </button>
         </div>

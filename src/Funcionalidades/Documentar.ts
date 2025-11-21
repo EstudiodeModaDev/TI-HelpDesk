@@ -66,6 +66,7 @@ export function useDocumentarTicket(services: Svc) {
         // (Opcional) subir archivo si aplica
         // if (state.archivo) { await Logs.attach(logId, state.archivo) }
         setState({archivo: null, correoresolutor: "", documentacion: "", resolutor: ""})
+        setSubmitting(false);
       
 
       // 2) Si es solución, cerrar ticket con estado correcto
@@ -110,7 +111,7 @@ export function useDocumentarTicket(services: Svc) {
       console.error("Error en handleSubmit:", err);
       // setError(String(err));
     } finally {
-      setSubmitting(false);
+      
     }
   };
 

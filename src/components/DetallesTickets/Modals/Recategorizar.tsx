@@ -9,7 +9,7 @@ import { norm } from "../../../utils/Commons";
 
 type CategoriaItem = { ID: string | number; Title: string };
 
-export default function Recategorizar({ ticket }: { ticket: Ticket }) {
+export default function Recategorizar({ ticket, onDone}: { ticket: Ticket, onDone: () => void }) {
   const {
     Categorias,
     SubCategorias,
@@ -140,7 +140,7 @@ export default function Recategorizar({ ticket }: { ticket: Ticket }) {
     <div className="dta-form">
       <h2 className="dta-title">Recategorizar Ticket</h2>
 
-      <form onSubmit={handleRecategorizar} noValidate className="dta-grid">
+      <form onSubmit={(e) => {handleRecategorizar(e); onDone()}} noValidate className="dta-grid">
 
         {/* Categoría / Subcategoría / Artículo */}
         <div className="dta-field">

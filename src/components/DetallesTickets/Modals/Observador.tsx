@@ -15,7 +15,7 @@ import { norm } from "../../../utils/Commons";
 
 type UserOptionEx = UserOption & { source?: "Empleado" | "Franquicia" };
 
-export default function AsignarObservador({ticket}: {ticket: Ticket}) {
+export default function AsignarObservador({ticket, onDone}: {ticket: Ticket, onDone: () => void}) {
 
   const {Franquicias: FranquiciasSvc, Logs: LogsSvc, Tickets: TicketSvc} = useGraphServices() as ReturnType<typeof useGraphServices> & {
     Franquicias: FranquiciasService;
@@ -68,7 +68,7 @@ export default function AsignarObservador({ticket}: {ticket: Ticket}) {
 
   return (
     <div className="dta-form">
-      <form onSubmit={handleObservador} noValidate className="dta-grid">
+      <form onSubmit={(e) => {handleObservador(e); onDone()}} noValidate className="dta-grid">
         {/* Solicitante */}
         <div className="dta-field">
           <label className="dta-label">Solicitante</label>

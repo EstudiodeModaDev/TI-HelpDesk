@@ -75,24 +75,24 @@ export type NavContext = {
    ============================================================ */
 
 const NAV: MenuItem[] = [
-  { id: "home", label: "Home", icon: <img src={HomeIcon} alt="" className="sb-icon" />, to: <DashBoardPage />, roles: ["Administrador", "Tecnico"], autocollapse: true },
-  { id: "ticketform", label: "Nuevo Ticket", icon: <img src={addIcon} alt="" className="sb-icon" />, to: () => <NuevoTicketForm />, roles: ["Administrador", "Tecnico"] },
-  { id: "ticketform_user", label: "Nuevo Ticket", icon: <img src={addIcon} alt="" className="sb-icon" />, to: <NuevoTicketUsuarioForm />, roles: ["Usuario", "Jefe de zona"] },
+  { id: "home", label: "Home", icon: <img src={HomeIcon} alt="" className="sb-icon" />, to: <DashBoardPage />, roles: ["Administrador", "Tecnico", "Listo"], autocollapse: true },
+  { id: "ticketform", label: "Nuevo Ticket", icon: <img src={addIcon} alt="" className="sb-icon" />, to: () => <NuevoTicketForm />, roles: ["Administrador", "Tecnico", "Listo"] },
+  { id: "ticketform_user", label: "Nuevo Ticket", icon: <img src={addIcon} alt="" className="sb-icon" />, to: <NuevoTicketUsuarioForm />, roles: ["Usuario", "Jefe de zona", "Listo"] },
   { id: "ticketTable", label: "Ver Tickets", icon: <img src={seeTickets} alt="" className="sb-icon" />, to: <TablaTickets />, autocollapse: true },
-  { id: "task", label: "Tareas", icon: <img src={tareasIcon} alt="" className="sb-icon" />, to: <TareasPage />, roles: ["Administrador", "Tecnico"], autocollapse: true },
-  { id: "formatos", label: "Formatos", icon: <img src={filesIcon} alt="" className="sb-icon" />, to: <Formatos />, roles: ["Administrador"] },
-  { id: "info", label: "Información", icon: <img src={infoIcon} alt="" className="sb-icon" />, to: <InfoPage />, roles: ["Administrador", "Tecnico"] },
-  { id: "admin", label: "Administración", icon: <img src={settingsIcon} className="sb-icon" />, roles: ["Administrador", "Tecnico"], children: [
+  { id: "task", label: "Tareas", icon: <img src={tareasIcon} alt="" className="sb-icon" />, to: <TareasPage />, roles: ["Administrador", "Tecnico", "Listo"], autocollapse: true },
+  { id: "formatos", label: "Formatos", icon: <img src={filesIcon} alt="" className="sb-icon" />, to: <Formatos />, roles: ["Administrador", "Listo"] },
+  { id: "info", label: "Información", icon: <img src={infoIcon} alt="" className="sb-icon" />, to: <InfoPage />, roles: ["Administrador", "Tecnico", "Listo"] },
+  { id: "admin", label: "Administración", icon: <img src={settingsIcon} className="sb-icon" />, roles: ["Administrador", "Tecnico", "Listo"], children: [
       { id: "anuncios", label: "Anuncios", to: <CrearAnuncio />, roles: ["Administrador", "Tecnico"], icon: <img src={newsIcon} className="sb-icon" /> },
-      { id: "plantillas", label: "Plantillas", icon: <img src={templateIcon} className="sb-icon" />, to: <CrearPlantilla />, roles: ["Administrador", "Tecnico"] },
+      { id: "plantillas", label: "Plantillas", icon: <img src={templateIcon} className="sb-icon" />, to: <CrearPlantilla />, roles: ["Administrador", "Tecnico", "Listo"] },
       { id: "usuarios", label: "Usuarios", icon: <img src={usersIcon} className="sb-icon" />, to: <UsuariosPanel />, roles: ["Administrador"] },
      // { id: "acceso", label: "Acceso", to: <UsuariosApp />, roles: ["Administrador", "Tecnico"] },
-      { id: "tips", label: "Tips", icon: <img src={infoIcon} className="sb-icon" />, to: <AnnouncementsTable />, roles: ["Administrador", "Tecnico"] },
+      { id: "tips", label: "Tips", icon: <img src={infoIcon} className="sb-icon" />, to: <AnnouncementsTable />, roles: ["Administrador", "Tecnico", "Listo"] },
     ],
   },
-  {id: "acciones", label: "Acciones", icon: <img src={ActionsIcon} className="sb-icon" />, roles: ["Administrador", "Tecnico", "Jefe de zona"], children: [
-      {id: "siesa", label: "Siesa", roles: ["Administrador", "Tecnico", "Jefe de zona"], icon: <img src={siesaIcon} className="sb-icon" />, children: [
-          {id: "cajpos", label: "Cajeros POS", icon: <img src={cajerosIcon} className="sb-icon" />, to: (rctx: RenderCtx) => rctx.services ? <CajerosPOSForm services={{ Tickets: rctx.services.Tickets, Logs: rctx.services.Logs }} /> : <div>Cargando servicios…</div>, roles: ["Administrador", "Tecnico", "Jefe de zona"],},
+  {id: "acciones", label: "Acciones", icon: <img src={ActionsIcon} className="sb-icon" />, roles: ["Administrador", "Tecnico", "Jefe de zona", "Listo"], children: [
+      {id: "siesa", label: "Siesa", roles: ["Administrador", "Tecnico", "Jefe de zona", "Listo"], icon: <img src={siesaIcon} className="sb-icon" />, children: [
+          {id: "cajpos", label: "Cajeros POS", icon: <img src={cajerosIcon} className="sb-icon" />, to: (rctx: RenderCtx) => rctx.services ? <CajerosPOSForm services={{ Tickets: rctx.services.Tickets, Logs: rctx.services.Logs }} /> : <div>Cargando servicios…</div>, roles: ["Administrador", "Tecnico", "Jefe de zona", "Listo"],},
         ],
       },
       {id: "cesar", label: "Cesar", roles: ["Administrador"], children: [

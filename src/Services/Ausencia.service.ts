@@ -33,6 +33,7 @@ export class AusenciaService {
         Descripcion: f.Descripcion,
         Fechadeinicio: f.Fechadeinicio,
         Fechayhora: f.Fechayhora,
+        NombreSolicitante: f.NombreSolicitante
     };
   }
 

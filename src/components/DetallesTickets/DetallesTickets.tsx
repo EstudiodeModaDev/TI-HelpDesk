@@ -21,6 +21,7 @@ const hasRecatRole = (r?: string) => {
 type Props = {
   ticket: Ticket;          
   onVolver: () => void;
+  onDocumentar: () => void;
   role: string;
 };
 
@@ -36,14 +37,11 @@ function Row({label, children, className = "",}: {label: string; children: React
   );
 }
 
-export function CaseDetail({ ticket, onVolver, role }: Props) {
+export function CaseDetail({ ticket, onVolver, role, onDocumentar }: Props) {
   const {loadAttachments, rows} = useTicketsAttachments(ticket.ID ?? "");
   // === Estado local del ticket seleccionado
   const [selected, setSelected] = React.useState<Ticket>(ticket);
   React.useEffect(() => {
-    if (!selected || selected.ID !== ticket.ID) {
-      setSelected(ticket);
-    }
     // al cambiar de ticket, oculta paneles
     setShowSeg(false);
     setShowRecat(false);
@@ -63,6 +61,10 @@ export function CaseDetail({ ticket, onVolver, role }: Props) {
   const [showBotton, setShowBotton] = React.useState(true)
 
   const canRecategorizar = hasRecatRole?.(role) ?? false;
+
+  React.useEffect(() => {
+    setSelected(ticket);
+  }, [ticket]);
 
   // === Derivados (memoizados)
   const categoria = React.useMemo(
@@ -215,7 +217,7 @@ export function CaseDetail({ ticket, onVolver, role }: Props) {
       {/* ===== Historial (toggle) ===== */}
       {showSeg && (
         <div className="seccion">
-          <TicketHistorial role={role ?? "Usuario"} onVolver={() => setShowSeg(false)} ticketId={selected.ID!} ticket={selected} onAdd={() => setShowBotton(true)}/>
+          <TicketHistorial role={role ?? "Usuario"} onVolver={() => setShowSeg(false)} ticketId={selected.ID!} ticket={selected} onAdd={() => setShowBotton(true)} onAddClick={onDocumentar}/>
         </div>
       )}
 
@@ -227,7 +229,7 @@ export function CaseDetail({ ticket, onVolver, role }: Props) {
                 ✕
               </button>
             <div className="modal-body">
-              <Recategorizar ticket={selected} />
+              <Recategorizar ticket={selected} onDone={onDocumentar} />
             </div>
           </div>
         </div>
@@ -260,7 +262,7 @@ export function CaseDetail({ ticket, onVolver, role }: Props) {
               </button>
             </div>
             <div className="modal-body">
-              <AsignarObservador ticket={selected} />
+              <AsignarObservador ticket={selected} onDone={onDocumentar}/>
             </div>
           </div>
         </div>
