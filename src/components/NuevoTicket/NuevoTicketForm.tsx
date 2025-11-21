@@ -16,7 +16,7 @@ import type { LogService } from "../../Services/Log.service";
 import { norm } from "../../utils/Commons";
 
 export type UserOptionEx = UserOption & { source?: "Empleado" | "Franquicia" };
-type TreeOption = {
+export type TreeOption = {
   value: string;              
   label: string;              
   meta: {
@@ -45,8 +45,8 @@ export default function NuevoTicketForm() {
     { value: "Correo", label: "Correo" }, 
     { value: "Disponibilidad", label: "Disponibilidad" },
     { value: "Teams", label: "Teams" },
-    { value: "WhatsApp", label: "WhatsApp" },
     { value: "Presencial", label: "Presencial" },
+    { value: "WhatsApp", label: "WhatsApp" },
   ];
 
   // ====== Combinar usuarios con franquicias
