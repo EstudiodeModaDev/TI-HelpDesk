@@ -38,7 +38,7 @@ export default function AnnouncementsTable() {
         <select className="ann-select" value={tipo} onChange={(e)=>setTipo(e.target.value)} aria-label="Filtrar por tipo">
           {tipos.map(t => <option key={t} value={t}>{t}</option>)}
         </select>
-        <button type="button" className="icon-btn" title="Agregar" aria-label="Agregar usuario" onClick={() => setModalAgregar(true)}>
+        <button type="button" className="btn btn-circle btn-secondary-final" title="Agregar" aria-label="Agregar usuario" onClick={() => setModalAgregar(true)}>
           +
         </button>
       </div>
@@ -65,7 +65,7 @@ export default function AnnouncementsTable() {
                   <td className="ann-id">{r.Id}</td>
                   <td>
                     <button className="ann-link" aria-label={`Abrir ${r.Title}`}>
-                      {r.Title}
+                      {r.Title.trim().trimStart()}
                     </button>
                   </td>
                   <td className="ann-sub">{r.Subtitulo ?? ""}</td>

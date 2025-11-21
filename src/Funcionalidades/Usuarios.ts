@@ -143,7 +143,8 @@ export function useUsuarios(usuariosSvc: UsuariosSPService) {
       .map((u) => {
         const nombre = String((u as any).Title ?? "—").trim();
         const correo = String((u as any).Correo ?? "").trim();
-        const id     = String((u as any).ID ?? "");
+        const id     = String((u as any).Id ?? "");
+        const rol    = String((u as UsuariosSP).Rol)
 
         // label como "Nombre - correo" (si hay correo)
         const label  = nombre;
@@ -152,6 +153,7 @@ export function useUsuarios(usuariosSvc: UsuariosSPService) {
           value: correo || id,   // usa correo como clave estable; fallback id
           label,
           id,
+          jobTitle: rol,
           email: correo || undefined,
         } as UserOption;
       })

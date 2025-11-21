@@ -61,7 +61,7 @@ export default function TicketsAsociados({title = "Tickets Asociados", ticket, e
         <div className="ta-header__left">
           <h2 className="ta-title">{title}</h2>
           {isPrivileged &&
-            <a className="btn btn-circle btn-circle--sm" onClick={showRel ? closeRelacionador : openRelacionador} aria-label="Relacionar nuevo">+</a>
+            <a className="btn btn-circle btn-secondary-final" onClick={showRel ? closeRelacionador : openRelacionador} aria-label="Relacionar nuevo">+</a>
           }
         </div>
 

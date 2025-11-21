@@ -22,6 +22,7 @@ export type UserOption = {
   id?: string;        // opcional (aad id si quieres)
   email?: string;     // opcional: para mostrar/filtrar
   jobTitle?: string;  // opcional: para mostrar/filtrar
+  
 };
 
 export type Reasignar = {

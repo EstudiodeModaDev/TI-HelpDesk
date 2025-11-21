@@ -36,9 +36,9 @@
 .ann-table{ width: 100%; border-collapse: collapse; }
 .ann-table thead th{
   text-align: left; position: sticky; top: 0; z-index: 1; background: var(--surface);
-  border-bottom: 2px solid var(--bd-strong); padding: 12px; font-weight: 700; color: var(--ink);
+  border-bottom: 2px solid var(--bd-strong); padding: 6px 10px;; font-weight: 700; color: var(--ink);
 }
-.ann-table tbody td{ border-bottom: 1px solid var(--bd); padding: 12px; color: var(--ink); }
+.ann-table tbody td{ border-bottom: 1px solid var(--bd); padding: 4px 10px; color: var(--ink); align-items: start;}
 .ann-table tbody tr:nth-child(odd){ background: color-mix(in oklab, var(--surface) 92%, var(--bd)); }
 
 .ann-id{ color: var(--muted); }
@@ -79,8 +79,8 @@
   padding: 0;
 
   /* caja cuadrada */
-  width: 40px;
-  height: 40px;
+  width: 20px;
+  height: 20px;
   border-radius: 12px;
   box-shadow: var(--shadow);
   color: var(--ink);

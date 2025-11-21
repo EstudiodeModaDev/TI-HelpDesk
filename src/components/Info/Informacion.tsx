@@ -12,8 +12,8 @@ export default function InfoPage() {
       <div className="info-toolbar">
         <div className="info-toolbar__right">
           <select  id="orden" className="info-select" value={orden} onChange={(e) => setOrden(e.target.value)} aria-label="Ordenar resultados">
-            <option value="proveedores">Proveedores de internet</option>
             <option value="tiendas">Información de Tiendas</option>
+            <option value="proveedores">Proveedores de internet</option>
           </select>
         </div>
       </div>

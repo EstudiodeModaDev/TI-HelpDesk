@@ -35,7 +35,7 @@ export default function NuevoTicketForm() {
     Tickets: TicketsService;
     Logs: LogService
   };
-  const {state, errors, submitting, categorias, subcategoriasAll, articulosAll, loadingCatalogos, setField, handleSubmit,} = useNuevoTicketForm({ Categorias, SubCategorias, Articulos, Tickets: TicketsSvc, Usuarios: UsuariosSPServiceSvc, Logs: LogsSvc});
+  const {state, errors, submitting, categorias, subcategoriasAll, articulosAll, loadingCatalogos, setField, handleSubmit, balanceCharge} = useNuevoTicketForm({ Categorias, SubCategorias, Articulos, Tickets: TicketsSvc, Usuarios: UsuariosSPServiceSvc, Logs: LogsSvc});
   const { franqOptions, loading: loadingFranq, error: franqError } = useFranquicias(FranquiciasSvc!);
   const { workersOptions, loadingWorkers, error: usersError } = useWorkers({
     onlyEnabled: true,
@@ -171,7 +171,20 @@ export default function NuevoTicketForm() {
               options={UseruserOptions}
               placeholder={loading ? "Cargando usuarios…" : "Buscar resolutor…"}
               value={state.resolutor}
-              onChange={(opt) => setField("resolutor", opt ?? null)}
+              onChange={async (opt) => {
+                console.table(opt)
+                if(opt?.jobTitle === "Tecnico"){
+                  const respuesta = (await balanceCharge(opt?.id ?? ""))
+                    if(respuesta?.ok){
+                      setField("resolutor", opt ?? null)
+                    } else {
+                      alert("A este resolutor se le han asignado demasiados casos en el dia de hoy, por favor escoja otro hasta balancear las cartas")
+                    }
+                  } else {
+                    setField("resolutor", opt ?? null)
+                  }
+                }
+              } 
               classNamePrefix="rs"
               isDisabled={submitting || loading}
               isLoading={loading}

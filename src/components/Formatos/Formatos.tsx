@@ -7,7 +7,7 @@ import SolicitudERP from "./SeguridadERP/SeguridadERP";
 import PermisosNavegacion from "./PermisosNavegacion/PermisosNavegacion";
 import type { OpcionSolicitud } from "../../Models/Formatos";
 
-const OPCIONES: OpcionSolicitud[] = ["Solicitud de servicios de TI", "FR Admin seguridad unidad de red", "FR Administrador seguridad ERP", "Permisos de navegacion",] as const;
+const OPCIONES: OpcionSolicitud[] = ["FR Administrador seguridad ERP", "FR Admin seguridad unidad de red", "Permisos de navegacion", "Solicitud de servicios de TI",] as const;
 
 const TYC_BY_OPCION: Record<OpcionSolicitud, string> = {
   "Solicitud de servicios de TI": `

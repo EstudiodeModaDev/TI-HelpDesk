@@ -367,7 +367,7 @@ input, select, textarea{
   /* hereda variables de .btn-final / variantes */
   padding: 0;                 /* el tamaño lo dan width/height */
   border-radius: 999px;       /* círculo perfecto */
-  width: 42px; height: 42px;  /* tamaño por defecto (md) */
+  width: 35px; height: 25px;  /* tamaño por defecto (md) */
   aspect-ratio: 1;            /* por seguridad */
   display: inline-grid;
   place-items: center;

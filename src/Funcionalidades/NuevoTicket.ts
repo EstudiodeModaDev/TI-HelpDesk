@@ -10,11 +10,12 @@ import type { TZDate } from "@date-fns/tz";
 import { TicketsService } from "../Services/Tickets.service";
 import { toGraphDateTime } from "../utils/Date";
 import type { Holiday } from "festivos-colombianos";
-import type { UsuariosSPService } from "../Services/Usuarios.Service";
+import { UsuariosSPService } from "../Services/Usuarios.Service";
 import { FlowClient } from "./FlowClient";
 import type { LogService } from "../Services/Log.service";
 import { useAuth } from "../auth/authContext";
 import { pickTecnicoConMenosCasos } from "../utils/Commons";
+import type { UsuariosSP } from "../Models/Usuarios";
 
 
 type Svc = {
@@ -302,9 +303,30 @@ export function useNuevoTicketForm(services: Svc) {
       }
     };
 
+  const balanceCharge = async (targetId: string, maxDiff= 3) => {
+    const resolutores: UsuariosSP[] = await Usuarios.getAll({filter: "fields/Rol eq 'Tecnico' and fields/Disponible eq 'Disponible'"})
+    
+    if(resolutores.length  > 0){
+        const countsDespues = resolutores.map(r => {
+          const base = r.Numerodecasos ?? 0;
+          return base;
+        });
+
+        const resolutor = await Usuarios.get(targetId)
+
+        const min = Math.min(...countsDespues);
+        const respuesta = ((Number(resolutor.Numerodecasos ?? 0)+1) - min) < maxDiff; 
+
+        return {
+          ok: respuesta
+        }
+    }
+  } 
+
+
   return {
     state, errors, submitting, fechaSolucion, categorias, subcategoriasAll: subcategorias, articulosAll, loadingCatalogos, errorCatalogos,
-    handleSubmit, setField
+    handleSubmit, setField, balanceCharge
   };
 }
 
@@ -443,9 +465,10 @@ export function useNuevoUsuarioTicketForm(services: Svc) {
     }
   };
 
+
   return {
     state, errors, submitting, fechaSolucion,
-    handleSubmit, setField
+    handleSubmit, setField, 
   };
 }
 

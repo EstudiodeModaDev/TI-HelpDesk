@@ -18,8 +18,8 @@ export default function InfoProveedores() {
         <div className="pi-actions__right">
           <label className="pi-only" htmlFor="proveedor">Proveedor</label>
           <select id="proveedor" className="pi-select" aria-label="Proveedor" onChange={(e) => setFilterMode(e.target.value)}>
-            <option value="tigo">Tigo</option>
             <option value="claro">Claro</option>
+            <option value="tigo">Tigo</option>
           </select>
         </div>
       </form>
