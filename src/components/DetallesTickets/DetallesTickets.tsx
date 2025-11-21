@@ -105,10 +105,10 @@ export function CaseDetail({ ticket, onVolver, role }: Props) {
         <Row className="pos-categoria" label="Categoría">
           {canRecategorizar ? (
             <button type="button" className="as-text" onClick={() => setShowRecat(true)}>
-              <Trunc text={categoria || "–"} lines={1}/>
+              <Trunc text={categoria || "-----------"} lines={1}/>
             </button>
           ) : (
-            <Trunc text={categoria || "–"} lines={1} />
+            <Trunc text={categoria || "-----------"} lines={1} />
           )}
         </Row>
 
@@ -130,10 +130,10 @@ export function CaseDetail({ ticket, onVolver, role }: Props) {
             <div className="cd-people-value">
               {canRecategorizar ? (
                 <button type="button" className="as-text" onClick={() => setShowObservador(true)}>
-                  <Trunc text={selected.Observador || "–"} lines={1} maxLenght={30}/>
+                  <Trunc text={selected.Observador || "–-----------"} lines={1} maxLenght={30}/>
                 </button>
               ) : (
-                selected.Observador || "—"
+                selected.Observador || "-----------"
               )}
             </div>
           </div>
@@ -143,7 +143,7 @@ export function CaseDetail({ ticket, onVolver, role }: Props) {
             <div className="cd-people-value">
               {canRecategorizar ? (
                 <button type="button" className="as-text" onClick={() => setShowReasig(true)}>
-                  <Trunc text={selected.Nombreresolutor || "–"} lines={1} maxLenght={30}/>
+                  <Trunc text={selected.Nombreresolutor || "-----------"} lines={1} maxLenght={30}/>
                 </button>
               ) : (
                 <Trunc text={selected.Nombreresolutor || "–"} lines={1} />
