@@ -32,6 +32,7 @@ import { DistribucionFacturaService } from "../Services/DistribucionFactura.serv
 // === Servicio TEST (Paz y salvos) ===
 import { PazSalvosService } from "../Services/PazSalvos.service";
 import { TipsService } from "../Services/Tips.service";
+import { AusenciaService } from "../Services/Ausencia.service";
 
 /* ================== Tipos de config ================== */
 export type SiteConfig = {
@@ -70,6 +71,7 @@ export type UnifiedConfig = {
     Inventario: string;
     DistribucionFactura: string;
     TipsInicio: string;
+    Ausencias: string;
 
     // TEST
     PazYSalvos: string;
@@ -106,7 +108,8 @@ export type GraphServices = {
   Tareas: TareasService;
   Inventario: InventarioService;
   DistribucionFactura: DistribucionFacturaService;
-  TipsInicio: TipsService
+  TipsInicio: TipsService;
+  Ausencias: AusenciaService  
 
   // TEST
   PazYSalvos: PazSalvosService;
@@ -153,6 +156,7 @@ const DEFAULT_CONFIG: UnifiedConfig = {
     Inventario: "Inventario",
     DistribucionFactura: "DistribucionFactura",
     TipsInicio: "TipsInicio",
+    Ausencias: "Asencias",
 
     // TEST
     PazYSalvos: "Paz y salvos",
@@ -222,7 +226,8 @@ export const GraphServicesProvider: React.FC<ProviderProps> = ({ children, confi
     const Tareas               = new TareasService(graph, hd.hostname,     hd.sitePath,  lists.Tareas);
     const Inventario           = new InventarioService(graph, hd.hostname, hd.sitePath,  lists.Inventario);
     const DistribucionFactura  = new DistribucionFacturaService(graph, hd.hostname, hd.sitePath, lists.DistribucionFactura);
-    const TipsInicio           = new TipsService(graph, hd.hostname, hd.sitePath, lists.TipsInicio)
+    const TipsInicio           = new TipsService(graph, hd.hostname, hd.sitePath, lists.TipsInicio);
+    const Ausencias            = new AusenciaService(graph, hd.hostname, hd.sitePath, lists.Ausencias)
 
     // TEST
     const PazYSalvos           = new PazSalvosService(graph, test.hostname, test.sitePath, lists.PazYSalvos);
@@ -230,7 +235,7 @@ export const GraphServicesProvider: React.FC<ProviderProps> = ({ children, confi
     return {
       graph,
       Sociedades, Proveedores, Plantillas, Internet, CasosHijosRequeridos, ActasEntrega, Anuncios, Articulos, Usuarios, Logs, Tickets, Categorias, Franquicias, SubCategorias,
-      InternetTiendas, Facturas, ItemFactura, ProveedoresFactura, Item, CentroCostos, CentroOperativo, Compras, Tareas, Inventario, DistribucionFactura, TipsInicio,
+      InternetTiendas, Facturas, ItemFactura, ProveedoresFactura, Item, CentroCostos, CentroOperativo, Compras, Tareas, Inventario, DistribucionFactura, TipsInicio, Ausencias,
       // TEST
       PazYSalvos,
     };

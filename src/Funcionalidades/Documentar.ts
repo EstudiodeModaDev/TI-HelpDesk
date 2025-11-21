@@ -66,16 +66,11 @@ export function useDocumentarTicket(services: Svc) {
         // (Opcional) subir archivo si aplica
         // if (state.archivo) { await Logs.attach(logId, state.archivo) }
         setState({archivo: null, correoresolutor: "", documentacion: "", resolutor: ""})
-      }
+      
 
       // 2) Si es solución, cerrar ticket con estado correcto
       if (tipo === "solucion") {
         if (!Tickets) throw new Error("Servicio Tickets no disponible.");
-        const soluciones = await Logs.getAll({filter: `fields/Title eq ${ticket.ID} and fields/Tipo_de_accion eq 'Solucion'`})
-        console.table(soluciones)
-        if(soluciones.length > 0){
-
-        } else {
           const estadoActual = norm(ticket.Estadodesolicitud ?? "");
           const nuevoEstado = estadoActual === "en atencion" ? "Cerrado" : "Cerrado fuera de tiempo";
           alert("Caso cerrado. Enviando notificación al solicitante")
@@ -109,8 +104,8 @@ export function useDocumentarTicket(services: Svc) {
               console.error("[Flow] Error enviando a solicitante:", err);
             }
         }
-        }
       }
+    }
     } catch (err) {
       console.error("Error en handleSubmit:", err);
       // setError(String(err));
