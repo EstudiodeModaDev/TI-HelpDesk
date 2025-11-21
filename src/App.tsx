@@ -40,6 +40,7 @@ import type { AnunciosService } from "./Services/Anuncios.service";
 import { logout } from "./auth/msal";
 import AnnouncementsTable from "./components/TipsTable/TipsTable";
 import { useTheme } from "./Funcionalidades/Theme";
+import TeamsEventForm from "./components/Ausencia/Ausencia";
 //import UsuariosApp from "./components/Usuarios copy/Acceso";
 
 /* ============================================================
@@ -323,6 +324,8 @@ function LoggedApp({ user }: { user: User }) {
   const navs = React.useMemo(() => filterNavTree(NAV, navCtx), [navCtx]);
 
   const [selected, setSelected] = React.useState<string>(() => firstLeafId(navs));
+  const [ausencia, setAusencia] = React.useState<boolean>(false);
+
   React.useEffect(() => {
     if (!findById(navs, selected)) setSelected(firstLeafId(navs));
   }, [navs, selected]);
@@ -449,6 +452,13 @@ function LoggedApp({ user }: { user: User }) {
                   {theme === "dark" ? "🌙" : "☀️"}
                 </span>
               </button>
+              {(role === "Tecnico" || role === "Administrador") && 
+                <button className="btn btn-transparent-final btn-m" onClick={() => setAusencia(!ausencia)} aria-label="Cambiar de rol">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 1024 1025">
+                    <path fill="#000000" d="M512 1025q-104 0-199-40.5t-163.5-109T40.5 712T0 513t40.5-199t109-163.5T313 41T512 0t199 41t163.5 109.5t109 163.5t40.5 199t-40.5 199t-109 163.5t-163.5 109t-199 40.5zm0-896q-104 0-192.5 51t-140 139.5t-51.5 193t51.5 193t140 140T512 897t192.5-51.5t140-140t51.5-193t-51.5-193t-140-139.5T512 129zm192 224L573 530q-5 20-22 33.5T512 577q-21 0-38-13t-23-32L256 289v-32h32l225 181l159-117h32v32z"/>
+                  </svg>
+                </button>
+              }
               {(user?.mail === "cesanchez@estudiodemoda.com.co" || user?.mail === "dpalacios@estudiodemoda.com.co") &&
                 <button className="btn btn-transparent-final btn-m" onClick={() => changeUser()} aria-label="Cambiar de rol">
                   <span>Cambiar de rol</span>
@@ -460,11 +470,13 @@ function LoggedApp({ user }: { user: User }) {
                 </svg>
                 <span>Salir</span>
               </button>
-
-
             </div>
             <div className="page page--fluid">{element}</div>
         </div>
+
+        {ausencia && (
+          <TeamsEventForm onDiscard={() => setAusencia(false)}></TeamsEventForm>
+        )}
       </main>
 
       {/* Modal de anuncio del día */}

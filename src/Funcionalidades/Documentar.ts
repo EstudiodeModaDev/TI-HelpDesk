@@ -50,55 +50,65 @@ export function useDocumentarTicket(services: Svc) {
     if (!validate()) return;
     setSubmitting(true);
     try {
-      // 1) Crear log
-      const logPayload: Log = {
-        Actor: account.name ?? account.username ?? "",
-        CorreoActor: account.username ?? "",
-        Descripcion: state.documentacion,
-        Tipo_de_accion: tipo,
-        Title: String(ticket.ID ?? ""),
-      };
+      const soluciones = await Logs.getAll({filter: `fields/Title eq ${ticket.ID} and fields/Tipo_de_accion eq 'Solucion'`})
+      if(soluciones.length > 0 && tipo === "solucion"){
+        alert("Este ticket ya tiene una solucion no puedes escribir mas de una por ticket")
+      } else {
+        const logPayload: Log = {
+          Actor: account.name ?? account.username ?? "",
+          CorreoActor: account.username ?? "",
+          Descripcion: state.documentacion,
+          Tipo_de_accion: tipo,
+          Title: String(ticket.ID ?? ""),
+        };
 
-      await Logs.create(logPayload);
-      // (Opcional) subir archivo si aplica
-      // if (state.archivo) { await Logs.attach(logId, state.archivo) }
-      setState({archivo: null, correoresolutor: "", documentacion: "", resolutor: ""})
+        await Logs.create(logPayload);
+        // (Opcional) subir archivo si aplica
+        // if (state.archivo) { await Logs.attach(logId, state.archivo) }
+        setState({archivo: null, correoresolutor: "", documentacion: "", resolutor: ""})
+      }
 
       // 2) Si es solución, cerrar ticket con estado correcto
       if (tipo === "solucion") {
         if (!Tickets) throw new Error("Servicio Tickets no disponible.");
-        const estadoActual = norm(ticket.Estadodesolicitud ?? "");
-        const nuevoEstado = estadoActual === "en atencion" ? "Cerrado" : "Cerrado fuera de tiempo";
-        alert("Caso cerrado. Enviando notificación al solicitante")
-        await Tickets.update(ticket.ID!, { Estadodesolicitud: nuevoEstado });
-        const casodecompra = await ComprasSvc.getAll({filter:  `fields/IdCreado eq '${ticket.ID}'`})
-        const casodeentrega = await ComprasSvc.getAll({filter:  `fields/IdEntrega eq '${ticket.ID}'`})
-        await Promise.allSettled( casodecompra.items.map((it) => { const id = String(it.Id);    return ComprasSvc.update(id, { Estado: "Pendiente por registro de factura" });}));
-        await Promise.allSettled( casodeentrega.items.map((it) => { const id = String(it.Id);    return ComprasSvc.update(id, { Estado: "Pendiente por registro de factura" });}));
+        const soluciones = await Logs.getAll({filter: `fields/Title eq ${ticket.ID} and fields/Tipo_de_accion eq 'Solucion'`})
+        console.table(soluciones)
+        if(soluciones.length > 0){
 
-        if (ticket.CorreoSolicitante) {
-          const title = `Cierre de Ticket - ${ticket.ID}`;
-          const message = `
-            <p>Este es un mensaje automático.<br>
-            <br>
-            Estimado/a ${ticket.Solicitante},<br>
-            <br>
-            Nos complace informarle que su caso con <em><strong>"</strong></em><em><strong>${ticket.Title}</strong></em><em><strong>"</strong></em> ID: ${ticket.ID} ha sido cerrado. Esperamos que su problema haya sido resuelto satisfactoriamente.<br>
-            <br>
-            Gracias por su colaboración y confianza.</p>
-            </p>`.trim();
+        } else {
+          const estadoActual = norm(ticket.Estadodesolicitud ?? "");
+          const nuevoEstado = estadoActual === "en atencion" ? "Cerrado" : "Cerrado fuera de tiempo";
+          alert("Caso cerrado. Enviando notificación al solicitante")
+          await Tickets.update(ticket.ID!, { Estadodesolicitud: nuevoEstado });
+          const casodecompra = await ComprasSvc.getAll({filter:  `fields/IdCreado eq '${ticket.ID}'`})
+          const casodeentrega = await ComprasSvc.getAll({filter:  `fields/IdEntrega eq '${ticket.ID}'`})
+          await Promise.allSettled( casodecompra.items.map((it) => { const id = String(it.Id);    return ComprasSvc.update(id, { Estado: "Pendiente por registro de factura" });}));
+          await Promise.allSettled( casodeentrega.items.map((it) => { const id = String(it.Id);    return ComprasSvc.update(id, { Estado: "Pendiente por registro de factura" });}));
 
-          try {
-            console.log("Enviando notificación")
-            await notifyFlow.invoke<FlowToUser, any>({
-              recipient: ticket.CorreoSolicitante,
-              title,
-              message,
-              mail: true, 
-            });
-          } catch (err) {
-            console.error("[Flow] Error enviando a solicitante:", err);
-          }
+          if (ticket.CorreoSolicitante) {
+            const title = `Cierre de Ticket - ${ticket.ID}`;
+            const message = `
+              <p>Este es un mensaje automático.<br>
+              <br>
+              Estimado/a ${ticket.Solicitante},<br>
+              <br>
+              Nos complace informarle que su caso con <em><strong>"</strong></em><em><strong>${ticket.Title}</strong></em><em><strong>"</strong></em> ID: ${ticket.ID} ha sido cerrado. Esperamos que su problema haya sido resuelto satisfactoriamente.<br>
+              <br>
+              Gracias por su colaboración y confianza.</p>
+              </p>`.trim();
+
+            try {
+              console.log("Enviando notificación")
+              await notifyFlow.invoke<FlowToUser, any>({
+                recipient: ticket.CorreoSolicitante,
+                title,
+                message,
+                mail: true, 
+              });
+            } catch (err) {
+              console.error("[Flow] Error enviando a solicitante:", err);
+            }
+        }
         }
       }
     } catch (err) {

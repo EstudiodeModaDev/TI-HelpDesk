@@ -1,0 +1,194 @@
+:root {
+  --cal-bg: #f3f2f1;
+  --cal-card-bg: #ffffff;
+  --cal-border: #d1d1d1;
+  --cal-border-strong: #c3c2c1;
+  --cal-text: #201f1e;
+  --cal-text-muted: #605e5c;
+  --cal-primary: #6264a7;
+  --cal-primary-hover: #4b4c82;
+  --cal-radius: 8px;
+  --cal-shadow: 0 0 0 1px rgba(0, 0, 0, 0.02),
+    0 6px 12px rgba(0, 0, 0, 0.14);
+}
+
+/* ===== Modal ===== */
+
+.cal-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 40px 16px;
+  box-sizing: border-box;
+  z-index: 1000;
+}
+
+.cal-modal {
+  max-width: 520px;
+  width: 100%;
+  max-height: calc(100vh - 80px);
+  overflow: auto;
+}
+
+/* ===== Card ===== */
+
+.cal-card {
+  width: 100%;
+  background: var(--cal-card-bg);
+  border-radius: var(--cal-radius);
+  box-shadow: var(--cal-shadow);
+  border: 1px solid var(--cal-border);
+  display: flex;
+  flex-direction: column;
+}
+
+/* header */
+.cal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--cal-border-strong);
+  gap: 8px;
+}
+
+.cal-header__left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cal-header__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: #92c353;
+}
+
+.cal-header__title {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--cal-text-muted);
+}
+
+.cal-header__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* body */
+.cal-body {
+  padding: 12px 16px 4px;
+}
+
+/* campos */
+.cal-field {
+  margin-bottom: 10px;
+}
+
+.cal-label {
+  display: block;
+  font-size: 12px;
+  color: var(--cal-text-muted);
+  margin-bottom: 4px;
+}
+
+/* inputs base */
+.cal-input,
+.cal-textarea {
+  width: 100%;
+  font-size: 13px;
+  padding: 6px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--cal-border);
+  box-sizing: border-box;
+  color: var(--cal-text);
+  background: #ffffff;
+}
+
+.cal-input:focus,
+.cal-textarea:focus {
+  outline: 1px solid var(--cal-primary);
+  border-color: var(--cal-primary);
+}
+
+/* título */
+.cal-input--title {
+  font-size: 16px;
+  font-weight: 500;
+  padding: 8px 10px;
+}
+
+/* date/time en fila */
+.cal-datetime-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cal-input--date {
+  flex: 1.1;
+}
+
+.cal-input--time {
+  width: 100px;
+}
+
+/* toggle "Todo el día" */
+.cal-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+  font-size: 12px;
+  color: var(--cal-text-muted);
+  white-space: nowrap;
+}
+
+.cal-toggle input {
+  margin: 0;
+}
+
+.cal-toggle__label {
+  cursor: pointer;
+}
+
+/* textarea */
+.cal-textarea {
+  resize: vertical;
+  min-height: 70px;
+}
+
+/* footer */
+.cal-footer {
+  padding: 6px 16px 10px;
+  display: flex;
+  justify-content: flex-end;
+  border-top: 1px solid var(--cal-border);
+}
+
+/* botón link "Más opciones" */
+.cal-link-button {
+  border: none;
+  background: none;
+  padding: 4px 0;
+  font-size: 12px;
+  color: var(--cal-primary);
+  cursor: pointer;
+}
+
+.cal-link-button:hover {
+  text-decoration: underline;
+}
+
+/* responsive */
+@media (max-width: 520px) {
+  .cal-modal {
+    max-height: 100vh;
+    padding-top: 0;
+  }
+}

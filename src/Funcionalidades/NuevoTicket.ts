@@ -389,6 +389,10 @@ export function useNuevoUsuarioTicketForm(services: Svc) {
         Title: ticketCreated?.ID ?? ""
       })
 
+      setState({archivo: null, Correosolicitante: account?.username ?? "", descripcion: "", motivo: "", solicitante: account?.name ?? ""})
+
+      setSubmitting(false); 
+
       if (ticketCreated?.CorreoSolicitante) {
         const title = `Asignación de Caso - ${ticketCreated.ID}`;
         const message = `
@@ -434,7 +438,7 @@ export function useNuevoUsuarioTicketForm(services: Svc) {
     } catch (err) {
       console.error("Error en handleSubmit:", err);
     } finally {
-      setSubmitting(false);
+      
     }
   };
 
