@@ -41,6 +41,7 @@ import { logout } from "./auth/msal";
 import AnnouncementsTable from "./components/TipsTable/TipsTable";
 import { useTheme } from "./Funcionalidades/Theme";
 import TeamsEventForm from "./components/Ausencia/Ausencia";
+//import { norm } from "./utils/Commons";
 //import UsuariosApp from "./components/Usuarios copy/Acceso";
 
 /* ============================================================
@@ -329,6 +330,8 @@ function LoggedApp({ user }: { user: User }) {
   React.useEffect(() => {
     if (!findById(navs, selected)) setSelected(firstLeafId(navs));
   }, [navs, selected]);
+
+  {/*<button onClick={() => {console.log(norm("NUÑEZ"))}}>PRUEBA NORMALIZACION</button>*/}
 
   const item = React.useMemo(() => findById(navs, selected), [navs, selected]);
   const element = React.useMemo(() => {

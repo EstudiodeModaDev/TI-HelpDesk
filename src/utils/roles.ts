@@ -16,7 +16,6 @@ const TTL_MS = 5 * 60 * 1000;
 
 const uidCache = new Map<string, CacheEntry<string | null>>();     // email -> userId
 const membCache = new Map<string, CacheEntry<boolean>>();          // `${userId}|${groupId}` -> bool
-const multiMembCache = new Map<string, CacheEntry<string[] | null>>(); // `${userId}|sortedGroupIds` -> matchedIds
 
 const now = () => Date.now();
 function getFromCache<T>(map: Map<string, CacheEntry<T>>, key: string): T | null {
@@ -60,6 +59,7 @@ async function getUserIdByEmail(graph: GraphRest, email: string): Promise<string
     return id;
   } catch {
     setCache(uidCache, k, null);
+
     return null;
   }
 }
@@ -96,41 +96,66 @@ export async function getRoleFromGroup(graph: GraphRest, email: string, groupId:
   }
 }
 
-/* =========================
-   1b) Obtener rol desde VARIOS grupos (prioridad = orden del array)
-   (Eficiente: un único checkMemberGroups)
-   ========================= */
-export async function getRoleFromGroups(graph: GraphRest, email: string, rules: GroupRule[]): Promise<RoleDecision | null> {
+const groupMembersCache = new Map<string, string[]>();
+
+async function getGroupMemberIds(graph: GraphRest, groupId: string): Promise<string[]> {
+  const cached = groupMembersCache.get(groupId);
+  if (cached) return cached;
+
+  const memberIds: string[] = [];
+  let url = `/groups/${encodeURIComponent(groupId)}/members?$select=id`;
+
+  while (url) {
+    const resp = await graph.get<{ value: { id: string }[]; "@odata.nextLink"?: string }>(url);
+    const items = resp.value ?? [];
+    memberIds.push(...items.map(m => m.id));
+
+    // si tu GraphRest ya te devuelve solo `value` sin nextLink, puedes simplificar
+    url = (resp as any)["@odata.nextLink"] ?? "";
+  }
+
+  groupMembersCache.set(groupId, memberIds);
+  return memberIds;
+}
+
+
+export async function getRoleFromGroups(
+  graph: GraphRest,
+  email: string,
+  rules: GroupRule[]
+): Promise<RoleDecision | null> {
   const safeEmail = String(email).trim().toLowerCase();
   if (!safeEmail || !rules.length) return null;
 
   const userId = await getUserIdByEmail(graph, safeEmail);
   if (!userId) return null;
 
+  // 1) sacar todos los groupIds de las reglas
   const groupIds = rules.map(r => r.groupId);
-  const sortedKey = groupIds.slice().sort().join(",");
-  const cacheKey = `${userId}|${sortedKey}`;
-  const cached = getFromCache(multiMembCache, cacheKey);
-  if (cached !== null) {
-    const matched = cached ?? [];
-    const first = rules.find(r => matched.includes(r.groupId));
-    return first ? { role: first.role, source: "group", matchedGroupId: first.groupId } : null;
-  }
 
-  try {
-    const data = await graph.post<{ value: string[] }>(
-      `/users/${encodeURIComponent(userId)}/checkMemberGroups`,
-      { groupIds }
-    );
-    const matched = data?.value ?? [];
-    setCache(multiMembCache, cacheKey, matched);
+  // 2) cargar miembros de todos los grupos (en paralelo)
+  const membersByGroupEntries = await Promise.all(
+    groupIds.map(async gid => {
+      const members = await getGroupMemberIds(graph, gid); // usa el helper de arriba
+      return [gid, members] as const;
+    })
+  );
 
-    const first = rules.find(r => matched.includes(r.groupId));
-    return first ? { role: first.role, source: "group", matchedGroupId: first.groupId } : null;
-  } catch {
-    setCache(multiMembCache, cacheKey, null);
-    return null;
-  }
+  const membersByGroup = Object.fromEntries(membersByGroupEntries) as Record<string, string[]>;
+
+  // 3) buscar la primera regla cuyo grupo contenga al userId
+  const matchedRule = rules.find(r => {
+    const members = membersByGroup[r.groupId] ?? [];
+    return members.includes(userId);
+  });
+
+  if (!matchedRule) {return null};
+
+  return {
+    role: matchedRule.role,
+    source: "group",
+    matchedGroupId: matchedRule.groupId,
+  };
 }
 
 /* =========================
