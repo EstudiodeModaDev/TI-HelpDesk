@@ -136,7 +136,8 @@ export async function getRoleFromGroups(
   // 2) cargar miembros de todos los grupos (en paralelo)
   const membersByGroupEntries = await Promise.all(
     groupIds.map(async gid => {
-      const members = await getGroupMemberIds(graph, gid); // usa el helper de arriba
+      const members = await getGroupMemberIds(graph, gid); 
+      console.table(members)
       return [gid, members] as const;
     })
   );

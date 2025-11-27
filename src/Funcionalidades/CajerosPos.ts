@@ -119,6 +119,7 @@ export function useCajerosPOS(services: Svc) {
       setErrors({});
     } finally {
       setSubmitting(false);
+      alert("La creación de este usuario se hara de forma automatica. Por favor estar pendiente al correo")
     }
   };
 
