@@ -14,7 +14,7 @@ export function useUserRole(email?: string | null) {
     groupRules: [{ groupId: "ca8b6719-431a-498a-ba9f-2c58242b1403", role: "Jefe de zona" }, { groupId: "937d53c8-536f-4d7c-9047-122480da727c", role: "Tecnico" }],
   };
 
-  const { Usuarios, Graph } = useGraphServices() as { Usuarios: any; Graph?: any };
+  const { Usuarios, graph } = useGraphServices() 
   const defaultRole = "Usuario";
 
   const [role, setRole] = React.useState<string>(defaultRole);
@@ -31,11 +31,11 @@ export function useUserRole(email?: string | null) {
       setLoading(true); setError(null);
       try {
         const decision = await resolveUserRole({
-          graph: Graph,
+          graph: graph,
           usuariosSvc: Usuarios,
           email: safeEmail,
           defaultRole,
-          ...(opts.groupRules ? { groupRules: opts.groupRules } : {}),
+          groupRules: opts.groupRules,
         });
         if (!cancel) { setRole(decision.role); setSource(decision.source); }
       } catch (e: any) {
@@ -45,7 +45,7 @@ export function useUserRole(email?: string | null) {
       }
     })();
     return () => { cancel = true; };
-  }, [email, Usuarios, Graph, defaultRole, JSON.stringify(opts)]);
+  }, [email, Usuarios, graph, defaultRole, JSON.stringify(opts)]);
 
   /** Alterna entre "Usuario" y "Administrador" sin I/O */
   const changeUser = React.useCallback(() => {

@@ -161,7 +161,7 @@ export async function getRoleFromSP(usuariosSvc: UsuariosSPService, email: strin
    3) Resolver combinado (prioriza grupos → luego SP → default)
    ========================= */
 export async function resolveUserRole({graph, usuariosSvc, email, groupRules = [], singleGroup, defaultRole = "Usuario",}: {
-  graph?: GraphRest;
+  graph: GraphRest;
   usuariosSvc: UsuariosSPService;
   email: string | null | undefined;
   groupRules?: GroupRule[];
