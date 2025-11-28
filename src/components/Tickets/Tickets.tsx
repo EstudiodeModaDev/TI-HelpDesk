@@ -20,10 +20,11 @@ export default function TablaTickets() {
   const { account } = useAuth();
   const userMail = account?.username ?? "";
   const isAdmin = useIsAdmin(userMail);
+  const allTickets = isAdmin.isAdmin || userMail === "listo@estudiodemoda.com.co"
   const userRole = useUserRole(userMail)
   const isPrivileged = userRole.role === "Administrador" || userRole.role === "Tecnico" || userRole.role === "Técnico";
   const { Tickets } = useGraphServices();
-  const {ticketsAbiertos, ticketsFueraTiempo, rows, loading, error, filterMode, range, pageSize, pageIndex, hasNext, sorts, setFilterMode, setRange, setPageSize, updateSelectedTicket, nextPage, loadFirstPage,  toggleSort} = useTickets(Tickets, userMail, isAdmin.isAdmin);
+  const {ticketsAbiertos, ticketsFueraTiempo, rows, loading, error, filterMode, range, pageSize, pageIndex, hasNext, sorts, setFilterMode, setRange, setPageSize, updateSelectedTicket, nextPage, loadFirstPage,  toggleSort} = useTickets(Tickets, userMail, allTickets);
 
   // Búsqueda local SOLO sobre la página visible (si quieres global, hay que mover a OData)
   const [search, setSearch] = React.useState("");
