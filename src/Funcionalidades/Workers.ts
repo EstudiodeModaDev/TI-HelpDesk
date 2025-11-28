@@ -49,7 +49,6 @@ function mapGraphUser(u: any, i: number): Worker {
 
 function mapSPRowToWorker(r: any): Worker {
   const f = r?.fields ?? r ?? {};
-  console.log(f)
   return {
     id: String(r.ID ?? r.Id ?? f.ID ?? f.Id ?? ''),
     displayName: String(
@@ -62,13 +61,14 @@ function mapSPRowToWorker(r: any): Worker {
 
 async function fetchUsersFromGraph(graph: GraphRest, opts: Options): Promise<Worker[]> {
   const onlyEnabled = opts.onlyEnabled ?? true;
+  console.log(onlyEnabled)
 
   const select = encodeURIComponent(
     'id,displayName,mail,userPrincipalName,jobTitle,accountEnabled'
   );
   const top = 999;
   const filters: string[] = [];
-  if (onlyEnabled) filters.push('accountEnabled eq true');
+  //if (onlyEnabled) filters.push('accountEnabled eq true');
 
   let url =
     `/users?$select=${select}&$top=${top}` +
@@ -94,7 +94,8 @@ async function fetchUsersFromGraph(graph: GraphRest, opts: Options): Promise<Wor
     seen.add(key);
     unique.push(u);
   }
-  return unique.map(mapGraphUser);
+  const mapped = unique.map(mapGraphUser);
+  return mapped
 }
 
 async function fetchUsersFromSharePoint(opts: Options): Promise<Worker[]> {
@@ -131,44 +132,74 @@ export function useWorkers(options: Options = {}) {
 
   const load = React.useCallback(async () => {
     if (!ready) return;
+
     setLoading(true);
     setError(null);
+
     try {
+      const previewLimit =
+        typeof options.previewLimit === "number" ? options.previewLimit : undefined;
+
+      // ---------- 1) RAMA: DATOS EN CACHE ----------
       if (cache[key]?.data) {
         const cached = cache[key]!.data!;
+
         const sliced =
-          typeof options.previewLimit === 'number'
-            ? cached.slice(0, options.previewLimit)
-            : cached;
+          typeof previewLimit === "number" ? cached.slice(0, previewLimit) : cached;
+
         setWorkers(sliced);
         setWorkersOptions(mapWorkersToOptions(sliced));
         return;
       }
-      if (!cache[key]) cache[key] = { data: null, promise: null };
 
+      // Si no existe entrada en cache, la creamos
+      if (!cache[key]) {
+        cache[key] = { data: null, promise: null };
+      }
+
+      // ---------- 2) SOLO CREAMOS LA PROMISE UNA VEZ ----------
       if (!cache[key]!.promise) {
         const graph = new GraphRest(getToken);
+
         cache[key]!.promise = (async () => {
           const [fromGraph, fromSP] = await Promise.all([
             fetchUsersFromGraph(graph, options),
             fetchUsersFromSharePoint(options),
           ]);
 
-          // Dedup general por email o id
+          // ---------- 3) MERGE + DEDUP ----------
           const map = new Map<string, Worker>();
+
           const put = (w: Worker) => {
-            const email = String(w.mail ?? '').trim().toLowerCase();
-            const id = String(w.id ?? '');
-            const k = email || id;
-            if (!k) return;
-            if (!map.has(k)) map.set(k, w);
+            const email = (w.mail ?? "").trim().toLowerCase();
+            const id = String(w.id ?? "").trim();
+            const name = (w.displayName ?? "").trim();
+
+            // key primaria: mail > id > displayName
+            const k = email || id || name;
+
+            if (!k) {
+              // opcional: log para debug
+              console.warn("Worker sin mail, id ni nombre, descartado:", w);
+              return;
+            }
+
+            if (!map.has(k)) {
+              map.set(k, w);
+            }
           };
+
           for (const g of fromGraph) put(g);
           for (const s of fromSP) put(s);
 
           const merged = Array.from(map.values());
-          merged.sort((a, b) => (a.displayName || '').localeCompare(b.displayName || ''));
 
+          // Orden alfabético por nombre
+          merged.sort((a, b) =>
+            (a.displayName ?? "").localeCompare(b.displayName ?? "")
+          );
+
+          // Guardamos en cache
           cache[key]!.data = merged;
           return merged;
         })().finally(() => {
@@ -176,19 +207,24 @@ export function useWorkers(options: Options = {}) {
         });
       }
 
+      // ---------- 4) ESPERAMOS LA PROMISE (CACHEADA) ----------
       const data = await cache[key]!.promise!;
+
       const sliced =
-        typeof options.previewLimit === 'number' ? data.slice(0, options.previewLimit) : data;
+        typeof previewLimit === "number" ? data.slice(0, previewLimit) : data;
+
       setWorkers(sliced);
       setWorkersOptions(mapWorkersToOptions(sliced));
     } catch (e: any) {
+      console.error("Error cargando usuarios:", e);
       setWorkers([]);
       setWorkersOptions([]);
-      setError(e?.message ?? 'Error cargando usuarios');
+      setError(e?.message ?? "Error cargando usuarios");
     } finally {
       setLoading(false);
     }
   }, [ready, getToken, key, options.previewLimit, mapWorkersToOptions]);
+
 
   // Efecto después de declarar `load`
   React.useEffect(() => {

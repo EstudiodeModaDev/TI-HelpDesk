@@ -156,7 +156,6 @@ export default function NuevoTicketForm() {
               classNamePrefix="rs"
               isDisabled={submitting || loadingWorkers || loadingFranq}
               isLoading={loadingWorkers || loadingFranq}
-              filterOption={userFilter}
               components={{ Option }}
               noOptionsMessage={() => (usersError || franqError ? "Error cargando opciones" : "Sin coincidencias")}
               isClearable
@@ -255,9 +254,6 @@ export default function NuevoTicketForm() {
                 value={treeValue}
                 onChange={onTreeChange}
                 isDisabled={disabledCats}
-                filterOption={(candidate, input) => {
-                  return norm(candidate.label).includes(norm(input));
-                }}
                 isClearable
               />
               {errors.categoria && <small className="error">{errors.categoria}</small>}
