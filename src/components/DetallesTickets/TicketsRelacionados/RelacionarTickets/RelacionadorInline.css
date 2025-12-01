@@ -1,108 +1,130 @@
-/* =========================================================
-   RELACIONADOR INLINE — tokens-only (oscuro/Claro)
-   ========================================================= */
-.relc{
-  --pad: clamp(12px, 1.8vw, 18px);
-  --gap: clamp(10px, 1.4vw, 16px);
-  background: var(--surface);
-  color: var(--ink);
-  border-radius: var(--radius-3xl, var(--radius));
-  overflow: visible;                /* no bloquear scroll */
-  container-type: inline-size;      /* responsive por espacio real */
-}
+/* ====== Contenedor principal ====== */
 
-/* Fila principal (modo + combobox / archivo) */
-.relc-row{
-  display: grid;
-  grid-template-columns: minmax(220px, 320px) minmax(260px, 1fr);
-  gap: var(--gap);
-}
-
-/* Cada control es una FILA auto-contenida */
-.relc-field{
-  display: grid;
-  gap: 6px;
-  min-width: 0;
-}
-.relc-field--grow{ align-self: start; }
-
-/* Etiquetas */
-.relc-field__label, .relc-label{
-  font-weight: 700;
-  color: var(--ink);
-}
-
-/* Nativos (select / input file) */
-.relc-native{
-  appearance: none;
-  width: 100%;
-  background: var(--field-bg);
-  color: var(--ink);
-  border-radius: 12px;
+.relc {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
   padding: 10px 12px;
-  outline: none;
-  transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
-  min-width: 0;
-}
-.relc-native:focus{
-  border-color: color-mix(in oklab, var(--primary) 55%, var(--bd) 45%);
-  box-shadow: 0 0 0 4px var(--ring);
-}
-
-/* Combobox / envoltorio (para React-Select o input compuesto) */
-.relc-combobox{
-  background: color-mix(in oklab, var(--surface) 96%, transparent);
-  border-radius: 12px;
-  padding: 10px;
-  overflow: visible;
-}
-
-/* Enlace utilitario (quitar archivo, etc.) */
-.relc-link{
-  appearance: none;
-  background: transparent;
-  border: 0;
-  padding: 0;
+  background: var(--surface-elev);
   color: var(--ink);
-  font-weight: 700;
-  cursor: pointer;
-  text-decoration: underline;
-  text-underline-offset: 2px;
-  text-decoration-thickness: 2px;
+  margin: 0 auto;
 }
 
-/* =========================
-   Acciones (botones circulares)
-   ========================= */
-.relc-actions{
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: max-content;
-  justify-content: end;
+/* Fila principal: combo modo + ticket / archivo */
+.relc-row {
+  display: flex;
   align-items: center;
   gap: 10px;
-  margin-top: var(--gap);
 }
 
-/* =========================================================
-   Responsive por espacio real (container queries)
-   ========================================================= */
-
-/* 2 → 1 columna cuando el espacio es estrecho */
-@container (max-width: 780px){
-  .relc-row{
-    grid-template-columns: 1fr;
-  }
-  .relc-actions{
-    justify-content: stretch;
-    grid-auto-flow: row;
-    grid-auto-columns: 1fr;
-  }
+/* Campo genérico */
+.relc-field {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
 }
 
-/* Densidad compacta */
-@container (max-width: 520px){
-  .relc{ --pad: 12px; }
-  .rs__control{ min-height: 40px !important; }
-  .relc-combobox{ padding: 8px; }
+.relc-field--grow {
+  flex: 1;
+}
+
+/* Etiquetas */
+.relc-field__label,
+.relc-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+/* Select nativo (modo, input file) */
+.relc-native {
+  min-width: 140px;
+  border-radius: 999px;
+  border: 1px solid var(--bd);
+  background: var(--field-bg);
+  color: var(--ink);
+  font-size: 13px;
+  padding: 6px 10px;
+  outline: none;
+  appearance: none;
+}
+
+.relc-native:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 1px var(--ring);
+}
+
+/* Contenedor del combobox / react-select */
+.relc-combobox {
+  width: 100%;
+}
+
+/* Link para limpiar archivo */
+.relc-link {
+  margin-top: 2px;
+  padding: 0;
+  border: none;
+  background: none;
+  font-size: 12px;
+  color: var(--primary);
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.relc-link:hover {
+  opacity: 0.85;
+}
+
+/* ====== Acciones (botones circulares) ====== */
+
+.relc-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+/* Botones circulares reutilizando tus clases base */
+.btn.btn-circle {
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  line-height: 1;
+}
+
+/* Colores, asumiendo que ya tienes btn-primary-final / secundarios
+   si no, puedes usar esto como base: */
+
+.btn.btn-circle.btn-primary {
+  background: var(--primary);
+  color: var(--primary-ink);
+  border: 1px solid var(--primary);
+}
+
+.btn.btn-circle.btn-secondary {
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid var(--bd);
+}
+
+.btn.btn-circle:hover {
+  filter: brightness(1.05);
+}
+
+
+.form-header {
+  display: flex;
+  align-items: center;       /* centra verticalmente */
+  justify-content: space-between;  /* deja el título a la izquierda y el botón a la derecha */
+  width: 100%;
+  margin-bottom: 12px;       /* opcional */
+}
+
+.form-header .tf-title {
+  margin: 0;                 /* quita espacio extra del h2 */
 }

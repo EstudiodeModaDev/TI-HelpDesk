@@ -14,6 +14,7 @@ import type { TicketsService } from "../../Services/Tickets.service";
 import RichTextBase64 from "../RichTextBase64/RichTextBase64";
 import type { LogService } from "../../Services/Log.service";
 import { norm } from "../../utils/Commons";
+import RelacionadorMasiva from "../MasiveNonFather/masiva";
 
 export type UserOptionEx = UserOption & { source?: "Empleado" | "Franquicia" };
 export type TreeOption = {
@@ -48,6 +49,7 @@ export default function NuevoTicketForm() {
     { value: "Presencial", label: "Presencial" },
     { value: "WhatsApp", label: "WhatsApp" },
   ];
+  const [masiva, setMasiva] = React.useState<boolean>(false)
 
   // ====== Combinar usuarios con franquicias
   const combinedOptions: UserOptionEx[] = React.useMemo(() => {
@@ -142,144 +144,153 @@ export default function NuevoTicketForm() {
 
   return (
   <div className="ticket-form">
-      <h2 className="tf-title">Nuevo Ticket</h2>
 
-      <form onSubmit={(e) => {e.preventDefault(); handleSubmit(e)}} noValidate className="tf-grid">
-          {/* Solicitante */}
-          <div className="tf-field">
-            <label className="tf-label">Solicitante</label>
-            <Select<UserOptionEx, false>
-              options={combinedOptions}
-              placeholder={loadingWorkers || loadingFranq ? "Cargando opciones…" : "Buscar solicitante…"}
-              value={state.solicitante as UserOptionEx | null}
-              onChange={(opt) => setField("solicitante", opt ?? null)}
-              classNamePrefix="rs"
-              isDisabled={submitting || loadingWorkers || loadingFranq}
-              isLoading={loadingWorkers || loadingFranq}
-              components={{ Option }}
-              noOptionsMessage={() => (usersError || franqError ? "Error cargando opciones" : "Sin coincidencias")}
-              isClearable
-            />
-            {errors.solicitante && <small className="error">{errors.solicitante}</small>}
-          </div>
+    {masiva ? <RelacionadorMasiva onCancel={() => setMasiva(false)} userMail={""} isAdmin={true} currentId={""}/> : (
+      <>
+        <div className="form-header">
+          <h2 className="tf-title">Nuevo Ticket</h2>
+          <button className="btn btn-primary-final btn-xs" onClick={() => setMasiva(true)}>Masivo</button>
+        </div> 
 
-          {/* Resolutor */}
-          <div className="tf-field">
-            <label className="tf-label">Resolutor</label>
-            <Select<UserOption, false>
-              options={UseruserOptions}
-              placeholder={loading ? "Cargando usuarios…" : "Buscar resolutor…"}
-              value={state.resolutor}
-              onChange={async (opt) => {
-                console.table(opt)
-                if(opt?.jobTitle === "Tecnico"){
-                  const respuesta = (await balanceCharge(opt?.id ?? ""))
-                    if(respuesta?.ok){
-                      setField("resolutor", opt ?? null)
-                    } else {
-                      alert("A este resolutor se le han asignado demasiados casos en el dia de hoy, por favor escoja otro hasta balancear las cartas")
-                    }
-                  } else {
-                    setField("resolutor", opt ?? null)
-                  }
-                }
-              } 
-              classNamePrefix="rs"
-              isDisabled={submitting || loading}
-              isLoading={loading}
-              filterOption={userFilter as any}
-              components={{ Option: Option as any }}
-              noOptionsMessage={() => (error ? "Error cargando usuarios" : "Sin coincidencias")}
-              isClearable
-            />
-            {errors.resolutor && <small className="error">{errors.resolutor}</small>}
-          </div>
-
-          {/* Fecha de apertura (opcional) */}
-          <div className="tf-field tf-col-2 tf-inline">
-            <label className="tf-checkbox">
-              <input type="checkbox" checked={state.usarFechaApertura} onChange={(ev) => setField("usarFechaApertura", ev.target.checked)} disabled={submitting} className="tf-checkbox"/>
-              <span>Escoger fecha de apertura</span>           
-            </label>
-          </div>
-
-          {state.usarFechaApertura && (
+        <form onSubmit={(e) => {e.preventDefault(); handleSubmit(e)}} noValidate className="tf-grid">
+            {/* Solicitante */}
             <div className="tf-field">
-              <label className="tf-label" htmlFor="fechaApertura">Fecha de apertura</label>
-              <input id="fechaApertura" type="date" value={state.fechaApertura ?? ""} onChange={(e) => setField("fechaApertura", e.target.value || null)} disabled={submitting} className="tf-input"/>
-              {errors.fechaApertura && <small className="error">{errors.fechaApertura}</small>}
-            </div>
-          )}
-
-          {/* Fuente */}
-          <div className="tf-field">
-            <label className="tf-label" htmlFor="fuente">Fuente Solicitante</label>
-            
-
-
-            <Select inputId="nomina" options={opcionesFuentes} classNamePrefix="rs" placeholder="Selecciona tipo de nómina..."
-              value={opcionesFuentes.find(o => o.value === state.fuente) ?? null}
-              onChange={(opt) => {setField("fuente", opt?.label ?? ""); }}
-              isClearable
-            />
-            {errors.fuente && <small className="error">{errors.fuente}</small>}
-          </div>
-
-          {/* Motivo */}
-          <div className="tf-field">
-            <label className="tf-label" htmlFor="motivo">Asunto</label>
-            <input id="motivo" type="text" placeholder="Ingrese el motivo" value={state.motivo} onChange={(e) => setField("motivo", e.target.value)} disabled={submitting} className="tf-input" maxLength={300}/>
-            {errors.motivo && <small className="error">{errors.motivo}</small>}
-          </div>
-
-          {/* Descripción */}
-          <div className={`tf-field tf-col-2 ${errors.descripcion ? "has-error" : ""}`}>
-            <label className="tf-label">Descripción</label>
-
-            <div className="rtb-box">
-              <RichTextBase64 value={state.descripcion} onChange={(html) => setField("descripcion", html)} placeholder="Describe el problema y pega capturas (Ctrl+V)..."/>
-            </div>
-
-            {errors.descripcion && <small className="error">{errors.descripcion}</small>}
-          </div>
-
-          {/* Categoría / Subcategoría / Artículo */}
-          <div className="tf-row tf-row--cats tf-col-2"> 
-            <div className="tf-field">
-              <label className="tf-label">Categoría</label>
-              <Select<TreeOption, false>
+              <label className="tf-label">Solicitante</label>
+              <Select<UserOptionEx, false>
+                options={combinedOptions}
+                placeholder={loadingWorkers || loadingFranq ? "Cargando opciones…" : "Buscar solicitante…"}
+                value={state.solicitante as UserOptionEx | null}
+                onChange={(opt) => setField("solicitante", opt ?? null)}
                 classNamePrefix="rs"
-                placeholder={loadingCatalogos ? "Cargando catálogo..." : "Buscar categoría/sub/artículo…"}
-                options={treeOptions}
-                value={treeValue}
-                onChange={onTreeChange}
-                isDisabled={disabledCats}
+                isDisabled={submitting || loadingWorkers || loadingFranq}
+                isLoading={loadingWorkers || loadingFranq}
+                components={{ Option }}
+                noOptionsMessage={() => (usersError || franqError ? "Error cargando opciones" : "Sin coincidencias")}
                 isClearable
               />
-              {errors.categoria && <small className="error">{errors.categoria}</small>}
+              {errors.solicitante && <small className="error">{errors.solicitante}</small>}
             </div>
-          </div>
 
-          {/* Archivo */}
-          <div className="tf-field tf-col-2">
-            <label className="tf-label" htmlFor="archivo">Adjuntar archivo</label>
-            <input
-              id="archivo"
-              type="file"
-              onChange={(e) => setField("archivo", e.target.files?.[0] ?? null)}
-              disabled={submitting}
-              className="tf-input"
-            />
-          </div>
+            {/* Resolutor */}
+            <div className="tf-field">
+              <label className="tf-label">Resolutor</label>
+              <Select<UserOption, false>
+                options={UseruserOptions}
+                placeholder={loading ? "Cargando usuarios…" : "Buscar resolutor…"}
+                value={state.resolutor}
+                onChange={async (opt) => {
+                  console.table(opt)
+                  if(opt?.jobTitle === "Tecnico"){
+                    const respuesta = (await balanceCharge(opt?.id ?? ""))
+                      if(respuesta?.ok){
+                        setField("resolutor", opt ?? null)
+                      } else {
+                        alert("A este resolutor se le han asignado demasiados casos en el dia de hoy, por favor escoja otro hasta balancear las cartas")
+                      }
+                    } else {
+                      setField("resolutor", opt ?? null)
+                    }
+                  }
+                } 
+                classNamePrefix="rs"
+                isDisabled={submitting || loading}
+                isLoading={loading}
+                filterOption={userFilter as any}
+                components={{ Option: Option as any }}
+                noOptionsMessage={() => (error ? "Error cargando usuarios" : "Sin coincidencias")}
+                isClearable
+              />
+              {errors.resolutor && <small className="error">{errors.resolutor}</small>}
+            </div>
 
-          {/* Submit */}
-          <div className="tf-actions tf-col-2">
-            <button type="submit" disabled={submitting || loadingCatalogos} className="btn btn-primary-final">
-              {submitting ? "Enviando..." : "Enviar Ticket"}
-            </button>
-          </div>
+            {/* Fecha de apertura (opcional) */}
+            <div className="tf-field tf-col-2 tf-inline">
+              <label className="tf-checkbox">
+                <input type="checkbox" checked={state.usarFechaApertura} onChange={(ev) => setField("usarFechaApertura", ev.target.checked)} disabled={submitting} className="tf-checkbox"/>
+                <span>Escoger fecha de apertura</span>           
+              </label>
+            </div>
+
+            {state.usarFechaApertura && (
+              <div className="tf-field">
+                <label className="tf-label" htmlFor="fechaApertura">Fecha de apertura</label>
+                <input id="fechaApertura" type="date" value={state.fechaApertura ?? ""} onChange={(e) => setField("fechaApertura", e.target.value || null)} disabled={submitting} className="tf-input"/>
+                {errors.fechaApertura && <small className="error">{errors.fechaApertura}</small>}
+              </div>
+            )}
+
+            {/* Fuente */}
+            <div className="tf-field">
+              <label className="tf-label" htmlFor="fuente">Fuente Solicitante</label>
+              
+
+
+              <Select inputId="nomina" options={opcionesFuentes} classNamePrefix="rs" placeholder="Selecciona tipo de nómina..."
+                value={opcionesFuentes.find(o => o.value === state.fuente) ?? null}
+                onChange={(opt) => {setField("fuente", opt?.label ?? ""); }}
+                isClearable
+              />
+              {errors.fuente && <small className="error">{errors.fuente}</small>}
+            </div>
+
+            {/* Motivo */}
+            <div className="tf-field">
+              <label className="tf-label" htmlFor="motivo">Asunto</label>
+              <input id="motivo" type="text" placeholder="Ingrese el motivo" value={state.motivo} onChange={(e) => setField("motivo", e.target.value)} disabled={submitting} className="tf-input" maxLength={300}/>
+              {errors.motivo && <small className="error">{errors.motivo}</small>}
+            </div>
+
+            {/* Descripción */}
+            <div className={`tf-field tf-col-2 ${errors.descripcion ? "has-error" : ""}`}>
+              <label className="tf-label">Descripción</label>
+
+              <div className="rtb-box">
+                <RichTextBase64 value={state.descripcion} onChange={(html) => setField("descripcion", html)} placeholder="Describe el problema y pega capturas (Ctrl+V)..."/>
+              </div>
+
+              {errors.descripcion && <small className="error">{errors.descripcion}</small>}
+            </div>
+
+            {/* Categoría / Subcategoría / Artículo */}
+            <div className="tf-row tf-row--cats tf-col-2"> 
+              <div className="tf-field">
+                <label className="tf-label">Categoría</label>
+                <Select<TreeOption, false>
+                  classNamePrefix="rs"
+                  placeholder={loadingCatalogos ? "Cargando catálogo..." : "Buscar categoría/sub/artículo…"}
+                  options={treeOptions}
+                  value={treeValue}
+                  onChange={onTreeChange}
+                  isDisabled={disabledCats}
+                  isClearable
+                />
+                {errors.categoria && <small className="error">{errors.categoria}</small>}
+              </div>
+            </div>
+
+            {/* Archivo */}
+            <div className="tf-field tf-col-2">
+              <label className="tf-label" htmlFor="archivo">Adjuntar archivo</label>
+              <input
+                id="archivo"
+                type="file"
+                onChange={(e) => setField("archivo", e.target.files?.[0] ?? null)}
+                disabled={submitting}
+                className="tf-input"
+              />
+            </div>
+
+            {/* Submit */}
+            <div className="tf-actions tf-col-2">
+              <button type="submit" disabled={submitting || loadingCatalogos} className="btn btn-primary-final">
+                {submitting ? "Enviando..." : "Enviar Ticket"}
+              </button>
+            </div>
         </form>
-      </div>
+      </>
+    )}
+      
+    </div>
   );
 }
 
