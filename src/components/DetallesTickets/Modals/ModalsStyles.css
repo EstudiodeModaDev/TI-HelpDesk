@@ -25,6 +25,7 @@
   grid-template-columns: repeat(2, minmax(260px, 1fr));
   gap: var(--gap);
   margin-top: 8px;
+  height: auto;
 }
 
 /* Cada CAMPO es una FILA */

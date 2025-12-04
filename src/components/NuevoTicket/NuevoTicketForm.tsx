@@ -90,13 +90,19 @@ export default function NuevoTicketForm() {
 
   const treeValue: TreeOption | null = React.useMemo(() => {
     if (!state.articulo) return null;
-    // Match por el título del artículo al final del path
-    const normEnd = norm(state.articulo);
+
+    const normArt = norm(state.articulo || "");
+    const normCat = norm(state.categoria || "");
+    const normSub = norm(state.subcategoria || "");
+
     return (
-      treeOptions.find(o => norm(o.meta.artTitle) === normEnd) ??
-      null
+      treeOptions.find(o =>
+        norm(o.meta.artTitle) === normArt &&
+        norm(o.meta.catTitle) === normCat &&
+        norm(o.meta.subTitle) === normSub
+      ) ?? null
     );
-  }, [state.articulo, treeOptions]);
+  }, [state.articulo, state.categoria, state.subcategoria, treeOptions]);
 
   const userFilter = (option: any, raw: string) => {
     const q = norm(raw);

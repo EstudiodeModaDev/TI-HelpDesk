@@ -50,13 +50,19 @@ export default function Recategorizar({ ticket, onDone}: { ticket: Ticket, onDon
 
   const treeValue: TreeOption | null = React.useMemo(() => {
     if (!state.articulo) return null;
-    // Match por el título del artículo al final del path
-    const normEnd = norm(state.articulo);
+
+    const normArt = norm(state.articulo || "");
+    const normCat = norm(state.categoria || "");
+    const normSub = norm(state.subcategoria || "");
+
     return (
-      treeOptions.find(o => norm(o.meta.artTitle) === normEnd) ??
-      null
+      treeOptions.find(o =>
+        norm(o.meta.artTitle) === normArt &&
+        norm(o.meta.catTitle) === normCat &&
+        norm(o.meta.subTitle) === normSub
+      ) ?? null
     );
-  }, [state.articulo, treeOptions]);
+  }, [state.articulo, state.categoria, state.subcategoria, treeOptions]);
 
   const onTreeChange = (opt: SingleValue<TreeOption>) => {
     if (!opt) {
@@ -97,7 +103,15 @@ export default function Recategorizar({ ticket, onDone}: { ticket: Ticket, onDon
                   return norm(candidate.label).includes(norm(input));
                 }}
                 isClearable
-              />
+                menuPortalTarget={typeof document !== "undefined" ? document.body : null}
+                menuPosition="fixed"
+                styles={{
+                  menuPortal: (base) => ({
+                    ...base,
+                    zIndex: 9999,   // por encima del modal
+                  }),
+                }}
+                />
               {errors.categoria && <small className="error">{errors.categoria}</small>}
             </div>
           </div>
