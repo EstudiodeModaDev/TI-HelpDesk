@@ -15,12 +15,21 @@ import { formatPesosEsCO, toNumberFromEsCO } from "../../utils/Number";
 import { useGraphServices } from "../../graph/GrapServicesContext";
 import { useCentroCostos, useCO } from "../../Funcionalidades/Compras";
 
+// ⭐ NUEVO: Modal genérico para Centro de Costos / Centro Operativo / (futuro) Unidad de negocio
+import CentroModal from "./ProveedorModal/CentroModal";
+// ⭐ NUEVO: Hook unificado para crear centros en las listas de SP (CentroCostos / CentrosOperativos)
+import { useCentrosFactura } from "../../Funcionalidades/CentrosFactura";
+
 export default function RegistroFactura() {
   const { getToken } = useAuth();
   const [compras, setCompras] = useState<Compra[]>([]);
   const { CentroCostos, CentroOperativo } = useGraphServices();
-  const { ccOptions } = useCentroCostos(CentroCostos as any);
-  const { COOptions, UNOptions} = useCO(CentroOperativo as any);
+
+   // ⭐ NUEVO: hook que permite agregar centros a las listas de SP (CentroCostos / CentrosOperativos)
+  const { agregarCentro, refreshFlag } = useCentrosFactura();
+  
+  const { ccOptions } = useCentroCostos(CentroCostos as any, refreshFlag);
+  const { COOptions, UNOptions} = useCO(CentroOperativo as any, refreshFlag);
   const [mostrarFechas, setMostrarFechas] = useState(false);
   const { registrarFactura, handleConector } = useFacturas();
   const [initialDate, setInitialDate] = useState("");
@@ -37,6 +46,10 @@ export default function RegistroFactura() {
   const [formData, setFormData] = useState<ReFactura>({FechaEmision: "", NoFactura: "", Proveedor: "", Title: "", Items: "", DescripItems: "", ValorAnIVA: 0, CC: "", CO: "", un: "", DetalleFac: "", FecEntregaCont: null, DocERP: "", Observaciones: "", RegistradoPor: account?.name ?? ""});
   const [displayValor, setDisplayValor] = React.useState("");
   const [errors, setErrors] = React.useState<Record<string, string>>({});
+
+  // ⭐ NUEVO: estado para controlar la visibilidad del modal de centros
+  const [showCentroModal, setShowCentroModal] = useState(false);
+
 
   useEffect(() => {
     const fetchCompras = async () => {
@@ -95,6 +108,21 @@ export default function RegistroFactura() {
     } else {
       console.warn("Proveedor seleccionado no encontrado en lista:", id);
     }
+  };
+
+  // ⭐ NUEVO: función que recibe lo que viene del CentroModal y lo manda al servicio unificado
+  const handleSaveCentro = async (payload: {
+    tipo: "CentroCostos" | "CentrosOperativos";
+    Title: string;
+    Codigo: string;
+  }) => {
+    // Llamamos al servicio unificado (CentrosFacturaService) a través del hook
+    await agregarCentro(payload.tipo, {
+      Title: payload.Title,   // Nombre en SP (campo Title)
+      Codigo: payload.Codigo, // Código en SP (campo Codigo)
+    });
+    // Opcional: podrías recargar opciones de CC/CO aquí si lo deseas
+    // pero como las traes con hooks separados, puedes manejarlo luego.
   };
 
   function validate(): boolean {
@@ -236,7 +264,7 @@ export default function RegistroFactura() {
                   <small className="error">{errors.Proveedor}</small>
                 </div>
 
-                {/* 🔹 Botón para abrir modal */}
+                {/* 🔹 Botón para abrir modal de proveedor */}
                 <button
                   type="button"
                   className="btn btn-terciary btn-sm form-group__btn"
@@ -444,6 +472,18 @@ export default function RegistroFactura() {
                 <small className="error">{errors.un}</small>
               </div>
 
+              {/* ⭐ NUEVO: botón para abrir el modal de centros, cercano a CC/CO/UN */}
+              <div className="campo">
+                <label>¿No encuentras el centro/unidad?</label>
+                <button
+                  type="button"
+                  className="btn btn-terciary btn-sm"
+                  onClick={() => setShowCentroModal(true)}
+                >
+                  + Nuevo C.C/C.O/U.N
+                </button>
+              </div>
+
               {/* 🧾 Detalle */}
               <div className="campo">
                 <label>
@@ -505,6 +545,13 @@ export default function RegistroFactura() {
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
           onSave={agregarProveedor}
+        />
+
+        {/* ⭐ NUEVO: Modal para crear Centro de Costos / Centro Operativo / (futuro) Unidad de negocio */}
+        <CentroModal
+          isOpen={showCentroModal}
+          onClose={() => setShowCentroModal(false)}
+          onSave={handleSaveCentro}
         />
       </>
     )}

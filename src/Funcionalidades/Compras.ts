@@ -376,7 +376,7 @@ export function useCompras(ComprasSvc: ComprasService, TicketsSvc: TicketsServic
   };
 }
 
-export function useCentroCostos(CCSvc: CentroCostosService) {
+export function useCentroCostos(CCSvc: CentroCostosService, refreshFlag?: number) {
   const [CC, setCC] = React.useState<CentroCostos[]>([]);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
@@ -386,7 +386,6 @@ export function useCentroCostos(CCSvc: CentroCostosService) {
     setError(null);
     try {
       const items = await CCSvc.getAll();
-
       setCC(Array.isArray(items) ? items : []);
     } catch (e: any) {
       setError(e?.message ?? "Error cargando centros de costo");
@@ -398,7 +397,7 @@ export function useCentroCostos(CCSvc: CentroCostosService) {
 
   React.useEffect(() => {
     loadCC();
-  }, [loadCC]);
+  }, [loadCC, refreshFlag]);   // ⭐ escucha el refreshFlag
 
   const ccOptions = React.useMemo(
     () => CC.map(c => ({ value: c.Codigo, label: c.Title })),
@@ -411,7 +410,8 @@ export function useCentroCostos(CCSvc: CentroCostosService) {
   };
 }
 
-export function useCO(COSvc: COService) {
+
+export function useCO(COSvc: COService, refreshFlag?: number) {
   const [CentrosOperativos, setCO] = React.useState<CentroCostos[]>([]);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
@@ -421,10 +421,9 @@ export function useCO(COSvc: COService) {
     setError(null);
     try {
       const items = await COSvc.getAll();
-
       setCO(Array.isArray(items) ? items : []);
     } catch (e: any) {
-      setError(e?.message ?? "Error cargando centros de costo");
+      setError(e?.message ?? "Error cargando centros operativos");
       setCO([]);
     } finally {
       setLoading(false);
@@ -433,7 +432,7 @@ export function useCO(COSvc: COService) {
 
   React.useEffect(() => {
     LoadCentroOperativos();
-  }, [LoadCentroOperativos]);
+  }, [LoadCentroOperativos, refreshFlag]);   // ⭐ escucha el refreshFlag
 
   const COOptions = React.useMemo(
     () => CentrosOperativos.map(c => ({ value: c.Codigo, label: c.Title })),
@@ -441,9 +440,12 @@ export function useCO(COSvc: COService) {
   );
 
   const UNOptions = React.useMemo(
-    () => UN.map(un => ({value: un.codigo, label: `${un.codigo} - ${un.descripcion}`})),
+    () => UN.map(un => ({
+      value: un.codigo,
+      label: `${un.codigo} - ${un.descripcion}`,
+    })),
     []
-  )
+  );
 
   return {
     CentrosOperativos, COOptions, loading, error,
@@ -451,5 +453,6 @@ export function useCO(COSvc: COService) {
     UNOptions
   };
 }
+
 
 
