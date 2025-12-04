@@ -1,561 +1,688 @@
-import DistribucionFactura from "./DistribucionFactura/DistribucionFactura";
+// ============================================================
+// RegistroFactura.tsx — versión COMPLETA, FUNCIONAL Y COMENTADA
+// ============================================================
+
 import React, { useEffect, useState } from "react";
-import { useFacturas } from "../../Funcionalidades/RegistrarFactura";
-import FacturasLista from "./FacturasLista/FacturasLista";
-import type { ReFactura } from "../../Models/RegistroFacturaInterface";
 import "./RegistroFactura.css";
+
+import DistribucionFactura from "./DistribucionFactura/DistribucionFactura";
+import FacturasLista from "./FacturasLista/FacturasLista";
+
+import { useFacturas } from "../../Funcionalidades/RegistrarFactura";
 import { useAuth } from "../../auth/authContext";
-import Select from "react-select";
 import { useProveedores } from "../../Funcionalidades/ProveedoresFactura";
-import ProveedorModal from "./ProveedorModal/ProveedorModal";
-import { Items, type Compra } from "../../Models/Compras";
-import { ComprasService } from "../../Services/Compras.service";
-import { GraphRest } from "../../graph/GraphRest";
-import { formatPesosEsCO, toNumberFromEsCO } from "../../utils/Number";
+
 import { useGraphServices } from "../../graph/GrapServicesContext";
 import { useCentroCostos, useCO } from "../../Funcionalidades/Compras";
 
-// ⭐ NUEVO: Modal genérico para Centro de Costos / Centro Operativo / (futuro) Unidad de negocio
-import CentroModal from "./ProveedorModal/CentroModal";
-// ⭐ NUEVO: Hook unificado para crear centros en las listas de SP (CentroCostos / CentrosOperativos)
 import { useCentrosFactura } from "../../Funcionalidades/CentrosFactura";
 
-export default function RegistroFactura() {
-  const { getToken } = useAuth();
-  const [compras, setCompras] = useState<Compra[]>([]);
-  const { CentroCostos, CentroOperativo } = useGraphServices();
+// Modal proveedor y modal centros
+import ProveedorModal from "./ProveedorModal/ProveedorModal";
+import CentroModal from "./ProveedorModal/CentroModal";
 
-   // ⭐ NUEVO: hook que permite agregar centros a las listas de SP (CentroCostos / CentrosOperativos)
-  const { agregarCentro, refreshFlag } = useCentrosFactura();
-  
-  const { ccOptions } = useCentroCostos(CentroCostos as any, refreshFlag);
-  const { COOptions, UNOptions} = useCO(CentroOperativo as any, refreshFlag);
-  const [mostrarFechas, setMostrarFechas] = useState(false);
-  const { registrarFactura, handleConector } = useFacturas();
-  const [initialDate, setInitialDate] = useState("");
-  const [finalDate, setFinalDate] = useState("");
-  const [selectedCompra, setSelectedCompra] = useState<string>("");
-  const { proveedores, loading, error, agregarProveedor  } = useProveedores();
-  const [proveedorSeleccionado, setProveedorSeleccionado] = useState<string>("");
-  const [isModalOpen, setIsModalOpen] = useState(false);
+// Utils
+import Select from "react-select";
+import { formatPesosEsCO, toNumberFromEsCO } from "../../utils/Number";
+
+// Modelos
+import type { ReFactura } from "../../Models/RegistroFacturaInterface";
+import type { Compra } from "../../Models/Compras";
+import { Items } from "../../Models/Compras";
+
+// Servicios
+import { ComprasService } from "../../Services/Compras.service";
+import { GraphRest } from "../../graph/GraphRest";
+
+export default function RegistroFactura() {
+  // ============================================================
+  // Hooks base del sistema
+  // ============================================================
+  const { account, getToken } = useAuth();
   const graph = new GraphRest(getToken);
   const comprasService = new ComprasService(graph);
-  const [mostrarLista, setMostrarLista] = useState(false);
+
+  const { registrarFactura } = useFacturas();
+
+  // ============================================================
+  // Hooks de proveedores
+  // ============================================================
+  const { proveedores, loading, error, agregarProveedor } = useProveedores();
+
+  // ============================================================
+  // Hooks de centros desde SP
+  // ============================================================
+  const { CentroCostos, CentroOperativo } = useGraphServices();
+
+  // Hook unificado para crear CC / CO / UN
+  const { agregarCentro, refreshFlag } = useCentrosFactura();
+
+  // CC, CO y UN vienen de tu hook de Compras (lo respetamos)
+  const { ccOptions } = useCentroCostos(CentroCostos as any, refreshFlag);
+  const { COOptions, UNOptions } = useCO(CentroOperativo as any, refreshFlag);
+
+  // ============================================================
+  // Estados principales
+  // ============================================================
+  const [compras, setCompras] = useState<Compra[]>([]);
   const [mostrarDistribucion, setMostrarDistribucion] = useState(false);
-  const {account} = useAuth()
-  const [formData, setFormData] = useState<ReFactura>({FechaEmision: "", NoFactura: "", Proveedor: "", Title: "", Items: "", DescripItems: "", ValorAnIVA: 0, CC: "", CO: "", un: "", DetalleFac: "", FecEntregaCont: null, DocERP: "", Observaciones: "", RegistradoPor: account?.name ?? ""});
-  const [displayValor, setDisplayValor] = React.useState("");
-  const [errors, setErrors] = React.useState<Record<string, string>>({});
-
-  // ⭐ NUEVO: estado para controlar la visibilidad del modal de centros
+  const [mostrarLista, setMostrarLista] = useState(false);
+  const [isModalProveedorOpen, setIsModalProveedorOpen] = useState(false);
   const [showCentroModal, setShowCentroModal] = useState(false);
+  const [proveedorSeleccionado, setProveedorSeleccionado] = useState("");
 
+  const [selectedCompra, setSelectedCompra] = useState("");
 
+  const [displayValor, setDisplayValor] = useState("");
+
+  const [formData, setFormData] = useState<ReFactura>({
+    FechaEmision: "",
+    NoFactura: "",
+    Proveedor: "",
+    Title: "",
+    Items: "",
+    DescripItems: "",
+    ValorAnIVA: 0,
+    CC: "",
+    CO: "",
+    un: "",
+    DetalleFac: "",
+    FecEntregaCont: null,
+    DocERP: "",
+    Observaciones: "",
+    RegistradoPor: account?.name ?? "",
+  });
+
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // ============================================================
+  // Cargar compras relevantes
+  // ============================================================
   useEffect(() => {
     const fetchCompras = async () => {
       try {
-        const filtro = ["Pendiente por registro de inventario", "Pendiente por entrega al usuario", "Pendiente por registro de factura"].map(e => `fields/Estado eq '${e}'`).join(" or ");
-        const { items } = await comprasService.getAll({filter: filtro, orderby: "fields/FechaSolicitud desc", top: 100,});
+        const filtro = [
+          "Pendiente por registro de inventario",
+          "Pendiente por entrega al usuario",
+          "Pendiente por registro de factura",
+        ]
+          .map((e) => `fields/Estado eq '${e}'`)
+          .join(" or ");
+
+        const { items } = await comprasService.getAll({
+          filter: filtro,
+          orderby: "fields/FechaSolicitud desc",
+          top: 100,
+        });
+
         setCompras(items);
       } catch (error) {
         console.error("Error cargando compras filtradas:", error);
       }
     };
+
     fetchCompras();
   }, []);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+  // ============================================================
+  // Handlers del formulario
+  // ============================================================
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
+  ) => {
     const { name, value } = e.target;
+
     if (name === "Items") {
       const seleccion = Items.find((o) => o.codigo === value);
-      setFormData((prev) => ({...prev, Items: value, DescripItems: seleccion ? seleccion.descripcion : "",}));
-    } else {
-      setFormData((prev) => ({...prev, [name]: name === "ValorAnIVA" ? toNumberFromEsCO(value) : value,}));
+      setFormData((prev) => ({
+        ...prev,
+        Items: value,
+        DescripItems: seleccion ? seleccion.descripcion : "",
+      }));
+      return;
     }
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: name === "ValorAnIVA" ? toNumberFromEsCO(value) : value,
+    }));
   };
 
+  // ============================================================
+  // Cuando se selecciona una compra, llenar CC/CO/UN y Items
+  // ============================================================
   const handleCompraSeleccionada = async (id: string) => {
     setSelectedCompra(id);
+
     if (!id) {
-      setFormData((prev) => ({...prev, CC: "", CO: "", un: "", DetalleFac: "", Items: "", DescripItems: ""}));
+      setFormData((prev) => ({
+        ...prev,
+        CC: "",
+        CO: "",
+        un: "",
+        DetalleFac: "",
+        Items: "",
+        DescripItems: "",
+      }));
       return;
     }
 
     try {
       const compra = await comprasService.get(id);
-      setFormData((prev) => ({...prev, Items: compra.CodigoItem || "", DescripItems: compra.DescItem || "",  CC: compra.CCosto || "", CO: compra.CO || "", un: compra.UN || "", DetalleFac: compra.Dispositivo || "",}));
+
+      setFormData((prev) => ({
+        ...prev,
+        Items: compra.CodigoItem || "",
+        DescripItems: compra.DescItem || "",
+        CC: compra.CCosto || "",
+        CO: compra.CO || "",
+        un: compra.UN || "",
+        DetalleFac: compra.Dispositivo || "",
+      }));
     } catch (error) {
-      console.error("❌ Error al cargar la compra seleccionada:", error);
+      console.error("❌ Error al cargar la compra:", error);
     }
   };
 
+  // ============================================================
+  // Seleccionar proveedor
+  // ============================================================
   const handleProveedorSeleccionado = (id: string) => {
     setProveedorSeleccionado(id);
+
     if (!id) {
-      setFormData(prev => ({...prev, Proveedor: "", Title: "",}));
+      setFormData((prev) => ({ ...prev, Proveedor: "", Title: "" }));
       return;
     }
 
-    // Buscar el proveedor por Id en la lista del hook
-    const prov = proveedores.find(p => String(p.Id) === String(id));
+    const prov = proveedores.find((p) => String(p.Id) === String(id));
 
     if (prov) {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
-        Proveedor: prov.Nombre ?? "", // ← Nombre del proveedor  aca ya se guardan, pero el input de proveedor se quita para no ser redundantes
-        Title: prov.Title ?? "",      // ← NIT del proveedor     este si lo trae y lo llena automaticamwnte
+        Proveedor: prov.Nombre ?? "",
+        Title: prov.Title ?? "",
       }));
-    } else {
-      console.warn("Proveedor seleccionado no encontrado en lista:", id);
     }
   };
 
-  // ⭐ NUEVO: función que recibe lo que viene del CentroModal y lo manda al servicio unificado
+  // ============================================================
+  // Guardar centro desde el modal
+  // Soporta: CentroCostos, CentrosOperativos, UnidadNegocio
+  // ============================================================
   const handleSaveCentro = async (payload: {
-    tipo: "CentroCostos" | "CentrosOperativos";
+    tipo: "CentroCostos" | "CentrosOperativos" | "UnidadNegocio";
     Title: string;
     Codigo: string;
   }) => {
-    // Llamamos al servicio unificado (CentrosFacturaService) a través del hook
     await agregarCentro(payload.tipo, {
-      Title: payload.Title,   // Nombre en SP (campo Title)
-      Codigo: payload.Codigo, // Código en SP (campo Codigo)
+      Title: payload.Title,
+      Codigo: payload.Codigo,
     });
-    // Opcional: podrías recargar opciones de CC/CO aquí si lo deseas
-    // pero como las traes con hooks separados, puedes manejarlo luego.
   };
 
+  // ============================================================
+  // Validación del formulario
+  // ============================================================
   function validate(): boolean {
     const e: Record<string, string> = {};
-    if (!formData.Proveedor)      e.Proveedor  = "Proveedor Requerido.";
-    if (!formData.FechaEmision)   e.FechaEmision = "Seleccione fecha de emision.";
-    if (!formData.Items)          e.Items              = "Seleccione item.";
-    if (!formData.ValorAnIVA)     e.ValorAnIVA          = "Requerida.";
-    if (!formData.ValorAnIVA)     e.ValorAnIVA          = "Requerida.";
-    if (!formData.DetalleFac)     e.DetalleFact          = "Requerida.";
+
+    if (!formData.Proveedor) e.Proveedor = "Proveedor requerido.";
+    if (!formData.FechaEmision) e.FechaEmision = "Fecha requerida.";
+    if (!formData.Items) e.Items = "Ítem requerido.";
+    if (!formData.ValorAnIVA) e.ValorAnIVA = "Valor requerido.";
+    if (!formData.DetalleFac) e.DetalleFac = "Detalle requerido.";
+
     setErrors(e);
     return Object.keys(e).length === 0;
   }
 
+  // ============================================================
+  // Enviar factura
+  // ============================================================
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if(!(validate())) return
+
+    if (!validate()) return;
+
     await registrarFactura(formData);
+
     alert("✅ Factura registrada con éxito");
-    setFormData({FechaEmision: "", NoFactura: "", Proveedor: "", Title: "", Items: "", DescripItems: "", ValorAnIVA: 0, CC: "", CO: "", un: "", DetalleFac: "",  FecEntregaCont: null, DocERP: "", Observaciones: "", RegistradoPor: account?.name ?? "", });
+
+    setFormData({
+      FechaEmision: "",
+      NoFactura: "",
+      Proveedor: "",
+      Title: "",
+      Items: "",
+      DescripItems: "",
+      ValorAnIVA: 0,
+      CC: "",
+      CO: "",
+      un: "",
+      DetalleFac: "",
+      FecEntregaCont: null,
+      DocERP: "",
+      Observaciones: "",
+      RegistradoPor: account?.name ?? "",
+    });
+
+    setDisplayValor("");
+    setSelectedCompra("");
+    setProveedorSeleccionado("");
   };
 
+  // ============================================================
+  // Render
+  // ============================================================
   return (
-  <div className="registro-container">
-    {/* ✅ Si se pide mostrar el formulario de Distribución, lo mostramos */}
-    {mostrarDistribucion ? (
-      <>
-        {/* CONTENEDOR EN FILA */}
-        <div className="acciones-top">
-          <button type="button" className="btn btn-secondary-final btn-personalized" onClick={() => setMostrarDistribucion(false)}>
-            🔙 Volver al registro de factura
-          </button>
-
-          {!mostrarFechas && (
-            <button type="button" className= "btn btn-secondary-final btn-personalized" onClick={() => setMostrarFechas(true)}>
-              📅 Prueba conector
+    <div className="registro-container">
+      {/* ============================================================
+        DISTRIBUCIÓN
+      ============================================================ */}
+      {mostrarDistribucion ? (
+        <>
+          <div className="acciones-top">
+            <button
+              type="button"
+              className="btn btn-secondary-final btn-personalized"
+              onClick={() => setMostrarDistribucion(false)}
+            >
+              🔙 Volver
             </button>
-          )}
-        </div>
-
-        {/* Cuando se muestran las fechas */}
-        {mostrarFechas && (
-          <div className="selector-fechas-container">
-            <label className="selector-label">
-              Fecha inicial:
-              <input
-                type="date"
-                value={initialDate}
-                onChange={(e) => setInitialDate(e.target.value)}
-              />
-            </label>
-
-            <label className="selector-label">
-              Fecha final:
-              <input
-                type="date"
-                value={finalDate}
-                onChange={(e) => setFinalDate(e.target.value)}
-              />
-            </label>
-
-            <div className="selector-botones">
-              <button type="button" className="btn btn-primary btn-personalized btn-xs"
-                onClick={async () => {
-                  if (!initialDate || !finalDate) {
-                    alert("⚠️ Debes seleccionar ambas fechas.");
-                    return;
-                  }
-                  await handleConector(initialDate, finalDate);
-                  setMostrarFechas(false);
-                  setInitialDate("");
-                  setFinalDate("");
-                }}
-              >
-                ✅ Ejecutar conector
-              </button>
-
-              <button type="button" className="btn btn-secondary-final btn-xs"
-                onClick={() => {
-                  setMostrarFechas(false);
-                  setInitialDate("");
-                  setFinalDate("");
-                }}
-              >
-                ❌ Cancelar
-              </button>
-            </div>
           </div>
-        )}
 
-        <DistribucionFactura />
-      </>
-    ) : (
-      <>
-        <h2>{mostrarLista ? "📄 Facturas Registradas" : "Registro de Facturas"}</h2>
+          <DistribucionFactura />
+        </>
+      ) : (
+        <>
+          <h2>{mostrarLista ? "📄 Facturas Registradas" : "Registro de Facturas"}</h2>
 
-        {!mostrarLista ? (
-          <form className="registro-form" onSubmit={handleSubmit}>
-            <div className="fila-compra-proveedor">
-              <div className="campo">
-                <label htmlFor="compraSelect">Seleccionar compra relacionada:</label>
-                <select
-                  id="compraSelect"
-                  className="proveedor-select"
-                  value={selectedCompra}
-                  onChange={(e) => handleCompraSeleccionada(e.target.value)}
-                >
-                  <option value="">-- Seleccione una compra --</option>
-                  {compras.map((c) => (
-                    <option key={c.Id} value={c.Id}>
-                      {c.Title} - {c.SolicitadoPor} - {c.Estado}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* 🔹 Desplegable de proveedores + botón en la misma línea */}
-              <div className="form-group fila-compra-proveedor__proveedor">
-                <div className="form-group__field">
-                  <label htmlFor="proveedor-select">Proveedor:</label>
-                  {loading ? (
-                    <span>Cargando...</span>
-                  ) : error ? (
-                    <span style={{ color: "red" }}>{error}</span>
-                  ) : (
-                    <select
-                      id="proveedor-select"
-                      value={proveedorSeleccionado}
-                      onChange={(e) => handleProveedorSeleccionado(e.target.value)}
-                    >
-                      <option value="">-- Selecciona un proveedor --</option>
-                      {proveedores.map((p) => (
-                        <option key={p.Id} value={p.Id}>
-                          {p.Nombre}
-                        </option>
-                      ))}
-                    </select>
-                  )}
-                  <small className="error">{errors.Proveedor}</small>
+          {/* ============================================================
+            FORMULARIO PRINCIPAL
+          ============================================================ */}
+          {!mostrarLista ? (
+            <form className="registro-form" onSubmit={handleSubmit}>
+              {/* ============================ */}
+              {/*       COMPRA + PROVEEDOR     */}
+              {/* ============================ */}
+              
+              <div className="fila-compra-proveedor">
+                {/* ---------------------- */}
+                {/* Seleccionar compra */}
+                {/* ---------------------- */}
+                <div className="campo">
+                  <label>Compra relacionada:</label>
+                  <select
+                    className="proveedor-select"
+                    value={selectedCompra}
+                    onChange={(e) => handleCompraSeleccionada(e.target.value)}
+                  >
+                    <option value="">-- Seleccione una compra --</option>
+                    {compras.map((c) => (
+                      <option key={c.Id} value={c.Id}>
+                        {c.Title} - {c.SolicitadoPor} - {c.Estado}
+                      </option>
+                    ))}
+                  </select>
                 </div>
 
-                {/* 🔹 Botón para abrir modal de proveedor */}
-                <button
-                  type="button"
-                  className="btn btn-terciary btn-sm form-group__btn"
-                  onClick={() => setIsModalOpen(true)}
-                >
-                  + Nuevo proveedor
-                </button>
-              </div>
-            </div>
-            <div className="form-grid">
-              {/* 📆 Fecha de emisión */}
-              <div className="campo">
-                <label>
-                  Fecha de emisión
-                  <input type="date" name="FechaEmision" value={formData.FechaEmision} onChange={handleChange} required/>
-                  <small className="error">{errors.FechaEmision}</small>
-                </label>
-              </div>
+                {/* ---------------------- */}
+                {/* Proveedor */}
+                {/* ---------------------- */}
+                <div className="form-group fila-compra-proveedor__proveedor">
+                  <div className="form-group__field">
+                    <label>Proveedor:</label>
 
-              {/* 🔢 Número de factura */}
-              <div className="campo">
-                <label>
-                  No. Factura
-                  <input type="text" name="NoFactura" value={formData.NoFactura} onChange={handleChange} required/>
-                </label>
-              </div>
-
-              {/* 🧾 NIT (Title) (llenado automático; readonly) */}
-              <div className="campo">
-                <label>
-                  NIT
-                  <input type="text" name="Title" value={formData.Title}  onChange={handleChange} required readOnly/>
-                  <small className="error">{errors.Proveedor}</small>
-                </label>
-              </div>
-
-              {/* 🧾 Ítem (Código + descripción automática con búsqueda) */}
-              <div className="campo">
-                <label>Ítem (Código + descripción)</label>
-                <Select
-                  classNamePrefix="rs"
-                  options={Items.map((op) => ({
-                    value: op.codigo,
-                    label: `${op.codigo} - ${op.descripcion}`,
-                  }))}
-                  placeholder="Buscar ítem…"
-                  isClearable
-                  value={
-                    formData.Items
-                      ? {
-                          value: formData.Items,
-                          label:
-                            Items.find((op) => op.codigo === formData.Items)
-                              ?.descripcion || formData.Items,
+                    {loading ? (
+                      <span>Cargando...</span>
+                    ) : error ? (
+                      <span style={{ color: "red" }}>{error}</span>
+                    ) : (
+                      <select
+                        value={proveedorSeleccionado}
+                        onChange={(e) =>
+                          handleProveedorSeleccionado(e.target.value)
                         }
-                      : null
-                  }
-                  onChange={(opt) => {
-                    setFormData((prev) => ({
-                      ...prev,
-                      Items: opt?.value || "",
-                      DescripItems: opt?.label?.split(" - ")[1] || "",
-                    }));
-                  }}
-                  filterOption={(option, input) =>
-                    option.label.toLowerCase().includes(input.toLowerCase())
-                  }
-                />
+                      >
+                        <option value="">-- Seleccione proveedor --</option>
+                        {proveedores.map((p) => (
+                          <option key={p.Id} value={p.Id}>
+                            {p.Nombre}
+                          </option>
+                        ))}
+                      </select>
+                    )}
+
+                    <small className="error">{errors.Proveedor}</small>
+                  </div>
+
+                  <button
+                    type="button"
+                    className="btn btn-terciary btn-sm form-group__btn"
+                    onClick={() => setIsModalProveedorOpen(true)}
+                  >
+                    + Nuevo proveedor
+                  </button>
+                </div>
+              </div>
+
+              {/* ============================ */}
+              {/*      CAMPOS GENERALES       */}
+              {/* ============================ */}
+
+              <div className="form-grid">
+                {/* Fecha */}
+                <div className="campo">
+                  <label>
+                    Fecha de emisión
+                    <input
+                      type="date"
+                      name="FechaEmision"
+                      value={formData.FechaEmision}
+                      onChange={handleChange}
+                      required
+                    />
+                    <small className="error">{errors.FechaEmision}</small>
+                  </label>
+                </div>
+
+                {/* No factura */}
+                <div className="campo">
+                  <label>
+                    No. Factura
+                    <input
+                      type="text"
+                      name="NoFactura"
+                      value={formData.NoFactura}
+                      onChange={handleChange}
+                    />
+                  </label>
+                </div>
+
+                {/* NIT */}
+                <div className="campo">
+                  <label>
+                    NIT
+                    <input
+                      type="text"
+                      name="Title"
+                      value={formData.Title}
+                      readOnly
+                    />
+                  </label>
+                </div>
+
+                {/* Ítem */}
+                <div className="campo">
+                  <label>Ítem</label>
+                  <Select
+                    classNamePrefix="rs"
+                    options={Items.map((op) => ({
+                      value: op.codigo,
+                      label: `${op.codigo} - ${op.descripcion}`,
+                    }))}
+                    placeholder="Buscar ítem…"
+                    isClearable
+                    value={
+                      formData.Items
+                        ? {
+                            value: formData.Items,
+                            label:
+                              Items.find(
+                                (op) => op.codigo === formData.Items
+                              )?.descripcion ?? "",
+                          }
+                        : null
+                    }
+                    onChange={(opt) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        Items: opt?.value ?? "",
+                        DescripItems:
+                          opt?.label?.split(" - ")[1] ?? "",
+                      }))
+                    }
+                  />
+                </div>
+
+                {/* Descripción item */}
+                <div className="campo">
+                <label>Descripción del ítem</label>
+                <input value={formData.DescripItems} readOnly />
                 <small className="error">{errors.Items}</small>
               </div>
 
-              {/* 📝 Descripción del ítem (solo lectura, se llena automático) */}
-              <div className="campo">
-                <label>
-                  Descripción del ítem
-                  <input name="DescripItems" value={formData.DescripItems} readOnly />
-                  <small className="error">{errors.Items}</small>
-                </label>
-              </div>
+                {/* Valor */}
+                <div className="campo">
+                  <label>
+                    Valor antes IVA
+                    <input
+                      type="text"
+                      name="ValorAnIVA"
+                      value={displayValor}
+                      onChange={(e) => {
+                        const raw = e.target.value;
+                        const f = formatPesosEsCO(raw);
+                        const num = toNumberFromEsCO(f);
 
-              {/* 💰 Valor */}
-              <div className="campo">
-                <label>
-                  Valor antes iva (en pesos)
-                  <input type="text" inputMode="numeric" name="ValorAnIVA" placeholder="Ej: 100.000,00" value={String(displayValor)} 
-                    onChange={(e) => {
-                      const raw = e.target.value;
-                      const f = formatPesosEsCO(raw);
-                      const num = toNumberFromEsCO(f);
-                      setDisplayValor(f);
-                      handleChange({
-                        target: { name: "ValorAnIVA", value: String(num) },
-                      } as unknown as React.ChangeEvent<HTMLInputElement>);
-                    }}
-                    onBlur={() => {
-                      const num = toNumberFromEsCO(displayValor);
-                      setDisplayValor(
-                        new Intl.NumberFormat("es-CO", {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
-                        }).format(Number.isFinite(num) ? num : 0)
-                      );
-                    }}
-                  />
+                        setDisplayValor(f);
+
+                        setFormData((prev) => ({
+                          ...prev,
+                          ValorAnIVA: num,
+                        }));
+                      }}
+                      onBlur={() => {
+                        const num = toNumberFromEsCO(displayValor);
+                        setDisplayValor(
+                          new Intl.NumberFormat("es-CO", {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          }).format(num)
+                        );
+                      }}
+                    />
+                  </label>
                   <small className="error">{errors.ValorAnIVA}</small>
+                </div>
+
+                {/* CC */}
+                <div className="campo">
+                  <label>Centro de Costos (C.C)</label>
+                  <Select
+                    classNamePrefix="rs"
+                    options={ccOptions.map((cc) => ({
+                      value: cc.value,
+                      label: `${cc.value} - ${cc.label}`,
+                    }))}
+                    isClearable
+                    placeholder="Buscar C.C..."
+                    value={
+                      formData.CC
+                        ? {
+                            value: formData.CC,
+                            label:
+                              ccOptions.find(
+                                (cc) => cc.value === formData.CC
+                              )?.label ?? "",
+                          }
+                        : null
+                    }
+                    onChange={(opt) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        CC: opt?.value ?? "",
+                      }))
+                    }
+                  />
+                </div>
+
+                {/* CO */}
+                <div className="campo">
+                  <label>Centro Operativo (C.O)</label>
+                  <Select
+                    classNamePrefix="rs"
+                    options={COOptions.map((co) => ({
+                      value: co.value,
+                      label: `${co.value} - ${co.label}`,
+                    }))}
+                    isClearable
+                    placeholder="Buscar C.O..."
+                    value={
+                      formData.CO
+                        ? {
+                            value: formData.CO,
+                            label:
+                              COOptions.find(
+                                (co) => co.value === formData.CO
+                              )?.label ?? "",
+                          }
+                        : null
+                    }
+                    onChange={(opt) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        CO: opt?.value ?? "",
+                      }))
+                    }
+                  />
+                </div>
+
+                {/* Unidad de negocio */}
+                <div className="campo">
+                  <label>Unidad de Negocio (U.N)</label>
+                  <Select
+                    classNamePrefix="rs"
+                    options={UNOptions.map((un) => ({
+                      value: un.value,
+                      label: `${un.value} - ${un.label}`,
+                    }))}
+                    isClearable
+                    placeholder="Buscar U.N..."
+                    value={
+                      formData.un
+                        ? {
+                            value: formData.un,
+                            label:
+                              UNOptions.find(
+                                (u) => u.value === formData.un
+                              )?.label ?? "",
+                          }
+                        : null
+                    }
+                    onChange={(opt) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        un: opt?.value ?? "",
+                      }))
+                    }
+                  />
+                </div>
+
+                {/* BOTÓN CREAR CC/CO/UN */}
+                <div className="campo">
+                  <label>¿No aparece?</label>
+                  <button
+                    type="button"
+                    className="btn2 btn-terciary"
+                    onClick={() => setShowCentroModal(true)}
+                  >
+                    + Nuevo C.C/C.O/U.N
+                  </button>
+                </div>
+
+                {/* Detalle */}
+                <div className="campo">
+                <label>Detalle Fac</label>
+                <input
+                  name="DetalleFac"
+                  value={formData.DetalleFac}
+                  onChange={handleChange}
+                />
+              </div>
+
+                {/* Fecha contabilidad */}
+                <div className="campo">
+                  <label>
+                    Fecha entrega contabilidad
+                    <input
+                      type="date"
+                      name="FecEntregaCont"
+                      value={formData.FecEntregaCont ?? ""}
+                      onChange={handleChange}
+                    />
+                  </label>
+                </div>
+
+                {/* Documento ERP */}
+                <div className="campo">
+                  <label>Documento ERP</label>
+                  <input
+                    name="DocERP"
+                    value={formData.DocERP}
+                    onChange={handleChange}
+                  />
+                </div>
+              </div>
+
+              {/* Observaciones */}
+              <div className="campo">
+                <label>
+                  Observaciones
+                  <textarea
+                    name="Observaciones"
+                    value={formData.Observaciones}
+                    onChange={handleChange}
+                    rows={2}
+                  />
                 </label>
               </div>
 
-              {/* 🏢 Centro de Costos (C.C) */}
-              <div className="campo">
-                <label>Centro de Costos (C.C)</label>
-                <Select
-                  classNamePrefix="rs"
-                  options={ccOptions.map((cc) => ({value: cc.value, label: `${cc.value} - ${cc.label}`, }))}
-                  placeholder="Buscar centro de costo…"
-                  isClearable
-                  value={
-                    formData.CC
-                      ? {
-                          value: formData.CC,
-                          label:
-                            ccOptions.find((cc) => cc.value === formData.CC)
-                              ?.label || formData.CC,
-                        }
-                      : null
-                  }
-                  onChange={(opt) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      CC: opt?.value || "",
-                    }))
-                  }
-                  filterOption={(option, input) =>
-                    option.label.toLowerCase().includes(input.toLowerCase())
-                  }
-                />
-                <small className="error">{errors.CC}</small>
-              </div>
+              {/* BOTONES PRINCIPALES */}
+              <div className="botones-container">
+                <button type="submit" className="btn btn-primary-final">
+                  Registrar factura
+                </button>
 
-              {/* 🏭 Centro Operativo (C.O) */}
-              <div className="campo">
-                <label>Centro Operativo (C.O)</label>
-                <Select
-                  classNamePrefix="rs"
-                  options={COOptions.map((co) => ({
-                    value: co.value,
-                    label: `${co.value} - ${co.label}`,
-                  }))}
-                  placeholder="Buscar centro operativo…"
-                  isClearable
-                  value={
-                    formData.CO
-                      ? {
-                          value: formData.CO,
-                          label:
-                            COOptions.find((co) => co.value === formData.CO)
-                              ?.label || formData.CO,
-                        }
-                      : null
-                  }
-                  onChange={(opt) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      CO: opt?.value || "",
-                    }))
-                  }
-                  filterOption={(option, input) =>
-                    option.label.toLowerCase().includes(input.toLowerCase())
-                  }
-                />
-                <small className="error">{errors.CO}</small>
-              </div>
-
-              {/* 🧱 Unidad de Negocio (U.N) */}
-              <div className="campo">
-                <label>Unidad de Negocio (U.N)</label>
-                <Select
-                  classNamePrefix="rs"
-                  options={UNOptions.map((un) => ({
-                    value: un.value,
-                    label: `${un.value} - ${un.label}`,
-                  }))}
-                  placeholder="Buscar unidad de negocio…"
-                  isClearable
-                  value={
-                    formData.un
-                      ? {
-                          value: formData.un,
-                          label:
-                            UNOptions.find((u) => u.value === formData.un)
-                              ?.label || formData.un,
-                        }
-                      : null
-                  }
-                  onChange={(opt) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      un: opt?.value || "",
-                    }))
-                  }
-                  filterOption={(option, input) =>
-                    option.label.toLowerCase().includes(input.toLowerCase())
-                  }
-                />
-                <small className="error">{errors.un}</small>
-              </div>
-
-              {/* ⭐ NUEVO: botón para abrir el modal de centros, cercano a CC/CO/UN */}
-              <div className="campo">
-                <label>¿No encuentras el centro/unidad?</label>
                 <button
                   type="button"
-                  className="btn btn-terciary btn-sm"
-                  onClick={() => setShowCentroModal(true)}
+                  className="btn btn-secondary-final"
+                  onClick={() => setMostrarLista(true)}
                 >
-                  + Nuevo C.C/C.O/U.N
+                  Ver facturas
+                </button>
+
+                <button
+                  type="button"
+                  className="btn-distribucion"
+                  onClick={() => setMostrarDistribucion(true)}
+                >
+                  Distribuir factura
                 </button>
               </div>
-
-              {/* 🧾 Detalle */}
-              <div className="campo">
-                <label>
-                  Detalle Fac
-                  <input name="DetalleFac" value={formData.DetalleFac} onChange={handleChange} />
-                </label>
-              </div>
-
-              {/* 📦 Fecha de entrega contabilidad */}
-              <div className="campo">
-                <label>
-                  Fecha de entrega contabilidad
-                  <input type="date" name="FecEntregaCont" value={formData.FecEntregaCont ?? ""} onChange={handleChange}/>
-                </label>
-              </div>
-
-              {/* 📎 Documento ERP */}
-              <div className="campo">
-                <label>
-                  Documento ERP
-                  <input type="text" name="DocERP" value={formData.DocERP} onChange={handleChange} />
-                </label>
-              </div>
-            </div>
-
-            {/* 🗒️ Observaciones */}
-            <div className="campo">
-              <label>
-                Observaciones
-                <textarea name="Observaciones" rows={2} value={formData.Observaciones} onChange={handleChange} placeholder="Escribe observaciones si aplica..." />
-              </label>
-            </div>
-
-            {/* Botones */}
-            <div className="botones-container">
-              <button type="submit" className="btn btn-primary-final">
-                ✅  Registrar Factura
-              </button>
-
-              <button type="button" className="btn btn-secondary-final" onClick={() => setMostrarLista(true)}>
-                📄 Mostrar Facturas
-              </button>
-
-              {/* botón para abrir DistribucionFactura */}
-              <button type="button" className="btn-distribucion" onClick={() => setMostrarDistribucion(true)}>
-                📦 Distribuir Factura
-              </button>
-            </div>
-          </form>
-        ) : (
-          // 📋 Vista de facturas con su propio componente de filtros
-          <div>
+            </form>
+          ) : (
             <FacturasLista onVolver={() => setMostrarLista(false)} />
-          </div>
-        )}
+          )}
 
-        {/* Modal de proveedor (mantener como en tu versión) */}
-        <ProveedorModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          onSave={agregarProveedor}
-        />
+          {/* MODAL PROVEEDOR */}
+          <ProveedorModal
+            isOpen={isModalProveedorOpen}
+            onClose={() => setIsModalProveedorOpen(false)}
+            onSave={agregarProveedor}
+          />
 
-        {/* ⭐ NUEVO: Modal para crear Centro de Costos / Centro Operativo / (futuro) Unidad de negocio */}
-        <CentroModal
-          isOpen={showCentroModal}
-          onClose={() => setShowCentroModal(false)}
-          onSave={handleSaveCentro}
-        />
-      </>
-    )}
-  </div>
-);
-
+          {/* MODAL CENTROS (CC / CO / UN) */}
+          <CentroModal
+            isOpen={showCentroModal}
+            onClose={() => setShowCentroModal(false)}
+            onSave={handleSaveCentro}
+          />
+        </>
+      )}
+    </div>
+  );
 }

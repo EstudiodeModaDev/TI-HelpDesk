@@ -1,27 +1,51 @@
-import React, { useState } from "react";
-import "./ProveedorModal.css"; // puedes reutilizar el mismo estilo
+// ============================================================
+// CentroModal.tsx
+// ------------------------------------------------------------
+// Modal para crear:
+//   ✔ Centro de Costos
+//   ✔ Centro Operativo
+//   ✔ Unidad de Negocio
+//
+// Usa el hook unificado useCentrosFactura a través de onSave()
+// NO guarda nada por su cuenta: solo envía datos al hook.
+// ============================================================
 
+import React, { useState } from "react";
+import "./ProveedorModal.css"; // Reutilizamos el estilo existente
+
+// Tipo de centro permitido (CC, CO, UN)
 import type { TipoCentroSoportado } from "../../../Funcionalidades/CentrosFactura";
 
 interface CentroModalProps {
   isOpen: boolean;
   onClose: () => void;
+
+  // onSave → llama useCentrosFactura().agregarCentro()
   onSave: (payload: {
     tipo: TipoCentroSoportado;
-    Title: string;  // Nombre
-    Codigo: string; // Código
+    Title: string;
+    Codigo: string;
   }) => Promise<void>;
 }
 
-const CentroModal: React.FC<CentroModalProps> = ({ isOpen, onClose, onSave }) => {
+const CentroModal: React.FC<CentroModalProps> = ({
+  isOpen,
+  onClose,
+  onSave,
+}) => {
+  // Estado del formulario
   const [tipo, setTipo] = useState<TipoCentroSoportado>("CentroCostos");
   const [nombre, setNombre] = useState("");
   const [codigo, setCodigo] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  // Si el modal está cerrado → no renderizar nada
   if (!isOpen) return null;
 
+  // ============================================================
+  // Guardar nueva entrada en la lista correspondiente
+  // ============================================================
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -33,14 +57,20 @@ const CentroModal: React.FC<CentroModalProps> = ({ isOpen, onClose, onSave }) =>
 
     try {
       setLoading(true);
+
+      // Enviar datos al hook unificado
       await onSave({
         tipo,
         Title: nombre,
         Codigo: codigo,
       });
+
+      // Limpiar formulario
       setNombre("");
       setCodigo("");
       setTipo("CentroCostos");
+
+      // Cerrar modal
       onClose();
     } catch (err) {
       console.error(err);
@@ -50,28 +80,34 @@ const CentroModal: React.FC<CentroModalProps> = ({ isOpen, onClose, onSave }) =>
     }
   };
 
+  // ============================================================
+  // Render
+  // ============================================================
   return (
     <div className="modal-overlay">
       <div className="modal-container">
         <h3>Agregar centro</h3>
 
         <form onSubmit={handleSubmit} className="modal-form">
-          {/* Tipo de centro */}
+
+          {/* Selección del tipo de centro */}
           <label>
             Tipo:
             <select
               value={tipo}
-              onChange={(e) => setTipo(e.target.value as TipoCentroSoportado)}
+              onChange={(e) =>
+                setTipo(e.target.value as TipoCentroSoportado)
+              }
             >
               <option value="CentroCostos">Centro de Costos</option>
               <option value="CentrosOperativos">Centro Operativo</option>
-              {/* Cuando tengas la lista de UN:
-                <option value="UnidadNegocio">Unidad de Negocio</option>
-              */}
+
+              {/* ⭐ Ya podemos activar Unidad de Negocio */}
+              <option value="UnidadNegocio">Unidad de Negocio</option>
             </select>
           </label>
 
-          {/* Nombre (Title en SP) */}
+          {/* Nombre (Title) */}
           <label>
             Nombre:
             <input
@@ -82,7 +118,7 @@ const CentroModal: React.FC<CentroModalProps> = ({ isOpen, onClose, onSave }) =>
             />
           </label>
 
-          {/* Código (campo Codigo en SP) */}
+          {/* Código */}
           <label>
             Código:
             <input
@@ -103,6 +139,7 @@ const CentroModal: React.FC<CentroModalProps> = ({ isOpen, onClose, onSave }) =>
             >
               {loading ? "Guardando..." : "Guardar"}
             </button>
+
             <button
               type="button"
               onClick={onClose}
@@ -111,6 +148,7 @@ const CentroModal: React.FC<CentroModalProps> = ({ isOpen, onClose, onSave }) =>
               Cancelar
             </button>
           </div>
+
         </form>
       </div>
     </div>

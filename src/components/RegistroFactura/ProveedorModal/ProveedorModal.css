@@ -67,7 +67,7 @@
   cursor: pointer;
   transition: transform .05s ease, filter .15s ease, box-shadow .18s ease, border-color .15s;
 }
-.modal-buttons .btn-cancelar:hover{ border-color: var(--bd-strong, #d1d5db); box-shadow: 0 0 0 4px var(--ring, rgba(59,130,246,.15)); }
+.modal-buttons .btn-cancelar:hover{ border-color: var(--bd-strong, #4679c4); box-shadow: 0 0 0 4px var(--ring, rgba(59,130,246,.15)); }
 .modal-buttons .btn-cancelar:active{ transform: translateY(1px); }
 
 /* Texto de error */

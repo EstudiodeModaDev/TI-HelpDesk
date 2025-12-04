@@ -1,5 +1,12 @@
 // ============================================================
-// Hook unificado para manejar Centros (Costos / Operativos)
+// Hook unificado para manejar Centros:
+//   ✔ CentroCostos
+//   ✔ CentrosOperativos
+//   ✔ UnidadNegocio
+//
+// - Expone agregarCentro()
+// - Expone refreshFlag para que otros hooks reactiven sus cargas.
+// - Usa GraphRest + CentrosFacturaService.
 // ============================================================
 
 import { useState } from "react";
@@ -8,32 +15,45 @@ import { useAuth } from "../auth/authContext";
 import type { CentroFactura, TipoCentro } from "../Models/CentroFactura";
 import { CentrosFacturaService } from "../Services/CentrosFactura.service";
 
+// ⭐ Permitimos TODOS los tipos soportados por el servicio
 export type TipoCentroSoportado = Extract<
   TipoCentro,
-  "CentroCostos" | "CentrosOperativos"
+  "CentroCostos" | "CentrosOperativos" | "UnidadNegocio"
 >;
 
 export const useCentrosFactura = () => {
   const { getToken } = useAuth();
 
+  // Estado común para cualquier tipo de centro
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [centros, setCentros] = useState<CentroFactura[]>([]);
 
-  // ⭐ NUEVO: indicador global de refresco
+  // ⭐ Esta bandera permite que todos los hooks externos (CC/CO/UN)
+  //   actualicen automáticamente sus listas cuando se agrega un nuevo centro.
   const [refreshFlag, setRefreshFlag] = useState(0);
 
+  // ============================================================
+  // Crear el servicio según el tipo solicitado
+  // ============================================================
   const crearService = (tipo: TipoCentroSoportado) => {
     const graph = new GraphRest(getToken);
     return new CentrosFacturaService(graph, tipo);
   };
 
+  // ============================================================
+  // Obtener lista desde SharePoint según el tipo
+  // ============================================================
   const cargarCentros = async (tipo: TipoCentroSoportado) => {
     setLoading(true);
     setError(null);
+
     try {
       const service = crearService(tipo);
+
+      // Obtener lista ordenada por nombre (Title)
       const lista = await service.getAll({ orderby: "Title" });
+
       setCentros(lista);
     } catch (e: any) {
       console.error("Error cargando centros:", e);
@@ -43,20 +63,26 @@ export const useCentrosFactura = () => {
     }
   };
 
+  // ============================================================
+  // Crear un centro en SP y refrescar automáticamente
+  // ============================================================
   const agregarCentro = async (
     tipo: TipoCentroSoportado,
     centro: { Title: string; Codigo: string }
   ) => {
     setLoading(true);
     setError(null);
+
     try {
       const service = crearService(tipo);
+
+      // Crear el registro en SP
       await service.add(centro);
 
-      // ✔ REFRESCA la lista del tipo recién creado
+      // Volver a cargar la lista del tipo actual
       await cargarCentros(tipo);
 
-      // ⭐ NUEVO: avisar globalmente que hay un nuevo centro
+      // ⭐ Notificar globalmente a CC/CO/UN que deben recargarse
       setRefreshFlag(Date.now());
 
     } catch (e: any) {
@@ -67,14 +93,18 @@ export const useCentrosFactura = () => {
     }
   };
 
+  // ============================================================
+  // Retorno del hook listo para cualquier componente
+  // ============================================================
   return {
-    centros,
+    centros,      // Última lista consultada (según tipo)
     loading,
     error,
+
     cargarCentros,
     agregarCentro,
 
-    // ⭐ NUEVO: bandera de refresco para que otros hooks actualicen listas
+    // ⭐ Todos los hooks dependientes deben escuchar esta bandera
     refreshFlag,
   };
 };
