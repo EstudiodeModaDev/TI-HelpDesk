@@ -362,3 +362,42 @@
   box-shadow: 0 0 0 4px var(--ring);
   border-color: color-mix(in oklab, var(--primary) 55%, var(--bd) 45%);
 }
+
+.html-trunc {
+  max-width: 100%;
+  overflow: hidden;
+  word-wrap: break-word;
+  white-space: normal;
+}
+
+/* Obliga a que cualquier HTML QUE VENGA respete el ancho */
+.html-trunc * {
+  max-width: 100% !important;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  white-space: normal !important;
+}
+
+/* Si vienen imágenes grandes, las escala */
+.html-trunc img {
+  max-width: 100% !important;
+  height: auto !important;
+  display: block;
+}
+
+/* Si vienen tablas gigantes */
+.html-trunc table {
+  width: 100% !important;
+  table-layout: fixed;
+}
+
+.html-trunc td, 
+.html-trunc th {
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+/* Evitar que un <p> tenga márgenes enormes */
+.html-trunc p {
+  margin: 4px 0 !important;
+}
