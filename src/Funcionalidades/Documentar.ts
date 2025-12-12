@@ -8,7 +8,6 @@ import type { AccountInfo } from "@azure/msal-browser";
 import { FlowClient } from "./FlowClient";
 import type { FlowToUser } from "../Models/FlujosPA";
 import type { ComprasService } from "../Services/Compras.service";
-import { norm } from "../utils/Commons";
 
 type Svc = { Tickets?: TicketsService; Logs: LogService; ComprasSvc: ComprasService };
 
@@ -72,8 +71,7 @@ export function useDocumentarTicket(services: Svc) {
       // 2) Si es solución, cerrar ticket con estado correcto
       if (tipo === "solucion") {
         if (!Tickets) throw new Error("Servicio Tickets no disponible.");
-          const estadoActual = norm(ticket.Estadodesolicitud ?? "");
-          const nuevoEstado = estadoActual === "en atencion" ? "Cerrado" : "Cerrado fuera de tiempo";
+          const nuevoEstado = ticket.Estadodesolicitud === "En Atención" ? "Cerrado" : "Cerrado fuera de tiempo";
           alert("Caso cerrado. Enviando notificación al solicitante")
           await Tickets.update(ticket.ID!, { Estadodesolicitud: nuevoEstado });
           const casodecompra = await ComprasSvc.getAll({filter:  `fields/IdCreado eq '${ticket.ID}'`})
