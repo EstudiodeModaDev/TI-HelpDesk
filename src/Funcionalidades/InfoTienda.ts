@@ -1,11 +1,9 @@
 import React from "react";
-import type { GetAllOpts } from "../Models/Commons";
 import type { InternetTiendasService } from "../Services/InternetTiendas.service";
 import type { InfoInternetTienda, InternetTiendas } from "../Models/Internet";
 import type { SociedadesService } from "../Services/Sociedades.service";
 
 
-const escOData = (s: string) => `'${String(s).replace(/'/g, "''")}'`;
 
 /** Carga un diccionario nombreEmpresa -> NIT, consultando por lotes */
   async function getCompaniesMapByIds(CompaniesSvc: SociedadesService, ids: Array<string | number>,concurrency = 8): Promise<Record<string, string>> {
@@ -94,43 +92,45 @@ const escOData = (s: string) => `'${String(s).replace(/'/g, "''")}'`;
     return map;
   }
 
-
 export function useInfoInternetTiendas(InfoInternetSvc: InternetTiendasService, CompaniesSvc: SociedadesService) {
+  const [allRows, setAllRows] = React.useState<InfoInternetTienda[]>([]);
   const [rows, setRows] = React.useState<InfoInternetTienda[]>([]);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const [query, setQuery] = React.useState("");
 
-  const buildFilter = React.useCallback((): GetAllOpts => {
-    const q = query.trim().toLowerCase();
-    if (q.length < 2) return { top: 0 };
+  const norm = React.useCallback((s: unknown) => {return String(s ?? "").trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");}, []);
 
-    const qEsc = escOData(q);
-    const filters = [
-      `startswith(fields/Tienda, ${qEsc})`,
-      `startswith(fields/CORREO, ${qEsc})`,
-      `startswith(fields/IDENTIFICADOR, ${qEsc})`,
-    ];
+  const applyClientFilter = React.useCallback((qRaw: string, base: InfoInternetTienda[]) => {
+      const q = norm(qRaw);
 
-    return {
-      filter: filters.join(" or "),
-      top: 150,
-    };
-  }, [query]);
+      if (q.length < 2) return base;
+
+      return base.filter((r) => {
+        return (
+          norm(r.Tienda).includes(q) ||
+          norm(r.Correo).includes(q) ||
+          norm(r.Identificador).includes(q)
+        );
+      });
+    },
+    [norm]
+  );
+
+  const buildFilter = React.useCallback(() => {
+    return { top: 5000 };
+  }, []);
 
   const loadQuery = React.useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-
-      const  items: InternetTiendas[]  = await InfoInternetSvc.getAll(buildFilter()); 
-
-      const companyNames = items.map(r => r.Compa_x00f1__x00ed_a ?? "");
+      const items: InternetTiendas[] = await InfoInternetSvc.getAll(buildFilter());
+      const companyNames = items.map((r) => r.Compa_x00f1__x00ed_a ?? "");
       const companiesMap = await getCompaniesMapByIds(CompaniesSvc, companyNames);
-      const companiesName = await getNamesCompaniesMapByIds(CompaniesSvc, companyNames)
+      const companiesName = await getNamesCompaniesMapByIds(CompaniesSvc, companyNames);
 
-      // 3) Mapear a tu modelo normalizado
-      const view: InfoInternetTienda[] = items.map(r => ({
+      const view: InfoInternetTienda[] = items.map((r) => ({
         ID: r.ID,
         Ciudad: r.Title ?? "N/A",
         CentroComercial: r.Centro_x0020_Comercial ?? "N/A",
@@ -142,22 +142,29 @@ export function useInfoInternetTiendas(InfoInternetSvc: InternetTiendasService, 
         Direccion: r.DIRECCI_x00d3_N ?? "N/A",
         Local: r.Local ?? "N/A",
         Nota: r.Nota ?? "N/A",
-        ComparteCon: r.Nota ?? "N/A", // si es otra columna, cámbiala aquí
+        ComparteCon: r.Nota ?? "N/A",
         Nit: companiesMap[(r.Compa_x00f1__x00ed_a ?? "").trim()] ?? "N/A",
-        Sociedad: companiesName[(r.Compa_x00f1__x00ed_a ?? "").trim()] ?? "N/A",   
+        Sociedad: companiesName[(r.Compa_x00f1__x00ed_a ?? "").trim()] ?? "N/A",
       }));
 
-      setRows(view);
+      setAllRows(view);
+      setRows(applyClientFilter(query, view));
     } catch (e: any) {
       setError(e?.message ?? "Error cargando tiendas");
+      setAllRows([]);
       setRows([]);
     } finally {
       setLoading(false);
     }
-  }, [InfoInternetSvc, CompaniesSvc, buildFilter]);
+  }, [InfoInternetSvc, CompaniesSvc, buildFilter, applyClientFilter, query]);
+
+  // Re-filtra cuando cambie el query (sin llamar al servidor)
+  React.useEffect(() => {
+    setRows(applyClientFilter(query, allRows));
+  }, [query, allRows, applyClientFilter]);
 
   return {
-    // datos visibles (solo la página actual)
+    // datos visibles
     rows,
     loading,
     error,
@@ -166,5 +173,8 @@ export function useInfoInternetTiendas(InfoInternetSvc: InternetTiendasService, 
     // acciones
     setQuery,
     loadQuery,
+
+    // opcional: por si quieres acceder al dataset completo
+    allRows,
   };
 }
