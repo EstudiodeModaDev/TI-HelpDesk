@@ -16,6 +16,7 @@ import type { LogService } from "../Services/Log.service";
 import { useAuth } from "../auth/authContext";
 import { pickTecnicoConMenosCasos } from "../utils/Commons";
 import type { UsuariosSP } from "../Models/Usuarios";
+import type { Ticket } from "../Models/Tickets";
 
 
 type Svc = {
@@ -381,13 +382,14 @@ export function useNuevoUsuarioTicketForm(services: Svc) {
       const resolutor = await pickTecnicoConMenosCasos(Usuarios);
       console.log(resolutor);
 
-      const payload = {
+      const payload: Ticket = {
         Title: state.motivo,
         Descripcion: state.descripcion,
         FechaApertura: aperturaISO,
         TiempoSolucion: tiempoSolISO,
         Nombreresolutor: resolutor?.Title,
-        Correoresolutor: resolutor?.Correo,
+        CorreoResolutor: resolutor?.Correo,
+        IdResolutor: resolutor?.Id,
         Solicitante: account?.name,
         CorreoSolicitante: account?.username,
         Estadodesolicitud: "En Atención",
