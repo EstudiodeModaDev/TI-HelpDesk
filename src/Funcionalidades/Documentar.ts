@@ -48,6 +48,10 @@ export function useDocumentarTicket(services: Svc) {
     e.preventDefault();
     if (!validate()) return;
     setSubmitting(true);
+    if(!ticket.Categoria){
+      alert("No puedes hacer ninguna acción en el ticket antes de categorizarlo")
+      return
+    }
     try {
       const soluciones = await Logs.getAll({filter: `fields/Title eq ${ticket.ID} and fields/Tipo_de_accion eq 'Solucion'`})
       if(soluciones.length > 0 && tipo === "solucion"){
