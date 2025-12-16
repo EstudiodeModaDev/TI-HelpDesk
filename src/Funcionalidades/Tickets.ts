@@ -1,23 +1,27 @@
 import React from "react";
 import type { SortDir, SortField, Ticket, ticketOption } from "../Models/Tickets";
 import { TicketsService } from "../Services/Tickets.service";
-import type { DateRange,  } from "../Models/Filtros";
+import type { DateRange } from "../Models/Filtros";
 import { toISODateFlex } from "../utils/Date";
 import type { GetAllOpts } from "../Models/Commons";
 import type { RelacionadorState } from "../Models/nuevoTicket";
 import { FlowClient } from "./FlowClient";
 import { fileToBasePA64 } from "../utils/Commons";
 import type { MasiveFlow } from "../Models/FlujosPA";
+import type { GraphRest } from "../graph/GraphRest";
+
+
+
+const Tiendas_group = "e06961ff-6886-450d-a97f-48c3c3a55233";
 
 export function parseDDMMYYYYHHMM(fecha?: string | null): Date {
   if (!fecha) return new Date(NaN);
   const [dmy, hm] = fecha.trim().split(/\s+/);
   if (!dmy || !hm) return new Date(NaN);
-  const [d, m, y] = dmy.split('/');
-  const [H, M] = hm.split(':');
+  const [d, m, y] = dmy.split("/");
+  const [H, M] = hm.split(":");
   if (!d || !m || !y || !H || !M) return new Date(NaN);
-  // Construimos ISO local (sin zona); JS lo interpreta en local.
-  const iso = `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}T${H.padStart(2, '0')}:${M.padStart(2, '0')}`;
+  const iso = `${y}-${m.padStart(2, "0")}-${d.padStart(2, "0")}T${H.padStart(2, "0")}:${M.padStart(2, "0")}`;
   const dt = new Date(iso);
   return isNaN(dt.getTime()) ? new Date(NaN) : dt;
 }
@@ -26,13 +30,10 @@ export function parseFechaFlex(fecha?: string): Date {
   if (!fecha) return new Date(NaN);
   const t = fecha.trim();
 
-  // 1) YYYY-MM-DD HH:mm  o  YYYY-MM-DDTHH:mm  (lo más común desde Graph/SharePoint)
   if (/^\d{4}-\d{2}-\d{2}/.test(t)) {
-    // normaliza el espacio a 'T' para que Date lo entienda mejor
-    return new Date(t.replace(' ', 'T'));
+    return new Date(t.replace(" ", "T"));
   }
 
-  // 2) DD/MM/YYYY HH:mm  (tu formato anterior)
   const m = t.match(/^(\d{2})\/(\d{2})\/(\d{4})\s+(\d{2}):(\d{2})$/);
   if (m) {
     const [, dd, mm, yyyy, HH, MM] = m;
@@ -43,114 +44,198 @@ export function parseFechaFlex(fecha?: string): Date {
 }
 
 export function calcularColorEstado(ticket: Ticket): string {
-  const estado = (ticket.Estadodesolicitud ?? '').toLowerCase();
+  const estado = (ticket.Estadodesolicitud ?? "").toLowerCase();
 
-  if (estado === 'cerrado' || estado === 'cerrado fuera de tiempo') {
-    return 'rgba(0,0,0,1)'; // negro para cerrados
+  if (estado === "cerrado" || estado === "cerrado fuera de tiempo") {
+    return "rgba(0,0,0,1)";
   }
 
   if (!ticket.FechaApertura || !ticket.TiempoSolucion) {
-    return 'rgba(255,0,0,1)'; // rojo si faltan fechas
+    return "rgba(255,0,0,1)";
   }
 
   const inicio = parseFechaFlex(ticket.FechaApertura).getTime();
-  const fin    = parseFechaFlex(ticket.TiempoSolucion).getTime();
-  const ahora  = Date.now();
+  const fin = parseFechaFlex(ticket.TiempoSolucion).getTime();
+  const ahora = Date.now();
 
   if (isNaN(inicio) || isNaN(fin)) {
-    return 'rgba(255,0,0,1)'; // rojo si fechas inválidas
+    return "rgba(255,0,0,1)";
   }
 
-  const horasTotales   = (fin - inicio) / 3_600_000;
-  const horasRestantes = (fin - ahora)  / 3_600_000;
+  const horasTotales = (fin - inicio) / 3_600_000;
+  const horasRestantes = (fin - ahora) / 3_600_000;
 
-  // vencido o duración inválida => rojo
   if (horasTotales <= 0 || horasRestantes <= 0) {
-    return 'rgba(255,0,0,1)';
+    return "rgba(255,0,0,1)";
   }
 
-  // p = % de tiempo restante
   const p = Math.max(0, Math.min(1, horasRestantes / horasTotales));
 
-  // >50% verde, 10–50% amarillo/naranja, <10% rojo
-  const r = p > 0.5 ? 34  : p > 0.1 ? 255 : 255;
-  const g = p > 0.5 ? 139 : p > 0.1 ? 165 :   0;
-  const b = p > 0.5 ? 34  : p > 0.1 ?   0 :   0;
+  const r = p > 0.5 ? 34 : p > 0.1 ? 255 : 255;
+  const g = p > 0.5 ? 139 : p > 0.1 ? 165 : 0;
+  const b = p > 0.5 ? 34 : p > 0.1 ? 0 : 0;
 
-  const alpha = Math.max(0.3, 1 - p); // más visible cuando queda poco
-
+  const alpha = Math.max(0.3, 1 - p);
   return `rgba(${r},${g},${b},${alpha})`;
 }
 
-export function useTickets(TicketsSvc: TicketsService, userMail: string, isAdmin: boolean) {
+export function useTickets(graph: GraphRest, TicketsSvc: TicketsService, userMail: string, role: string) {
   const [rows, setRows] = React.useState<Ticket[]>([]);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const [filterMode, setFilterMode] = React.useState<string>("En curso");
   const today = React.useMemo(() => toISODateFlex(new Date()), []);
   const [range, setRange] = React.useState<DateRange>({ from: today, to: today });
-  const [pageSize, setPageSize] = React.useState<number>(10); // = $top
-  const [pageIndex, setPageIndex] = React.useState<number>(1); // 1-based
+  const [pageSize, setPageSize] = React.useState<number>(10);
+  const [pageIndex, setPageIndex] = React.useState<number>(1);
   const [nextLink, setNextLink] = React.useState<string | null>(null);
-  const [sorts, setSorts] = React.useState<Array<{field: SortField; dir: SortDir}>>([{ field: 'id', dir: 'desc' }]);
-  const [state, setState] = React.useState<RelacionadorState>({TicketRelacionar: null});
-  const [ticketsAbiertos, setTicketsAbiertos] = React.useState<number>(0)
-  const [ticketsFueraTiempo, setTicketsFueraTiempo] = React.useState<number>(0)
-
+  const [sorts, setSorts] = React.useState<Array<{ field: SortField; dir: SortDir }>>([{ field: "id", dir: "desc" }]);
+  const [state, setState] = React.useState<RelacionadorState>({ TicketRelacionar: null });
+  const [ticketsAbiertos, setTicketsAbiertos] = React.useState<number>(0);
+  const [ticketsFueraTiempo, setTicketsFueraTiempo] = React.useState<number>(0);
   const setField = <K extends keyof RelacionadorState>(k: K, v: RelacionadorState[K]) => setState((s) => ({ ...s, [k]: v }));
+  const notifyFlow = new FlowClient("https://defaultcd48ecd97e154f4b97d9ec813ee42b.2c.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/c6d30061fb55449798cbdb76da3172e5/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=n-NqCPMlsQaZ9PDJyG6f9hLmkTtHvRjybLqc9Ilk8eM");
+  const sortFieldToOData: Record<SortField, string> = {
+    id: "Id",
+    FechaApertura: "fields/FechaApertura",
+    TiempoSolucion: "fields/TiempoSolucion",
+    Title: "fields/Title",
+    resolutor: "fields/Nombreresolutor",
+  };
 
-   const notifyFlow = new FlowClient("https://defaultcd48ecd97e154f4b97d9ec813ee42b.2c.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/c6d30061fb55449798cbdb76da3172e5/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=n-NqCPMlsQaZ9PDJyG6f9hLmkTtHvRjybLqc9Ilk8eM")
-  
+  const [zoneEmails, setZoneEmails] = React.useState<string[]>([]);
 
-  // construir filtro OData
+  const loadGroupEmails = React.useCallback(async () => {
+    const isJefeZona = role === "Jefe de zona";
+    if (!isJefeZona) {
+      setZoneEmails([]);
+      return;
+    }
+    try {
+      const out = new Set<string>();
+
+      const collect = (value: any[]) => {
+        for (const m of value ?? []) {
+          const mail = String(m?.mail ?? "").trim().toLowerCase();
+          const upn = String(m?.userPrincipalName ?? "").trim().toLowerCase();
+          const picked = mail || upn;
+          if (picked) out.add(picked);
+        }
+      };
+
+      // 1) primera página
+      let page = await graph.get<any>(
+        `/groups/${Tiendas_group}/members?$select=mail,userPrincipalName&$top=999`
+      );
+      collect(page?.value);
+
+      // 2) paginación por nextLink (absoluto)
+      while (page?.["@odata.nextLink"]) {
+        page = await graph.getAbsolute<any>(page["@odata.nextLink"]);
+        collect(page?.value);
+      }
+
+      setZoneEmails(Array.from(out).sort());
+    } catch (e: any) {
+      // si falla, no rompas la vista; solo no aplica el extra
+      setZoneEmails([]);
+      console.warn("[Tickets] No se pudo cargar miembros del grupo:", e?.message ?? e);
+    } finally {
+    }
+  }, [graph, role]);
+
+  React.useEffect(() => {
+    let cancel = false;
+    (async () => {
+      if (cancel) return;
+      await loadGroupEmails();
+    })();
+    return () => {
+      cancel = true;
+    };
+  }, [loadGroupEmails]);
+
   const buildFilter = React.useCallback((): GetAllOpts => {
     const filters: string[] = [];
+    const isAdmin = role === "Administrador" || (userMail !== "listo@estudiodemoda.com.co");
+    const isJefeZona = role === "Jefe de zona";
 
-    if (!isAdmin ) {
-      const emailSafe = userMail.replace(/'/g, "''");
-      filters.push(`(fields/CorreoSolicitante eq '${emailSafe}' or fields/CorreoObservador eq '${emailSafe}' or fields/Correoresolutor eq '${emailSafe}')`);
+    if (!isAdmin) {
+      const emailSafe = String(userMail ?? "").replace(/'/g, "''");
+
+      // Siempre: mis tickets (incluye Jefe de zona)
+      const myVisibility =
+        `(fields/CorreoSolicitante eq '${emailSafe}' or ` +
+        `fields/CorreoObservador eq '${emailSafe}' or ` +
+        `fields/Correoresolutor eq '${emailSafe}')`;
+
+      // Extra: solicitantes del grupo (solo Jefe de zona)
+      let zoneVisibility = "";
+      if (isJefeZona) {
+        const MAX_OR = 25;
+
+        const safeGroupEmails = (zoneEmails ?? [])
+          .map((e) => String(e ?? "").trim().toLowerCase())
+          .filter(Boolean)
+          .filter((e) => e !== String(userMail ?? "").trim().toLowerCase())
+          .slice(0, MAX_OR)
+          .map((e) => e.replace(/'/g, "''"));
+
+        if (safeGroupEmails.length > 0) {
+          zoneVisibility = `(${safeGroupEmails
+            .map((e) => `fields/CorreoSolicitante eq '${e}'`)
+            .join(" or ")})`;
+        }
+      }
+
+      // OR: mis tickets + tickets zona
+      if (zoneVisibility) filters.push(`(${myVisibility} or ${zoneVisibility})`);
+      else filters.push(myVisibility);
     }
 
+    // estado (igual)
     if (filterMode === "En curso") {
       filters.push(`(fields/Estadodesolicitud eq 'En atención' or fields/Estadodesolicitud eq 'Fuera de tiempo')`);
     } else if (filterMode === "Todos") {
-
+      // nada
     } else {
       filters.push(`startswith(fields/Estadodesolicitud,'Cerrado')`);
     }
 
-    if (range.from && range.to && (range.from < range.to)) {
+    // rango (igual)
+    if (range.from && range.to && range.from < range.to) {
       if (range.from) filters.push(`fields/FechaApertura ge '${range.from}T00:00:00Z'`);
-      if (range.to)   filters.push(`fields/FechaApertura le '${range.to}T23:59:59Z'`);
+      if (range.to) filters.push(`fields/FechaApertura le '${range.to}T23:59:59Z'`);
     }
 
-    // ← NUEVO: construir orderby desde 'sorts'
+    // orderby (igual)
     const orderParts: string[] = sorts
-      .map(s => {
+      .map((s) => {
         const col = sortFieldToOData[s.field];
-        return col ? `${col} ${s.dir}` : '';
+        return col ? `${col} ${s.dir}` : "";
       })
       .filter(Boolean);
 
-    // Estabilidad de orden: si no incluiste 'id', agrega 'id desc' como desempate.
-    if (!sorts.some(s => s.field === 'id')) {
-      orderParts.push('ID desc');
-    }
+    if (!sorts.some((s) => s.field === "id")) orderParts.push("ID desc");
+
     return {
       filter: filters.join(" and "),
       orderby: orderParts.join(","),
       top: pageSize,
     };
-  }, [isAdmin, userMail, filterMode, range.from, range.to, pageSize, sorts]); 
+  }, [role, userMail, filterMode, range.from, range.to, pageSize, sorts, zoneEmails]);
 
   const toTicketOptions = React.useCallback(
-    async (opts?: {includeIdInLabel?: boolean; fallbackIfEmptyTitle?: string; idPrefix?: string; top?: number; orderby?: string;}): Promise<ticketOption[]> => {
-      const {includeIdInLabel = true, fallbackIfEmptyTitle = "(Sin título)", idPrefix = "#",} = opts ?? {};
+    async (opts?: { includeIdInLabel?: boolean; fallbackIfEmptyTitle?: string; idPrefix?: string; top?: number; orderby?: string }): Promise<ticketOption[]> => {
+      const { includeIdInLabel = true, fallbackIfEmptyTitle = "(Sin título)", idPrefix = "#" } = opts ?? {};
 
       const seen = new Set<string>();
-      const { items, nextLink } = await TicketsSvc.getAll({orderby: "id desc"});;
-      console.log(nextLink)
-      const result = items.filter((t: any) => t && t.ID != null).map((t: any): ticketOption => {
+      const { items, nextLink } = await TicketsSvc.getAll({ orderby: "id desc" });
+      console.log(nextLink);
+
+      const result = items
+        .filter((t: any) => t && t.ID != null)
+        .map((t: any): ticketOption => {
           const id = String(t.ID);
           const title = (t.Title ?? "").trim() || fallbackIfEmptyTitle;
           const label = includeIdInLabel ? `${title} — ID: ${idPrefix}${id}` : title;
@@ -168,9 +253,10 @@ export function useTickets(TicketsSvc: TicketsService, userMail: string, isAdmin
   );
 
   const loadFirstPage = React.useCallback(async () => {
-    setLoading(true); setError(null);
+    setLoading(true);
+    setError(null);
     try {
-      const { items, nextLink } = await TicketsSvc.getAll(buildFilter()); // debe devolver {items,nextLink}
+      const { items, nextLink } = await TicketsSvc.getAll(buildFilter());
       setRows(items);
       setNextLink(nextLink ?? null);
       setPageIndex(1);
@@ -185,12 +271,17 @@ export function useTickets(TicketsSvc: TicketsService, userMail: string, isAdmin
   }, [TicketsSvc, buildFilter, sorts]);
 
   const loadCantidadResolutor = React.useCallback(async () => {
-    setLoading(true); setError(null);
+    setLoading(true);
+    setError(null);
     try {
-      const { items: itemsAbiertos } = await TicketsSvc.getAll({filter: `(fields/CorreoSolicitante eq '${userMail}' or fields/CorreoObservador eq '${userMail}' or fields/Correoresolutor eq '${userMail}') and fields/Estadodesolicitud eq 'En Atención'`});
-      const { items: itemsFueraTiempo } = await TicketsSvc.getAll({filter: `(fields/CorreoSolicitante eq '${userMail}' or fields/CorreoObservador eq '${userMail}' or fields/Correoresolutor eq '${userMail}') and fields/Estadodesolicitud eq 'Fuera de tiempo'`});
-      setTicketsAbiertos(itemsAbiertos.length)
-      setTicketsFueraTiempo(itemsFueraTiempo.length)
+      const { items: itemsAbiertos } = await TicketsSvc.getAll({
+        filter: `(fields/CorreoSolicitante eq '${userMail}' or fields/CorreoObservador eq '${userMail}' or fields/Correoresolutor eq '${userMail}') and fields/Estadodesolicitud eq 'En Atención'`,
+      });
+      const { items: itemsFueraTiempo } = await TicketsSvc.getAll({
+        filter: `(fields/CorreoSolicitante eq '${userMail}' or fields/CorreoObservador eq '${userMail}' or fields/Correoresolutor eq '${userMail}') and fields/Estadodesolicitud eq 'Fuera de tiempo'`,
+      });
+      setTicketsAbiertos(itemsAbiertos.length);
+      setTicketsFueraTiempo(itemsFueraTiempo.length);
     } catch (e: any) {
       setError(e?.message ?? "Error cargando tickets");
       setRows([]);
@@ -211,10 +302,9 @@ export function useTickets(TicketsSvc: TicketsService, userMail: string, isAdmin
         } else if (type === "hijo") {
           await TicketsSvc.update(String(relatedId), { IdCasoPadre: String(actualId) });
         } else {
-          // "masiva": deja definido qué harás aquí
           throw new Error("Relación 'masiva' aún no implementada");
         }
-        return true;  // éxito
+        return true;
       } catch (e: any) {
         setError(e?.message ?? "Error actualizando relación del ticket");
         return false;
@@ -227,36 +317,39 @@ export function useTickets(TicketsSvc: TicketsService, userMail: string, isAdmin
 
   React.useEffect(() => {
     loadFirstPage();
-    loadCantidadResolutor()
+    loadCantidadResolutor();
   }, [loadFirstPage, loadCantidadResolutor]);
 
-  const updateSelectedTicket = React.useCallback(async (id: string) => {
-    setLoading(true); setError(null);
-    try {
-      const ticket  = await TicketsSvc.get(id)
-      return ticket
-    } catch (e: any) {
-      setError(e?.message ?? "Error cargando tickets");
-      setRows([]);
-      setNextLink(null);
-      setPageIndex(1);
-    } finally {
-      setLoading(false);
-    }
-  }, [TicketsSvc, buildFilter, sorts]);
+  const updateSelectedTicket = React.useCallback(
+    async (id: string) => {
+      setLoading(true);
+      setError(null);
+      try {
+        const ticket = await TicketsSvc.get(id);
+        return ticket;
+      } catch (e: any) {
+        setError(e?.message ?? "Error cargando tickets");
+        setRows([]);
+        setNextLink(null);
+        setPageIndex(1);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [TicketsSvc, buildFilter, sorts]
+  );
 
-
-  // siguiente página: seguir el nextLink tal cual
   const hasNext = !!nextLink;
 
   const nextPage = React.useCallback(async () => {
     if (!nextLink) return;
-    setLoading(true); setError(null);
+    setLoading(true);
+    setError(null);
     try {
       const { items, nextLink: n2 } = await TicketsSvc.getByNextLink(nextLink);
-      setRows(items);              // 👈 reemplaza la página visible
-      setNextLink(n2 ?? null);     // null si no hay más
-      setPageIndex(i => i + 1);
+      setRows(items);
+      setNextLink(n2 ?? null);
+      setPageIndex((i) => i + 1);
     } catch (e: any) {
       setError(e?.message ?? "Error cargando más tickets");
     } finally {
@@ -264,61 +357,52 @@ export function useTickets(TicketsSvc: TicketsService, userMail: string, isAdmin
     }
   }, [nextLink, TicketsSvc]);
 
-  // recargas por cambios externos
-  const applyRange = React.useCallback(() => { loadFirstPage(); }, [loadFirstPage]);
-
-  const sortFieldToOData: Record<SortField, string> = {
-    id: 'Id',
-    FechaApertura: 'fields/FechaApertura',
-    TiempoSolucion: 'fields/TiempoSolucion',
-    Title: 'fields/Title',
-    resolutor: 'fields/Nombreresolutor',
-  };
+  const applyRange = React.useCallback(() => {
+    loadFirstPage();
+  }, [loadFirstPage]);
 
   const toggleSort = React.useCallback((field: SortField, additive = false) => {
-    setSorts(prev => {
-      const idx = prev.findIndex(s => s.field === field);
+    setSorts((prev) => {
+      const idx = prev.findIndex((s) => s.field === field);
       if (!additive) {
-        // clic normal: solo esta columna; alterna asc/desc
         if (idx >= 0) {
-          const dir: SortDir = prev[idx].dir === 'desc' ? 'asc' : 'desc';
+          const dir: SortDir = prev[idx].dir === "desc" ? "asc" : "desc";
           return [{ field, dir }];
         }
-        return [{ field, dir: 'asc' }];
+        return [{ field, dir: "asc" }];
       }
-      // Shift+clic: multi-columna
       if (idx >= 0) {
         const copy = [...prev];
-        copy[idx] = { field, dir: copy[idx].dir === 'desc' ? 'asc' : 'desc' };
+        copy[idx] = { field, dir: copy[idx].dir === "desc" ? "asc" : "desc" };
         return copy;
       }
-      return [...prev, { field, dir: 'asc' }];
+      return [...prev, { field, dir: "asc" }];
     });
   }, []);
 
-  async function sendFileToFlow(file: File, uploader?: string ) {
+  async function sendFileToFlow(file: File, uploader?: string) {
     const contentBase64 = await fileToBasePA64(file);
 
     const payload = {
-      uploader: uploader ?? "",      
+      uploader: uploader ?? "",
       file: {
         name: file.name,
         contentType: file.type || "application/octet-stream",
-        contentBase64
-      }
+        contentBase64,
+      },
     };
 
     try {
-      await notifyFlow.invoke<MasiveFlow, any>({file: payload.file,});
+      await notifyFlow.invoke<MasiveFlow, any>({ file: payload.file });
       setState((s) => ({ ...s, archivo: null }));
-      } catch (err) {
-       console.error("[Flow] Error enviando a solicitante:", err);
+    } catch (err) {
+      console.error("[Flow] Error enviando a solicitante:", err);
     }
   }
 
   return {
-    rows, ticketsAbiertos, loading, ticketsFueraTiempo, error, pageSize, pageIndex, hasNext, filterMode,sorts, range, state,
-    nextPage, setPageSize, setFilterMode, setRange, applyRange, loadFirstPage, toggleSort, setField, toTicketOptions, setState, handleConfirm, sendFileToFlow, updateSelectedTicket
+    rows, ticketsAbiertos, loading, ticketsFueraTiempo, error, pageSize, pageIndex, hasNext, filterMode, sorts, range, state,
+    nextPage, setPageSize, setFilterMode, setRange, applyRange, loadFirstPage, toggleSort, setField, toTicketOptions, setState, handleConfirm, sendFileToFlow, updateSelectedTicket,
   };
 }
 
@@ -339,7 +423,6 @@ export function useTicketsRelacionados(TicketsSvc: TicketsService, ticket: Ticke
     setError(null);
 
     try {
-      // --- Padre (si aplica) ---
       const idPadre = ticket.IdCasoPadre;
       if (idPadre != null && idPadre !== "") {
         const padreRes = await TicketsSvc.get(String(ticket.IdCasoPadre));
@@ -348,7 +431,6 @@ export function useTicketsRelacionados(TicketsSvc: TicketsService, ticket: Ticke
         setPadre(null);
       }
 
-      // --- Hijos ---
       const hijosRes = await TicketsSvc.getAll({
         filter: `fields/IdCasoPadre eq ${Number(ticket.ID)}`,
       });
@@ -364,12 +446,9 @@ export function useTicketsRelacionados(TicketsSvc: TicketsService, ticket: Ticke
 
   React.useEffect(() => {
     loadRelateds();
-  }, [loadRelateds])
+  }, [loadRelateds]);
 
   return {
-    padre, hijos,
-    loading,
-    error,
-    loadRelateds,
+    padre, hijos, loading, error, loadRelateds,
   };
 }

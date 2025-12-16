@@ -8,13 +8,14 @@ import type { UserOption } from "../../Models/Commons";
 import { useGraphServices } from "../../graph/GrapServicesContext";
 import { useNuevoTicketForm } from "../../Funcionalidades/NuevoTicket";
 import { useWorkers } from "../../Funcionalidades/Workers";
-import { useUsuarios } from "../../Funcionalidades/Usuarios";
+import { useUserRole, useUsuarios } from "../../Funcionalidades/Usuarios";
 import { UsuariosSPService } from "../../Services/Usuarios.Service";
 import type { TicketsService } from "../../Services/Tickets.service";
 import RichTextBase64 from "../RichTextBase64/RichTextBase64";
 import type { LogService } from "../../Services/Log.service";
 import { norm } from "../../utils/Commons";
 import RelacionadorMasiva from "../MasiveNonFather/masiva";
+import { useAuth } from "../../auth/authContext";
 
 export type UserOptionEx = UserOption & { source?: "Empleado" | "Franquicia" };
 export type TreeOption = {
@@ -36,6 +37,8 @@ export default function NuevoTicketForm() {
     Tickets: TicketsService;
     Logs: LogService
   };
+  const {account} = useAuth()
+  const userRole = useUserRole(account?.username)
   const {state, errors, submitting, categorias, subcategoriasAll, articulosAll, loadingCatalogos, setField, handleSubmit, balanceCharge} = useNuevoTicketForm({ Categorias, SubCategorias, Articulos, Tickets: TicketsSvc, Usuarios: UsuariosSPServiceSvc, Logs: LogsSvc});
   const { franqOptions, loading: loadingFranq, error: franqError } = useFranquicias(FranquiciasSvc!);
   const { workersOptions, loadingWorkers, error: usersError } = useWorkers({
@@ -151,7 +154,7 @@ export default function NuevoTicketForm() {
   return (
   <div className="ticket-form">
 
-    {masiva ? <RelacionadorMasiva onCancel={() => setMasiva(false)} userMail={""} isAdmin={true} currentId={""}/> : (
+    {masiva ? <RelacionadorMasiva onCancel={() => setMasiva(false)} userMail={account?.username ?? ""} role={userRole.role} currentId={""}/> : (
       <>
         <div className="form-header">
           <h2 className="tf-title">Nuevo Ticket</h2>

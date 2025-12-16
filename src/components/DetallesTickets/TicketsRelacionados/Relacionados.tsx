@@ -74,7 +74,7 @@ export default function TicketsAsociados({title = "Tickets Asociados", ticket, e
           {loadingOpts ? (
             <div className="ta-skeleton" style={{ height: 40 }} aria-hidden />
           ) : (
-            <RelacionadorInline currentId={Number(ticket.ID)} onCancel={closeRelacionador} userMail={""} isAdmin={true} reload={loadRelateds}/>
+            <RelacionadorInline currentId={Number(ticket.ID)} onCancel={closeRelacionador} userMail={userRole.role}  role="" reload={loadRelateds}/>
           )}
         </div>
       ) : (

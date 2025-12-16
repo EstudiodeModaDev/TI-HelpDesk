@@ -12,14 +12,14 @@ type Props = { currentId: number | string;
   onCancel: () => void;
   reload: () => void;
   userMail: string;
-  isAdmin: boolean;
+  role: string;
 };
 
-export default function RelacionadorInline({currentId, onCancel, userMail, isAdmin, reload}: Props) {
+export default function RelacionadorInline({currentId, onCancel, userMail, reload, role}: Props) {
   const [mode, setMode] = React.useState<Mode>("padre");
   const [tickets, setTickets] = React.useState<ticketOption[]>([]);
-  const { Tickets } = useGraphServices();
-  const {toTicketOptions, state, setField, handleConfirm, sendFileToFlow} = useTickets(Tickets, userMail, isAdmin);
+  const { Tickets, graph } = useGraphServices();
+  const {toTicketOptions, state, setField, handleConfirm, sendFileToFlow} = useTickets(graph, Tickets, userMail, role,);
 
   React.useEffect(() => {
     let alive = true;

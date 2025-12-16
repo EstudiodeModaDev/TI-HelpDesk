@@ -5,12 +5,12 @@ import { useTickets } from "../../Funcionalidades/Tickets";
 type Props = { currentId: number | string;
   onCancel: () => void;
   userMail: string;
-  isAdmin: boolean;
+  role: string;
 };
 
-export default function RelacionadorMasiva({onCancel, userMail, isAdmin}: Props) {
-  const { Tickets } = useGraphServices();
-  const {state, setField, sendFileToFlow} = useTickets(Tickets, userMail, isAdmin);
+export default function RelacionadorMasiva({onCancel, userMail, role}: Props) {
+  const { Tickets, graph } = useGraphServices();
+  const {state, setField, sendFileToFlow} = useTickets(graph, Tickets, userMail, role);
 
   const handleDownload = () => {
     const link = document.createElement("a");
