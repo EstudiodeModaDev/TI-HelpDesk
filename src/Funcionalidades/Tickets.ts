@@ -157,7 +157,7 @@ export function useTickets(graph: GraphRest, TicketsSvc: TicketsService, userMai
 
   const buildFilter = React.useCallback((): GetAllOpts => {
     const filters: string[] = [];
-    const isAdmin = role === "Administrador" || (userMail !== "listo@estudiodemoda.com.co");
+    const isAdmin = role === "Administrador" || (userMail === "listo@estudiodemoda.com.co");
     const isJefeZona = role === "Jefe de zona";
 
     if (!isAdmin) {
