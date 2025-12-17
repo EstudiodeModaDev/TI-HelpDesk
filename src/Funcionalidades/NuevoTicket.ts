@@ -388,7 +388,7 @@ export function useNuevoUsuarioTicketForm(services: Svc) {
         FechaApertura: aperturaISO,
         TiempoSolucion: tiempoSolISO,
         Nombreresolutor: resolutor?.Title,
-        CorreoResolutor: resolutor?.Correo,
+        Correoresolutor: resolutor?.Correo,
         IdResolutor: resolutor?.Id,
         Solicitante: account?.name,
         CorreoSolicitante: account?.username,
@@ -439,7 +439,7 @@ export function useNuevoUsuarioTicketForm(services: Svc) {
         }
 
         // Notificar resolutor    
-        if (ticketCreated?.CorreoResolutor) {
+        if (ticketCreated?.Correoresolutor) {
           const title = `Nuevo caso asignado - ${ticketCreated.ID}`;
           const message = `
           <p>¡Hola!<br><br>
@@ -454,7 +454,7 @@ export function useNuevoUsuarioTicketForm(services: Svc) {
           </p>`.trim();
 
           try {
-            await notifyFlow.invoke<FlowToUser, any>({recipient: ticketCreated.CorreoResolutor, title, message, mail: true,});
+            await notifyFlow.invoke<FlowToUser, any>({recipient: ticketCreated.Correoresolutor, title, message, mail: true,});
           } catch (err) {
             console.error("[Flow] Error enviando a resolutor:", err);
           }

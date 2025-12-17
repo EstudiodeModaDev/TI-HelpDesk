@@ -93,7 +93,7 @@ export class TicketsService {
       // Resolutor
       Nombreresolutor: f.Nombreresolutor ?? '',
       IdResolutor: f.IdResolutor ?? '',
-      CorreoResolutor: f.Correoresolutor ?? '',
+      Correoresolutor: f.Correoresolutor ?? '',
 
       // Solicitante
       Solicitante: f.Solicitante ?? '',

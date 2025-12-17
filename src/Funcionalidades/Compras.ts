@@ -339,7 +339,7 @@ export function useCompras(
         }
       }
 
-      if (ticketCreated?.CorreoResolutor) {
+      if (ticketCreated?.Correoresolutor) {
         const title = `Nuevo caso asignado - ${ticketCreated.ID}`;
         const message = `
         <p>¡Hola!<br><br>
@@ -359,7 +359,7 @@ export function useCompras(
 
         try {
           await notifyFlow.invoke<FlowToUser, any>({
-            recipient: ticketCreated.CorreoResolutor,
+            recipient: ticketCreated.Correoresolutor,
             title,
             message,
             mail: true,

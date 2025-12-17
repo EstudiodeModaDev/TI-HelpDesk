@@ -15,7 +15,7 @@ export type Ticket = {
   SubCategoria?: string;
   SubSubCategoria?: string;
   Fuente?: string;
-  CorreoResolutor?: string;
+  Correoresolutor?: string;
   CorreoSolicitante?: string;
   IdCasoPadre?: string;
   ANS?: string;

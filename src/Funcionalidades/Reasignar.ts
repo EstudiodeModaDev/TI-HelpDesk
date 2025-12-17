@@ -44,7 +44,7 @@ export function useReasignarTicket(services: Svc, ticket: Ticket) {
     setSubmitting(true);
     try {
       const candidatoMail = state.resolutor?.email?.trim();
-      const solicitanteMail = ticket?.CorreoResolutor;
+      const solicitanteMail = ticket?.Correoresolutor;
 
       if (!candidatoMail) throw new Error("No se proporcionó correo del candidato (resolutor).");
       if (!solicitanteMail) throw new Error("No se encontró correo del resolutor previo en el ticket.");

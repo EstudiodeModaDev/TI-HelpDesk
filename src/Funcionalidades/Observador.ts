@@ -42,7 +42,7 @@ export function useAsignarObservador(services: Svc, ticket: Ticket) {
       const payloadLog: Log = {
         Title: ticket.ID ?? "",
         Actor: ticket.Nombreresolutor ?? "",
-        CorreoActor: ticket.CorreoResolutor ?? "",
+        CorreoActor: ticket.Correoresolutor ?? "",
         Descripcion: `${ticket.Nombreresolutor} ha asignado como observador del ticket con ID #${ticket.ID} a ${state.observador?.label}`,
         Tipo_de_accion: "Asignacion observador",
       };

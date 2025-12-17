@@ -141,7 +141,7 @@ export function usePazSalvos(services: Svc) {
             alert("Se ha registrado la solicitud con éxito")
             const idTexto = String(ticketCreated.ID || "—");
             const fechaSolTexto = solucion ? new Date(solucion as unknown as string).toLocaleString() : "No aplica";
-            const resolutorEmail = ticketCreated.CorreoResolutor || "";
+            const resolutorEmail = ticketCreated.Correoresolutor || "";
             LogSvc.create({Actor: "Sitema", Descripcion:  `Se ha creado un nuevo ticket para el siguiente requerimiento: ${ticketCreated.Title}`,  Tipo_de_accion: "Creacion", Title: idTexto, CorreoActor: ""});   
             setState({Cargo: "", Cedula: "", CO: "", Empresa: "", Fechadeingreso: "", Fechadesalida: "", Jefe: "", Nombre: "", Title: "", Consecutivo: "", CorreoJefe: "", Correos: "", Solicitante: ""});
             setErrors({})
