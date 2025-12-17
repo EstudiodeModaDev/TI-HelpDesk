@@ -97,7 +97,7 @@ export default function DashboardDetallado() {
                   <SmallDonut value={r.porcentaje} />
                   <div className="res-meta">
                     <div className="res-name">{r.nombre}</div>
-                    <div className="res-sub">0.00%</div>
+                    <div className="res-sub"></div>
                   </div>
                 </div>
                 <div className="res-right">
