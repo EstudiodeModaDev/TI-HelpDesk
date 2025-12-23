@@ -116,9 +116,9 @@ export function useRecategorizarTicket(services: Svc, ticket: Ticket) {
     []
   );
 
-  const handleRecategorizar = async (e: React.FormEvent) => {
+  const handleRecategorizar = async (e: React.FormEvent): Promise<boolean> => {
     e.preventDefault();
-    if (!validate()) return;
+    if (!validate()) return false;
 
     setSubmitting(true);
     try {
@@ -137,18 +137,13 @@ export function useRecategorizarTicket(services: Svc, ticket: Ticket) {
 
       let solucionTZ: TZDate | null = null;
       if (horasAns > 0) {
-        solucionTZ = calcularFechaSolucion(apertura, horasAns, holidays); // TZDate | null
+        solucionTZ = calcularFechaSolucion(apertura, horasAns, holidays); 
       }
 
-      // Convierte TZDate -> Date normal para guardar en estado/mostrar
+      // Convierte TZDate -> Date normal
       const solucionDate = solucionTZ ? new Date(solucionTZ as unknown as string) : null;
       setFechaSolucion(solucionDate);
-
-      // Serializa para Graph/SharePoint (usa tu helper)
       const tiempoSolISO = solucionDate ? toGraphDateTime(solucionDate) : null;
-      // Si quieres forzar UTC string:
-      // const tiempoSolISO = solucionDate ? toUtcIso(solucionDate) : null;
-
       const payloadUpdate: Partial<Ticket> = {
         Categoria: state.categoria,
         SubCategoria: state.subcategoria,
@@ -159,6 +154,7 @@ export function useRecategorizarTicket(services: Svc, ticket: Ticket) {
 
       if (!Tickets?.update) {
         console.error("Tickets service no disponible. Verifica el GraphServicesProvider.");
+        return false
       } else {
         const updated = await Tickets.update(String(ticket.ID), payloadUpdate);
         console.log("Ticket actualizado:", updated);
@@ -194,12 +190,14 @@ export function useRecategorizarTicket(services: Svc, ticket: Ticket) {
             });
           } catch (err) {
             console.error("[Flow] Error enviando a resolutor:", err);
+            return false
           }
         }
 
         // Limpiar formulario
         setState({ categoria: "", subcategoria: "", articulo: "" });
         setErrors({});
+        return true
       }
     } finally {
       setSubmitting(false);

@@ -7,20 +7,12 @@ import { useRecategorizarTicket } from "../../../Funcionalidades/Recategorizar";
 import type { Ticket } from "../../../Models/Tickets";
 import { norm } from "../../../utils/Commons";
 import type { TreeOption } from "../../NuevoTicket/NuevoTicketForm";
+import { useAuth } from "../../../auth/authContext";
 
 export default function Recategorizar({ ticket, onDone}: { ticket: Ticket, onDone: () => void }) {
-  const {
-    Categorias,
-    SubCategorias,
-    Articulos,
-    Tickets: TicketsSvc,
-  } = useGraphServices() as ReturnType<typeof useGraphServices> & {
-    Tickets: TicketsService;
-  };
-
-  const {state, errors, submitting, categorias, subcategoriasAll, articulosAll, loadingCatalogos, setField, handleRecategorizar,
-    } = useRecategorizarTicket({ Categorias, SubCategorias, Articulos, Tickets: TicketsSvc }, ticket);
-
+  const {Categorias, SubCategorias, Articulos, Tickets: TicketsSvc, Logs} = useGraphServices() as ReturnType<typeof useGraphServices> & {Tickets: TicketsService;};
+  const {state, errors, submitting, categorias, subcategoriasAll, articulosAll, loadingCatalogos, setField, handleRecategorizar,} = useRecategorizarTicket({ Categorias, SubCategorias, Articulos, Tickets: TicketsSvc }, ticket);
+  const {account} = useAuth()
   const treeOptions: TreeOption[] = React.useMemo(() => {
     if (!categorias.length || !subcategoriasAll.length || !articulosAll.length) return [];
     const subById = new Map(subcategoriasAll.map(s => [String(s.ID), s]));
@@ -80,13 +72,31 @@ export default function Recategorizar({ ticket, onDone}: { ticket: Ticket, onDon
     setField("articulo", artTitle);
   };
 
+  const handleConfirm = async (e: React.FormEvent) => {
+    const canContinue = await handleRecategorizar(e);
+
+    if (!canContinue) return;
+
+    const newCategoriaBuilt = [state.categoria, state.subcategoria, state.articulo]
+      .filter(Boolean)
+      .join(" > ");
+
+    await Logs.create({
+      Actor: account?.name ?? "", 
+      CorreoActor: account?.username ?? "", 
+      Descripcion: "El resolutor cambió la categoría del ticket a: " + newCategoriaBuilt,
+      Tipo_de_accion: "Recategorización",
+      Title: String(ticket.ID ?? ""),
+    });
+  };
+
   const disabledCats = submitting || loadingCatalogos;
 
   return (
     <div className="dta-form">
       <h2 className="dta-title">Recategorizar Ticket</h2>
 
-      <form onSubmit={(e) => {handleRecategorizar(e); onDone()}} noValidate className="dta-grid">
+      <form onSubmit={(e) => {handleConfirm(e); onDone()}} noValidate className="dta-grid">
 
         {/* Categoría / Subcategoría / Artículo */}
           <div className="tf-row tf-row--cats tf-col-2"> 
