@@ -27,6 +27,7 @@
 /* =========================================================
    MODO DISTRIBUCIÓN + CONECTOR
    ========================================================= */
+
 .btn-distribucion{
   display: inline-flex;
   align-items: center;
@@ -50,6 +51,8 @@
   -webkit-tap-highlight-color: transparent;
 }
 
+/* Estados hover/active compartidos */
+
 .btn-volver:hover,
 .btn-cancelar:hover,
 .btn-nuevo-proveedor:hover,
@@ -68,7 +71,9 @@
   transform: translateY(1px);
 }
 
-/* Variantes por intención */
+/* =========================================================
+   VARIANTES DE BOTÓN
+   ========================================================= */
 
 .btn-volver{
   background: color-mix(in oklab, var(--field-bg) 94%, transparent);
@@ -101,39 +106,73 @@
   background: color-mix(in oklab, var(--surface-elev) 92%, var(--muted) 8%);
 }
 
-/* Bloque de fechas para el conector */
+/* =========================================================
+   FILA PROVEEDOR + BOTONES (NUEVO)
+   ========================================================= */
 
-.selector-fechas-container{
-  margin-top: 14px;
-  padding: 12px 14px;
-  border-radius: var(--radius, 18px);
-  border: 1px solid color-mix(in oklab, var(--border) 80%, transparent);
-  background: color-mix(in oklab, var(--surface-elev) 96%, transparent);
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0,1fr));
-  gap: 12px 16px;
+/* Contenedor que agrupa selector de proveedor y los dos botones */
+.fila-compra-proveedor{
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: flex-end;
+  margin-top: 8px;
 }
 
-.selector-label{
+/* Bloque principal: label+select + botones */
+.fila-compra-proveedor__proveedor{
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  width: 100%;
+}
+
+/* El campo de proveedor ocupa todo el ancho posible */
+.fila-compra-proveedor__proveedor .form-group__field{
+  flex: 1 1 auto;
   display: grid;
   gap: 4px;
-  font-size: .9rem;
 }
 
-.selector-label input[type="date"]{
-  background: var(--field-bg, #131a22);
-  color: var(--ink);
-  border-radius: 999px;
-  border: 1px solid var(--border, #1f2a36);
-  padding: 6px 12px;
-  font: inherit;
-}
-
-.selector-botones{
-  grid-column: 1 / -1;
+/* Botones "Nuevo proveedor" y "Nuevo C.C/C.O/U.N" */
+.form-group__btn{
   display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  height: 40px;
+  padding: 0 16px !important;
+}
+
+/* Por si aún usas .btn2 en algún punto, que se comporte como botón normal */
+.btn2{
+  display: inline-grid;
+  grid-auto-flow: column;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 14px;
+  border-radius: var(--radius, 18px);
+  border: 1px solid var(--border, #1f2a36);
+  background: color-mix(in oklab, var(--surface-elev) 92%, transparent);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* Responsive: en pantallas pequeñas los elementos se apilan ordenados */
+@media (max-width: 720px){
+  .fila-compra-proveedor{
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .fila-compra-proveedor__proveedor{
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .form-group__btn{
+    width: 100%;
+  }
 }
 
 /* =========================================================
@@ -169,7 +208,7 @@
   gap: 4px;
 }
 
-/* Inputs base (no pisa los de otros módulos porque solo afecta dentro del form) */
+/* Inputs específicos del módulo RegistroFactura */
 .registro-form input[type="text"],
 .registro-form input[type="date"],
 .registro-form textarea,
@@ -191,23 +230,16 @@
   box-shadow: 0 0 0 3px var(--ring, rgba(59,130,246,.25));
 }
 
-/* Select de proveedor + botón nuevo proveedor en línea */
-.form-group.mb-3{
-  grid-template-columns: minmax(0,1.5fr) max-content;
-  align-items: end;
-  gap: 10px;
-}
-
-/* Mensajes de error */
-.error{
-  color: color-mix(in oklab, var(--primary, #ef4444) 60%, var(--ink) 40%);
-  font-size: .78rem;
-}
-
 /* Observaciones */
 .registro-form textarea{
   resize: vertical;
   min-height: 70px;
+}
+
+/* Mensaje de error */
+.error{
+  color: color-mix(in oklab, var(--primary, #ef4444) 60%, var(--ink) 40%);
+  font-size: .78rem;
 }
 
 /* =========================================================
@@ -221,7 +253,6 @@
   gap: 10px;
 }
 
-/* En pantallas pequeñas, que los botones puedan ocupar toda la fila */
 @media (max-width: 720px){
   .botones-container{
     flex-direction: column;
@@ -229,22 +260,16 @@
   }
   .botones-container > button{
     width: 100%;
-    justify-content: center;
   }
 }
 
-
-
 /* =========================================================
-   RESPONSIVE LAYOUT
+   RESPONSIVE GRID CAMPOS
    ========================================================= */
 
 @media (max-width: 1024px){
   .form-grid{
     grid-template-columns: repeat(2, minmax(0,1fr));
-  }
-  .form-group.mb-3{
-    grid-template-columns: 1fr;
   }
 }
 
@@ -255,21 +280,4 @@
   .form-grid{
     grid-template-columns: 1fr;
   }
-  .selector-fechas-container{
-    grid-template-columns: 1fr;
-  }
 }
-
-.btn-medium{
-    display: block !important;      /* o flex */
-  width: 50% !important;         /* ocupa todo el ancho del contenedor */
-  max-width: none !important;
-  margin-top: 5px; 
-}
-
-.btn-personalized{
-  margin: 5px;
-  width: 300px !important;
-  max-width: none !important;
-}
-
