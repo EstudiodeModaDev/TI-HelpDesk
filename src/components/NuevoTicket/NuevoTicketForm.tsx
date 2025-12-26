@@ -191,10 +191,10 @@ export default function NuevoTicketForm() {
                   console.table(opt)
                   if(opt?.jobTitle === "Tecnico"){
                     const respuesta = (await balanceCharge(opt?.id ?? ""))
-                      if(respuesta?.ok){
+                      if(respuesta?.ok || account?.username === "mamartinez@estudiodemoda.com.co"){
                         setField("resolutor", opt ?? null)
                       } else {
-                        alert("A este resolutor se le han asignado demasiados casos en el dia de hoy, por favor escoja otro hasta balancear las cartas")
+                        alert("A este resolutor se le han asignado demasiados casos en el dia de hoy, por favor escoja otro hasta balancear las cargas")
                       }
                     } else {
                       setField("resolutor", opt ?? null)
