@@ -228,6 +228,14 @@ export default function NuevoTicketForm() {
               </div>
             )}
 
+            {/* Fecha de apertura (opcional) */}
+            <div className="tf-field tf-col-2 tf-inline">
+              <label className="tf-checkbox">
+                <input type="checkbox" checked={state.usarFechaApertura} onChange={(ev) => setField("cerrar", ev.target.checked)} disabled={submitting} className="tf-checkbox"/>
+                <span>Ticket cerrado</span>           
+              </label>
+            </div>
+
             {/* Fuente */}
             <div className="tf-field">
               <label className="tf-label" htmlFor="fuente">Fuente Solicitante</label>

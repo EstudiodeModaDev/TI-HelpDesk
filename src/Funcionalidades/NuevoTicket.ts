@@ -183,7 +183,7 @@ export function useNuevoTicketForm(services: Svc) {
         Correoresolutor: state.resolutor?.email,
         Solicitante: state.solicitante?.label,
         CorreoSolicitante: state.solicitante?.value,
-        Estadodesolicitud: "En Atención",
+        Estadodesolicitud: state.cerrar ? "Cerrado" : "En Atención",
         ANS: ANS
       };
 

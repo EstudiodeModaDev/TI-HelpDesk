@@ -15,6 +15,7 @@ export type FormState = {
   articulo: string;
   archivo: File | null;
   ANS?: "";
+  cerrar?: boolean
 };
 
 export type RelacionadorState = {
