@@ -83,17 +83,26 @@ export function useDocumentarTicket(services: Svc) {
           await Promise.allSettled( casodecompra.items.map((it) => { const id = String(it.Id);    return ComprasSvc.update(id, { Estado: "Pendiente por registro de factura" });}));
           await Promise.allSettled( casodeentrega.items.map((it) => { const id = String(it.Id);    return ComprasSvc.update(id, { Estado: "Pendiente por registro de factura" });}));
 
+          const solucion = await Logs.getAll({filter: `fields/Title eq '${ticket.ID}' and Tipo_de_accion eq 'Solucion'`})
+
           if (ticket.CorreoSolicitante) {
             const title = `Cierre de Ticket - ${ticket.ID}`;
+
+            const detalleSolucion = solucion?.[0]?.Descripcion ?? ""; // evita crash
+
             const message = `
-              <p>Este es un mensaje automático.<br>
-              <br>
-              Estimado/a ${ticket.Solicitante},<br>
-              <br>
-              Nos complace informarle que su caso con <em><strong>"</strong></em><em><strong>${ticket.Title}</strong></em><em><strong>"</strong></em> ID: ${ticket.ID} ha sido cerrado. Esperamos que su problema haya sido resuelto satisfactoriamente.<br>
-              <br>
-              Gracias por su colaboración y confianza.</p>
-              </p>`.trim();
+              <p>Este es un mensaje automático.</p>
+
+              <p>
+                Estimado/a ${ticket.Solicitante},<br><br>
+                Nos complace informarle que su caso "${ticket.Title}" (ID: ${ticket.ID}) ha sido cerrado.
+                Esperamos que su problema haya sido resuelto satisfactoriamente.
+              </p>
+
+              ${detalleSolucion ? `<hr><div>${detalleSolucion}</div>` : ""}
+
+              <p>Gracias por su colaboración y confianza.</p>
+            `.trim();
 
             try {
               console.log("Enviando notificación")

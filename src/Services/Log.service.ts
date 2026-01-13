@@ -116,7 +116,7 @@ export class LogService {
     return this.toModel(res);
   }
 
-  async getAll(opts?: GetAllOpts) {
+  async getAll(opts?: GetAllOpts): Promise<Log[]> {
     await this.ensureIds();
 
     // ID -> id, Title -> fields/Title (cuando NO está prefijado con '/')
