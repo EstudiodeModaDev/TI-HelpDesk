@@ -1,5 +1,6 @@
 // ============================================================
 // RegistroFactura.tsx — versión COMPLETA, FUNCIONAL Y COMENTADA
+// (✅ Reintegrado handleConector para exportar facturas)
 // ============================================================
 
 import React, { useEffect, useState } from "react";
@@ -42,7 +43,9 @@ export default function RegistroFactura() {
   const graph = new GraphRest(getToken);
   const comprasService = new ComprasService(graph);
 
-  const { registrarFactura } = useFacturas();
+  // ✅ Antes: solo registrarFactura
+  // ✅ Ahora: también handleConector (exportar por Flow)
+  const { registrarFactura, handleConector } = useFacturas();
 
   // ============================================================
   // Hooks de proveedores
@@ -72,8 +75,12 @@ export default function RegistroFactura() {
   const [proveedorSeleccionado, setProveedorSeleccionado] = useState("");
 
   const [selectedCompra, setSelectedCompra] = useState("");
-
   const [displayValor, setDisplayValor] = useState("");
+
+  // ✅ Export (Flow)
+  const [exportInitialDate, setExportInitialDate] = useState("");
+  const [exportFinalDate, setExportFinalDate] = useState("");
+  const [exporting, setExporting] = useState(false);
 
   const [formData, setFormData] = useState<ReFactura>({
     FechaEmision: "",
@@ -275,6 +282,32 @@ export default function RegistroFactura() {
   };
 
   // ============================================================
+  // ✅ Exportar facturas (Power Automate Flow / Conector)
+  // ============================================================
+  const handleExportFacturas = async () => {
+    if (!exportInitialDate || !exportFinalDate) {
+      alert("⚠️ Debes seleccionar fecha inicial y fecha final.");
+      return;
+    }
+
+    if (new Date(exportInitialDate) > new Date(exportFinalDate)) {
+      alert("⚠️ La fecha inicial no puede ser mayor que la fecha final.");
+      return;
+    }
+
+    try {
+      setExporting(true);
+      await handleConector(exportInitialDate, exportFinalDate);
+      // Nota: tu hook ya hace alert de éxito. Si quieres, lo quitamos del hook y lo dejamos aquí.
+    } catch (err) {
+      console.error("❌ Error exportando facturas:", err);
+      alert("❌ No se pudo generar el export. Revisa consola.");
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  // ============================================================
   // Render
   // ============================================================
   return (
@@ -298,7 +331,9 @@ export default function RegistroFactura() {
         </>
       ) : (
         <>
-          <h2>{mostrarLista ? "📄 Facturas Registradas" : "Registro de Facturas"}</h2>
+          <h2>
+            {mostrarLista ? "📄 Facturas Registradas" : "Registro de Facturas"}
+          </h2>
 
           {/* ============================================================
             FORMULARIO PRINCIPAL
@@ -308,30 +343,24 @@ export default function RegistroFactura() {
               {/* ============================ */}
               {/*       COMPRA + PROVEEDOR     */}
               {/* ============================ */}
-              
-              <div className="fila-compra-proveedor">
-                {/* ---------------------- */}
-                {/* Seleccionar compra */}
-                {/* ---------------------- */}
-                <div className="campo">
-                  <label>Compra relacionada:</label>
-                  <select
-                    className="proveedor-select"
-                    value={selectedCompra}
-                    onChange={(e) => handleCompraSeleccionada(e.target.value)}
-                  >
-                    <option value="">-- Seleccione una compra --</option>
-                    {compras.map((c) => (
-                      <option key={c.Id} value={c.Id}>
-                        {c.Title} - {c.SolicitadoPor} - {c.Estado}
-                      </option>
-                    ))}
-                  </select>
-                </div>
 
-                {/* ---------------------- */}
-                {/* Proveedor */}
-                {/* ---------------------- */}
+              <div className="campo">
+                <label>Compra relacionada:</label>
+                <select
+                  className="proveedor-select"
+                  value={selectedCompra}
+                  onChange={(e) => handleCompraSeleccionada(e.target.value)}
+                >
+                  <option value="">-- Seleccione una compra --</option>
+                  {compras.map((c) => (
+                    <option key={c.Id} value={c.Id}>
+                      {c.Title} - {c.SolicitadoPor} - {c.Estado}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="fila-compra-proveedor">
                 <div className="form-group fila-compra-proveedor__proveedor">
                   <div className="form-group__field">
                     <label>Proveedor:</label>
@@ -359,22 +388,33 @@ export default function RegistroFactura() {
                     <small className="error">{errors.Proveedor}</small>
                   </div>
 
-                  <button
-                    type="button"
-                    className="btn btn-terciary btn-sm form-group__btn"
-                    onClick={() => setIsModalProveedorOpen(true)}
-                  >
-                    + Nuevo proveedor
-                  </button>
+                  <div className="fila-compra-proveedor__acciones">
+                    <button
+                      type="button"
+                      className="btn btn-terciary btn-sm form-group__btn"
+                      onClick={() => setIsModalProveedorOpen(true)}
+                    >
+                      + Nuevo proveedor
+                    </button>
+
+                    <div className="acciones-cc">
+                      <span className="acciones-cc__label">¿No aparece?</span>
+                      <button
+                        type="button"
+                        className="btn btn-terciary btn-sm acciones-cc__btn"
+                        onClick={() => setShowCentroModal(true)}
+                      >
+                        + Nuevo C.C/C.O/U.N
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
 
               {/* ============================ */}
               {/*      CAMPOS GENERALES       */}
               {/* ============================ */}
-
               <div className="form-grid">
-                {/* Fecha */}
                 <div className="campo">
                   <label>
                     Fecha de emisión
@@ -389,7 +429,6 @@ export default function RegistroFactura() {
                   </label>
                 </div>
 
-                {/* No factura */}
                 <div className="campo">
                   <label>
                     No. Factura
@@ -402,7 +441,6 @@ export default function RegistroFactura() {
                   </label>
                 </div>
 
-                {/* NIT */}
                 <div className="campo">
                   <label>
                     NIT
@@ -415,7 +453,6 @@ export default function RegistroFactura() {
                   </label>
                 </div>
 
-                {/* Ítem */}
                 <div className="campo">
                   <label>Ítem</label>
                   <Select
@@ -431,9 +468,8 @@ export default function RegistroFactura() {
                         ? {
                             value: formData.Items,
                             label:
-                              Items.find(
-                                (op) => op.codigo === formData.Items
-                              )?.descripcion ?? "",
+                              Items.find((op) => op.codigo === formData.Items)
+                                ?.descripcion ?? "",
                           }
                         : null
                     }
@@ -441,21 +477,18 @@ export default function RegistroFactura() {
                       setFormData((prev) => ({
                         ...prev,
                         Items: opt?.value ?? "",
-                        DescripItems:
-                          opt?.label?.split(" - ")[1] ?? "",
+                        DescripItems: opt?.label?.split(" - ")[1] ?? "",
                       }))
                     }
                   />
                 </div>
 
-                {/* Descripción item */}
                 <div className="campo">
-                <label>Descripción del ítem</label>
-                <input value={formData.DescripItems} readOnly />
-                <small className="error">{errors.Items}</small>
-              </div>
+                  <label>Descripción del ítem</label>
+                  <input value={formData.DescripItems} readOnly />
+                  <small className="error">{errors.Items}</small>
+                </div>
 
-                {/* Valor */}
                 <div className="campo">
                   <label>
                     Valor antes IVA
@@ -489,7 +522,6 @@ export default function RegistroFactura() {
                   <small className="error">{errors.ValorAnIVA}</small>
                 </div>
 
-                {/* CC */}
                 <div className="campo">
                   <label>Centro de Costos (C.C)</label>
                   <Select
@@ -505,9 +537,8 @@ export default function RegistroFactura() {
                         ? {
                             value: formData.CC,
                             label:
-                              ccOptions.find(
-                                (cc) => cc.value === formData.CC
-                              )?.label ?? "",
+                              ccOptions.find((cc) => cc.value === formData.CC)
+                                ?.label ?? "",
                           }
                         : null
                     }
@@ -520,7 +551,6 @@ export default function RegistroFactura() {
                   />
                 </div>
 
-                {/* CO */}
                 <div className="campo">
                   <label>Centro Operativo (C.O)</label>
                   <Select
@@ -536,9 +566,8 @@ export default function RegistroFactura() {
                         ? {
                             value: formData.CO,
                             label:
-                              COOptions.find(
-                                (co) => co.value === formData.CO
-                              )?.label ?? "",
+                              COOptions.find((co) => co.value === formData.CO)
+                                ?.label ?? "",
                           }
                         : null
                     }
@@ -551,7 +580,6 @@ export default function RegistroFactura() {
                   />
                 </div>
 
-                {/* Unidad de negocio */}
                 <div className="campo">
                   <label>Unidad de Negocio (U.N)</label>
                   <Select
@@ -567,9 +595,8 @@ export default function RegistroFactura() {
                         ? {
                             value: formData.un,
                             label:
-                              UNOptions.find(
-                                (u) => u.value === formData.un
-                              )?.label ?? "",
+                              UNOptions.find((u) => u.value === formData.un)
+                                ?.label ?? "",
                           }
                         : null
                     }
@@ -582,29 +609,15 @@ export default function RegistroFactura() {
                   />
                 </div>
 
-                {/* BOTÓN CREAR CC/CO/UN */}
                 <div className="campo">
-                  <label>¿No aparece?</label>
-                  <button
-                    type="button"
-                    className="btn2 btn-terciary"
-                    onClick={() => setShowCentroModal(true)}
-                  >
-                    + Nuevo C.C/C.O/U.N
-                  </button>
+                  <label>Detalle Fac</label>
+                  <input
+                    name="DetalleFac"
+                    value={formData.DetalleFac}
+                    onChange={handleChange}
+                  />
                 </div>
 
-                {/* Detalle */}
-                <div className="campo">
-                <label>Detalle Fac</label>
-                <input
-                  name="DetalleFac"
-                  value={formData.DetalleFac}
-                  onChange={handleChange}
-                />
-              </div>
-
-                {/* Fecha contabilidad */}
                 <div className="campo">
                   <label>
                     Fecha entrega contabilidad
@@ -617,7 +630,6 @@ export default function RegistroFactura() {
                   </label>
                 </div>
 
-                {/* Documento ERP */}
                 <div className="campo">
                   <label>Documento ERP</label>
                   <input
@@ -628,7 +640,6 @@ export default function RegistroFactura() {
                 </div>
               </div>
 
-              {/* Observaciones */}
               <div className="campo">
                 <label>
                   Observaciones
@@ -641,7 +652,6 @@ export default function RegistroFactura() {
                 </label>
               </div>
 
-              {/* BOTONES PRINCIPALES */}
               <div className="botones-container">
                 <button type="submit" className="btn btn-primary-final">
                   Registrar factura
@@ -665,7 +675,52 @@ export default function RegistroFactura() {
               </div>
             </form>
           ) : (
-            <FacturasLista onVolver={() => setMostrarLista(false)} />
+            <>
+              {/* ============================================================
+                ✅ Panel exportar (Flow)
+              ============================================================ */}
+              <div className="export-panel">
+                <div className="export-panel__row">
+                  <div className="export-panel__field">
+                    <label>Fecha inicial</label>
+                    <input
+                      type="date"
+                      value={exportInitialDate}
+                      onChange={(e) => setExportInitialDate(e.target.value)}
+                    />
+                  </div>
+
+                  <div className="export-panel__field">
+                    <label>Fecha final</label>
+                    <input
+                      type="date"
+                      value={exportFinalDate}
+                      onChange={(e) => setExportFinalDate(e.target.value)}
+                    />
+                  </div>
+
+                  <button
+                    type="button"
+                    className="btn btn-primary-final"
+                    onClick={handleExportFacturas}
+                    disabled={exporting}
+                    title="Genera el conector/export y lo envía al correo"
+                  >
+                    {exporting ? "Generando..." : "Exportar facturas"}
+                  </button>
+
+                  <button
+                    type="button"
+                    className="btn btn-secondary-final"
+                    onClick={() => setMostrarLista(false)}
+                  >
+                    Volver
+                  </button>
+                </div>
+              </div>
+
+              <FacturasLista onVolver={() => setMostrarLista(false)} />
+            </>
           )}
 
           {/* MODAL PROVEEDOR */}

@@ -295,7 +295,7 @@ input, select, textarea{
               border-color .18s ease, box-shadow .18s ease,
               transform .06s ease;
   min-height: 40px;
-  max-width: 1000px !important;
+  max-width: 500px !important;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
 }
