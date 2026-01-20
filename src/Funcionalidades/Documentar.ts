@@ -99,6 +99,10 @@ export function useDocumentarTicket(services: Svc) {
                 Esperamos que su problema haya sido resuelto satisfactoriamente.
               </p>
 
+              <p>
+                El resolutor ha brindaddo la siguiente solución:
+              </p>
+
               ${detalleSolucion ? `<hr><div>${detalleSolucion}</div>` : ""}
 
               <p>Gracias por su colaboración y confianza.</p>
