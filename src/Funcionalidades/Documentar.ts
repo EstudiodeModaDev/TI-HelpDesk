@@ -83,7 +83,7 @@ export function useDocumentarTicket(services: Svc) {
           await Promise.allSettled( casodecompra.items.map((it) => { const id = String(it.Id);    return ComprasSvc.update(id, { Estado: "Pendiente por registro de factura" });}));
           await Promise.allSettled( casodeentrega.items.map((it) => { const id = String(it.Id);    return ComprasSvc.update(id, { Estado: "Pendiente por registro de factura" });}));
 
-          const solucion = await Logs.getAll({filter: `fields/Title eq '${ticket.ID}' and Tipo_de_accion eq 'Solucion'`})
+          const solucion = await Logs.getAll({filter: `fields/Title eq '${ticket.ID}' and fields/Tipo_de_accion eq 'Solucion'`})
 
           if (ticket.CorreoSolicitante) {
             const title = `Cierre de Ticket - ${ticket.ID}`;
