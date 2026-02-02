@@ -35,6 +35,7 @@ import EdmNewsModal from "./components/News/Confirmar/Confirmar";
 import usersIcon from "./assets/users.svg"
 import ActionsIcon from "./assets/actions.svg"
 import siesaIcon from "./assets/siesa.png"
+import storageIcon from "./assets/storage.svg"
 import cajerosIcon from "./assets/cajeros.svg"
 import type { AnunciosService } from "./Services/Anuncios.service";
 import { logout } from "./auth/msal";
@@ -83,7 +84,7 @@ const NAV: MenuItem[] = [
   { id: "task", label: "Tareas", icon: <img src={tareasIcon} alt="" className="sb-icon" />, to: <TareasPage />, roles: ["Administrador", "Tecnico", "Listo"], autocollapse: true },
   { id: "formatos", label: "Formatos", icon: <img src={filesIcon} alt="" className="sb-icon" />, to: <Formatos />, roles: ["Administrador", "Listo"] },
   { id: "info", label: "Información", icon: <img src={infoIcon} alt="" className="sb-icon" />, to: <InfoPage />, roles: ["Administrador", "Tecnico", "Listo"] },
-  { id: "storage", label: "Almacenamiento", icon: <img src={infoIcon} alt="" className="sb-icon" />, to: <StoragePage />, roles: ["Administrador", "Tecnico", "Listo"] },
+  { id: "storage", label: "Almacenamiento", icon: <img src={storageIcon} alt="" className="sb-icon" />, to: <StoragePage />, roles: ["Administrador", "Listo"] },
   { id: "admin", label: "Administración", icon: <img src={settingsIcon} className="sb-icon" />, roles: ["Administrador", "Tecnico", "Listo"], children: [
       { id: "anuncios", label: "Anuncios", to: <CrearAnuncio />, roles: ["Administrador", "Tecnico"], icon: <img src={newsIcon} className="sb-icon" /> },
       { id: "plantillas", label: "Plantillas", icon: <img src={templateIcon} className="sb-icon" />, to: <CrearPlantilla />, roles: ["Administrador", "Tecnico", "Listo"] },
