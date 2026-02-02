@@ -41,6 +41,7 @@ import { logout } from "./auth/msal";
 import AnnouncementsTable from "./components/TipsTable/TipsTable";
 import { useTheme } from "./Funcionalidades/Theme";
 import TeamsEventForm from "./components/Ausencia/Ausencia";
+import { StoragePage } from "./components/Storage/StoragePage";
 //import UsuariosApp from "./components/Usuarios copy/Acceso";
 
 /* ============================================================
@@ -82,6 +83,7 @@ const NAV: MenuItem[] = [
   { id: "task", label: "Tareas", icon: <img src={tareasIcon} alt="" className="sb-icon" />, to: <TareasPage />, roles: ["Administrador", "Tecnico", "Listo"], autocollapse: true },
   { id: "formatos", label: "Formatos", icon: <img src={filesIcon} alt="" className="sb-icon" />, to: <Formatos />, roles: ["Administrador", "Listo"] },
   { id: "info", label: "Información", icon: <img src={infoIcon} alt="" className="sb-icon" />, to: <InfoPage />, roles: ["Administrador", "Tecnico", "Listo"] },
+  { id: "storage", label: "Almacenamiento", icon: <img src={infoIcon} alt="" className="sb-icon" />, to: <StoragePage />, roles: ["Administrador", "Tecnico", "Listo"] },
   { id: "admin", label: "Administración", icon: <img src={settingsIcon} className="sb-icon" />, roles: ["Administrador", "Tecnico", "Listo"], children: [
       { id: "anuncios", label: "Anuncios", to: <CrearAnuncio />, roles: ["Administrador", "Tecnico"], icon: <img src={newsIcon} className="sb-icon" /> },
       { id: "plantillas", label: "Plantillas", icon: <img src={templateIcon} className="sb-icon" />, to: <CrearPlantilla />, roles: ["Administrador", "Tecnico", "Listo"] },

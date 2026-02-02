@@ -19,18 +19,16 @@ export class GraphRest {
 
     const res = await fetch(this.base + path, {
       method,
+      ...init, // ✅ primero
       headers: {
         Authorization: `Bearer ${token}`,
         ...(hasBody ? { 'Content-Type': 'application/json' } : {}),
-        // Quita esta Prefer si no la necesitas
         Prefer: 'HonorNonIndexedQueriesWarningMayFailRandomly',
-        ...(init?.headers || {}),
+        ...(init?.headers || {}), // ✅ se mezcla sin borrar Authorization
       },
-      body: hasBody ? JSON.stringify(body) : undefined,
-      ...init,
+      body: hasBody ? JSON.stringify(body) : undefined, // ✅ tu control de body manda
     });
 
-    // ---- Manejo de error con mensaje detallado de Graph ----
     if (!res.ok) {
       let detail = '';
       try {
@@ -47,19 +45,13 @@ export class GraphRest {
       throw new Error(`${method} ${path} → ${res.status} ${res.statusText}${detail ? `: ${detail}` : ''}`);
     }
 
-    // ---- 204 No Content o respuesta vacía ----
     if (res.status === 204) return undefined as unknown as T;
 
-    // ---- Parseo seguro según content-type ----
     const ct = res.headers.get('content-type') || '';
-    const txt = await res.text(); // evita error si está vacío
+    const txt = await res.text();
     if (!txt) return undefined as unknown as T;
 
-    if (ct.includes('application/json')) {
-      return JSON.parse(txt) as T;
-    }
-
-    // Si la respuesta no es JSON, retorna texto
+    if (ct.includes('application/json')) return JSON.parse(txt) as T;
     return txt as unknown as T;
   }
 
@@ -70,6 +62,29 @@ export class GraphRest {
     });
     if (!res.ok) throw new Error(`Graph ${res.status}`);
     return await res.blob();
+  }
+
+  async getWithHeaders(path: string, extraHeaders: Record<string, string>): Promise<any> {
+    const token = await this.getToken(); // o como lo llames tú
+
+    const res = await fetch(`https://graph.microsoft.com/v1.0${path}`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+        ...extraHeaders,
+      },
+    });
+
+    if (!res.ok) {
+      const txt = await res.text();
+      throw new Error(`${path} → ${res.status}: ${txt}`);
+    }
+
+    // algunos endpoints devuelven 204 sin body
+    if (res.status === 204) return null;
+
+    return res.json();
   }
 
   // Helpers públicos

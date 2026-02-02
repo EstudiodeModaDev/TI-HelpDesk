@@ -30,19 +30,24 @@ export default function DashboardDetallado() {
   const { Tickets } = useGraphServices() as ReturnType<typeof useGraphServices> & {
     TicketService: TicketsService;
   };
-  const { totalCasos, totalEnCurso, totalFinalizados, totalFueraTiempo, porcentajeCumplimiento, topCategorias, range,  resolutores, Fuentes, loading, conteoPorMes, topSolicitante,
-    obtenerTotal, setRange, obtenerFuentes, } = useDetallado(Tickets);
 
-  // carga inicial
+  const {totalCasos, totalEnCurso, totalFinalizados, totalFueraTiempo, porcentajeCumplimiento, topCategorias, range, resolutores, Fuentes, loading, conteoPorMes, topSolicitante, obtenerTotal, setRange, obtenerFuentes,} = useDetallado(Tickets);
+
   React.useEffect(() => {
+    if (!range.from || !range.to) return;
     obtenerTotal();
-    obtenerFuentes()
-  }, [range.from, range.to]); 
+  }, [range.from, range.to, obtenerTotal]);
+
+  React.useEffect(() => {
+    obtenerFuentes();
+  }, [obtenerFuentes]);
 
   if (loading) {
     return (
       <section className="dash">
-        <div className="dash-loading" role="status" aria-live="polite">Cargando…</div>
+        <div className="dash-loading" role="status" aria-live="polite">
+          Cargando…
+        </div>
       </section>
     );
   }
@@ -83,8 +88,18 @@ export default function DashboardDetallado() {
       <main className="dash-center">
         <header className="center-head">
           <div className="dash-filters">
-            <input className="date" type="date" onChange={(e) => setRange({ ...range, from: e.target.value })} value={range.from}/>
-            <input className="date" type="date" onChange={(e) => setRange({ ...range, to: e.target.value })} value={range.to}/>
+            <input
+              className="date"
+              type="date"
+              value={range?.from ?? ""}
+              onChange={(e) => setRange((prev) => ({ ...prev, from: e.target.value }))}
+            />
+            <input
+              className="date"
+              type="date"
+              value={range?.to ?? ""}
+              onChange={(e) => setRange((prev) => ({ ...prev, to: e.target.value }))}
+            />
           </div>
         </header>
 
@@ -113,10 +128,10 @@ export default function DashboardDetallado() {
       {/* Columna derecha */}
       <aside className="dash-right">
         <FuentesSolicitud data={Fuentes} />
-        
+
         <section className="panel">
           <h4>Casos mensuales</h4>
-          <CasosPorMesChart data={conteoPorMes} height={200} maxBars={5}/>
+          <CasosPorMesChart data={conteoPorMes} height={200} maxBars={5} />
           <div className="linechart placeholder" />
         </section>
 
@@ -128,6 +143,7 @@ export default function DashboardDetallado() {
     </section>
   );
 }
+
 
 /* ====== Mini componentes SVG ====== */
 function Donut({value, size = 160, stroke = 12, ring = "#0ea5e9",}: {

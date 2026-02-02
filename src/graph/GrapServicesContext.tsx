@@ -33,6 +33,7 @@ import { DistribucionFacturaService } from "../Services/DistribucionFactura.serv
 import { PazSalvosService } from "../Services/PazSalvos.service";
 import { TipsService } from "../Services/Tips.service";
 import { AusenciaService } from "../Services/Ausencia.service";
+import { SharePointStorageService } from "../Services/sharepointStorage.service";
 
 /* ================== Tipos de config ================== */
 export type SiteConfig = {
@@ -110,6 +111,7 @@ export type GraphServices = {
   DistribucionFactura: DistribucionFacturaService;
   TipsInicio: TipsService;
   Ausencias: AusenciaService  
+  Storage: SharePointStorageService;
 
   // TEST
   PazYSalvos: PazSalvosService;
@@ -228,12 +230,13 @@ export const GraphServicesProvider: React.FC<ProviderProps> = ({ children, confi
     const DistribucionFactura  = new DistribucionFacturaService(graph, hd.hostname, hd.sitePath, lists.DistribucionFactura);
     const TipsInicio           = new TipsService(graph, hd.hostname, hd.sitePath, lists.TipsInicio);
     const Ausencias            = new AusenciaService(graph, hd.hostname, hd.sitePath, lists.Ausencias)
+    const Storage               = new SharePointStorageService(graph);
 
     // TEST
     const PazYSalvos           = new PazSalvosService(graph, test.hostname, test.sitePath, lists.PazYSalvos);
 
     return {
-      graph,
+      graph, Storage,
       Sociedades, Proveedores, Plantillas, Internet, CasosHijosRequeridos, ActasEntrega, Anuncios, Articulos, Usuarios, Logs, Tickets, Categorias, Franquicias, SubCategorias,
       InternetTiendas, Facturas, ItemFactura, ProveedoresFactura, Item, CentroCostos, CentroOperativo, Compras, Tareas, Inventario, DistribucionFactura, TipsInicio, Ausencias,
       // TEST
