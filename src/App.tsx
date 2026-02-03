@@ -71,7 +71,7 @@ export type NavContext = {
   flags?: Set<string>;
   hasService?: (k: keyof Services) => boolean;
 };
-
+ 
 /* ============================================================
    Árbol único de navegación con reglas de visibilidad
    ============================================================ */
