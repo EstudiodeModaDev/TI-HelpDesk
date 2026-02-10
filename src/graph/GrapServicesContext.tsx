@@ -34,6 +34,10 @@ import { PazSalvosService } from "../Services/PazSalvos.service";
 import { TipsService } from "../Services/Tips.service";
 import { AusenciaService } from "../Services/Ausencia.service";
 import { SharePointStorageService } from "../Services/sharepointStorage.service";
+import { DispositivosService } from "../Services/dispositivos.service";
+import { PrestamosService } from "../Services/prestamos.service";
+import { PruebasPrestamoService } from "../Services/pruebasPrestamo.service";
+import { PruebasService } from "../Services/pruebas.service";
 
 /* ================== Tipos de config ================== */
 export type SiteConfig = {
@@ -73,6 +77,10 @@ export type UnifiedConfig = {
     DistribucionFactura: string;
     TipsInicio: string;
     Ausencias: string;
+    dispositivos: string;
+    prestamos: string;
+    pruebas: string;
+    pruebasPrestamo: string;  
 
     // TEST
     PazYSalvos: string;
@@ -112,6 +120,10 @@ export type GraphServices = {
   TipsInicio: TipsService;
   Ausencias: AusenciaService  
   Storage: SharePointStorageService;
+  dispositivos: DispositivosService;
+  prestamos: PrestamosService;
+  pruebas: PruebasService
+  pruebasPrestamo: PruebasPrestamoService
 
   // TEST
   PazYSalvos: PazSalvosService;
@@ -159,6 +171,10 @@ const DEFAULT_CONFIG: UnifiedConfig = {
     DistribucionFactura: "DistribucionFactura",
     TipsInicio: "TipsInicio",
     Ausencias: "Ausencias",
+    dispositivos: "Prestamos - Dispositivos",
+    prestamos: "Prestamos - Prestamos",
+    pruebas: "Prestamos - Pruebas",
+    pruebasPrestamo: "Prestamos - Pruebas prestamo",
 
     // TEST
     PazYSalvos: "Paz y salvos",
@@ -230,7 +246,11 @@ export const GraphServicesProvider: React.FC<ProviderProps> = ({ children, confi
     const DistribucionFactura  = new DistribucionFacturaService(graph, hd.hostname, hd.sitePath, lists.DistribucionFactura);
     const TipsInicio           = new TipsService(graph, hd.hostname, hd.sitePath, lists.TipsInicio);
     const Ausencias            = new AusenciaService(graph, hd.hostname, hd.sitePath, lists.Ausencias)
-    const Storage               = new SharePointStorageService(graph);
+    const Storage              = new SharePointStorageService(graph);
+    const dispositivos         = new DispositivosService(graph, hd.hostname, hd.sitePath, lists.dispositivos);
+    const prestamos            = new PrestamosService(graph, hd.hostname, hd.sitePath, lists.prestamos);
+    const pruebas              = new PruebasService(graph, hd.hostname, hd.sitePath, lists.pruebas);
+    const pruebasPrestamo      = new PruebasPrestamoService(graph, hd.hostname, hd.sitePath, lists.pruebasPrestamo);
 
     // TEST
     const PazYSalvos           = new PazSalvosService(graph, test.hostname, test.sitePath, lists.PazYSalvos);
@@ -239,6 +259,7 @@ export const GraphServicesProvider: React.FC<ProviderProps> = ({ children, confi
       graph, Storage,
       Sociedades, Proveedores, Plantillas, Internet, CasosHijosRequeridos, ActasEntrega, Anuncios, Articulos, Usuarios, Logs, Tickets, Categorias, Franquicias, SubCategorias,
       InternetTiendas, Facturas, ItemFactura, ProveedoresFactura, Item, CentroCostos, CentroOperativo, Compras, Tareas, Inventario, DistribucionFactura, TipsInicio, Ausencias,
+      dispositivos, prestamos, pruebas, pruebasPrestamo,
       // TEST
       PazYSalvos,
     };

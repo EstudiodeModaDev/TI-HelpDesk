@@ -35,7 +35,7 @@ export class SharePointStorageService {
     return (res?.value ?? []) as Array<{ id: string; name: string; webUrl?: string }>;
   }
 
-    async computeDriveSize(driveId: string): Promise<{ totalBytes: number; filesCount: number }> {
+  async computeDriveSize(driveId: string): Promise<{ totalBytes: number; filesCount: number }> {
     let totalBytes = 0;
     let filesCount = 0;
 
@@ -68,7 +68,7 @@ export class SharePointStorageService {
     }
 
     return { totalBytes, filesCount };
-    }
+  }
 
 
   /**

@@ -25,6 +25,11 @@ export type UserOption = {
   
 };
 
+export type desplegablesOptions = {
+  value: string;      // lo que guardas (recomiendo el correo)
+  label: string;      // lo que se muestra
+};
+
 export type Reasignar = {
     IDCandidato: number;            
     Nota: string;

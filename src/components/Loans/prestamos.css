@@ -1,0 +1,881 @@
+/* ---------- Base / Page ---------- */
+.pl-page{
+  min-height: calc(100dvh - 2px);
+  color: var(--ink);
+  border-radius: var(--radius);
+}
+
+.pl-grid2{
+  display: grid;
+  grid-template-columns: 1.65fr 1fr;
+  gap: 16px;
+  align-items: start;
+}
+
+@media (max-width: 980px){
+  .pl-grid2{ grid-template-columns: 1fr; }
+}
+
+.pl-muted{ color: var(--muted); }
+.pl-strong{ color: var(--ink); font-weight: 700; }
+.pl-mono{
+  font-variant-numeric: tabular-nums;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+/* ---------- Header ---------- */
+.pl-header{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap: 14px;
+  padding: 6px 4px 14px;
+}
+
+.pl-h1{
+  margin:0;
+  font-size: 22px;
+  letter-spacing: .2px;
+  line-height: 1.2;
+}
+
+.pl-headerRight{
+  display:flex;
+  gap:10px;
+  align-items:center;
+  flex-wrap:wrap;
+}
+
+/* ---------- Card ---------- */
+.pl-card{
+  background: linear-gradient(180deg,
+    color-mix(in oklab, var(--surface) 96%, transparent),
+    color-mix(in oklab, var(--surface-elev) 92%, transparent)
+  );
+  border: 1px solid var(--bd);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  min-width: 0; 
+}
+
+.pl-cardHead{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap: 14px;
+  padding: 14px 14px 12px;
+  border-bottom: 1px solid var(--bd);
+}
+
+.pl-cardHeadLeft{
+  min-width: 280px;
+}
+
+.pl-cardTitle{
+  font-weight: 800;
+  letter-spacing: .2px;
+  font-size: 15px;
+}
+
+.pl-cardSub{
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.pl-cardRight{
+  display:flex;
+  align-items:center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.pl-cardBody{
+  padding: 14px;
+}
+
+/* ---------- Tabs ---------- */
+.pl-tabs{
+  display:flex;
+  gap: 10px;
+  padding: 10px 2px 16px;
+  flex-wrap: wrap;
+}
+
+.pl-tab{
+  appearance: none;
+  border: 1px solid var(--bd);
+  background: color-mix(in oklab, var(--surface) 92%, transparent);
+  color: var(--ink);
+  border-radius: 999px;
+  padding: 10px 14px;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: .15px;
+  cursor: pointer;
+  transition: transform .12s ease, background .12s ease, border-color .12s ease, box-shadow .12s ease, opacity .12s ease;
+  box-shadow: 0 10px 22px rgba(0,0,0,.18);
+}
+
+.pl-tab:hover{
+  background: color-mix(in oklab, var(--surface) 82%, var(--brand-400) 18%);
+  border-color: color-mix(in oklab, var(--bd) 60%, var(--brand-400) 40%);
+  transform: translateY(-1px);
+}
+
+.pl-tab:active{ transform: translateY(0px) scale(.99); }
+
+.pl-tab.is-active{
+  background: linear-gradient(135deg, var(--primary), color-mix(in oklab, var(--primary) 70%, var(--brand-400) 30%));
+  color: var(--primary-ink);
+  border-color: color-mix(in oklab, var(--primary) 55%, var(--bd) 45%);
+  box-shadow:
+    0 0 0 4px var(--ring),
+    0 16px 36px rgba(0,0,0,.26);
+}
+
+.pl-tab:focus-visible{
+  outline: none;
+  box-shadow: 0 0 0 4px var(--ring), 0 12px 26px rgba(0,0,0,.24);
+}
+
+/* ---------- Toolbar / Inputs ---------- */
+.pl-toolbar{
+  display:flex;
+  gap: 10px;
+  align-items:center;
+  flex-wrap: wrap;
+  padding: 8px;
+  border: 1px solid var(--bd);
+  border-radius: calc(var(--radius-xl) - 8px);
+  background: color-mix(in oklab, var(--surface-elev) 88%, transparent);
+  margin-bottom: 12px;
+}
+
+.pl-toolbar.pl-tight{
+  padding: 6px;
+  margin-bottom: 0;
+}
+
+.pl-input{
+  appearance: none;
+  width: 100%;
+  height: 40px;
+  padding: 0 12px;
+  border-radius: 10px;              /* más cuadrado (antes era muy redondo) */
+  border: 1px solid var(--bd);
+  background: rgba(255,255,255,.72);
+  color: var(--pl-text);
+  font-size: 14px;
+  line-height: 1;
+  transition: border-color .15s ease, box-shadow .15s ease, background .15s ease, transform .05s ease;
+  box-shadow: 0 1px 0 rgba(0,0,0,.03);
+  box-sizing: border-box;
+}
+
+
+select.pl-input{
+  flex: 0 0 180px;
+  min-width: 0px;
+  cursor: pointer;
+}
+
+.pl-input::placeholder{
+  color: color-mix(in oklab, var(--muted) 88%, transparent);
+}
+
+
+/* ---------- Buttons ---------- */
+.pl-btn{
+  appearance: none;
+  border: 1px solid var(--bd);
+  background: color-mix(in oklab, var(--surface) 90%, transparent);
+  color: var(--ink);
+  border-radius: 14px;
+  padding: 10px 12px;
+  font-weight: 800;
+  font-size: 13px;
+  letter-spacing: .15px;
+  cursor: pointer;
+  transition: transform .12s ease, box-shadow .12s ease, background .12s ease, border-color .12s ease, opacity .12s ease;
+  white-space: nowrap;
+}
+
+.pl-btn:hover{
+  transform: translateY(-1px);
+  background: color-mix(in oklab, var(--surface) 80%, var(--brand-400) 20%);
+  border-color: color-mix(in oklab, var(--bd) 55%, var(--brand-400) 45%);
+}
+
+.pl-btn:active{ transform: translateY(0px) scale(.99); }
+
+.pl-btn.primary{
+  background: linear-gradient(135deg, var(--primary), color-mix(in oklab, var(--primary) 70%, var(--brand-400) 30%));
+  color: var(--primary-ink);
+  border-color: color-mix(in oklab, var(--primary) 60%, var(--bd) 40%);
+  box-shadow: 0 0 0 4px color-mix(in oklab, var(--ring) 85%, transparent), 0 18px 38px rgba(0,0,0,.28);
+}
+
+.pl-btn.primary:hover{
+  background: linear-gradient(135deg,
+    color-mix(in oklab, var(--primary) 92%, #ffffff 8%),
+    color-mix(in oklab, var(--primary) 62%, var(--brand-400) 38%)
+  );
+}
+
+.pl-btn.ghost{
+  background: transparent;
+  border-color: color-mix(in oklab, var(--bd) 65%, transparent);
+}
+
+.pl-btn:focus-visible{
+  outline: none;
+  box-shadow: 0 0 0 4px var(--ring), 0 14px 30px rgba(0,0,0,.25);
+}
+
+.pl-btn:disabled{
+  opacity: .55;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* En InventorySection había un <button> sin clase: lo estilizamos si está dentro de .pl-actionsRow */
+.pl-actionsRow{
+  display:flex;
+  justify-content:flex-end;
+  gap: 10px;
+  padding-top: 10px;
+}
+
+.pl-actionsRow > button{
+  border: 1px solid var(--bd);
+  background: linear-gradient(135deg, var(--primary), color-mix(in oklab, var(--primary) 70%, var(--brand-400) 30%));
+  color: var(--primary-ink);
+  border-radius: 14px;
+  padding: 10px 12px;
+  font-weight: 900;
+  font-size: 13px;
+  cursor:pointer;
+  transition: transform .12s ease, box-shadow .12s ease, opacity .12s ease;
+  box-shadow: 0 0 0 4px color-mix(in oklab, var(--ring) 85%, transparent), 0 18px 38px rgba(0,0,0,.28);
+}
+
+.pl-actionsRow > button:hover{ transform: translateY(-1px); }
+.pl-actionsRow > button:active{ transform: translateY(0px) scale(.99); }
+
+/* ---------- Table ---------- */
+.pl-tableWrap{
+  border: 1px solid var(--bd);
+  border-radius: calc(var(--radius-xl) - 8px);
+  overflow: hidden;
+  background: color-mix(in oklab, var(--surface) 92%, transparent);
+}
+
+.pl-table{
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 13px;
+}
+
+.pl-table thead th{
+  text-align: left;
+  padding: 12px 12px;
+  color: color-mix(in oklab, var(--muted) 85%, var(--ink) 15%);
+  font-weight: 900;
+  letter-spacing: .18px;
+  background:
+    linear-gradient(180deg,
+      color-mix(in oklab, var(--surface-elev) 92%, transparent),
+      color-mix(in oklab, var(--surface) 92%, transparent)
+    );
+  border-bottom: 1px solid var(--bd);
+}
+
+.pl-table tbody td{
+  padding: 12px 12px;
+  border-bottom: 1px solid color-mix(in oklab, var(--bd) 70%, transparent);
+  vertical-align: top;
+}
+
+.pl-table tbody tr{
+  transition: background .12s ease;
+}
+
+.pl-table tbody tr:hover{
+  background: color-mix(in oklab, var(--surface) 78%, var(--brand-400) 22%);
+}
+
+.pl-cellMain{
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.pl-cellSub{
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* ---------- Badges / Pills ---------- */
+.pl-badge{
+  display:inline-flex;
+  align-items:center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--bd);
+  background: color-mix(in oklab, var(--surface-elev) 85%, transparent);
+  font-weight: 900;
+  font-size: 12px;
+  letter-spacing: .12px;
+  line-height: 1;
+}
+
+.pl-badge.ok{
+  border-color: color-mix(in oklab, var(--brand-400) 55%, var(--bd) 45%);
+  background: color-mix(in oklab, var(--brand-400) 22%, var(--surface) 78%);
+}
+
+.pl-badge.neutral{
+  background: color-mix(in oklab, var(--surface) 88%, transparent);
+}
+
+.pl-badge.bad{
+  border-color: color-mix(in oklab, var(--brand-600) 55%, var(--bd) 45%);
+  background: color-mix(in oklab, var(--brand-600) 16%, var(--surface) 84%);
+}
+
+/* Pill (status en Header) */
+.pl-pill{
+  display:inline-flex;
+  align-items:center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--bd);
+  font-weight: 900;
+  font-size: 12px;
+  letter-spacing: .12px;
+  background: color-mix(in oklab, var(--surface) 90%, transparent);
+}
+
+.pl-pill.ok{
+  border-color: color-mix(in oklab, var(--brand-400) 55%, var(--bd) 45%);
+  background: color-mix(in oklab, var(--brand-400) 22%, var(--surface) 78%);
+}
+
+.pl-pill.neutral{
+  background: color-mix(in oklab, var(--surface) 88%, transparent);
+}
+
+/* ---------- KPI ---------- */
+
+.pl-kpi{
+  border: 1px solid var(--bd);
+  border-radius: calc(var(--radius-xl) - 8px);
+  padding: 12px;
+  background:
+    radial-gradient(480px 150px at 20% 0%,
+      color-mix(in oklab, var(--brand-400) 22%, transparent),
+      transparent 60%
+    ),
+    color-mix(in oklab, var(--surface-elev) 90%, transparent);
+  min-width: 100px;
+}
+
+.pl-kpiLabel{
+  color: var(--muted);
+  font-weight: 800;
+  font-size: 12px;
+  letter-spacing: .14px;
+}
+
+.pl-kpiValue{
+  margin-top: 6px;
+  font-weight: 950;
+  font-size: 24px;
+  line-height: 1.05;
+}
+
+/* ---------- Notes / Empty ---------- */
+.pl-note{
+  margin-top: 12px;
+  padding: 10px 12px;
+  border: 1px dashed color-mix(in oklab, var(--bd) 70%, transparent);
+  border-radius: 14px;
+  background: color-mix(in oklab, var(--surface) 92%, transparent);
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.pl-empty{
+  padding: 12px;
+  border: 1px dashed color-mix(in oklab, var(--bd) 70%, transparent);
+  border-radius: 14px;
+  background: color-mix(in oklab, var(--surface) 92%, transparent);
+  color: var(--muted);
+}
+
+/* ---------- Modal ---------- */
+.pl-modalOverlay{
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.55);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding: 18px;
+  z-index: 50;
+}
+
+.pl-modal{
+  width: min(720px, 100%);
+  border-radius: var(--radius-3xl);
+  border: 1px solid var(--bd);
+  background:
+    radial-gradient(900px 300px at 18% 0%,
+      color-mix(in oklab, var(--brand-400) 20%, transparent),
+      transparent 62%
+    ),
+    var(--surface-elev);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  transform: translateY(0);
+}
+
+.pl-modalHead{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap: 14px;
+  padding: 14px 14px 12px;
+  border-bottom: 1px solid var(--bd);
+}
+
+.pl-modalBody{ padding: 14px; }
+
+.pl-modalActions{
+  display:flex;
+  justify-content:flex-end;
+  gap: 10px;
+  padding: 12px 14px;
+  border-top: 1px solid var(--bd);
+  background: color-mix(in oklab, var(--surface) 88%, transparent);
+}
+
+/* ---------- Form grid ---------- */
+.pl-formGrid{
+  display:grid;
+  grid-template-columns: 160px 1fr;
+  gap: 10px 12px;
+  align-items:center;
+}
+
+.pl-formGrid > span,
+.pl-label{
+  color: var(--muted);
+  font-weight: 800;
+  font-size: 12px;
+  letter-spacing: .12px;
+}
+
+@media (max-width: 640px){
+  .pl-formGrid{ grid-template-columns: 1fr; }
+}
+
+/* ---------- Inventory summary ---------- */
+.pl-summary{
+  border: 1px solid var(--bd);
+  border-radius: calc(var(--radius-xl) - 8px);
+  padding: 12px;
+  background: color-mix(in oklab, var(--surface) 92%, transparent);
+}
+
+.pl-summaryLine{
+  display:flex;
+  justify-content:space-between;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid color-mix(in oklab, var(--bd) 65%, transparent);
+}
+
+.pl-summaryLine:last-child{ border-bottom: 0; }
+
+/* ---------- Tests list ---------- */
+.pl-tests{
+  display:flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.pl-testItem{
+  border: 1px solid var(--bd);
+  border-radius: calc(var(--radius-xl) - 8px);
+  padding: 12px;
+  background:
+    linear-gradient(180deg,
+      color-mix(in oklab, var(--surface) 92%, transparent),
+      color-mix(in oklab, var(--surface-elev) 88%, transparent)
+    );
+}
+
+.pl-testMeta{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap: 10px;
+}
+
+.pl-testTitle{
+  font-weight: 900;
+  letter-spacing: .12px;
+}
+
+.pl-testControls{
+  display:flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+/* Si tu TestPill usa .pl-pill internamente, le damos look “toggle” */
+.pl-testControls .pl-pill{
+  cursor:pointer;
+  user-select:none;
+}
+
+.pl-testControls .pl-pill:hover{
+  border-color: color-mix(in oklab, var(--bd) 55%, var(--brand-400) 45%);
+  background: color-mix(in oklab, var(--surface) 78%, var(--brand-400) 22%);
+}
+
+/* ---------- Scrollbars (nice) ---------- */
+*{
+  scrollbar-width: thin;
+  scrollbar-color: var(--sb-thumb) var(--sb-track);
+}
+*::-webkit-scrollbar{ height: 10px; width: 10px; }
+*::-webkit-scrollbar-track{ background: var(--sb-track); border-radius: 999px; }
+*::-webkit-scrollbar-thumb{ background: var(--sb-thumb); border-radius: 999px; }
+*::-webkit-scrollbar-thumb:hover{ background: var(--sb-thumb-hover); }
+
+/* KPIs arriba */
+.pl-headTop{
+  margin-bottom: 10px;
+}
+
+.pl-kpisRow{
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* Barra de filtros FULL WIDTH debajo */
+.pl-filtersBar{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  margin: 10px 0 14px;
+
+  /* si quieres que NUNCA se parta en otra fila */
+  flex-wrap: nowrap;
+  min-width: 0;
+}
+
+/* Input que se estira */
+.pl-input.pl-grow{
+  flex: 1 1 520px;
+  min-width: 260px; /* ajusta a gusto */
+}
+
+/* Select tamaño fijo */
+.pl-input.pl-select{
+  flex: 0 0 180px;
+}
+
+/* Botón sin romper */
+.pl-filtersBar .pl-btn{
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.pl-modalWide{
+  width: min(1080px, 100%);
+  max-height: calc(100dvh - 48px);
+  display: flex;
+ flex-direction: column;
+}
+
+.pl-modalBody{
+  overflow: auto;
+}
+
+/* Layout Return (como tu boceto) */
+.pl-returnTop{
+  margin-bottom: 12px;
+}
+
+.pl-returnInfo{
+  border: 1px solid var(--bd);
+  border-radius: calc(var(--radius-xl) - 8px);
+  padding: 12px;
+  background: color-mix(in oklab, var(--surface) 92%, transparent);
+  display: grid;
+  gap: 8px;
+}
+
+.pl-returnLine{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+/* Abajo: pruebas + botón a la derecha */
+.pl-returnBottom{
+  border: 1px solid var(--bd);
+  border-radius: calc(var(--radius-xl) - 8px);
+  background: color-mix(in oklab, var(--surface) 92%, transparent);
+  overflow: hidden;
+
+  display: grid;
+  grid-template-columns: 1fr 260px; /* izquierda grande, derecha botón */
+  gap: 0;
+  min-height: 280px;
+}
+
+@media (max-width: 900px){
+  .pl-returnBottom{
+    grid-template-columns: 1fr; /* en móvil se apila */
+  }
+}
+
+.pl-returnTests{
+  padding: 12px;
+  border-right: 1px solid var(--bd);
+  min-width: 0;
+}
+
+@media (max-width: 900px){
+  .pl-returnTests{
+    border-right: 0;
+    border-bottom: 1px solid var(--bd);
+  }
+}
+
+.pl-returnSectionTitle{
+  font-weight: 900;
+  letter-spacing: .12px;
+  margin-bottom: 10px;
+}
+
+.pl-returnSide{
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* centra el botón verticalmente */
+  align-items: stretch;
+}
+
+.pl-returnBtn{
+  width: 100%;
+  padding: 14px 12px;
+  font-size: 14px;
+  border-radius: 16px;
+}
+
+/* ====== Tests: botones tipo segmented (sin bloques negros) ====== */
+
+/* Layout 3 columnas */
+.pl-testControls{
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 10px;
+}
+
+/* El botón wrapper (el que hoy se ve negro) */
+.pl-testPill{
+  appearance: none;
+  border: 1px solid var(--bd);
+  background: color-mix(in oklab, var(--surface) 92%, transparent);
+  border-radius: 14px;
+  padding: 10px;
+  cursor: pointer;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  transition: transform .12s ease, background .12s ease, border-color .12s ease, box-shadow .12s ease, opacity .12s ease;
+  box-shadow: 0 1px 0 rgba(0,0,0,.04);
+  color: black;
+}
+
+
+.pl-testPill:hover{
+  background: color-mix(in oklab, var(--surface) 78%, var(--brand-400) 22%);
+  border-color: color-mix(in oklab, var(--bd) 55%, var(--brand-400) 45%);
+  transform: translateY(-1px);
+}
+
+.pl-testPill:active{
+  transform: translateY(0px) scale(.99);
+}
+
+.pl-testPill:focus-visible{
+  outline: none;
+  box-shadow: 0 0 0 4px var(--ring), 0 12px 26px rgba(0,0,0,.18);
+}
+
+/* Cuando está activo, el “wrapper” también resalta */
+.pl-testPill.is-active{
+  border-color: color-mix(in oklab, var(--primary) 60%, var(--bd) 40%);
+  background: color-mix(in oklab, var(--surface) 70%, var(--brand-400) 30%);
+  box-shadow: 0 0 0 4px var(--ring), 0 14px 28px rgba(0,0,0,.18);
+}
+
+/* Evita que el <Pill> se vea “apretado” */
+.pl-testPill .pl-pill{
+  width: 100%;
+  justify-content: center;
+}
+
+/* Móvil: se apilan */
+@media (max-width: 520px){
+  .pl-testControls{
+    grid-template-columns: 1fr;
+  }
+}
+/* ===== Inventario layout (boceto) ===== */
+.pl-invLayout{
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 16px;
+  align-items: start;
+}
+
+@media (max-width: 980px){
+  .pl-invLayout{ grid-template-columns: 1fr; }
+}
+
+/* LEFT */
+.pl-invAddCard{
+  border: 1px solid var(--bd);
+  border-radius: var(--radius-xl);
+  background: color-mix(in oklab, var(--surface) 92%, transparent);
+  padding: 14px;
+}
+
+.pl-invAddTitle{
+  font-weight: 900;
+  letter-spacing: .12px;
+  margin-bottom: 10px;
+}
+
+.pl-invAddForm{
+  display: grid;
+  gap: 10px;
+}
+
+.pl-invLabel{
+  color: var(--muted);
+  font-weight: 800;
+  font-size: 12px;
+  letter-spacing: .12px;
+  margin-top: 6px;
+}
+
+/* RIGHT */
+.pl-invTableCard{
+  border: 1px solid var(--bd);
+  border-radius: var(--radius-xl);
+  background: color-mix(in oklab, var(--surface) 92%, transparent);
+  overflow: hidden;
+}
+
+.pl-invTableTop{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 12px;
+  border-bottom: 1px solid var(--bd);
+}
+
+.pl-invTableTitle{
+  font-weight: 900;
+  letter-spacing: .12px;
+}
+
+.pl-invSearch{
+  width: min(320px, 100%);
+}
+
+/* ===== Inventory layout (como tu boceto) ===== */
+.pl-invLayout{
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 18px;
+  align-items: start;
+}
+
+@media (max-width: 980px){
+  .pl-invLayout{ grid-template-columns: 1fr; }
+}
+
+/* Left panel */
+.pl-invLeft{
+  border: 1px solid var(--bd);
+  border-radius: var(--radius-xl);
+  background: color-mix(in oklab, var(--surface) 92%, transparent);
+  padding: 14px;
+}
+
+.pl-invTitle{
+  font-weight: 950;
+  font-size: 18px;
+  letter-spacing: .2px;
+  margin-bottom: 12px;
+}
+
+.pl-invForm{
+  display: grid;
+  gap: 10px;
+}
+
+.pl-invAddBtn{
+  width: 100%;
+  justify-content: center;
+  padding: 12px 12px;
+}
+
+/* Right panel */
+.pl-invRight{
+  border: 1px solid var(--bd);
+  border-radius: var(--radius-xl);
+  background: color-mix(in oklab, var(--surface) 92%, transparent);
+  overflow: hidden;
+}
+
+/* topbar con buscador arriba-derecha */
+.pl-invTopbar{
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 12px;
+  border-bottom: 1px solid var(--bd);
+  background: color-mix(in oklab, var(--surface-elev) 88%, transparent);
+}
+
+.pl-invSearch{
+  width: min(340px, 100%);
+}
+
+/* tabla ocupa el resto */
+.pl-invTable{
+  padding: 12px;
+}

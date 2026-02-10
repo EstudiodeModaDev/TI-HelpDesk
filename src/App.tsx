@@ -43,7 +43,8 @@ import AnnouncementsTable from "./components/TipsTable/TipsTable";
 import { useTheme } from "./Funcionalidades/Theme";
 import TeamsEventForm from "./components/Ausencia/Ausencia";
 import { StoragePage } from "./components/Storage/StoragePage";
-//import UsuariosApp from "./components/Usuarios copy/Acceso";
+import { PrestamosPage } from "./components/Loans/PretamosPage";
+import loanImage from "./assets/device.svg"
 
 /* ============================================================
    Tipos de navegación y contexto de visibilidad
@@ -71,7 +72,7 @@ export type NavContext = {
   flags?: Set<string>;
   hasService?: (k: keyof Services) => boolean;
 };
- 
+  
 /* ============================================================
    Árbol único de navegación con reglas de visibilidad
    ============================================================ */
@@ -85,6 +86,7 @@ const NAV: MenuItem[] = [
   { id: "formatos", label: "Formatos", icon: <img src={filesIcon} alt="" className="sb-icon" />, to: <Formatos />, roles: ["Administrador", "Listo"] },
   { id: "info", label: "Información", icon: <img src={infoIcon} alt="" className="sb-icon" />, to: <InfoPage />, roles: ["Administrador", "Tecnico", "Listo"] },
   { id: "storage", label: "Almacenamiento", icon: <img src={storageIcon} alt="" className="sb-icon" />, to: <StoragePage />, roles: ["Administrador", "Listo"] },
+  { id: "loan", label: "Prestamos", icon: <img src={loanImage} alt="" className="sb-icon" />, to: <PrestamosPage />, roles: ["Administrador", "Listo"] },
   { id: "admin", label: "Administración", icon: <img src={settingsIcon} className="sb-icon" />, roles: ["Administrador", "Tecnico", "Listo"], children: [
       { id: "anuncios", label: "Anuncios", to: <CrearAnuncio />, roles: ["Administrador", "Tecnico"], icon: <img src={newsIcon} className="sb-icon" /> },
       { id: "plantillas", label: "Plantillas", icon: <img src={templateIcon} className="sb-icon" />, to: <CrearPlantilla />, roles: ["Administrador", "Tecnico", "Listo"] },
