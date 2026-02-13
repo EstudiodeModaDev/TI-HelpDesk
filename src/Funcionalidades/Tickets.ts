@@ -82,6 +82,7 @@ export function calcularColorEstado(ticket: Ticket): string {
 export function useTickets(graph: GraphRest, TicketsSvc: TicketsService, userMail: string, role: string) {
   const [rows, setRows] = React.useState<Ticket[]>([]);
   const [loading, setLoading] = React.useState(false);
+  const [me, setMe] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const [filterMode, setFilterMode] = React.useState<string>("En curso");
   const today = React.useMemo(() => toISODateFlex(new Date()), []);
@@ -160,7 +161,7 @@ export function useTickets(graph: GraphRest, TicketsSvc: TicketsService, userMai
     const isAdmin = role === "Administrador" || (userMail === "listo@estudiodemoda.com.co");
     const isJefeZona = role === "Jefe de zona";
 
-    if (!isAdmin) {
+    if (!isAdmin || me) {
       const emailSafe = String(userMail ?? "").replace(/'/g, "''");
 
       // Siempre: mis tickets (incluye Jefe de zona)
@@ -223,7 +224,7 @@ export function useTickets(graph: GraphRest, TicketsSvc: TicketsService, userMai
       orderby: orderParts.join(","),
       top: pageSize,
     };
-  }, [role, userMail, filterMode, range.from, range.to, pageSize, sorts, zoneEmails]);
+  }, [role, userMail, filterMode, range.from, range.to, pageSize, sorts, zoneEmails, me]);
 
   const toTicketOptions = React.useCallback(
     async (opts?: { includeIdInLabel?: boolean; fallbackIfEmptyTitle?: string; idPrefix?: string; top?: number; orderby?: string }): Promise<ticketOption[]> => {
@@ -401,7 +402,7 @@ export function useTickets(graph: GraphRest, TicketsSvc: TicketsService, userMai
   }
 
   return {
-    rows, ticketsAbiertos, loading, ticketsFueraTiempo, error, pageSize, pageIndex, hasNext, filterMode, sorts, range, state,
+    rows, ticketsAbiertos, loading, ticketsFueraTiempo, error, pageSize, pageIndex, hasNext, filterMode, sorts, range, state, setMe, me, 
     nextPage, setPageSize, setFilterMode, setRange, applyRange, loadFirstPage, toggleSort, setField, toTicketOptions, setState, handleConfirm, sendFileToFlow, updateSelectedTicket,
   };
 }
