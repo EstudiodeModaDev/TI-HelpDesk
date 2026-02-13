@@ -19,7 +19,7 @@ import { toGraphDateOnly } from "../utils/Date";
 const ENTREGAS_BY_TIPO: Record<TipoUsuario, string[]> = {
   "Usuario administrativo": ["Computador", "Cargador", "Mouse", "Multipuertos", "Diadema"],
   "Usuario de diseño": ["Computador", "Tableta graficadora", "Cargador", "Mouse", "Multipuertos", "Diadema"],
-  "Tienda": ["CPU", "Monitor", "Teclado", "Mouse", "Lector CB", "Cajón Monedero", "Cámara", "Teléfono", "Multipuertos"],
+  "Tienda": ["Computador", "Monitor", "Teclado", "Mouse", "Lector CB", "Cajón Monedero", "Cámara", "Teléfono", "Multipuertos"],
 };
 const ITEMS_CON_TIPO_COMPUTADOR = new Set(["Computador", "CPU"]);
 const VACIO = "-------";
