@@ -125,7 +125,7 @@ export function ReturnModal({open, onClose, loan, dispositivos, onFinalize, }: R
             </div>
 
             <div className="pl-returnSide">
-              <button className="pl-btn primary pl-returnBtn" disabled={!canFinalize} onClick={submitFinalize}>
+              <button className="pl-btn primary pl-returnBtn" disabled={!canFinalize} onClick={() => {submitFinalize(); onClose()}}>
                 Devolver
               </button>
               {!canFinalize && (

@@ -48,6 +48,8 @@ export function PrestamosPage() {
     await notifyEstado(loan, dispositivosRows, continuar ? "Buen estado" : "Mal estado"); //Enviar notificacion de alerta
     alert("Se ha finalizado el prestamo. Se actualizará el estado del dispositivo.");
     await deviceReturn(loan.Id_dispositivo, continuar); //Organizar devolución del dispositivo
+    load()
+    loadPrestamos()
   };
 
   const onCreateDevice = async (mode: string) => {

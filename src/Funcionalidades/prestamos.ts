@@ -341,7 +341,7 @@ export function usePruebas() {
       let nextLink: string | undefined = undefined;
 
       do {
-        const res: PageResult<pruebasDefinidas> = nextLink ? await pruebas.getByNextLink(nextLink) : await pruebas.getAll({filter: `fields/Estado eq Activo`, orderby: "fields/Created asc"});     
+        const res: PageResult<pruebasDefinidas> = nextLink ? await pruebas.getByNextLink(nextLink) : await pruebas.getAll({filter: `fields/Estado eq 'Activo'`, orderby: "fields/Created asc"});     
 
         all.push(...(res.items ?? []));
         nextLink = res.nextLink ? res.nextLink : "";
@@ -360,7 +360,6 @@ export function usePruebas() {
     setSubmitting(true);
     const pruebasLoaded = await loadPruebas();
     try {
-      alert(pruebasLoaded.length)
       if(pruebasLoaded.length === 0) return
 
       pruebasLoaded.forEach(async p => {
