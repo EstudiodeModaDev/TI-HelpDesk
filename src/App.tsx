@@ -86,7 +86,7 @@ const NAV: MenuItem[] = [
   { id: "formatos", label: "Formatos", icon: <img src={filesIcon} alt="" className="sb-icon" />, to: <Formatos />, roles: ["Administrador", "Listo"] },
   { id: "info", label: "Información", icon: <img src={infoIcon} alt="" className="sb-icon" />, to: <InfoPage />, roles: ["Administrador", "Tecnico", "Listo"] },
   { id: "storage", label: "Almacenamiento", icon: <img src={storageIcon} alt="" className="sb-icon" />, to: <StoragePage />, roles: ["Administrador", "Listo"] },
-  { id: "loan", label: "Prestamos", icon: <img src={loanImage} alt="" className="sb-icon" />, to: <PrestamosPage />, roles: ["Administrador", "Listo"] },
+  { id: "loan", label: "Prestamos", icon: <img src={loanImage} alt="" className="sb-icon" />, to: <PrestamosPage />, roles: ["Administrador", "Listo", "Tecnico"] },
   { id: "admin", label: "Administración", icon: <img src={settingsIcon} className="sb-icon" />, roles: ["Administrador", "Tecnico", "Listo"], children: [
       { id: "anuncios", label: "Anuncios", to: <CrearAnuncio />, roles: ["Administrador", "Tecnico"], icon: <img src={newsIcon} className="sb-icon" /> },
       { id: "plantillas", label: "Plantillas", icon: <img src={templateIcon} className="sb-icon" />, to: <CrearPlantilla />, roles: ["Administrador", "Tecnico", "Listo"] },
