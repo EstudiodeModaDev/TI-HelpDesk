@@ -143,7 +143,7 @@ export function LoanHistorySection({onFinalizeLoan, setField, state, rows, query
                       </td>
 
                       <td>
-                        <div className="pl-cellMain">{device?.Title ?? "Equipo no encontrado"}</div>
+                        <div className="pl-cellMain">{device?.Title} {device?.Referencia}</div>
                         <div className="pl-cellSub pl-mono">{device?.Serial ?? "—"}</div>
                       </td>
 

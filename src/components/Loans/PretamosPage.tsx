@@ -23,7 +23,7 @@ export function deviceStatusTone(s: string): Tone {
 
 export function PrestamosPage() {
   const [activeTab, setActiveTab] = React.useState<PrestamosTabKey>("historial");
-  const {notify, rows, estado, setEstado, search, setSearch, handleSubmit, state, setField, load: loadPrestamos, finalizeLoan: Terminar, notifyEstado } = usePrestamos()
+  const {notify, visibleRows, estado, setEstado, search, setSearch, handleSubmit, state, setField, load: loadPrestamos, finalizeLoan: Terminar, notifyEstado } = usePrestamos()
   const {setState, deviceReturn, borrowDevice, load, setField: setFieldDispositivos, handleSubmit: crearDispositivo, rows: dispositivosRows, search: dispositivosSearch, setSearch: setDispositivosSearch, state: dispositivosState, editDevice } = useDispositivos()
   const {handleSubmit: createTest, editTest, createAllPruebas, loadAllPruebas, pruebasRows, state: pruebasState, setField: setFieldPruebas, setState: setPruebasState} = usePruebas()
 
@@ -73,7 +73,7 @@ export function PrestamosPage() {
       <Tabs value={activeTab} onChange={setActiveTab} items={[{ key: "historial", label: "Historial" }, { key: "inventario", label: "Inventario" }, { key: "pruebas", label: "Pruebas" }]}/>
 
       {activeTab === "historial" && (
-        <LoanHistorySection rows={rows} query={search} statusFilter={estado} onQueryChange={setSearch} onStatusFilterChange={setEstado} dispositivos={dispositivosRows} onCreateLoan={createLoan} state={state} setField={setField} onFinalizeLoan={finalizeLoan}/>
+        <LoanHistorySection rows={visibleRows} query={search} statusFilter={estado} onQueryChange={setSearch} onStatusFilterChange={setEstado} dispositivos={dispositivosRows} onCreateLoan={createLoan} state={state} setField={setField} onFinalizeLoan={finalizeLoan}/>
       )}
 
       {activeTab === "inventario" && (

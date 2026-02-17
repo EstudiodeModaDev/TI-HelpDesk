@@ -9,6 +9,7 @@ import type { FlowToUser } from "../Models/FlujosPA";
 
 export function usePrestamos() {
   const {prestamos, Tickets, Logs} = useGraphServices()
+  const {dispositivosById} = useDispositivos()
   const [rows, setRows] = React.useState<prestamos[]>([]);
   const [loading, setLoading] = React.useState(false);
   const [submitting, setSubmitting] = React.useState(false);
@@ -20,19 +21,17 @@ export function usePrestamos() {
   const [errors, setErrors] = React.useState<prestamosErrors>({});
   const {account} = useAuth()
   const notifyFlow = new FlowClient("https://defaultcd48ecd97e154f4b97d9ec813ee42b.2c.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/a21d66d127ff43d7a940369623f0b27d/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=0ptZLGTXbYtVNKdmIvLdYPhw1Wcqb869N3AOZUf2OH4")
-
+  
   const buildFilter = React.useCallback((): GetAllOpts => {
     const filters: string[] = [];
 
     if(estado && estado !== "all") filters.push(`fields/Estado eq '${estado}'`);
-    if(search) filters.push(`startswith(fields/Title, '${search}')`);
-
 
     return {
       filter: filters.join(" and "),
       orderby: "fields/Created asc", 
     };
-  }, [estado, search]);
+  }, [estado,]);
 
   const validate = () => {
     const e: prestamosErrors = {};
@@ -167,8 +166,29 @@ export function usePrestamos() {
     }
   }
 
+  const visibleRows = React.useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q || q.length < 3) return rows;
+
+    return rows.filter(p => {
+      const d = dispositivosById.get(p.Id_dispositivo);
+
+      return (
+        p.Title?.toLowerCase().includes(q) ||
+        p.nombreSolicitante?.toLowerCase().includes(q) ||
+        (d?.Referencia ?? "").toLowerCase().includes(q) ||
+        (d?.Serial ?? "").toLowerCase().includes(q) ||
+        (d?.Title)?.toLowerCase().includes(q)
+      );
+    });
+  }, [rows, search, dispositivosById]);
+  
+
+  React.useEffect(() => { load(); }, [load]);
+
+
   return {
-    rows, loading, error, load, reload, estado, setEstado, search, setSearch, handleSubmit, errors, submitting, setField, state, notify, finalizeLoan, notifyEstado
+    visibleRows, rows, loading, error, load, reload, estado, setEstado, search, setSearch, handleSubmit, errors, submitting, setField, state, notify, finalizeLoan, notifyEstado
   };
 }
 
@@ -313,8 +333,17 @@ export function useDispositivos() {
     load();
   }, [load]);
 
+  React.useEffect(() => { load(); }, [load]);
+
+
+  const dispositivosById = React.useMemo(() => {
+    const m = new Map<string, dispositivos>();
+    for (const d of rows) m.set(d?.Id ?? "", d);
+    return m;
+  }, [rows]);
+
   return {
-    rows, loading, error, load, reload, estado, setEstado, search, setSearch, handleSubmit, errors, state, setState, submitting, setField, borrowDevice, deviceReturn, editDevice
+    dispositivosById, rows, loading, error, load, reload, estado, setEstado, search, setSearch, handleSubmit, errors, state, setState, submitting, setField, borrowDevice, deviceReturn, editDevice
   };
 }
 

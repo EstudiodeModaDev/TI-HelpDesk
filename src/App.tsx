@@ -91,7 +91,6 @@ const NAV: MenuItem[] = [
       { id: "anuncios", label: "Anuncios", to: <CrearAnuncio />, roles: ["Administrador", "Tecnico"], icon: <img src={newsIcon} className="sb-icon" /> },
       { id: "plantillas", label: "Plantillas", icon: <img src={templateIcon} className="sb-icon" />, to: <CrearPlantilla />, roles: ["Administrador", "Tecnico", "Listo"] },
       { id: "usuarios", label: "Usuarios", icon: <img src={usersIcon} className="sb-icon" />, to: <UsuariosPanel />, roles: ["Administrador"] },
-     // { id: "acceso", label: "Acceso", to: <UsuariosApp />, roles: ["Administrador", "Tecnico"] },
       { id: "tips", label: "Tips", icon: <img src={infoIcon} className="sb-icon" />, to: <AnnouncementsTable />, roles: ["Administrador", "Tecnico", "Listo"] },
     ],
   },
