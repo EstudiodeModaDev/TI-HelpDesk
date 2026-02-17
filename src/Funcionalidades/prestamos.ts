@@ -148,6 +148,30 @@ export function usePrestamos() {
     }
   }, [buildFilter, prestamos]);
 
+  const loadDeviceLoans = React.useCallback(async (idDevice: string): Promise<prestamos[]> => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const all: prestamos[] = [];
+      let nextLink: string | undefined = undefined;
+
+      do {
+        const res: PageResult<prestamos> = nextLink ? await prestamos.getByNextLink(nextLink) : await prestamos.getAll({filter: `fields/Id_dispositivo eq '${idDevice}'`});     
+
+        all.push(...(res.items ?? []));
+        nextLink = res.nextLink ? res.nextLink : "";
+      } while (nextLink);
+
+      return all
+    } catch (e: any) {
+      setError(e?.message ?? "Error cargando logs");
+      return []
+    } finally {
+      setLoading(false);
+    }
+  }, [buildFilter, prestamos]);
+
   const reload = React.useCallback(() => {
     load();
   }, [load]);
@@ -188,7 +212,7 @@ export function usePrestamos() {
 
 
   return {
-    visibleRows, rows, loading, error, load, reload, estado, setEstado, search, setSearch, handleSubmit, errors, submitting, setField, state, notify, finalizeLoan, notifyEstado
+    loadDeviceLoans, visibleRows, rows, loading, error, load, reload, estado, setEstado, search, setSearch, handleSubmit, errors, submitting, setField, state, notify, finalizeLoan, notifyEstado
   };
 }
 
@@ -430,7 +454,7 @@ export function usePruebas() {
     }
   }, [pruebas]);
 
-  const loadPruebasPrestamo = React.useCallback(async (Id: string): Promise<pruebasPrestamo[]> => {
+  const loadPruebasPrestamo = React.useCallback(async (Id: string, fase: string): Promise<pruebasPrestamo[]> => {
     setLoading(true);
 
     try {
@@ -438,7 +462,7 @@ export function usePruebas() {
       let nextLink: string | undefined = undefined;
 
       do {
-        const res: PageResult<pruebasPrestamo> = nextLink ? await pruebasPrestamo.getByNextLink(nextLink) : await pruebasPrestamo.getAll({filter: `fields/IdPrestamo eq '${Id}'`});     
+        const res: PageResult<pruebasPrestamo> = nextLink ? await pruebasPrestamo.getByNextLink(nextLink) : await pruebasPrestamo.getAll({filter: `fields/IdPrestamo eq '${Id}' and fields/Fase eq '${fase}'`});     
 
         all.push(...(res.items ?? []));
         nextLink = res.nextLink ? res.nextLink : "";
@@ -469,7 +493,7 @@ export function usePruebas() {
       )
     );
 
-    await loadPruebasPrestamo(String(loan.Id));
+    await loadPruebasPrestamo(String(loan.Id), "Devolucion");
     setDraft({});
 
     const hasNoExitosa = pendingChanges.some(([, next]) =>

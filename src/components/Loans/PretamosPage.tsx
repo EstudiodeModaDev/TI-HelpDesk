@@ -4,7 +4,7 @@ import { useDispositivos, usePrestamos, usePruebas } from "../../Funcionalidades
 import { Tabs } from "./Tabs";
 import { LoanHistorySection } from "./Secciones";
 import { InventorySection } from "./InventorySection";
-import type { prestamos } from "../../Models/prestamos";
+import type { dispositivos, prestamos } from "../../Models/prestamos";
 import { PruebasSection } from "./Pruebas";
 export type Tone = "ok" | "warn" | "bad" | "neutral";
 export type PrestamosTabKey = "historial" | "inventario" | "pruebas";
@@ -23,7 +23,9 @@ export function deviceStatusTone(s: string): Tone {
 
 export function PrestamosPage() {
   const [activeTab, setActiveTab] = React.useState<PrestamosTabKey>("historial");
-  const {notify, visibleRows, estado, setEstado, search, setSearch, handleSubmit, state, setField, load: loadPrestamos, finalizeLoan: Terminar, notifyEstado } = usePrestamos()
+  const [selected, setSelected] = React.useState<dispositivos | null>(null)
+  const [deviceLoans, setDeviceLoans] = React.useState<prestamos[]>([])
+  const {loadDeviceLoans, notify, visibleRows, estado, setEstado, search, setSearch, handleSubmit, state, setField, load: loadPrestamos, finalizeLoan: Terminar, notifyEstado } = usePrestamos()
   const {setState, deviceReturn, borrowDevice, load, setField: setFieldDispositivos, handleSubmit: crearDispositivo, rows: dispositivosRows, search: dispositivosSearch, setSearch: setDispositivosSearch, state: dispositivosState, editDevice } = useDispositivos()
   const {handleSubmit: createTest, editTest, createAllPruebas, loadAllPruebas, pruebasRows, state: pruebasState, setField: setFieldPruebas, setState: setPruebasState} = usePruebas()
 
@@ -32,6 +34,28 @@ export function PrestamosPage() {
     loadPrestamos()
     loadAllPruebas()
   }, [dispositivosSearch, estado, search,]);
+
+  React.useEffect(() => {
+    if (!selected?.Id) return;
+
+    let cancelled = false;
+
+    (async () => {
+      try {
+        const deviceLoans = await loadDeviceLoans(selected.Id ?? "");
+        if (!cancelled) setDeviceLoans(deviceLoans);
+      } catch (err) {
+        if (!cancelled) {
+          // opcional: setError(err)
+          console.error(err);
+        }
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [selected?.Id]);
 
   const createLoan = async (deviceId: string) => {
     const result = await handleSubmit();
@@ -70,18 +94,50 @@ export function PrestamosPage() {
   
   return (
     <div className="pl-page">
-      <Tabs value={activeTab} onChange={setActiveTab} items={[{ key: "historial", label: "Historial" }, { key: "inventario", label: "Inventario" }, { key: "pruebas", label: "Pruebas" }]}/>
+      <Tabs 
+        value={activeTab} 
+        onChange={setActiveTab} 
+        items={[{ key: "historial", label: "Historial" }, { key: "inventario", label: "Inventario" }, { key: "pruebas", label: "Pruebas" }]}
+      />
 
       {activeTab === "historial" && (
-        <LoanHistorySection rows={visibleRows} query={search} statusFilter={estado} onQueryChange={setSearch} onStatusFilterChange={setEstado} dispositivos={dispositivosRows} onCreateLoan={createLoan} state={state} setField={setField} onFinalizeLoan={finalizeLoan}/>
+        <LoanHistorySection 
+          rows={visibleRows} 
+          query={search} 
+          statusFilter={estado} 
+          onQueryChange={setSearch} 
+          onStatusFilterChange={setEstado} 
+          dispositivos={dispositivosRows} 
+          onCreateLoan={createLoan} 
+          state={state} 
+          setField={setField} 
+          onFinalizeLoan={finalizeLoan}/>
       )}
 
       {activeTab === "inventario" && (
-        <InventorySection inventory={dispositivosRows} inventoryQuery={dispositivosSearch} onInventoryQueryChange={setDispositivosSearch} state={dispositivosState} setFieldState={setFieldDispositivos} onAddSubmit={onCreateDevice} load={load} setState={setState}/>
+        <InventorySection 
+          inventory={dispositivosRows}
+          inventoryQuery={dispositivosSearch}
+          onInventoryQueryChange={setDispositivosSearch}
+          state={dispositivosState} setFieldState={setFieldDispositivos}
+          onAddSubmit={onCreateDevice}
+          load={load}
+          setState={setState}
+          selectedDevice={selected}
+          setSelectedDevice={setSelected} 
+          rows={deviceLoans}        
+        />
       )}
 
       {activeTab === "pruebas" && (
-        <PruebasSection test={pruebasRows} state={pruebasState} setFieldState={setFieldPruebas} onAddSubmit={onCreateTest} load={loadAllPruebas} setState={setPruebasState}/>
+        <PruebasSection 
+          test={pruebasRows} 
+          state={pruebasState} 
+          setFieldState={setFieldPruebas} 
+          onAddSubmit={onCreateTest} 
+          load={loadAllPruebas} 
+          setState={setPruebasState}
+        />
       )}
     </div>
   );

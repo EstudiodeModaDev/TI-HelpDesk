@@ -11,9 +11,10 @@ export type ReturnModalProps = {
   dispositivos: dispositivos[];
   onFinalize: (continuar: boolean) => Promise<void> | void; // mejor tipado
   onChange?: (testId: string, next: string) => void;
+  mode: "edit" | "view";
 };
 
-export function ReturnModal({open, onClose, loan, dispositivos, onFinalize, }: ReturnModalProps) {
+export function ReturnModal({open, onClose, loan, dispositivos, onFinalize, mode }: ReturnModalProps) {
   const overlayRef = React.useRef<HTMLDivElement | null>(null);
   const { loadPruebasPrestamo, pruebasPrestamoRows, draft, onDraftChange, handleFinalize, setDraft} = usePruebas();
 
@@ -68,7 +69,7 @@ export function ReturnModal({open, onClose, loan, dispositivos, onFinalize, }: R
     const id = loan?.Id;
     if (!id) return;
 
-    loadPruebasPrestamo(String(id));
+    loadPruebasPrestamo(String(id), "Devolucion");
   }, [open, loan?.Id, loadPruebasPrestamo]);
 
   React.useEffect(() => {
@@ -121,16 +122,21 @@ export function ReturnModal({open, onClose, loan, dispositivos, onFinalize, }: R
           <div className="pl-returnBottom">
             <div className="pl-returnTests">
               <div className="pl-returnSectionTitle">Pruebas</div>
-              <ReturnTestsList tests={mergedTests} onChange={onDraftChange} />
+              <ReturnTestsList tests={mergedTests} onChange={onDraftChange} mode={mode} />
             </div>
 
             <div className="pl-returnSide">
               <button className="pl-btn primary pl-returnBtn" disabled={!canFinalize} onClick={() => {submitFinalize(); onClose()}}>
                 Devolver
               </button>
-              {!canFinalize && (
+              {!canFinalize && mode==="edit" && (
                 <div className="pl-note" style={{ marginTop: 10 }}>
                   Marca las pruebas antes de finalizar.
+                </div>)
+              }
+              {!canFinalize && mode==="view" && (
+                <div className="pl-note" style={{ marginTop: 10 }}>
+                  Solo disponible para vista.
                 </div>)
               }
             </div>

@@ -1,8 +1,9 @@
 import React from "react";
-import type { dispositivos } from "../../Models/prestamos";
+import type { dispositivos, prestamos } from "../../Models/prestamos";
 import { Badge } from "./Badge";
 import { DataTable } from "./DateTable";
 import { deviceStatusTone } from "./PretamosPage";
+import { DeviceHistoryModal } from "./DeviceHistory";
 
 export type InventorySectionProps = {
   inventory: dispositivos[];
@@ -14,10 +15,15 @@ export type InventorySectionProps = {
   onAddSubmit: (mode: string) => void;
   setState: (state: dispositivos) => void;
   load: () => void;
+  selectedDevice: dispositivos | null
+  setSelectedDevice: (e: dispositivos) => void
+  rows: prestamos[]
 };
 
-export function InventorySection({inventory, inventoryQuery, onInventoryQueryChange, state, setFieldState, onAddSubmit, setState}: InventorySectionProps) {
+export function InventorySection({rows, inventory, inventoryQuery, onInventoryQueryChange, state, setFieldState, onAddSubmit, setState, setSelectedDevice, selectedDevice}: InventorySectionProps) {
   const [mode, setMode] = React.useState<"new" | "edit">("new");
+  const [history, setHistory] = React.useState<boolean>(false)
+  
   return (
     <div className="pl-invLayout">
       {/* LEFT: Form pequeño */}
@@ -59,7 +65,7 @@ export function InventorySection({inventory, inventoryQuery, onInventoryQueryCha
 
         <div className="pl-invTable">
           <DataTable
-            columns={["Equipo", "Marca", "Serial", "Estado"]}
+            columns={["Equipo", "Marca", "Serial", "Estado", "Acciones"]}
             rows={
               <>
                 {inventory.map((d) => (
@@ -70,6 +76,11 @@ export function InventorySection({inventory, inventoryQuery, onInventoryQueryCha
                     <td>
                       <Badge tone={deviceStatusTone(d.Estado)}>{d.Estado}</Badge>
                     </td>
+                    <td className="pl-actionsCell">
+                      <button type="button" className="pl-actionBtn" onClick={() => {setSelectedDevice(d); setHistory(true)}}>
+                        Ver
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </>
@@ -77,6 +88,9 @@ export function InventorySection({inventory, inventoryQuery, onInventoryQueryCha
           />
         </div>
       </section>
+      
+      <DeviceHistoryModal open={history} onClose={() => setHistory(false)} selectedDispositivo={selectedDevice!} rows={rows} devices={inventory}></DeviceHistoryModal>
+
     </div>
   );
 }
