@@ -30,6 +30,7 @@ export type pruebasPrestamo = {
     IdPrestamo: string;
     Aprobado: string;
     Observaciones: string;
+    Fase: string;
 }
 
 export type dispositivosErrors = Partial<Record<keyof dispositivos, string>>;

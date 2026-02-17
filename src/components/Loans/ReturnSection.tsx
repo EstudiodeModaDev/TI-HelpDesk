@@ -11,15 +11,24 @@ export type ReturnModalProps = {
   dispositivos: dispositivos[];
   onFinalize: (continuar: boolean) => Promise<void> | void; // mejor tipado
   onChange?: (testId: string, next: string) => void;
-  mode: "edit" | "view";
+  mode: "edit" | "view"
+  fase: "Devolucion" | "Entrega" | "Ambas"
 };
 
-export function ReturnModal({open, onClose, loan, dispositivos, onFinalize, mode }: ReturnModalProps) {
+export function ReturnModal({open, onClose, loan, dispositivos, onFinalize, mode, fase}: ReturnModalProps) {
   const overlayRef = React.useRef<HTMLDivElement | null>(null);
   const { loadPruebasPrestamo, pruebasPrestamoRows, draft, onDraftChange, handleFinalize, setDraft} = usePruebas();
 
-  const mergedTests = React.useMemo(() => {
-    return pruebasPrestamoRows.map(t => {
+  const mergedTestsDevolucion = React.useMemo(() => {
+    return pruebasPrestamoRows.filter(t => t.Fase === "Devolucion").map(t => {
+      const id = t.Id ?? "";
+      const next = id && draft[id] ? draft[id] : undefined;
+      return next ? { ...t, Aprobado: next } : t;
+    });
+  }, [pruebasPrestamoRows, draft]);
+
+  const mergedTestEntrega = React.useMemo(() => {
+    return pruebasPrestamoRows.filter(t => t.Fase === "Entraga").map(t => {
       const id = t.Id ?? "";
       const next = id && draft[id] ? draft[id] : undefined;
       return next ? { ...t, Aprobado: next } : t;
@@ -69,7 +78,7 @@ export function ReturnModal({open, onClose, loan, dispositivos, onFinalize, mode
     const id = loan?.Id;
     if (!id) return;
 
-    loadPruebasPrestamo(String(id), "Devolucion");
+    loadPruebasPrestamo(String(id), fase);
   }, [open, loan?.Id, loadPruebasPrestamo]);
 
   React.useEffect(() => {
@@ -120,10 +129,20 @@ export function ReturnModal({open, onClose, loan, dispositivos, onFinalize, mode
           </div>
 
           <div className="pl-returnBottom">
-            <div className="pl-returnTests">
-              <div className="pl-returnSectionTitle">Pruebas</div>
-              <ReturnTestsList tests={mergedTests} onChange={onDraftChange} mode={mode} />
-            </div>
+            
+            { (fase === "Entrega" || fase=== "Ambas") ?
+              <div className="pl-returnTests">
+                <div className="pl-returnSectionTitle">Pruebas de devolucion</div>
+                <ReturnTestsList tests={mergedTestEntrega} onChange={onDraftChange} mode={mode} />
+              </div> : null
+            }
+
+            { (fase === "Devolucion" || fase=== "Ambas") ?
+              <div className="pl-returnTests">
+                <div className="pl-returnSectionTitle">Pruebas de devolucion</div>
+                <ReturnTestsList tests={mergedTestsDevolucion} onChange={onDraftChange} mode={mode} />
+              </div> : null
+            }
 
             <div className="pl-returnSide">
               <button className="pl-btn primary pl-returnBtn" disabled={!canFinalize} onClick={() => {submitFinalize(); onClose()}}>

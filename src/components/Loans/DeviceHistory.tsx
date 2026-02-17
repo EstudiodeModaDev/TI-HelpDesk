@@ -21,7 +21,7 @@ export function DeviceHistoryModal({open, selectedDispositivo, onClose, rows, de
   if (!open) return null;
 
   if (openPruebas) return (
-    <ReturnModal open={openPruebas} onClose={() => setOpenPruebas(false)} loan={selectedLoan!} dispositivos={devices} onFinalize={() => { return; } } mode={"view"} />
+    <ReturnModal open={openPruebas} onClose={() => setOpenPruebas(false)} loan={selectedLoan!} dispositivos={devices} onFinalize={() => { return; } } mode={"view"} fase={"Ambas"} />
   )
 
   return (

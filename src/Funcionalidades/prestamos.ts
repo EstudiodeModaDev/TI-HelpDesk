@@ -416,13 +416,14 @@ export function usePruebas() {
       if(pruebasLoaded.length === 0) return
 
       pruebasLoaded.forEach(async p => {
-        const payload: pruebasPrestamo = {
+        const payload = {
           Title: p.Title,
           IdPrestamo: prestamoId,
           Aprobado: "Pendiente",
-          Observaciones: ""
+          Observaciones: "",
         }
-        await pruebasPrestamo.create(payload);
+        await pruebasPrestamo.create({...payload, Fase: "Devolucion"});
+        await pruebasPrestamo.create({...payload, Fase: "Entrega"});
       });
     } catch (err) {
       console.error("Error en handleSubmit:", err);
@@ -454,30 +455,53 @@ export function usePruebas() {
     }
   }, [pruebas]);
 
-  const loadPruebasPrestamo = React.useCallback(async (Id: string, fase: string): Promise<pruebasPrestamo[]> => {
+  const loadPruebasPrestamo = React.useCallback(async (Id: string, fase: "Entrega" | "Devolucion" | "Ambas"): Promise<pruebasPrestamo[]> => {
     setLoading(true);
 
-    try {
-      const all: any[] = [];
+    const fetchByFase = async (faseSingle: "Entrega" | "Devolucion") => {
+      const all: pruebasPrestamo[] = [];
       let nextLink: string | undefined = undefined;
 
       do {
-        const res: PageResult<pruebasPrestamo> = nextLink ? await pruebasPrestamo.getByNextLink(nextLink) : await pruebasPrestamo.getAll({filter: `fields/IdPrestamo eq '${Id}' and fields/Fase eq '${fase}'`});     
+        const res: PageResult<pruebasPrestamo> = nextLink ? await pruebasPrestamo.getByNextLink(nextLink) : await pruebasPrestamo.getAll({filter: `fields/IdPrestamo eq '${Id}' and fields/Fase eq '${faseSingle}'`, });
 
         all.push(...(res.items ?? []));
         nextLink = res.nextLink ? res.nextLink : "";
-        console.log(all)
       } while (nextLink);
 
-      setPruebasPrestamoRows(all);
       return all;
+    };
+
+    try {
+      let rows: pruebasPrestamo[] = [];
+
+      if (fase === "Ambas") {
+        const [entrega, devolucion] = await Promise.all([
+          fetchByFase("Entrega"),
+          fetchByFase("Devolucion"),
+        ]);
+
+        // ✅ merge sin duplicados por Id
+        const map = new Map<string, pruebasPrestamo>();
+        [...entrega, ...devolucion].forEach((t) => {
+          const key = String(t.Id ?? "");
+          if (key) map.set(key, t);
+        });
+
+        rows = Array.from(map.values());
+      } else {
+        rows = await fetchByFase(fase);
+      }
+
+      setPruebasPrestamoRows(rows);
+      return rows;
     } catch (e: any) {
       setPruebasPrestamoRows([]);
       return [];
     } finally {
       setLoading(false);
     }
-  }, [pruebasPrestamo]);
+  },[pruebasPrestamo]);
 
   const pendingChanges = React.useMemo(() => {
     const currentById = new Map(pruebasPrestamoRows.map(t => [t.Id ?? "", t.Aprobado]));

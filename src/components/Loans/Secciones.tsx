@@ -234,7 +234,7 @@ export function LoanHistorySection({onFinalizeLoan, setField, state, rows, query
           </div>
         </div>
       )}
-      <ReturnModal open={openDevolver} onClose={() => setOpenDevolver(false)} loan={selectedLoan!} dispositivos={dispositivos} onFinalize={submitFinalize} mode={"edit"} />
+      <ReturnModal open={openDevolver} onClose={() => setOpenDevolver(false)} loan={selectedLoan!} dispositivos={dispositivos} onFinalize={submitFinalize} mode={"edit"} fase={"Devolucion"} />
     </>
   );
 }

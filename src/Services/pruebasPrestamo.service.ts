@@ -78,6 +78,7 @@ export class PruebasPrestamoService {
       Aprobado: f.Aprobado,
       IdPrestamo: f.IdPrestamo,
       Observaciones: f.Observaciones,
+      Fase: f.Fase
       
     }
   }
