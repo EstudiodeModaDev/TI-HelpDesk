@@ -33,5 +33,11 @@ export type pruebasPrestamo = {
     Fase: string;
 }
 
+export type pruebasDispositos = {
+    Id?: string;
+    Title: string;
+    IdPrueba: string;
+}
+
 export type dispositivosErrors = Partial<Record<keyof dispositivos, string>>;
 export type prestamosErrors = Partial<Record<keyof prestamos, string>>;

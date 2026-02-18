@@ -1,6 +1,6 @@
 import React from "react";
 import "./prestamos.css";
-import { useDispositivos, usePrestamos, usePruebas } from "../../Funcionalidades/prestamos";
+import { useDispositivos, usePrestamos, usePruebas, usePruebasDispositivos } from "../../Funcionalidades/prestamos";
 import { Tabs } from "./Tabs";
 import { LoanHistorySection } from "./Secciones";
 import { InventorySection } from "./InventorySection";
@@ -27,7 +27,8 @@ export function PrestamosPage() {
   const [deviceLoans, setDeviceLoans] = React.useState<prestamos[]>([])
   const {loadDeviceLoans, notify, visibleRows, estado, setEstado, search, setSearch, handleSubmit, state, setField, load: loadPrestamos, finalizeLoan: Terminar, notifyEstado } = usePrestamos()
   const {setState, deviceReturn, borrowDevice, load, setField: setFieldDispositivos, handleSubmit: crearDispositivo, rows: dispositivosRows, search: dispositivosSearch, setSearch: setDispositivosSearch, state: dispositivosState, editDevice } = useDispositivos()
-  const {handleSubmit: createTest, editTest, createAllPruebas, loadAllPruebas, pruebasRows, state: pruebasState, setField: setFieldPruebas, setState: setPruebasState} = usePruebas()
+  const {handleSubmit: createTest, editTest, createAllPruebas, loadAllPruebas, pruebasRows, state: pruebasState, setField: setFieldPruebas, setState: setPruebasState,} = usePruebas()
+  const {assignTest, unassignTest, loadDeviceTests, testsAssigned, testsLoading} = usePruebasDispositivos()
 
   React.useEffect(() => {
     load();
@@ -57,14 +58,16 @@ export function PrestamosPage() {
     };
   }, [selected?.Id]);
 
-  const createLoan = async (deviceId: string) => {
+  const createLoan = async (deviceId: string): Promise<prestamos | null> => {
     const result = await handleSubmit();
     if (result && result.continue) {
-      await createAllPruebas(result.created?.Id!)
+      await createAllPruebas(result.created?.Id!, deviceId)
       await borrowDevice(deviceId);
       notify(result.created!, dispositivosRows)
       load()
+      return result.created
     }
+    return null
   };
 
   const finalizeLoan = async (loan: prestamos, continuar: boolean) => {
@@ -124,9 +127,14 @@ export function PrestamosPage() {
           load={load}
           setState={setState}
           selectedDevice={selected}
-          setSelectedDevice={setSelected} 
-          rows={deviceLoans}        
-        />
+          setSelectedDevice={setSelected}
+          rows={deviceLoans}
+          testCatalogo={pruebasRows} 
+          assigned={testsAssigned} 
+          loading={testsLoading} 
+          loadAssignedByDevice={loadDeviceTests}        
+          onAssign={assignTest}
+          onUnassign={unassignTest} />
       )}
 
       {activeTab === "pruebas" && (

@@ -68,7 +68,6 @@ export function DeviceHistoryModal({open, selectedDispositivo, onClose, rows, de
                         return (
                           <tr key={l.Id} className={isClosed ? "pl-rowDisabled" : "pl-rowClickable"} 
                             onClick={() => {
-                              if (!isClosed) return;
                               setSelectedLoan(l);
                               setOpenPruebas(true);
                             }}
@@ -89,7 +88,6 @@ export function DeviceHistoryModal({open, selectedDispositivo, onClose, rows, de
                         );
                       })}
                     </>
-
                   }
                 />
             </div>

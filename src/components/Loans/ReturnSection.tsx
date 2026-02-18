@@ -28,7 +28,7 @@ export function ReturnModal({open, onClose, loan, dispositivos, onFinalize, mode
   }, [pruebasPrestamoRows, draft]);
 
   const mergedTestEntrega = React.useMemo(() => {
-    return pruebasPrestamoRows.filter(t => t.Fase === "Entraga").map(t => {
+    return pruebasPrestamoRows.filter(t => t.Fase === "Entrega").map(t => {
       const id = t.Id ?? "";
       const next = id && draft[id] ? draft[id] : undefined;
       return next ? { ...t, Aprobado: next } : t;
@@ -128,11 +128,11 @@ export function ReturnModal({open, onClose, loan, dispositivos, onFinalize, mode
             </div>
           </div>
 
-          <div className="pl-returnBottom">
+          <div className={`pl-returnBottom ${fase === "Ambas" ? "is-dual" : ""}`}>
             
             { (fase === "Entrega" || fase=== "Ambas") ?
               <div className="pl-returnTests">
-                <div className="pl-returnSectionTitle">Pruebas de devolucion</div>
+                <div className="pl-returnSectionTitle">Pruebas de entrega</div>
                 <ReturnTestsList tests={mergedTestEntrega} onChange={onDraftChange} mode={mode} />
               </div> : null
             }

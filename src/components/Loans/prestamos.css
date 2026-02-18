@@ -240,6 +240,10 @@ select.pl-input{
   transform: none;
 }
 
+.pl-actionsCell{
+  gap: 5px
+}
+
 /* En InventorySection había un <button> sin clase: lo estilizamos si está dentro de .pl-actionsRow */
 .pl-actionsRow{
   display:flex;
@@ -642,10 +646,19 @@ select.pl-input{
   overflow: hidden;
 
   display: grid;
-  grid-template-columns: 1fr 260px; /* izquierda grande, derecha botón */
   gap: 0;
   min-height: 280px;
 }
+
+.pl-returnBottom{
+  display: grid;
+  grid-template-columns: 1fr 260px;
+}
+
+.pl-returnBottom.is-dual{
+  grid-template-columns: 1fr 1fr 260px;
+}
+
 
 @media (max-width: 900px){
   .pl-returnBottom{
@@ -879,3 +892,4 @@ select.pl-input{
 .pl-invTable{
   padding: 12px;
 }
+

@@ -18,7 +18,7 @@ export type LoanHistorySectionProps = {
   onStatusFilterChange: (value: string) => void;
   dispositivos: dispositivos[];
 
-  onCreateLoan: (dispositivoId: string) => void; 
+  onCreateLoan: (dispositivoId: string) => Promise<prestamos | null>; 
   onFinalizeLoan: (loan: prestamos, continuar: boolean) => void;
   state: prestamos
   creating?: boolean;
@@ -51,6 +51,8 @@ export function LoanHistorySection({onFinalizeLoan, setField, state, rows, query
   const [openCreate, setOpenCreate] = React.useState(false);
   const [openDevolver, setOpenDevolver] = React.useState(false);
   const [selectedLoan, setSelectedLoan] = React.useState<prestamos | null>(null);
+  const [created, setCreated] = React.useState<prestamos | null>(null);
+  const [step, setStep] = React.useState<1 | 2>(1)
   const { workersOptions, loadingWorkers, error: usersError } = useWorkers({onlyEnabled: true, });
 
   const closeCreate = () => {
@@ -59,9 +61,11 @@ export function LoanHistorySection({onFinalizeLoan, setField, state, rows, query
 
   const canSubmit = state.nombreSolicitante.trim().length > 0 && !creating;
 
-  const submit = () => {
+  const submit = async () => {
     if (!canSubmit) return;
-    onCreateLoan(state.Id_dispositivo);
+    const created = await onCreateLoan(state.Id_dispositivo);
+    setCreated(created)
+    setStep(2)
   };
 
   const submitFinalize = (continuar: boolean) => {
@@ -77,9 +81,7 @@ export function LoanHistorySection({onFinalizeLoan, setField, state, rows, query
     return () => window.removeEventListener("keydown", onKey);
   }, [openCreate]);
 
-  const availableDevices: dispositivos[] = React.useMemo(() =>
-    dispositivos.filter((d) => d.Estado === "Disponible"),
-  [dispositivos]);
+  const availableDevices: dispositivos[] = React.useMemo(() => dispositivos.filter((d) => d.Estado === "Disponible"), [dispositivos]);
 
   const deviceOptions: desplegablesOptions[] = React.useMemo(() =>
     availableDevices.map((d) => ({
@@ -167,11 +169,15 @@ export function LoanHistorySection({onFinalizeLoan, setField, state, rows, query
       {/* MODAL */}
       {openCreate && (
         <div className="pl-modalOverlay" onMouseDown={closeCreate}>
-          <div className="pl-modal" onMouseDown={(e) => e.stopPropagation()}>
+          <div className="pl-modal pl-modalWide" onMouseDown={(e) => e.stopPropagation()}>
             <div className="pl-modalHead">
               <div>
-                <div className="pl-cardTitle">Crear préstamo</div>
-                <div className="pl-cardSub">Selecciona un dispositivo disponible e ingresa el solicitante</div>
+                <div className="pl-cardTitle">{step === 1 ? "Crear préstamo" : "Estado de entrega"}</div>
+                <div className="pl-cardSub">
+                  {step === 1
+                    ? "Selecciona un dispositivo disponible y un solicitante solicitante"
+                    : "Estas son las pruebas que se crearán para este préstamo"}
+                </div>
               </div>
 
               <button className="pl-btn ghost" onClick={closeCreate} aria-label="Cerrar">
@@ -180,60 +186,91 @@ export function LoanHistorySection({onFinalizeLoan, setField, state, rows, query
             </div>
 
             <div className="pl-modalBody">
-              <div className="pl-formGrid">
-                <span className="pl-label">Solicitante</span>
-                  <Select<UserOptionEx, false>
-                    options={workersOptions}
-                    placeholder={loadingWorkers ? "Cargando opciones…" : "Buscar solicitante…"}
-                    value={selectedSolicitante}
-                    onChange={(opt) => {setField("nombreSolicitante", opt?.label ?? ""); setField("Title", opt?.value ?? "");}}
-                    classNamePrefix="rs"
-                    isDisabled={loadingWorkers}
-                    isLoading={loadingWorkers}
-                    components={{ Option }}
-                    noOptionsMessage={() => (usersError ? "Error cargando opciones" : "Sin coincidencias")}
-                    isClearable
-                    menuPortalTarget={document.body}
-                    menuPosition="fixed"
-                    styles={{
-                      menuPortal: (base) => ({ ...base, zIndex: 9999 }),
-                    }}
-                  />
+              {step === 1 ? (
+                <>
+                  <div className="pl-formGrid">
+                    <span className="pl-label">Solicitante</span>
+                    <Select<UserOptionEx, false>
+                      options={workersOptions}
+                      placeholder={loadingWorkers ? "Cargando opciones…" : "Buscar solicitante…"}
+                      value={selectedSolicitante}
+                      onChange={(opt) => {
+                        setField("nombreSolicitante", opt?.label ?? "");
+                        setField("Title", opt?.value ?? "");
+                      }}
+                      classNamePrefix="rs"
+                      isDisabled={loadingWorkers}
+                      isLoading={loadingWorkers}
+                      components={{ Option }}
+                      noOptionsMessage={() => (usersError ? "Error cargando opciones" : "Sin coincidencias")}
+                      isClearable
+                      menuPortalTarget={document.body}
+                      menuPosition="fixed"
+                      styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
+                    />
 
-                <span className="pl-label">Dispositivo</span>
-                <Select<desplegablesOptions, false>
-                  options={deviceOptions}
-                  placeholder={"Buscar dispositivo"}
-                  value={selectedDevice}
-                  onChange={(opt) => {setField("Id_dispositivo", opt?.value ?? "");}}
-                  classNamePrefix="rs"
-                  isDisabled={loadingWorkers}
-                  isLoading={loadingWorkers}
-                  components={{ Option }}
-                  noOptionsMessage={() => (usersError ? "Error cargando opciones" : "Sin coincidencias")}
-                  isClearable
-                  menuPortalTarget={document.body}
-                  menuPosition="fixed"
-                  styles={{
-                    menuPortal: (base) => ({ ...base, zIndex: 9999 }),
-                  }}
-                />
-              </div>
+                    <span className="pl-label">Dispositivo</span>
+                    <Select<desplegablesOptions, false>
+                      options={deviceOptions}
+                      placeholder={"Buscar dispositivo"}
+                      value={selectedDevice}
+                      onChange={(opt) => {
+                        setField("Id_dispositivo", opt?.value ?? "");
+                      }}
+                      classNamePrefix="rs"
+                      isDisabled={loadingWorkers}
+                      isLoading={loadingWorkers}
+                      components={{ Option }}
+                      noOptionsMessage={() => (usersError ? "Error cargando opciones" : "Sin coincidencias")}
+                      isClearable
+                      menuPortalTarget={document.body}
+                      menuPosition="fixed"
+                      styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
+                    />
+                  </div>
 
-              {createError ? <div className="pl-note">{createError}</div> : null}
+                  {createError ? <div className="pl-note">{createError}</div> : null}
+                </>
+              ) : (
+                <>
+                  <ReturnModal 
+                    open={step === 2} 
+                    onClose={() => setOpenCreate(false)} 
+                    loan={created} 
+                    dispositivos={dispositivos} 
+                    onFinalize={() => {return}} 
+                    mode={"edit"} 
+                    fase={"Entrega"} />
+                </>
+              )}
             </div>
 
             <div className="pl-modalActions">
-              <button className="pl-btn" onClick={closeCreate} disabled={creating}>
-                Cancelar
-              </button>
-              <button className="pl-btn primary" onClick={submit} disabled={!canSubmit}>
-                {creating ? "Creando…" : "Crear préstamo"}
-              </button>
+              {step === 1 ? (
+                <>
+                  <button className="pl-btn" onClick={closeCreate} disabled={creating || step !== 1}>
+                    Cancelar
+                  </button>
+
+                  <button
+                    className="pl-btn primary"
+                    onClick={async () => {
+                      if (!canSubmit || creating) return;
+                      await submit();
+                    }}
+                    disabled={!canSubmit || creating}
+                  >
+                    {creating ? "Cargando..." : "Siguiente"}
+                  </button>
+                </>
+              ) : (
+                null
+              )}
             </div>
           </div>
         </div>
       )}
+
       <ReturnModal open={openDevolver} onClose={() => setOpenDevolver(false)} loan={selectedLoan!} dispositivos={dispositivos} onFinalize={submitFinalize} mode={"edit"} fase={"Devolucion"} />
     </>
   );

@@ -38,6 +38,7 @@ import { DispositivosService } from "../Services/dispositivos.service";
 import { PrestamosService } from "../Services/prestamos.service";
 import { PruebasPrestamoService } from "../Services/pruebasPrestamo.service";
 import { PruebasService } from "../Services/pruebas.service";
+import { PruebasDispositivoService } from "../Services/PruebasDispositivo.service";
 
 /* ================== Tipos de config ================== */
 export type SiteConfig = {
@@ -81,6 +82,7 @@ export type UnifiedConfig = {
     prestamos: string;
     pruebas: string;
     pruebasPrestamo: string;  
+    pruebasDispositivo: string;
 
     // TEST
     PazYSalvos: string;
@@ -123,7 +125,8 @@ export type GraphServices = {
   dispositivos: DispositivosService;
   prestamos: PrestamosService;
   pruebas: PruebasService
-  pruebasPrestamo: PruebasPrestamoService
+  pruebasPrestamo: PruebasPrestamoService;
+  pruebasDispositivo: PruebasDispositivoService
 
   // TEST
   PazYSalvos: PazSalvosService;
@@ -175,6 +178,7 @@ const DEFAULT_CONFIG: UnifiedConfig = {
     prestamos: "Prestamos - Prestamos",
     pruebas: "Prestamos - Pruebas",
     pruebasPrestamo: "Prestamos - Pruebas prestamo",
+    pruebasDispositivo: "Prestamos - PruebasDispostivo",
 
     // TEST
     PazYSalvos: "Paz y salvos",
@@ -251,6 +255,7 @@ export const GraphServicesProvider: React.FC<ProviderProps> = ({ children, confi
     const prestamos            = new PrestamosService(graph, hd.hostname, hd.sitePath, lists.prestamos);
     const pruebas              = new PruebasService(graph, hd.hostname, hd.sitePath, lists.pruebas);
     const pruebasPrestamo      = new PruebasPrestamoService(graph, hd.hostname, hd.sitePath, lists.pruebasPrestamo);
+    const pruebasDispositivo  = new PruebasDispositivoService(graph, hd.hostname, hd.sitePath, lists.pruebasDispositivo)
 
     // TEST
     const PazYSalvos           = new PazSalvosService(graph, test.hostname, test.sitePath, lists.PazYSalvos);
@@ -259,7 +264,7 @@ export const GraphServicesProvider: React.FC<ProviderProps> = ({ children, confi
       graph, Storage,
       Sociedades, Proveedores, Plantillas, Internet, CasosHijosRequeridos, ActasEntrega, Anuncios, Articulos, Usuarios, Logs, Tickets, Categorias, Franquicias, SubCategorias,
       InternetTiendas, Facturas, ItemFactura, ProveedoresFactura, Item, CentroCostos, CentroOperativo, Compras, Tareas, Inventario, DistribucionFactura, TipsInicio, Ausencias,
-      dispositivos, prestamos, pruebas, pruebasPrestamo,
+      dispositivos, prestamos, pruebas, pruebasPrestamo, pruebasDispositivo,
       // TEST
       PazYSalvos,
     };

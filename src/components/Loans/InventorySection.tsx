@@ -1,29 +1,45 @@
 import React from "react";
-import type { dispositivos, prestamos } from "../../Models/prestamos";
+import type { dispositivos, prestamos, pruebasDefinidas, pruebasDispositos } from "../../Models/prestamos";
 import { Badge } from "./Badge";
 import { DataTable } from "./DateTable";
 import { deviceStatusTone } from "./PretamosPage";
 import { DeviceHistoryModal } from "./DeviceHistory";
+import { DeviceTestsModal } from "./DeviceTestModal";
 
 export type InventorySectionProps = {
+  //Invetario
   inventory: dispositivos[];
   inventoryQuery: string;
   onInventoryQueryChange: (value: string) => void;
-
   state: dispositivos;
   setFieldState: (field: keyof dispositivos, value: string) => void;
   onAddSubmit: (mode: string) => void;
   setState: (state: dispositivos) => void;
   load: () => void;
+
+  //Historial de prestamos
   selectedDevice: dispositivos | null
   setSelectedDevice: (e: dispositivos) => void
   rows: prestamos[]
+
+  //Pruebas vinculadas al dispositivo
+  testCatalogo: pruebasDefinidas[]
+  loadAssignedByDevice: (deviceId: string) => void; 
+  assigned: pruebasDispositos[]
+  loading: boolean; 
+  onAssign: (deviceId: string, testId: string) => Promise<void>; 
+  onUnassign: (bridgeId: string, selectedDevice: dispositivos) => Promise<void>;
 };
 
-export function InventorySection({rows, inventory, inventoryQuery, onInventoryQueryChange, state, setFieldState, onAddSubmit, setState, setSelectedDevice, selectedDevice}: InventorySectionProps) {
+export function InventorySection({onAssign, onUnassign, loading, assigned, loadAssignedByDevice, testCatalogo, rows, inventory, inventoryQuery, onInventoryQueryChange, state, setFieldState, onAddSubmit, setState, setSelectedDevice, selectedDevice}: InventorySectionProps) {
   const [mode, setMode] = React.useState<"new" | "edit">("new");
   const [history, setHistory] = React.useState<boolean>(false)
-  
+  const [testOpen, setTestOpen] = React.useState<boolean>(false)
+
+  React.useEffect(() => {
+    if(selectedDevice) loadAssignedByDevice(selectedDevice.Id ?? "")
+  }, [selectedDevice]);
+
   return (
     <div className="pl-invLayout">
       {/* LEFT: Form pequeño */}
@@ -77,8 +93,11 @@ export function InventorySection({rows, inventory, inventoryQuery, onInventoryQu
                       <Badge tone={deviceStatusTone(d.Estado)}>{d.Estado}</Badge>
                     </td>
                     <td className="pl-actionsCell">
-                      <button type="button" className="pl-actionBtn" onClick={() => {setSelectedDevice(d); setHistory(true)}}>
-                        Ver
+                      <button type="button" className="pl-btn" onClick={() => {setSelectedDevice(d); setHistory(true)}}>
+                        Ver Historial
+                      </button>
+                      <button type="button" className="pl-btn" onClick={() => {setSelectedDevice(d); setTestOpen(true);}}>
+                        Pruebas
                       </button>
                     </td>
                   </tr>
@@ -90,6 +109,16 @@ export function InventorySection({rows, inventory, inventoryQuery, onInventoryQu
       </section>
       
       <DeviceHistoryModal open={history} onClose={() => setHistory(false)} selectedDispositivo={selectedDevice!} rows={rows} devices={inventory}></DeviceHistoryModal>
+      <DeviceTestsModal
+        open={testOpen}
+        onClose={() => setTestOpen(false)}
+        device={selectedDevice!}
+        catalog={testCatalogo}
+        assigned={assigned}
+        loading={loading}
+        onAssign={onAssign}
+        onUnassign={onUnassign}
+      />
 
     </div>
   );
