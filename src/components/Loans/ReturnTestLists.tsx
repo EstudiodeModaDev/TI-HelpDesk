@@ -30,7 +30,7 @@ export function ReturnTestsList({ tests, onChange, mode }: ReturnTestsListProps)
                 disabled={desactivar || !id}
                 style={{ height: 40 }}
               >
-                <option value="" disabled>
+                <option value="">
                   Selecciona…
                 </option>
                 <option value="Aprobado">Aprobado</option>
