@@ -102,26 +102,34 @@ export default function Recategorizar({ ticket, onDone}: { ticket: Ticket, onDon
           <div className="tf-row tf-row--cats tf-col-2"> 
             <div className="tf-field">
               <label className="tf-label">Categoría</label>
-              <Select<TreeOption, false>
-                classNamePrefix="rs"
-                placeholder={loadingCatalogos ? "Cargando catálogo..." : "Buscar categoría/sub/artículo…"}
-                options={treeOptions}
-                value={treeValue}
-                onChange={onTreeChange}
-                isDisabled={disabledCats}
-                filterOption={(candidate, input) => {
-                  return norm(candidate.label).includes(norm(input));
-                }}
-                isClearable
-                menuPortalTarget={typeof document !== "undefined" ? document.body : null}
-                menuPosition="fixed"
-                styles={{
-                  menuPortal: (base) => ({
-                    ...base,
-                    zIndex: 9999,   // por encima del modal
-                  }),
-                }}
+                <Select<TreeOption, false>
+                  classNamePrefix="rs"
+                  placeholder={loadingCatalogos ? "Cargando catálogo..." : "Buscar categoría/sub/artículo…"}
+                  options={treeOptions}
+                  value={treeValue}
+                  onChange={onTreeChange}
+                  isDisabled={disabledCats}
+                  isClearable
+                  filterOption={(option, input) => {
+                    if (!input) return true;
+
+                    const q = norm(input).toLowerCase();
+                    const { catTitle, subTitle, artTitle } = option.data.meta;
+
+                    return (
+                      norm(option.label).toLowerCase().includes(q) ||
+                      norm(catTitle).toLowerCase().includes(q) ||
+                      norm(subTitle).toLowerCase().includes(q) ||
+                      norm(artTitle).toLowerCase().includes(q)
+                    );
+                  }}
+                  menuPortalTarget={typeof document !== "undefined" ? document.body : null}
+                  menuPosition="fixed"
+                  styles={{
+                    menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                  }}
                 />
+
               {errors.categoria && <small className="error">{errors.categoria}</small>}
             </div>
           </div>

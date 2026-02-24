@@ -77,8 +77,8 @@ export async function ensureIds(
   return { siteId, listId };
 }
 
-export function  norm (s?: string){
- return (s ?? "").normalize("NFD").replace(/\p{Diacritic}/gu, "").trim();
+export function norm(value?: string) {
+  return (value ?? "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
 }
 
 export async function pickTecnicoConMenosCasos(Usuarios: UsuariosSPService): Promise<UsuariosSP | null>{
