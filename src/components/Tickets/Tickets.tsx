@@ -22,24 +22,15 @@ export default function TablaTickets() {
   const userRole = useUserRole(userMail)
   const isPrivileged = userRole.role === "Administrador" || userRole.role === "Tecnico" || userRole.role === "Técnico";
   const { Tickets, graph } = useGraphServices();
-  const {me, setMe, ticketsAbiertos, ticketsFueraTiempo, rows, loading, error, filterMode, range, pageSize, pageIndex, hasNext, sorts, setFilterMode, setRange, setPageSize, updateSelectedTicket, nextPage, loadFirstPage,  toggleSort} = useTickets(graph, Tickets, userMail, userRole.role);
+  const { loadAll, search, setSearch, me, setMe, ticketsAbiertos, ticketsFueraTiempo, rows, loading, error, filterMode, range, pageSize, pageIndex, hasNext, sorts, setFilterMode, setRange, setPageSize, updateSelectedTicket, nextPage,  toggleSort} = useTickets(graph, Tickets, userMail, userRole.role);
 
   // Búsqueda local SOLO sobre la página visible (si quieres global, hay que mover a OData)
-  const [search, setSearch] = React.useState("");
+
   const [ticketSeleccionado, setTicketSeleccionado] = React.useState<Ticket | null>(null);
 
-  const filtered = React.useMemo(() => {
-    const q = search.trim().toLowerCase();
-    if (!q) return rows;
-    return rows.filter((t) => {
-      const texto = `${t.Nombreresolutor ?? ""} ${t.Solicitante ?? ""} ${t.Title ?? ""} ${t.ID}`.toLowerCase();
-      return texto.includes(q);
-    });
-  }, [rows, search]);
-
   const handleTicketChanged = React.useCallback(() => {
-    loadFirstPage();
-  }, [loadFirstPage]);
+    loadAll();
+  }, [loadAll]);
 
   React.useEffect(() => {
     if (!ticketSeleccionado) return;
@@ -82,7 +73,7 @@ export default function TablaTickets() {
       {/* Estados */}
       {loading && <p>Cargando tickets…</p>}
       {error && <p style={{ color: "#b91c1c" }}>{error}</p>}
-      {!loading && !error && filtered.length === 0 && !ticketSeleccionado && <p>No hay tickets para los filtros seleccionados.</p>}
+      {!loading && !error && rows.length === 0 && !ticketSeleccionado && <p>No hay tickets para los filtros seleccionados.</p>}
 
       {/* Tabla o Detalle */}
       {ticketSeleccionado ? (
@@ -119,7 +110,7 @@ export default function TablaTickets() {
               </tr>
             </thead>
             <tbody>
-              {filtered.map((ticket) => (
+              {rows.map((ticket) => (
                 <tr key={ticket.ID} onClick={() => setTicketSeleccionado(ticket)} tabIndex={0} onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && setTicketSeleccionado(ticket)}>
                   <td>{ticket.ID}</td>
                   <td><span title={ticket.Nombreresolutor}>{ticket.Nombreresolutor}</span></td>
@@ -136,9 +127,9 @@ export default function TablaTickets() {
           </table>
 
           {/* Paginación servidor: Anterior = volver a primera página (loadFirstPage), Siguiente = nextLink */}
-          {filtered.length > 0 && (
+          {rows.length > 0 && (
             <div className="paginacion">
-              <button onClick={loadFirstPage} disabled={loading || pageIndex <= 1}>
+              <button onClick={loadAll} disabled={loading || pageIndex <= 1}>
                 Anterior
               </button>
               <span>Página {pageIndex}</span>
