@@ -8,6 +8,23 @@ import { norm } from "../utils/Commons";
 import { toGraphDateTime } from "../utils/Date";
 
 type ConteoMes = { mes: string; total: number }; // 'YYYY-MM'
+const getCurrentMonthRange = (): DateRange => {
+  const now = new Date();
+
+  // Primer día del mes
+  const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+
+  // Último día del mes (día 0 del siguiente mes)
+  const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+
+  const toISODate = (d: Date) => d.toISOString().split("T")[0];
+
+  return {
+    from: toISODate(firstDay),
+    to: toISODate(lastDay),
+  };
+};
+
 
 export function useDetallado(TicketsSvc: TicketsService) {
   const [resolutores, setResolutores] = React.useState<ResolutorAgg[]>([]);
@@ -21,7 +38,7 @@ export function useDetallado(TicketsSvc: TicketsService) {
   const [error, setError] = React.useState<string | null>(null);
 
   // Range controlado por UI
-  const [range, setRange] = React.useState<DateRange>({ from: "", to: "" });
+  const [range, setRange] = React.useState<DateRange>(getCurrentMonthRange());
 
   const [topCategorias, setTopCategorias] = React.useState<TopCategoria[]>([]);
   const [topSolicitante, setopSolicitante] = React.useState<TopCategoria[]>([]);
