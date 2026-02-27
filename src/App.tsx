@@ -100,8 +100,8 @@ const NAV: MenuItem[] = [
         ],
       },
       {id: "cesar", label: "Cesar", roles: ["Administrador"], children: [
-          { id: "compras", label: "Compras", to: <ComprasPage />, roles: ["Administrador"] },
-          { id: "facturas", label: "Facturas", to: <RegistroFactura />, roles: ["Administrador"] },
+          { id: "compras", label: "Compras", to: <ComprasPage />, roles: ["Administrador", "Tecnico"] },
+          { id: "facturas", label: "Facturas", to: <RegistroFactura />, roles: ["Administrador", "Tecnico"] },
           { id: "paz", label: "Paz y Salvos", to: <PazySalvosMode />, roles: ["Administrador"] },
         ],
       },
