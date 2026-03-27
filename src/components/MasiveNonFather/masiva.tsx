@@ -14,7 +14,7 @@ export default function RelacionadorMasiva({onCancel, userMail, role}: Props) {
 
   const handleDownload = () => {
     const link = document.createElement("a");
-    link.href = "/Plantilla Masiva Sin Padre.xlsx"; // ruta dentro de public
+    link.href = "/Plantilla Masiva.xlsx"; // ruta dentro de public
     link.download = "PlantillaApertura.xlsx";          // nombre con el que se guarda
     document.body.appendChild(link);
     link.click();
