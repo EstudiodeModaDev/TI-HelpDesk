@@ -100,8 +100,8 @@ export function useDetallado(TicketsSvc: TicketsService) {
     (ticketsIn: Ticket[]): ResolutorAgg[] => {
       const getResolvers = (t: any): Array<{ email: string; name: string }> => {
         const out: Array<{ email: string; name: string }> = [];
-        const direct = t?.CorreoResolutor ?? "";
-        const nombreResolutor = t?.Nombreresolutor ?? "";
+        const direct = t?.Correoresolutor.trim() ?? "";
+        const nombreResolutor = t?.Nombreresolutor.trim() ?? "";
 
         if (direct) {
           const parts = String(direct)
@@ -134,17 +134,14 @@ export function useDetallado(TicketsSvc: TicketsService) {
         });
       };
 
-      const byRes = new Map<
-        string,
-        { nombre: string; email: string; total: number; at: number; vencidos: number; enCurso: number }
-      >();
+      const byRes = new Map<string, { nombre: string; email: string; total: number; at: number; vencidos: number; enCurso: number }>();
 
       for (const t of ticketsIn) {
         const estado = getEstado(t as any);
         const cls = classifyEstado(estado);
 
-        for (const r of getResolvers(t as any)) {
-          const key = r.email || r.name.toLowerCase();
+        for (const r of getResolvers(t as Ticket)) {
+          const key = r.email.trim().toLocaleLowerCase() || r.name.toLowerCase().trim();
 
           const rec =
             byRes.get(key) ?? {
