@@ -45,6 +45,7 @@ import TeamsEventForm from "./components/Ausencia/Ausencia";
 import { StoragePage } from "./components/Storage/StoragePage";
 import { PrestamosPage } from "./components/Loans/PretamosPage";
 import loanImage from "./assets/device.svg"
+import ReportsPage from "./components/Reports/ReportsPage";
 
 /* ============================================================
    Tipos de navegación y contexto de visibilidad
@@ -92,6 +93,7 @@ const NAV: MenuItem[] = [
       { id: "plantillas", label: "Plantillas", icon: <img src={templateIcon} className="sb-icon" />, to: <CrearPlantilla />, roles: ["Administrador", "Tecnico", "Listo"] },
       { id: "usuarios", label: "Usuarios", icon: <img src={usersIcon} className="sb-icon" />, to: <UsuariosPanel />, roles: ["Administrador"] },
       { id: "tips", label: "Tips", icon: <img src={infoIcon} className="sb-icon" />, to: <AnnouncementsTable />, roles: ["Administrador", "Tecnico", "Listo"] },
+      { id: "reports", label: "Reportes", icon: <img src={filesIcon} className="sb-icon" />, to: <ReportsPage />, roles: ["Administrador", "Tecnico", "Listo"] },
     ],
   },
   {id: "acciones", label: "Acciones", icon: <img src={ActionsIcon} className="sb-icon" />, roles: ["Administrador", "Tecnico", "Jefe de zona", "Listo"], children: [

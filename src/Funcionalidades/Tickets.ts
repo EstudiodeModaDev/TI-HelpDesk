@@ -151,17 +151,49 @@ export function useTickets(graph: GraphRest, TicketsSvc: TicketsService, userMai
     []
   );
 
-  const sortFieldToOData: Record<SortField, string> = {
-    id: "Id",
-    FechaApertura: "fields/FechaApertura",
-    TiempoSolucion: "fields/TiempoSolucion",
-    Title: "fields/Title",
-    resolutor: "fields/Nombreresolutor",
-  };
+  const getSortValue = React.useCallback((ticket: Ticket, field: SortField): number | string => {
+    switch (field) {
+      case "id":
+        return Number(ticket.ID ?? 0);
+      case "FechaApertura": {
+        const time = parseFechaFlex(ticket.FechaApertura).getTime();
+        return Number.isNaN(time) ? 0 : time;
+      }
+      case "TiempoSolucion": {
+        const time = parseFechaFlex(ticket.TiempoSolucion).getTime();
+        return Number.isNaN(time) ? 0 : time;
+      }
+      case "Title":
+        return String(ticket.Title ?? "").toLocaleLowerCase();
+      case "resolutor":
+        return String(ticket.Nombreresolutor ?? "").toLocaleLowerCase();
+      default:
+        return "";
+    }
+  }, []);
 
-  /* =========================
-     Grupo (Jefe de zona)
-  ========================= */
+  const sortTicketsLocal = React.useCallback((items: Ticket[]): Ticket[] => {
+    const activeSorts: Array<{ field: SortField; dir: SortDir }> = sorts.some((s) => s.field === "id")
+      ? sorts
+      : [...sorts, { field: "id", dir: "desc" as const }];
+
+    return [...items].sort((a, b) => {
+      for (const sort of activeSorts) {
+        const av = getSortValue(a, sort.field);
+        const bv = getSortValue(b, sort.field);
+
+        if (av === bv) continue;
+
+        let cmp = 0;
+        if (typeof av === "number" && typeof bv === "number") cmp = av - bv;
+        else cmp = String(av).localeCompare(String(bv), undefined, { sensitivity: "base" });
+
+        if (cmp !== 0) return sort.dir === "asc" ? cmp : -cmp;
+      }
+
+      return 0;
+    });
+  }, [getSortValue, sorts]);
 
   const [zoneEmails, setZoneEmails] = React.useState<string[]>([]);
 
@@ -176,9 +208,9 @@ export function useTickets(graph: GraphRest, TicketsSvc: TicketsService, userMai
       const out = new Set<string>();
 
       const collect = (value: any[]) => {
-        for (const m of value ?? []) {
-          const mail = String(m?.mail ?? "").trim().toLowerCase();
-          const upn = String(m?.userPrincipalName ?? "").trim().toLowerCase();
+        for (const member of value ?? []) {
+          const mail = String(member?.mail ?? "").trim().toLowerCase();
+          const upn = String(member?.userPrincipalName ?? "").trim().toLowerCase();
           const picked = mail || upn;
           if (picked) out.add(picked);
         }
@@ -201,117 +233,100 @@ export function useTickets(graph: GraphRest, TicketsSvc: TicketsService, userMai
 
   React.useEffect(() => {
     let cancel = false;
+
     (async () => {
       if (cancel) return;
       await loadGroupEmails();
     })();
+
     return () => {
       cancel = true;
     };
   }, [loadGroupEmails]);
 
-  /* =========================
-     Build filter (sin top)
-  ========================= */
 
-  const buildFilter = React.useCallback((): Pick<GetAllOpts, "filter" | "orderby"> => {
-    const filters: string[] = [];
-
+  const buildQueryPlans = React.useCallback((): Array<Pick<GetAllOpts, "filter">> => {
     const isAdmin = role === "Administrador" || userMail === "listo@estudiodemoda.com.co";
     const isJefeZona = role === "Jefe de zona";
+    const sharedFilters: string[] = [];
 
-    // Visibilidad
-    if (!isAdmin || me) {
-      const emailSafe = String(userMail ?? "").replace(/'/g, "''");
-
-      const myVisibility =
-        `(fields/CorreoSolicitante eq '${emailSafe}' or ` +
-        `fields/CorreoObservador eq '${emailSafe}' or ` +
-        `fields/Correoresolutor eq '${emailSafe}')`;
-
-      let zoneVisibility = "";
-      if (isJefeZona) {
-        const MAX_OR = 25;
-
-        const safeGroupEmails = (zoneEmails ?? [])
-          .map((e) => String(e ?? "").trim().toLowerCase())
-          .filter(Boolean)
-          .filter((e) => e !== String(userMail ?? "").trim().toLowerCase())
-          .slice(0, MAX_OR)
-          .map((e) => e.replace(/'/g, "''"));
-
-        if (safeGroupEmails.length > 0) {
-          zoneVisibility = `(${safeGroupEmails.map((e) => `fields/CorreoSolicitante eq '${e}'`).join(" or ")})`;
-        }
-      }
-
-      if (zoneVisibility) filters.push(`(${myVisibility} or ${zoneVisibility})`);
-      else filters.push(myVisibility);
-    }
-
-    // Estado
     if (filterMode === "En curso") {
-      filters.push(
+      sharedFilters.push(
         `(fields/Estadodesolicitud eq 'En atención' or fields/Estadodesolicitud eq 'Fuera de tiempo')`
       );
-    } else if (filterMode === "Todos") {
-      // nada
-    } else {
-      filters.push(`startswith(fields/Estadodesolicitud,'Cerrado')`);
+    } else if (filterMode !== "Todos") {
+      sharedFilters.push(`startswith(fields/Estadodesolicitud,'Cerrado')`);
     }
 
-    // Rango (OJO: <= para permitir mismo día)
     if (range.from && range.to && range.from <= range.to) {
-      if (range.from) filters.push(`fields/FechaApertura ge '${range.from}T00:00:00Z'`);
-      if (range.to) filters.push(`fields/FechaApertura le '${range.to}T23:59:59Z'`);
+      sharedFilters.push(`fields/FechaApertura ge '${range.from}T00:00:00Z'`);
+      sharedFilters.push(`fields/FechaApertura le '${range.to}T23:59:59Z'`);
     }
 
-    // OrderBy
-    const orderParts: string[] = sorts
-      .map((s) => {
-        const col = sortFieldToOData[s.field];
-        return col ? `${col} ${s.dir}` : "";
-      })
-      .filter(Boolean);
+    if (isAdmin && !me) {
+      return [{ filter: sharedFilters.join(" and ") }];
+    }
 
-    if (!sorts.some((s) => s.field === "id")) orderParts.push("Id desc");
+    const currentUser = String(userMail ?? "").trim().toLowerCase();
+    const emailSafe = currentUser.replace(/'/g, "''");
+    const visibilityFilters = [
+      `fields/CorreoSolicitante eq '${emailSafe}'`,
+      `fields/CorreoObservador eq '${emailSafe}'`,
+      `fields/Correoresolutor eq '${emailSafe}'`,
+    ];
 
-    return {
-      filter: filters.join(" and "),
-      orderby: orderParts.join(","),
-    };
-  }, [role, userMail, filterMode, range.from, range.to, sorts, zoneEmails, me]);
+    if (isJefeZona) {
+      const MAX_ZONE_EMAILS = 25;
+      const safeGroupEmails = (zoneEmails ?? [])
+        .map((e) => String(e ?? "").trim().toLowerCase())
+        .filter(Boolean)
+        .filter((e) => e !== currentUser)
+        .slice(0, MAX_ZONE_EMAILS)
+        .map((e) => e.replace(/'/g, "''"));
 
-  /* =========================
-     Cargar TODO (paginación server, lista local)
-  ========================= */
+      for (const email of safeGroupEmails) {
+        visibilityFilters.push(`fields/CorreoSolicitante eq '${email}'`);
+      }
+    }
+
+    return Array.from(new Set(visibilityFilters)).map((visibilityFilter) => ({
+      filter: [visibilityFilter, ...sharedFilters].filter(Boolean).join(" and "),
+    }));
+  }, [filterMode, me, range.from, range.to, role, userMail, zoneEmails]);
+
+  const loadAllPages = React.useCallback(async (opts?: GetAllOpts): Promise<Ticket[]> => {
+    const SERVER_PAGE = 999;
+    const MAX_ITEMS_PER_QUERY = 5000;
+
+    let { items, nextLink } = await TicketsSvc.getAll({
+      ...opts,
+      top: opts?.top ?? SERVER_PAGE,
+    });
+
+    const all: Ticket[] = [...(items ?? [])];
+
+    while (nextLink && all.length < MAX_ITEMS_PER_QUERY) {
+      const res = await TicketsSvc.getByNextLink(nextLink);
+      all.push(...(res.items ?? []));
+      nextLink = res.nextLink ?? null;
+    }
+
+    return all;
+  }, [TicketsSvc]);
 
   const loadAll = React.useCallback(async () => {
     setLoading(true);
     setError(null);
-
-    const MAX_ITEMS = 5000; // seguridad (ajústalo si quieres)
-    const SERVER_PAGE = 999;
-
     try {
-      const base = buildFilter();
-
-      // primera página
-      let { items, nextLink } = await TicketsSvc.getAll({
-        ...base,
-        top: SERVER_PAGE,
-      });
-
-      const all: Ticket[] = [...(items ?? [])];
-
-      // siguientes páginas
-      while (nextLink && all.length < MAX_ITEMS) {
-        const res = await TicketsSvc.getByNextLink(nextLink);
-        all.push(...(res.items ?? []));
-        nextLink = res.nextLink ?? null;
+      const queryPlans = buildQueryPlans();
+      const merged = new Map<string, Ticket>();
+      for (const plan of queryPlans) {
+        const items = await loadAllPages(plan);
+        for (const ticket of items) {
+          merged.set(String(ticket.ID), ticket);
+        }
       }
-
-      setBaseRows(all);
+      setBaseRows(sortTicketsLocal(Array.from(merged.values())));
       setPageIndex(1);
     } catch (e: any) {
       setError(e?.message ?? "Error cargando tickets");
@@ -320,7 +335,7 @@ export function useTickets(graph: GraphRest, TicketsSvc: TicketsService, userMai
     } finally {
       setLoading(false);
     }
-  }, [TicketsSvc, buildFilter]);
+  }, [buildQueryPlans, loadAllPages, sortTicketsLocal]);
 
   /* =========================
      Cantidades (Abiertos / Fuera de tiempo)
@@ -329,26 +344,27 @@ export function useTickets(graph: GraphRest, TicketsSvc: TicketsService, userMai
   const loadCantidadResolutor = React.useCallback(async () => {
     setLoading(true);
     setError(null);
-
-    const emailSafe = String(userMail ?? "").replace(/'/g, "''");
-
+    const emailSafe = String(userMail ?? "").trim().toLowerCase().replace(/'/g, "''");
     try {
-      const { items: itemsAbiertos } = await TicketsSvc.getAll({
-        filter:
-          `(fields/CorreoSolicitante eq '${emailSafe}' or fields/CorreoObservador eq '${emailSafe}' or fields/Correoresolutor eq '${emailSafe}') and ` +
-          `fields/Estadodesolicitud eq 'En atención'`,
-        top: 999,
-      });
-
-      const { items: itemsFueraTiempo } = await TicketsSvc.getAll({
-        filter:
-          `(fields/CorreoSolicitante eq '${emailSafe}' or fields/CorreoObservador eq '${emailSafe}' or fields/Correoresolutor eq '${emailSafe}') and ` +
-          `fields/Estadodesolicitud eq 'Fuera de tiempo'`,
-        top: 999,
-      });
-
-      setTicketsAbiertos(itemsAbiertos?.length ?? 0);
-      setTicketsFueraTiempo(itemsFueraTiempo?.length ?? 0);
+      const buildCountFilters = (status: string) => ([
+        `fields/CorreoSolicitante eq '${emailSafe}' and fields/Estadodesolicitud eq '${status}'`,
+        `fields/CorreoObservador eq '${emailSafe}' and fields/Estadodesolicitud eq '${status}'`,
+        `fields/Correoresolutor eq '${emailSafe}' and fields/Estadodesolicitud eq '${status}'`,
+      ]);
+      const countUniqueTickets = async (filters: string[]) => {
+        const merged = new Set<string>();
+        for (const filter of filters) {
+          const items = await loadAllPages({ filter });
+          for (const ticket of items) merged.add(String(ticket.ID));
+        }
+        return merged.size;
+      };
+      const [abiertos, fueraTiempo] = await Promise.all([
+        countUniqueTickets(buildCountFilters("En atención")),
+        countUniqueTickets(buildCountFilters("Fuera de tiempo")),
+      ]);
+      setTicketsAbiertos(abiertos);
+      setTicketsFueraTiempo(fueraTiempo);
     } catch (e: any) {
       setError(e?.message ?? "Error cargando conteos");
       setTicketsAbiertos(0);
@@ -356,7 +372,7 @@ export function useTickets(graph: GraphRest, TicketsSvc: TicketsService, userMai
     } finally {
       setLoading(false);
     }
-  }, [TicketsSvc, userMail]);
+  }, [loadAllPages, userMail]);
 
   /* =========================
      Efecto único de carga (sin duplicar)
@@ -635,3 +651,6 @@ export function useTicketsRelacionados(TicketsSvc: TicketsService, ticket: Ticke
     loadRelateds,
   };
 }
+
+
+
