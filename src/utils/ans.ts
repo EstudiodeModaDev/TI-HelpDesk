@@ -152,9 +152,9 @@ export function calculoANS(categoria: string, subcategoria: string, articulo?: s
 
 /** (Opcional) Mapa de horas por ANS para reuso. */
 export const HORAS_POR_ANS: Record<Exclude<ANSLevel, ''>, number> = {
-  'ANS 1': 2,
-  'ANS 2': 4,
-  'ANS 3': 8,
-  'ANS 4': 56,
-  'ANS 5': 240,
+  'ANS 1': 4,
+  'ANS 2': 8,
+  'ANS 3': 16,
+  'ANS 4': 112,
+  'ANS 5': 480,
 };
