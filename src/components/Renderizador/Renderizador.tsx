@@ -19,7 +19,7 @@ export default function HtmlContent({
   const clean = React.useMemo(() => {
     return DOMPurify.sanitize(html, {
       USE_PROFILES: { html: true },
-      ALLOWED_URI_REGEXP: /^(?:(?:https?|mailto|tel|data:image\/(?:png|jpeg|gif|webp));)/i,
+      ALLOWED_URI_REGEXP: /^(?:(?:https?|mailto|tel):|data:image\/(?:png|jpeg|gif|webp|svg\+xml))/i,
       ADD_ATTR: ["target", "rel"],
     });
   }, [html]);

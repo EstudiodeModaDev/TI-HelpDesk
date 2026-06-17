@@ -1,6 +1,6 @@
 import * as React from "react";
 import "./Welcome.css";
-import { useTips } from "../../Funcionalidades/Anuncementes";
+import { useTips } from "../../Funcionalidades/content/Anuncementes";
 import securityIcon from "../../assets/security.svg"
 import infoIcon from "../../assets/infoTip.svg"
 import type { TipUI } from "../../Models/Tips";

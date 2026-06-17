@@ -1,7 +1,7 @@
 import "./InfoTienda.css";
 import { useGraphServices } from "../../../graph/GrapServicesContext";
 import type { ProveedoresService } from "../../../Services/Proveedores.service";
-import { useProveedores } from "../../../Funcionalidades/ProveedoresInternet";
+import { useProveedores } from "../../../Funcionalidades/operations/ProveedoresInternet";
 
 /* 3) destructuring con nombre correcto en el tipo */
 export default function InfoProveedores() {

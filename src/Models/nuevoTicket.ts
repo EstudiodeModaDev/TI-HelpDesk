@@ -13,7 +13,7 @@ export type FormState = {
   categoria: string;
   subcategoria: string;
   articulo: string;
-  archivo: File | null;
+  archivo: File[];
   ANS?: "";
   cerrar?: boolean
 };
@@ -28,7 +28,7 @@ export type UserFormState = {
   Correosolicitante: string;
   motivo: string;
   descripcion: string;
-  archivo: File[] | null;
+  archivo: File[];
 };
 
 export type FormDocumentarState = {

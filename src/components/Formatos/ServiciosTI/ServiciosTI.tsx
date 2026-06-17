@@ -1,8 +1,7 @@
 // src/components/Formatos/ServiciosTI/ServiciosTI.tsx
-import { useSolicitudServicios } from "../../../Funcionalidades/Formatos";
-import { useGraphServices } from "../../../graph/GrapServicesContext";
+import { useSolicitudServicios } from "../../../Funcionalidades/forms/Formatos";
 import type { Servicios } from "../../../Models/Formatos";
-import type { TicketsService } from "../../../Services/Tickets.service";
+import { useRepositories } from "../../../repositories/repositoriesContext";
 import "./ServiciosTI.css";
 
 const SERVICIOS_CATALOG: Array<{ key: keyof Servicios; label: string }> = [
@@ -18,8 +17,8 @@ const SERVICIOS_CATALOG: Array<{ key: keyof Servicios; label: string }> = [
 const ciudades = ["Medellín", "Bogotá", "Cali", "Barranquilla", "Otra"]
 
 export default function SolicitudUsuarioForm() {
-  const { Tickets: TicketsSvc} = (useGraphServices() as ReturnType<typeof useGraphServices> & {Tickets: TicketsService;})
-  const {state, errors,sending, handleSubmit, setField} = useSolicitudServicios(TicketsSvc);
+  const {tickets} = useRepositories()
+  const {state, errors,sending, handleSubmit, setField} = useSolicitudServicios(tickets!);
 
   return (
     <section className="su-scope su-card" role="region" aria-labelledby="su_titulo">

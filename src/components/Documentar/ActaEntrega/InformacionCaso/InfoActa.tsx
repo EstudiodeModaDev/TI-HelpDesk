@@ -1,6 +1,6 @@
 
 import type { FormStateActa, TipoUsuario } from "../../../../Models/ActasEntrega";
-import { useActaEntrega } from "../../../../Funcionalidades/ActaEntrega";
+import { useActaEntrega } from "../../../../Funcionalidades/Tickets/ActaEntrega";
 import type { Ticket } from "../../../../Models/Tickets";
 import { Toggle } from "../../../Toggle/Toggle";
 import "./InfoActa.css";

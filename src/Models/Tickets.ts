@@ -3,17 +3,16 @@ import type { UserOption } from "./Commons";
 export type Ticket = {
   ID?: string;
   Nombreresolutor?: string;
-  IdResolutor?: string;
   Solicitante?: string;
-  Title?: string; //Asunto
+  AsuntoTicket?: string; //Asunto
   FechaApertura?: string; // "dd/mm/yyyy hh:mm"
-  TiempoSolucion?: string;   // "dd/mm/yyyy hh:mm"
+  FechaMaxima?: string;   // "dd/mm/yyyy hh:mm"
   Estadodesolicitud?: string;
   Observador?: string;
   Descripcion?: string;
   Categoria?: string;
   SubCategoria?: string;
-  SubSubCategoria?: string;
+  Articulo?: string;
   Fuente?: string;
   Correoresolutor?: string;
   CorreoSolicitante?: string;
@@ -54,3 +53,5 @@ export type AttachmentLite = {
 // Para filtros locales
 export type SortDir = 'asc' | 'desc';
 export type SortField = 'id' | 'FechaApertura' | 'TiempoSolucion' | 'Title' | 'resolutor';
+
+export type TicketsError = Partial<Record<keyof Ticket, string>>;

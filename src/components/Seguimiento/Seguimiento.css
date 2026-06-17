@@ -126,6 +126,32 @@
   text-decoration: underline;
 }
 
+.th-attachments{
+  margin-top: 8px;
+}
+
+.th-attachments-list{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.th-attachment-link{
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--bd, #c7cbd1);
+  background: color-mix(in oklab, var(--surface, #fff) 92%, var(--field-bg, #f6f7f9));
+  color: var(--ink, #0f172a);
+  text-decoration: none;
+}
+
+.th-attachment-link:hover{
+  text-decoration: underline;
+}
+
 .th-bubble{
   background: #c2c3c4;            /* slate-50 */
   border: 1px solid #c2c3c4;      /* slate-200 */

@@ -1,7 +1,7 @@
 import "./NuevaPlantilla.css";
 import { useGraphServices } from "../../graph/GrapServicesContext";
 import type { PlantillasService } from "../../Services/Plantillas.service";
-import { usePlantillas } from "../../Funcionalidades/Plantillas";
+import { usePlantillas } from "../../Funcionalidades/content/Plantillas";
 import RichTextBase64 from "../RichTextBase64/RichTextBase64";
 
 export default function CrearPlantilla() {

@@ -1,13 +1,13 @@
 import "./CajerosPOS.css"; // importa el css que nos diste
-import { useCajerosPOS } from "../../Funcionalidades/CajerosPos";
-import type { TicketsService } from "../../Services/Tickets.service";
+import { useCajerosPOS } from "../../Funcionalidades/operations/CajerosPos";
 import Select, { type SingleValue } from "react-select";
-import type { LogService } from "../../Services/Log.service";
+import type { TicketsRepository } from "../../repositories/TicketsRepository/TicketRepository";
+import type { LogRepository } from "../../repositories/LogRepository/LogRespository";
 
 type Props = {
   services: {
-    Tickets?: TicketsService;
-    Logs: LogService
+    Tickets?: TicketsRepository;
+    Logs: LogRepository
   };
 };
 

@@ -12,6 +12,7 @@
   "dependencies": {
     "@azure/msal-browser": "^4.24.0",
     "@date-fns/tz": "^1.4.1",
+    "@supabase/supabase-js": "^2.108.2",
     "@tinymce/tinymce-react": "^6.3.0",
     "date-fns": "^4.1.0",
     "date-fns-tz": "^3.2.0",
@@ -19,6 +20,7 @@
     "festivos-colombianos": "^1.1.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
+    "react-hot-toast": "^2.6.0",
     "react-select": "^5.10.2",
     "tinymce": "^8.1.2",
     "tz": "^0.1.1",

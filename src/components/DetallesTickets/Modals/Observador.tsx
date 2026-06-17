@@ -4,26 +4,19 @@ import "./ModalsStyles.css";
 import type { UserOption } from "../../../Models/Commons";
 import { useGraphServices } from "../../../graph/GrapServicesContext";
 import type { Ticket } from "../../../Models/Tickets";
-import type { FranquiciasService } from "../../../Services/Franquicias.service";
-import type { UsuariosSPService } from "../../../Services/Usuarios.Service";
-import type { LogService } from "../../../Services/Log.service";
-import { useAsignarObservador } from "../../../Funcionalidades/Observador";
-import { useWorkers } from "../../../Funcionalidades/Workers";
-import { useFranquicias } from "../../../Funcionalidades/Franquicias";
-import { TicketsService } from "../../../Services/Tickets.service";
+import { useAsignarObservador } from "../../../Funcionalidades/Tickets/Observador";
+import { useWorkers } from "../../../Funcionalidades/access/Workers";
+import { useFranquicias } from "../../../Funcionalidades/access/Franquicias";
 import { norm } from "../../../utils/Commons";
+import { useRepositories } from "../../../repositories/repositoriesContext";
 
 type UserOptionEx = UserOption & { source?: "Empleado" | "Franquicia" };
 
 export default function AsignarObservador({ticket, onDone}: {ticket: Ticket, onDone: () => void}) {
 
-  const {Franquicias: FranquiciasSvc, Logs: LogsSvc, Tickets: TicketSvc} = useGraphServices() as ReturnType<typeof useGraphServices> & {
-    Franquicias: FranquiciasService;
-    Usuarios: UsuariosSPService;
-    Logs: LogService
-    Tickets: TicketsService
-  };
-  const {state,errors, submitting, setField, handleObservador,} = useAsignarObservador({Logs: LogsSvc, Tickets: TicketSvc}, ticket);
+  const {Franquicias: FranquiciasSvc, } = useGraphServices()
+  const {tickets, logs: LogsSvc,} = useRepositories()
+  const {state,errors, submitting, setField, handleObservador,} = useAsignarObservador({Logs: LogsSvc!, Tickets: tickets!}, ticket);
   const { franqOptions, loading: loadingFranq, error: franqError } = useFranquicias(FranquiciasSvc!);
   const { workersOptions, loadingWorkers, error: usersError } = useWorkers({onlyEnabled: true,});
 

@@ -1,6 +1,6 @@
 import React from "react";
 import "./prestamos.css";
-import { useDispositivos, usePrestamos, usePruebas, usePruebasDispositivos } from "../../Funcionalidades/prestamos";
+import { useDispositivos, usePrestamos, usePruebas, usePruebasDispositivos } from "../../Funcionalidades/loans/prestamos";
 import { Tabs } from "./Tabs";
 import { LoanHistorySection } from "./Secciones";
 import { InventorySection } from "./InventorySection";

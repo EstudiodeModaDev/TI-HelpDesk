@@ -1,33 +1,21 @@
 import "./Documentar.css";
-import type { FranquiciasService } from "../../Services/Franquicias.service";
 import { useGraphServices } from "../../graph/GrapServicesContext";
-import { UsuariosSPService } from "../../Services/Usuarios.Service";
-import type { TicketsService } from "../../Services/Tickets.service";
 import RichTextBase64 from "../RichTextBase64/RichTextBase64";
-import type { LogService } from "../../Services/Log.service";
 import { useAuth } from "../../auth/authContext";
 import type { Ticket } from "../../Models/Tickets";
-import { useDocumentarTicket } from "../../Funcionalidades/Documentar";
-import { usePlantillas } from "../../Funcionalidades/Plantillas";
-import type { PlantillasService } from "../../Services/Plantillas.service";
+import { useDocumentarTicket } from "../../Funcionalidades/Tickets/Documentar";
+import { usePlantillas } from "../../Funcionalidades/content/Plantillas";
 import React from "react";
 import EscalamientoInternet from "./EscalamientoProveedor/Escalamiento";
 import InfoActaEntrega from "./ActaEntrega/InformacionCaso/InfoActa";
-import type { ComprasService } from "../../Services/Compras.service";
+import { useRepositories } from "../../repositories/repositoriesContext";
 
 export default function Documentar({ ticket, tipo, onDone }: { ticket: Ticket; tipo: "solucion" | "seguimiento"; onDone: () => void | Promise<void>}) {
-  const { Tickets: TicketsSvc, Logs: LogsSvc, Plantillas: PlantillasSvc, Compras} =
-    (useGraphServices() as ReturnType<typeof useGraphServices> & {
-      Franquicias: FranquiciasService;
-      Usuarios: UsuariosSPService;
-      Tickets: TicketsService;
-      Logs: LogService;
-      Plantillas: PlantillasService;
-      ComprasSvc: ComprasService
-    });
-
+  const {   Plantillas: PlantillasSvc, Compras} = useGraphServices()
+  const { tickets: TicketsSvc, logs: LogsSvc,} = useRepositories()
+ 
   const { account } = useAuth();
-  const { state, errors, submitting, setField, handleSubmit } = useDocumentarTicket({ Tickets: TicketsSvc, Logs: LogsSvc, ComprasSvc: Compras });
+  const { state, errors, submitting, setField, handleSubmit } = useDocumentarTicket({ Tickets: TicketsSvc!, Logs: LogsSvc!, ComprasSvc: Compras });
 
   // ⬇️ usamos también loading/error por si quieres feedback
   const { ListaPlantillas, loading: loadingPlantillas, error: errorPlantillas } = usePlantillas(PlantillasSvc);

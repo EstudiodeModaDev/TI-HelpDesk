@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import "./InfoTienda.css";
 import { useGraphServices } from "../../../graph/GrapServicesContext";
 import type { InternetService } from "../../../Services/Internet.service";
-import { useInfoInternetTiendas } from "../../../Funcionalidades/InfoTienda";
+import { useInfoInternetTiendas } from "../../../Funcionalidades/operations/InfoTienda";
 import type { InfoInternetTienda } from "../../../Models/Internet";
 import type { SociedadesService } from "../../../Services/Sociedades.service";
 

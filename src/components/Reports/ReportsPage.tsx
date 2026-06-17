@@ -1,11 +1,11 @@
 import * as React from "react";
 import * as XLSX from "xlsx";
-import { useGraphServices } from "../../graph/GrapServicesContext";
 import type { Ticket } from "../../Models/Tickets";
-import type { TicketsService } from "../../Services/Tickets.service";
 import { toISODateTimeFlex } from "../../utils/Date";
 import { norm } from "../../utils/Commons";
 import "./Reports.css";
+import { useRepositories } from "../../repositories/repositoriesContext";
+import type { TicketsRepository } from "../../repositories/TicketsRepository/TicketRepository";
 
 type MonthWindow = {
   label: string;
@@ -47,29 +47,11 @@ function getMonthWindow(baseDate: Date, offset: number): MonthWindow {
   };
 }
 
-function buildDateFilter(range: MonthWindow): string {
-  return [
-    `fields/FechaApertura ge '${range.start.toISOString()}'`,
-    `fields/FechaApertura lt '${range.endExclusive.toISOString()}'`,
-  ].join(" and ");
-}
 
-async function getAllTicketsForRange(service: TicketsService, range: MonthWindow): Promise<Ticket[]> {
-  const firstPage = await service.getAll({
-    filter: buildDateFilter(range),
-    orderby: "fields/FechaApertura asc",
-    top: 500,
-  });
+async function getAllTicketsForRange(service: TicketsRepository, range: MonthWindow): Promise<Ticket[]> {
+  const firstPage = await service.loadTickets({range: {from: String(range.start), to: String(range.endExclusive)}});
 
-  const allTickets = [...firstPage.items];
-  let nextLink = firstPage.nextLink;
-
-  while (nextLink) {
-    const nextPage = await service.getByNextLink(nextLink);
-    console.log(nextPage)
-    allTickets.push(...nextPage.items);
-    nextLink = nextPage.nextLink;
-  }
+  const allTickets = [...firstPage.data];
 
   return allTickets;
 }
@@ -109,7 +91,7 @@ function splitResolvers(ticket: Ticket): string[] {
 function toExcelRows(tickets: Ticket[]) {
   return tickets.map((ticket) => ({
     ID: ticket.ID ?? "",
-    Asunto: normalizeText(ticket.Title),
+    Asunto: normalizeText(ticket.AsuntoTicket),
     Solicitante: normalizeText(ticket.Solicitante),
     "Correo solicitante": normalizeText(ticket.CorreoSolicitante),
     Resolutor: normalizeText(ticket.Nombreresolutor),
@@ -118,9 +100,9 @@ function toExcelRows(tickets: Ticket[]) {
     Fuente: normalizeText(ticket.Fuente),
     Categoria: normalizeText(ticket.Categoria),
     Subcategoria: normalizeText(ticket.SubCategoria),
-    Articulo: normalizeText(ticket.SubSubCategoria),
+    Articulo: normalizeText(ticket.Articulo),
     "Fecha apertura": toISODateTimeFlex(ticket.FechaApertura) || "",
-    "Tiempo solucion": toISODateTimeFlex(ticket.TiempoSolucion) || "",
+    "Tiempo solucion": toISODateTimeFlex(ticket.FechaMaxima) || "",
     ANS: normalizeText(ticket.ANS),
     Observador: normalizeText(ticket.Observador),
     "Correo observador": normalizeText(ticket.CorreoObservador),
@@ -198,7 +180,7 @@ function makeSheetName(label: string): string {
 }
 
 export default function ReportsPage() {
-  const { Tickets } = useGraphServices();
+  const { tickets } = useRepositories();
   const [state, setState] = React.useState<ExportState>("idle");
   const [message, setMessage] = React.useState("Exporta los tickets del mes actual y del mes anterior en un solo archivo de Excel.");
   const [monthSummaries, setMonthSummaries] = React.useState<MonthSummary[]>([]);
@@ -213,8 +195,8 @@ export default function ReportsPage() {
 
     try {
       const [currentTickets, previousTickets] = await Promise.all([
-        getAllTicketsForRange(Tickets, currentMonth),
-        getAllTicketsForRange(Tickets, previousMonth),
+        getAllTicketsForRange(tickets!, currentMonth),
+        getAllTicketsForRange(tickets!, previousMonth),
       ]);
 
       const workbook = XLSX.utils.book_new();
@@ -256,7 +238,7 @@ export default function ReportsPage() {
       setResolverSummaries([]);
       setMessage(error?.message ?? "No fue posible generar el reporte de tickets.");
     }
-  }, [Tickets, currentMonth, previousMonth]);
+  }, [tickets, currentMonth, previousMonth]);
 
   return (
     <section className="reports-page">

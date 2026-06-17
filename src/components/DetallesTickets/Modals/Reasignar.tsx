@@ -6,12 +6,11 @@ import Select, {
 import "./ModalsStyles.css";
 import type { UserOption } from "../../../Models/Commons";
 import { useGraphServices } from "../../../graph/GrapServicesContext";
-import { useUsuarios } from "../../../Funcionalidades/Usuarios";
-import { UsuariosSPService } from "../../../Services/Usuarios.Service";
-import { useReasignarTicket } from "../../../Funcionalidades/Reasignar";
+import { useUsuarios } from "../../../Funcionalidades/auth/Usuarios";
+import { useReasignarTicket } from "../../../Funcionalidades/Tickets/Reasignar";
 import type { Ticket } from "../../../Models/Tickets";
-import type { LogService } from "../../../Services/Log.service";
 import { norm } from "../../../utils/Commons";
+import { useRepositories } from "../../../repositories/repositoriesContext";
 
 type UserOptionEx = UserOption & {
   source?: "Empleado" | "Franquicia";
@@ -20,14 +19,11 @@ type UserOptionEx = UserOption & {
 };
 
 export default function Reasignar({ ticket }: { ticket: Ticket }) {
-  const { Usuarios: UsuariosSPServiceSvc, Logs: LogSvc } =
-    (useGraphServices() as ReturnType<typeof useGraphServices> & {
-      Logs: LogService;
-      Usuarios: UsuariosSPService;
-    });
+  const { Usuarios: UsuariosSPServiceSvc,  } = useGraphServices() 
+  const {logs: LogSvc} = useRepositories()
 
   const { state, errors, submitting, setField, handleReasignar } =
-    useReasignarTicket({ Usuarios: UsuariosSPServiceSvc, Logs: LogSvc }, ticket);
+    useReasignarTicket({ Usuarios: UsuariosSPServiceSvc, Logs: LogSvc! }, ticket);
     
 
   const { UseruserOptions, loading, error } = useUsuarios(UsuariosSPServiceSvc!);

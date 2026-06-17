@@ -1,21 +1,19 @@
 import * as React from "react";
+import toast from "react-hot-toast";
 import Select, { components, type OptionProps, type SingleValue } from "react-select";
 import "./NuevoTicketForm.css";
 import "../../App.css"
-import { useFranquicias } from "../../Funcionalidades/Franquicias";
-import type { FranquiciasService } from "../../Services/Franquicias.service";3
+import { useFranquicias } from "../../Funcionalidades/access/Franquicias";
 import type { UserOption } from "../../Models/Commons";
 import { useGraphServices } from "../../graph/GrapServicesContext";
-import { useNuevoTicketForm } from "../../Funcionalidades/NuevoTicket";
-import { useWorkers } from "../../Funcionalidades/Workers";
-import { useUserRole, useUsuarios } from "../../Funcionalidades/Usuarios";
-import { UsuariosSPService } from "../../Services/Usuarios.Service";
-import type { TicketsService } from "../../Services/Tickets.service";
+import { useNuevoTicketForm } from "../../Funcionalidades/Tickets/NuevoTicket";
+import { useWorkers } from "../../Funcionalidades/access/Workers";
+import { useUserRole, useUsuarios } from "../../Funcionalidades/auth/Usuarios";
 import RichTextBase64 from "../RichTextBase64/RichTextBase64";
-import type { LogService } from "../../Services/Log.service";
 import { norm } from "../../utils/Commons";
 import RelacionadorMasiva from "../MasiveNonFather/masiva";
 import { useAuth } from "../../auth/authContext";
+import { useRepositories } from "../../repositories/repositoriesContext";
 
 export type UserOptionEx = UserOption & { source?: "Empleado" | "Franquicia" };
 export type TreeOption = {
@@ -31,15 +29,12 @@ export type TreeOption = {
 };
 
 export default function NuevoTicketForm() {
-  const {Categorias, SubCategorias, Articulos, Franquicias: FranquiciasSvc, Usuarios: UsuariosSPServiceSvc, Tickets: TicketsSvc, Logs: LogsSvc} = useGraphServices() as ReturnType<typeof useGraphServices> & {
-    Franquicias: FranquiciasService;
-    Usuarios: UsuariosSPService;
-    Tickets: TicketsService;
-    Logs: LogService
-  };
+  const {Categorias, SubCategorias, Articulos, Franquicias: FranquiciasSvc, Usuarios: UsuariosSPServiceSvc,} = useGraphServices()
+  const {tickets, logs} = useRepositories()
+
   const {account} = useAuth()
   const userRole = useUserRole(account?.username)
-  const {state, errors, submitting, categorias, subcategoriasAll, articulosAll, loadingCatalogos, setField, handleSubmit, balanceCharge} = useNuevoTicketForm({ Categorias, SubCategorias, Articulos, Tickets: TicketsSvc, Usuarios: UsuariosSPServiceSvc, Logs: LogsSvc});
+  const {state, errors, submitting, categorias, subcategoriasAll, articulosAll, loadingCatalogos, setField, handleSubmit, balanceCharge} = useNuevoTicketForm({ Categorias, SubCategorias, Articulos, Tickets: tickets!, Usuarios: UsuariosSPServiceSvc, Logs: logs!});
   const { franqOptions, loading: loadingFranq, error: franqError } = useFranquicias(FranquiciasSvc!);
   const { workersOptions, loadingWorkers, error: usersError } = useWorkers({
     onlyEnabled: true,
@@ -194,7 +189,7 @@ export default function NuevoTicketForm() {
                       if(respuesta?.ok || account?.username === "mamartinez@estudiodemoda.com.co"){
                         setField("resolutor", opt ?? null)
                       } else {
-                        alert("A este resolutor se le han asignado demasiados casos en el dia de hoy, por favor escoja otro hasta balancear las cargas")
+                        toast.error("Este resolutor tiene demasiados casos hoy. Escoge otro para balancear la carga.")
                       }
                     } else {
                       setField("resolutor", opt ?? null)
@@ -240,9 +235,7 @@ export default function NuevoTicketForm() {
             <div className="tf-field">
               <label className="tf-label" htmlFor="fuente">Fuente Solicitante</label>
               
-
-
-              <Select inputId="nomina" options={opcionesFuentes} classNamePrefix="rs" placeholder="Selecciona tipo de nómina..."
+              <Select inputId="fuente" options={opcionesFuentes} classNamePrefix="rs" placeholder="Selecciona fuente de solicitud..."
                 value={opcionesFuentes.find(o => o.value === state.fuente) ?? null}
                 onChange={(opt) => {setField("fuente", opt?.label ?? ""); }}
                 isClearable
@@ -291,7 +284,10 @@ export default function NuevoTicketForm() {
               <input
                 id="archivo"
                 type="file"
-                onChange={(e) => setField("archivo", e.target.files?.[0] ?? null)}
+                multiple
+                onChange={(e) =>
+                  setField("archivo", Array.from(e.target.files ?? []))
+                }
                 disabled={submitting}
                 className="tf-input"
               />

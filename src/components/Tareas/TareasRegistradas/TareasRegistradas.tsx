@@ -1,4 +1,4 @@
-import { useTareas } from "../../../Funcionalidades/Tareas";
+import { useTareas } from "../../../Funcionalidades/tasks/Tareas";
 import { useGraphServices } from "../../../graph/GrapServicesContext";
 import type { TareasService } from "../../../Services/Tareas.service";
 import { toISODateTimeFlex } from "../../../utils/Date";

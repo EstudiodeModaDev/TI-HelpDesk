@@ -1,9 +1,8 @@
 import * as React from "react";
-import { usePermisosNavegacion } from "../../../Funcionalidades/Formatos";
-import { useGraphServices } from "../../../graph/GrapServicesContext";
-import type { TicketsService } from "../../../Services/Tickets.service";
+import { usePermisosNavegacion } from "../../../Funcionalidades/forms/Formatos";
 import "./PermisosNavegacion.css";
 import type { FilaPermisoNav } from "../../../Models/Formatos";
+import { useRepositories } from "../../../repositories/repositoriesContext";
 
 const COLS = [
   { key: "Youtube",    label: "YouTube" },
@@ -20,9 +19,8 @@ const COLS = [
 type ToggleKey = (typeof COLS)[number]["key"];
 
 export default function PermisosNavegacion() {
-  const { Tickets: TicketsSvc } =
-    (useGraphServices() as ReturnType<typeof useGraphServices> & { Tickets: TicketsService });
-  const {filas, sending, error, addFila, removeFila, setCampo, submit,} = usePermisosNavegacion(TicketsSvc);
+  const { tickets: TicketsSvc } = useRepositories()
+  const {filas, sending, error, addFila, removeFila, setCampo, submit,} = usePermisosNavegacion(TicketsSvc!);
 
   function setCampoNav<K extends ToggleKey>(id: string, key: K, value: boolean) {
     setCampo(id, key as K, value as FilaPermisoNav[K]);

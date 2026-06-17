@@ -1,13 +1,14 @@
 // TicketsAsociados.tsx
-import * as React from "react";
-import { useTicketsRelacionados } from "../../../Funcionalidades/Tickets";
-import { useGraphServices } from "../../../graph/GrapServicesContext";
-import type { Ticket } from "../../../Models/Tickets";
-import "./TicketsAsociados.css";
-import type { TicketLite } from "./RelacionarTickets/Relacionador";
-import RelacionadorInline from "./RelacionarTickets/Relacionador";
-import { useUserRole } from "../../../Funcionalidades/Usuarios";
+import React from "react";
 import { useAuth } from "../../../auth/authContext";
+import { useUserRole } from "../../../Funcionalidades/auth/Usuarios";
+import type { Ticket } from "../../../Models/Tickets";
+import { useRepositories } from "../../../repositories/repositoriesContext";
+import type { TicketLite } from "./RelacionarTickets/Relacionador";
+import "./TicketsAsociados.css";
+import RelacionadorInline from "./RelacionarTickets/Relacionador";
+import { useTicketsRelacionados } from "../../../Funcionalidades/Tickets/TicketsRelaciones";
+
 
 type Props = {
   title?: string;
@@ -19,11 +20,12 @@ type Props = {
 };
 
 export default function TicketsAsociados({title = "Tickets Asociados", ticket, emptyChildrenText = "No es hijo de ningun caso", onSelect, buildHref}: Props) {
-  const { Tickets } = useGraphServices();
+  
+  const { tickets } = useRepositories();
   const {account} = useAuth()
   const userRole = useUserRole(account?.username)
   const isPrivileged = userRole.role === "Administrador" || userRole.role === "Tecnico" || userRole.role === "Técnico";
-  const { padre, hijos, loading, error, loadRelateds } = useTicketsRelacionados(Tickets, ticket);
+  const { padre, hijos, loading, error, loadRelateds } = useTicketsRelacionados(tickets!, ticket,);
 
   // ====== Relacionador (UI) ======
   const [showRel, setShowRel] = React.useState(false);
@@ -56,7 +58,6 @@ export default function TicketsAsociados({title = "Tickets Asociados", ticket, e
 
   return (
     <section className="ta-panel" aria-label={title}>
-      {/* Header SIEMPRE visible */}
       <header className="ta-header">
         <div className="ta-header__left">
           <h2 className="ta-title">{title}</h2>
@@ -68,7 +69,6 @@ export default function TicketsAsociados({title = "Tickets Asociados", ticket, e
 
       </header>
 
-      {/* ===== Contenido ===== */}
       {showRel ? (
         <div className="ta-relacionador-wrap">
           {loadingOpts ? (
@@ -83,7 +83,6 @@ export default function TicketsAsociados({title = "Tickets Asociados", ticket, e
           {error && <p className="ta-error">Error cargando tickets</p>}
 
           <div className="ta-body">
-            {/* Padre */}
             <section className="ta-column">
               <p className="ta-label">Ticket padre:</p>
               <ul className="ta-list">
@@ -94,11 +93,11 @@ export default function TicketsAsociados({title = "Tickets Asociados", ticket, e
                     <span className="ta-list__dash" aria-hidden>-</span>
                     {onSelect ? (
                       <button type="button" className="ta-link ta-link--button" onClick={(e) => handleClick(e, padre)}>
-                        {padre.Title} <span className="ta-link__muted"> {" → "} ID: {padre.ID}</span>
+                        {padre.AsuntoTicket} <span className="ta-link__muted"> {" → "} ID: {padre.ID}</span>
                       </button>
                     ) : (
                       <a className="ta-link" href={href(padre.ID ?? "")}>
-                        {padre.Title} <span className="ta-link__muted">{" → "} ID: {padre.ID}</span>
+                        {padre.AsuntoTicket} <span className="ta-link__muted">{" → "} ID: {padre.ID}</span>
                       </a>
                     )}
                   </li>
@@ -106,7 +105,6 @@ export default function TicketsAsociados({title = "Tickets Asociados", ticket, e
               </ul>
             </section>
 
-            {/* Hijos */}
             <section className="ta-column">
               <div className="encabezado">
                 {hijos.length === 0 ? (
@@ -136,7 +134,7 @@ export default function TicketsAsociados({title = "Tickets Asociados", ticket, e
                         <li key={t.ID} className="ta-list__item">
                           <span className="ta-list__dash" aria-hidden>-</span>
                           <button type="button" className="ta-link ta-link--button" onClick={(e) => handleClick(e, t)}>
-                            {t.Title} <span className="ta-link__muted">{" → "} ID: {t.ID}</span>
+                            {t.AsuntoTicket} <span className="ta-link__muted">{" → "} ID: {t.ID}</span>
                           </button>
                         </li>
                       ))}
@@ -151,7 +149,7 @@ export default function TicketsAsociados({title = "Tickets Asociados", ticket, e
                             className="ta-link ta-link--button"
                             onClick={(e) => handleClick(e, t)}
                           >
-                            {t.Title} <span className="ta-link__muted">{" → "} ID: {t.ID}</span>
+                            {t.AsuntoTicket} <span className="ta-link__muted">{" → "} ID: {t.ID}</span>
                           </button>
                         </li>
                       ))}

@@ -2,7 +2,7 @@ import * as React from "react";
 import { createPortal } from "react-dom";
 import type { dispositivos, prestamos } from "../../Models/prestamos";
 import { ReturnTestsList } from "./ReturnTestLists";
-import { usePruebas } from "../../Funcionalidades/prestamos";
+import { usePruebas } from "../../Funcionalidades/loans/prestamos";
 
 export type ReturnModalProps = {
   open: boolean;

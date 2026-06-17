@@ -1,24 +1,17 @@
-import type { FranquiciasService } from "../../Services/Franquicias.service";
 import type { UserOption } from "../../Models/Commons";
 import { useGraphServices } from "../../graph/GrapServicesContext";
-import {  useNuevoUsuarioTicketForm } from "../../Funcionalidades/NuevoTicket";
-import { UsuariosSPService } from "../../Services/Usuarios.Service";
-import type { TicketsService } from "../../Services/Tickets.service";
+import {  useNuevoUsuarioTicketForm } from "../../Funcionalidades/Tickets/NuevoTicket";
 import RichTextBase64 from "../RichTextBase64/RichTextBase64";
-import type { LogService } from "../../Services/Log.service";
 import "../NuevoTicket/NuevoTicketForm.css"
+import { useRepositories } from "../../repositories/repositoriesContext";
 
 export type UserOptionEx = UserOption & { source?: "Empleado" | "Franquicia" };
 
 export default function NuevoTicketUsuarioForm() {
-  const {Categorias, SubCategorias, Articulos, Usuarios: UsuariosSPServiceSvc, Tickets: TicketsSvc, Logs: LogsSvc} = useGraphServices() as ReturnType<typeof useGraphServices> & {
-    Franquicias: FranquiciasService;
-    Usuarios: UsuariosSPService;
-    Tickets: TicketsService;
-    Logs: LogService
-  };
+  const {Categorias, SubCategorias, Articulos, Usuarios: UsuariosSPServiceSvc} = useGraphServices()
+  const {tickets, logs} = useRepositories()
 
-  const {state, errors, submitting, setField, handleSubmit,} = useNuevoUsuarioTicketForm({ Categorias, SubCategorias, Articulos, Tickets: TicketsSvc, Usuarios: UsuariosSPServiceSvc, Logs: LogsSvc});
+  const {state, errors, submitting, setField, handleSubmit,} = useNuevoUsuarioTicketForm({ Categorias, SubCategorias, Articulos, Tickets: tickets!, Usuarios: UsuariosSPServiceSvc, Logs: logs!});
 
   return (
     <div className="ticket-form">
@@ -49,7 +42,7 @@ export default function NuevoTicketUsuarioForm() {
 
           {Array.isArray(state.archivo) && state.archivo.length > 0 && (
             <ul className="tf-files">
-              {state.archivo.map((f, i) => (
+              {state.archivo.map((f: File, i: number) => (
                 <li key={i}>
                   {f.name} ({Math.round(f.size / 1024)} KB)
                 </li>

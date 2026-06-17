@@ -1,8 +1,8 @@
 import React from "react";
-import { useUsuarios } from "../../Funcionalidades/Usuarios";
+import { useUsuarios } from "../../Funcionalidades/auth/Usuarios";
 import { useGraphServices } from "../../graph/GrapServicesContext";
 import "./Usuarios.css"
-import { useFranquicias } from "../../Funcionalidades/Franquicias";
+import { useFranquicias } from "../../Funcionalidades/access/Franquicias";
 import { useConfirm } from "../ModalDelete/ConfirmProvider";
 import NuevoTecnico from "./AgregarUsuarios/AgregarUsuarios";
 import NuevaFranquicia from "./AgregarFranquicias/AgregarFranquicias";

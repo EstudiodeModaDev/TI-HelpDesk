@@ -2,16 +2,17 @@ import * as React from "react";
 import Select, { type SingleValue } from "react-select";
 import "./ModalsStyles.css";
 import { useGraphServices } from "../../../graph/GrapServicesContext";
-import type { TicketsService } from "../../../Services/Tickets.service";
-import { useRecategorizarTicket } from "../../../Funcionalidades/Recategorizar";
+import { useRecategorizarTicket } from "../../../Funcionalidades/Tickets/Recategorizar";
 import type { Ticket } from "../../../Models/Tickets";
 import { norm } from "../../../utils/Commons";
 import type { TreeOption } from "../../NuevoTicket/NuevoTicketForm";
 import { useAuth } from "../../../auth/authContext";
+import { useRepositories } from "../../../repositories/repositoriesContext";
 
 export default function Recategorizar({ ticket, onDone}: { ticket: Ticket, onDone: () => void }) {
-  const {Categorias, SubCategorias, Articulos, Tickets: TicketsSvc, Logs} = useGraphServices() as ReturnType<typeof useGraphServices> & {Tickets: TicketsService;};
-  const {state, errors, submitting, categorias, subcategoriasAll, articulosAll, loadingCatalogos, setField, handleRecategorizar,} = useRecategorizarTicket({ Categorias, SubCategorias, Articulos, Tickets: TicketsSvc }, ticket);
+  const {tickets, logs} = useRepositories()
+  const {Categorias, SubCategorias, Articulos, } = useGraphServices() as ReturnType<typeof useGraphServices>;
+  const {state, errors, submitting, categorias, subcategoriasAll, articulosAll, loadingCatalogos, setField, handleRecategorizar,} = useRecategorizarTicket({ Categorias, SubCategorias, Articulos, Tickets: tickets! }, ticket);
   const {account} = useAuth()
   const treeOptions: TreeOption[] = React.useMemo(() => {
     if (!categorias.length || !subcategoriasAll.length || !articulosAll.length) return [];
@@ -81,12 +82,13 @@ export default function Recategorizar({ ticket, onDone}: { ticket: Ticket, onDon
       .filter(Boolean)
       .join(" > ");
 
-    await Logs.create({
-      Actor: account?.name ?? "", 
-      CorreoActor: account?.username ?? "", 
-      Descripcion: "El resolutor cambió la categoría del ticket a: " + newCategoriaBuilt,
-      Tipo_de_accion: "Recategorización",
-      Title: String(ticket.ID ?? ""),
+    await logs?.createLog({
+      seguimientos_solvi_actor: account?.name ?? "", 
+      seguimientos_solvi_correo_actor: account?.username ?? "", 
+      seguimientos_solvi_descripcion: "El resolutor cambió la categoría del ticket a: " + newCategoriaBuilt,
+      seguimientos_solvi_tipo_de_accion: "Recategorización",
+      seguimientos_solvi_id_ticket: Number(ticket.ID ?? ""),
+      seguimientos_solvi_action_date: new Date()
     });
   };
 

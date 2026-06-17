@@ -1,9 +1,8 @@
 import React from "react";
-import { useDashboard } from "../../../Funcionalidades/Dashboard";
-import { useGraphServices } from "../../../graph/GrapServicesContext";
-import type { TicketsService } from "../../../Services/Tickets.service";
+import { useDashboard } from "../../../Funcionalidades/dashboard/Dashboard";
 import "./DashboardResumen.css";
 import type { DailyPoint, Fuente, TopCategoria } from "../../../Models/Dashboard";
+import { useRepositories } from "../../../repositories/repositoriesContext";
 
 // ===== util: formatea "2,1 mil" / "0,2 mil" =====
 function formatShort(n: number) {
@@ -32,11 +31,9 @@ const COLORS: Record<string, string> = {
 };
 
 export default function DashboardResumen() {
-  const { Tickets } = useGraphServices() as ReturnType<typeof useGraphServices> & {
-    TicketService: TicketsService;
-  };
+  const { tickets } = useRepositories()
   const { totalCasos, totalEnCurso, totalFinalizados, totalFueraTiempo, porcentajeCumplimiento, topSolicitante, range, totalCategorias, resolutores, Fuentes, casosPorDia, loading, 
-    obtenerTotal, obtenerTop5, setRange, obtenerTotalCategoria, obtenerTotalResolutor, obtenerFuentes,obtenerCasosPorDia, } = useDashboard(Tickets);
+    obtenerTotal, obtenerTop5, setRange, obtenerTotalCategoria, obtenerTotalResolutor, obtenerFuentes,obtenerCasosPorDia, } = useDashboard(tickets!);
 
   // carga inicial
   React.useEffect(() => {
@@ -47,6 +44,11 @@ export default function DashboardResumen() {
     obtenerFuentes("resumen");
     obtenerCasosPorDia("resumen", true, );
   }, [range.from, range.to]); 
+
+
+    React.useEffect(() => {
+      console.log(resolutores)
+  }, [resolutores]); 
 
   if (loading) {
     return (
@@ -108,11 +110,11 @@ export default function DashboardResumen() {
                   <SmallDonut value={porcentajeCumplimiento} />
                   <div className="res-meta">
                     <div className="res-name">{r.nombre}</div>
-                    <div className="res-sub">0.00%</div>
+                    <div className="res-sub">{porcentajeCumplimiento * 100}%</div>
                   </div>
                 </div>
                 <div className="res-right">
-                  <div className="res-total">{totalCasos}</div>
+                  <div className="res-total">{r.total}</div>
                   <div className="res-caption">Total Casos</div>
                 </div>
               </li>

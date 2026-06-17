@@ -1,7 +1,7 @@
 import * as React from "react";
 import "./NuevoUsuario.css";
 import { useGraphServices } from "../../../graph/GrapServicesContext";
-import { useFranquicias } from "../../../Funcionalidades/Franquicias";
+import { useFranquicias } from "../../../Funcionalidades/access/Franquicias";
 
 type Props = {
   onCancel: () => void;

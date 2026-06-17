@@ -2,7 +2,7 @@
 import * as React from "react";
 import "./EscalamientoInternet.css";
 import type { Ticket } from "../../../Models/Tickets";
-import { useEscalamiento } from "../../../Funcionalidades/Escalamiento";
+import { useEscalamiento } from "../../../Funcionalidades/Tickets/Escalamiento";
 
 type Props = {
   ticket?: Ticket;
@@ -135,7 +135,7 @@ export default function EscalamientoInternet({ticket,}: Props) {
               <p className="esc-muted">No hay nada adjunto.</p>
             ) : (
               <ul className="esc-files">
-                {state.adjuntos.map((f, i) => (
+                {state.adjuntos.map((f: File, i: number) => (
                   <li key={i}>{f.name}</li>
                 ))}
               </ul>

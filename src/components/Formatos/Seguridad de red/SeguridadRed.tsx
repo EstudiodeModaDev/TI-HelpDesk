@@ -1,14 +1,13 @@
-import { useSolicitudesRed } from "../../../Funcionalidades/Formatos";
-import { useGraphServices } from "../../../graph/GrapServicesContext";
+import { useSolicitudesRed } from "../../../Funcionalidades/forms/Formatos";
 import type { PermisoRed } from "../../../Models/Formatos";
-import type { TicketsService } from "../../../Services/Tickets.service";
+import { useRepositories } from "../../../repositories/repositoriesContext";
 import "./SeguridadRed.css";
 
 const PERMISOS: PermisoRed[] = ["Lectura", "Escritura", "Lectura y escritura"];
 
 export default function SeguridadRed() {
-  const { Tickets: TicketsSvc} = (useGraphServices() as ReturnType<typeof useGraphServices> & {Tickets: TicketsService;})
-  const {filas, sending, error, addFila, removeFila, setCampo, submit,} = useSolicitudesRed(TicketsSvc);
+  const {tickets} = useRepositories()
+  const {filas, sending, error, addFila, removeFila, setCampo, submit,} = useSolicitudesRed(tickets!);
 
   return (
     <section className="sr-scope">

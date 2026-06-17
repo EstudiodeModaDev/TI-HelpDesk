@@ -12,8 +12,6 @@ import { ActasdeentregaService } from "../Services/Actasdeentrega.service";
 import { AnunciosService } from "../Services/Anuncios.service";
 import { ArticulosService } from "../Services/Articulos.service";
 import { UsuariosSPService } from "../Services/Usuarios.Service";
-import { LogService } from "../Services/Log.service";
-import { TicketsService } from "../Services/Tickets.service";
 import { CategoriasService } from "../Services/Categorias.service";
 import { FranquiciasService } from "../Services/Franquicias.service";
 import { SubCategoriasService } from "../Services/SubCategorias.Service";
@@ -61,7 +59,6 @@ export type UnifiedConfig = {
     Articulos: string;
     Usuarios: string;
     Logs: string;
-    Tickets: string;
     Categorias: string;
     Franquicias: string;
     SubCategorias: string;
@@ -103,8 +100,6 @@ export type GraphServices = {
   Anuncios: AnunciosService;
   Articulos: ArticulosService;
   Usuarios: UsuariosSPService;
-  Logs: LogService;
-  Tickets: TicketsService;
   Categorias: CategoriasService;
   Franquicias: FranquiciasService;
   SubCategorias: SubCategoriasService;
@@ -157,7 +152,6 @@ const DEFAULT_CONFIG: UnifiedConfig = {
     Articulos: "Articulos",
     Usuarios: "Usuarios",
     Logs: "Log",
-    Tickets: "Tickets",
     Categorias: "Categorias",
     Franquicias: "Franquicias",
     SubCategorias: "SubCategorias",
@@ -232,8 +226,6 @@ export const GraphServicesProvider: React.FC<ProviderProps> = ({ children, confi
     const Anuncios             = new AnunciosService(graph, hd.hostname,   hd.sitePath,  lists.Anuncios);
     const Articulos            = new ArticulosService(graph, hd.hostname,  hd.sitePath,  lists.Articulos);
     const Usuarios             = new UsuariosSPService(graph, hd.hostname, hd.sitePath,  lists.Usuarios);
-    const Logs                 = new LogService(graph, hd.hostname,        hd.sitePath,  lists.Logs);
-    const Tickets              = new TicketsService(graph, hd.hostname,    hd.sitePath,  lists.Tickets);
     const Categorias           = new CategoriasService(graph, hd.hostname, hd.sitePath,  lists.Categorias);
     const Franquicias          = new FranquiciasService(graph, hd.hostname, hd.sitePath, lists.Franquicias);
     const SubCategorias        = new SubCategoriasService(graph, hd.hostname, hd.sitePath, lists.SubCategorias);
@@ -262,7 +254,7 @@ export const GraphServicesProvider: React.FC<ProviderProps> = ({ children, confi
 
     return {
       graph, Storage,
-      Sociedades, Proveedores, Plantillas, Internet, CasosHijosRequeridos, ActasEntrega, Anuncios, Articulos, Usuarios, Logs, Tickets, Categorias, Franquicias, SubCategorias,
+      Sociedades, Proveedores, Plantillas, Internet, CasosHijosRequeridos, ActasEntrega, Anuncios, Articulos, Usuarios, Categorias, Franquicias, SubCategorias,
       InternetTiendas, Facturas, ItemFactura, ProveedoresFactura, Item, CentroCostos, CentroOperativo, Compras, Tareas, Inventario, DistribucionFactura, TipsInicio, Ausencias,
       dispositivos, prestamos, pruebas, pruebasPrestamo, pruebasDispositivo,
       // TEST

@@ -6,10 +6,10 @@ import HtmlContent from "../Renderizador/Renderizador";
 import Recategorizar from "./Modals/Recategorizar";
 import Reasignar from "./Modals/Reasignar";
 import AsignarObservador from "./Modals/Observador";
-import TicketsAsociados from "./TicketsRelacionados/Relacionados";
 import { ParseDateShow } from "../../utils/Date";
 import Trunc from "../Trunc/trunc";
-import { useTicketsAttachments } from "../../Funcionalidades/AttachmentsTickets";
+import { useTicketsAttachments } from "../../Funcionalidades/Tickets/AttachmentsTickets";
+import TicketsAsociados from "./TicketsRelacionados/Relacionados";
 
 
 /* ================== Helpers y tipos ================== */
@@ -25,6 +25,39 @@ type Props = {
   role: string;
 };
 
+type AttachmentRow = {
+  name: string;
+  link: string;
+  attachment_type?: string;
+  id_ticket?: number | null;
+  id_seguimiento?: number | null;
+};
+
+type PreviewKind = "image" | "pdf" | "text" | "video" | "audio" | "unsupported";
+
+const getFileExtension = (value?: string) => {
+  if (!value) return "";
+  const cleanValue = value.split("?")[0].split("#")[0];
+  const parts = cleanValue.split(".");
+  return parts.length > 1 ? parts.pop()?.toLowerCase() ?? "" : "";
+};
+
+const getPreviewKind = (file?: AttachmentRow): PreviewKind => {
+  const ext = getFileExtension(file?.name) || getFileExtension(file?.link);
+
+  if (["png", "jpg", "jpeg", "gif", "bmp", "webp", "svg"].includes(ext)) return "image";
+  if (ext === "pdf") return "pdf";
+  if (["txt", "csv", "log", "json", "xml"].includes(ext)) return "text";
+  if (["mp4", "webm", "ogg", "mov"].includes(ext)) return "video";
+  if (["mp3", "wav", "ogg", "m4a"].includes(ext)) return "audio";
+
+  return "unsupported";
+};
+
+const openAttachmentDownload = (file: AttachmentRow) => {
+  window.open(file.link, "_blank", "noopener,noreferrer");
+};
+
 /* ================== Componente ================== */
 export type Opcion = { value: string; label: string };
 
@@ -38,21 +71,27 @@ function Row({label, children, className = "",}: {label: string; children: React
 }
 
 export function CaseDetail({ ticket, onVolver, role, onDocumentar }: Props) {
-  const {loadAttachments, rows} = useTicketsAttachments(ticket.ID ?? "");
+  const {loadAttachments, rows} = useTicketsAttachments();
   // === Estado local del ticket seleccionado
   const [selected, setSelected] = React.useState<Ticket>(ticket);
+  const [selectedAttachment, setSelectedAttachment] = React.useState<AttachmentRow | null>(null);
   React.useEffect(() => {
     // al cambiar de ticket, oculta paneles
     setShowSeg(false);
     setShowRecat(false);
     setShowReasig(false);
     setShowObservador(false);
+    setSelectedAttachment(null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ticket?.ID]);
 
   React.useEffect(() => {
-    loadAttachments()
-  }, [ticket?.ID]);
+    loadAttachments({
+      attachment_type: "Creacion",
+      id_ticket: Number(ticket.ID),
+    });
+    
+  }, [ticket?.ID, loadAttachments]);
 
   const [showSeg, setShowSeg] = React.useState(false);
   const [showRecat, setShowRecat] = React.useState(false);
@@ -66,13 +105,33 @@ export function CaseDetail({ ticket, onVolver, role, onDocumentar }: Props) {
     setSelected(ticket);
   }, [ticket]);
 
+  React.useEffect(() => {
+    if (!Array.isArray(rows) || rows.length === 0) {
+      setSelectedAttachment(null);
+      return;
+    }
+
+    setSelectedAttachment((current) => {
+      if (current && rows.some((row) => row.link === current.link)) {
+        return current;
+      }
+
+      const firstPreviewable = rows.find((row) => getPreviewKind(row) !== "unsupported");
+      return firstPreviewable ?? null;
+    });
+  }, [rows]);
+
   // === Derivados (memoizados)
   const categoria = React.useMemo(
     () =>
-      [selected?.Categoria, selected?.SubCategoria, selected?.SubSubCategoria]
+      [selected?.Categoria, selected?.SubCategoria, selected?.Articulo]
         .filter(Boolean)
         .join(" > "),
-    [selected?.Categoria, selected?.SubCategoria, selected?.SubSubCategoria]
+    [selected?.Categoria, selected?.SubCategoria, selected?.Articulo]
+  );
+  const previewKind = React.useMemo(
+    () => getPreviewKind(selectedAttachment ?? undefined),
+    [selectedAttachment]
   );
 
   if (!selected) return <div>Ticket no encontrado</div>;
@@ -96,7 +155,7 @@ export function CaseDetail({ ticket, onVolver, role, onDocumentar }: Props) {
         </Row>
 
         <Row className="pos-solucion" label="Fecha de Solución">
-          <Trunc text={ParseDateShow(selected.TiempoSolucion ?? "") ?? "—"} />
+          <Trunc text={ParseDateShow(selected.FechaMaxima ?? "") ?? "—"} />
         </Row>
 
         <Row className="pos-fuente" label="Fuente solicitante">
@@ -157,7 +216,7 @@ export function CaseDetail({ ticket, onVolver, role, onDocumentar }: Props) {
         {/* Fila 4: Título */}
         <Row className="pos-titulo" label="Título">
           {/* 2 líneas en móvil para mejor legibilidad */}
-          {selected.Title}
+          {selected.AsuntoTicket}
         </Row>
 
         {/* Fila 5: Descripción (HTML truncada en móvil vía .html-trunc) */}
@@ -181,28 +240,115 @@ export function CaseDetail({ ticket, onVolver, role, onDocumentar }: Props) {
               {rows.map((r: any, i: number) => {
                 const name = r?.DisplayName ?? r?.name ?? `Archivo ${i + 1}`;
                 const href = r?.AbsoluteUri ?? r?.link ?? r?.Url ?? r?.url ?? "";
+                const attachment = {
+                  ...r,
+                  name,
+                  link: href,
+                } as AttachmentRow;
+                const canPreview = getPreviewKind(attachment) !== "unsupported";
                 if (!href) return null;
                 return (
                   <li key={`${href}-${i}`} className="cd-file">
-                    <a href={href} target="_blank" rel="noopener noreferrer" className="cd-file-link"
+                    <button
+                      type="button"
+                      className={`cd-file-link ${selectedAttachment?.link === href ? "is-active" : ""}`}
+                      onClick={() => {
+                        if (canPreview) {
+                          setSelectedAttachment(attachment);
+                          return;
+                        }
+
+                        openAttachmentDownload(attachment);
+                      }}
                       title={name}
                     >
                       <span className={`cd-file-ico ext-${name}`} aria-hidden />
                       <Trunc text={name} lines={1} />
-                    </a>
+                    </button>
                   </li>
                 );
               })}
             </ul>
           ))}
+
+          {selectedAttachment && previewKind !== "unsupported" && (
+            <div className="cd-attachment-viewer">
+              <div className="cd-attachment-viewer-head">
+                <strong>{selectedAttachment.name}</strong>
+                <a
+                  href={selectedAttachment.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn-primary cd-attachment-download"
+                >
+                  Descargar
+                </a>
+              </div>
+
+              <div className="cd-attachment-frame">
+                {previewKind === "image" && (
+                  <img
+                    src={selectedAttachment.link}
+                    alt={selectedAttachment.name}
+                    className="cd-attachment-image"
+                  />
+                )}
+
+                {previewKind === "pdf" && (
+                  <iframe
+                    src={selectedAttachment.link}
+                    title={selectedAttachment.name}
+                    className="cd-attachment-iframe"
+                  />
+                )}
+
+                {previewKind === "text" && (
+                  <iframe
+                    src={selectedAttachment.link}
+                    title={selectedAttachment.name}
+                    className="cd-attachment-iframe"
+                  />
+                )}
+
+                {previewKind === "video" && (
+                  <video controls className="cd-attachment-media">
+                    <source src={selectedAttachment.link} />
+                    Tu navegador no pudo reproducir este video.
+                  </video>
+                )}
+
+                {previewKind === "audio" && (
+                  <audio controls className="cd-attachment-audio">
+                    <source src={selectedAttachment.link} />
+                    Tu navegador no pudo reproducir este audio.
+                  </audio>
+                )}
+              </div>
+            </div>
+          )}
+
+          {selectedAttachment && previewKind === "unsupported" && (
+            <div className="cd-attachment-fallback">
+              <p>Este archivo no se puede visualizar dentro de la página.</p>
+              <a
+                href={selectedAttachment.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-primary cd-attachment-download"
+              >
+                Descargar archivo
+              </a>
+            </div>
+          )}
         </section>
       )}
 
 
-      {/* ===== Tickets relacionados ===== */}
+      {/* ===== Tickets relacionados ===== */
       <div className="seccion">
         <TicketsAsociados key={String(selected.ID)} ticket={selected} onSelect={(t: Ticket) => {setShowSeg(false); setSelected(t)}}/>
       </div>
+      }
 
       {/* ===== Botón de Seguimiento ===== */}
       {showBotton ?

@@ -9,15 +9,11 @@ import InfoPage from "./components/Info/Informacion";
 import CrearPlantilla from "./components/NuevaPlantilla/NuevaPlantilla";
 import UsuariosPanel from "./components/Usuarios/Usuarios";
 import CajerosPOSForm from "./components/CajerosPOS/CajerosPOS";
-import ComprasPage from "./components/Compras/ComprasPage";
-import RegistroFactura from "./components/RegistroFactura/RegistroFactura";
 import type { User } from "./Models/User";
 import { AuthProvider, useAuth } from "./auth/authContext";
-import { useUserRole } from "./Funcionalidades/Usuarios";
+import { useUserRole } from "./Funcionalidades/auth/Usuarios";
 import { GraphServicesProvider, useGraphServices } from "./graph/GrapServicesContext";
-import type { TicketsService } from "./Services/Tickets.service";
 import type { UsuariosSPService } from "./Services/Usuarios.Service";
-import type { LogService } from "./Services/Log.service";
 import HomeIcon from "./assets/home.svg";
 import addIcon from "./assets/add.svg";
 import seeTickets from "./assets/tickets.svg";
@@ -26,34 +22,32 @@ import filesIcon from "./assets/file.svg";
 import infoIcon from "./assets/info.svg";
 import settingsIcon from "./assets/settings.svg";
 import templateIcon from "./assets/template.svg";
-import PazySalvosMode from "./components/PazSalvos/PazYSalvo";
 import WelcomeSolvi from "./components/Welcome/Welcome";
 import DashBoardPage from "./components/Dashboard/DashboardPage";
-import CrearAnuncio from "./components/News/News";
-import newsIcon from "./assets/news.svg";
-import EdmNewsModal from "./components/News/Confirmar/Confirmar";
 import usersIcon from "./assets/users.svg"
 import ActionsIcon from "./assets/actions.svg"
 import siesaIcon from "./assets/siesa.png"
 import storageIcon from "./assets/storage.svg"
 import cajerosIcon from "./assets/cajeros.svg"
-import type { AnunciosService } from "./Services/Anuncios.service";
 import { logout } from "./auth/msal";
 import AnnouncementsTable from "./components/TipsTable/TipsTable";
-import { useTheme } from "./Funcionalidades/Theme";
+import { useTheme } from "./Funcionalidades/auth/Theme";
 import TeamsEventForm from "./components/Ausencia/Ausencia";
 import { StoragePage } from "./components/Storage/StoragePage";
 import { PrestamosPage } from "./components/Loans/PretamosPage";
 import loanImage from "./assets/device.svg"
 import ReportsPage from "./components/Reports/ReportsPage";
+import { useRepositories } from "./repositories/repositoriesContext";
+import type { TicketsRepository } from "./repositories/TicketsRepository/TicketRepository";
+import type { LogRepository } from "./repositories/LogRepository/LogRespository";
 
 /* ============================================================
    Tipos de navegación y contexto de visibilidad
    ============================================================ */
 
-type RenderCtx = { services?: { Tickets: TicketsService; Usuarios: UsuariosSPService; Logs: LogService } };
+type RenderCtx = { services?: { Tickets: TicketsRepository; Usuarios: UsuariosSPService; Logs: LogRepository } };
 
-type Services = { Tickets: TicketsService; Usuarios: UsuariosSPService; Logs: LogService };
+type Services = { Tickets: TicketsRepository; Usuarios: UsuariosSPService; Logs: LogRepository };
 
 export type MenuItem = {
   id: string;
@@ -89,7 +83,6 @@ const NAV: MenuItem[] = [
   { id: "storage", label: "Almacenamiento", icon: <img src={storageIcon} alt="" className="sb-icon" />, to: <StoragePage />, roles: ["Administrador", "Listo"] },
   { id: "loan", label: "Prestamos", icon: <img src={loanImage} alt="" className="sb-icon" />, to: <PrestamosPage />, roles: ["Administrador", "Listo", "Tecnico"] },
   { id: "admin", label: "Administración", icon: <img src={settingsIcon} className="sb-icon" />, roles: ["Administrador", "Tecnico", "Listo"], children: [
-      { id: "anuncios", label: "Anuncios", to: <CrearAnuncio />, roles: ["Administrador", "Tecnico"], icon: <img src={newsIcon} className="sb-icon" /> },
       { id: "plantillas", label: "Plantillas", icon: <img src={templateIcon} className="sb-icon" />, to: <CrearPlantilla />, roles: ["Administrador", "Tecnico", "Listo"] },
       { id: "usuarios", label: "Usuarios", icon: <img src={usersIcon} className="sb-icon" />, to: <UsuariosPanel />, roles: ["Administrador"] },
       { id: "tips", label: "Tips", icon: <img src={infoIcon} className="sb-icon" />, to: <AnnouncementsTable />, roles: ["Administrador", "Tecnico", "Listo"] },
@@ -99,12 +92,6 @@ const NAV: MenuItem[] = [
   {id: "acciones", label: "Acciones", icon: <img src={ActionsIcon} className="sb-icon" />, roles: ["Administrador", "Tecnico", "Jefe de zona", "Listo"], children: [
       {id: "siesa", label: "Siesa", roles: ["Administrador", "Tecnico", "Jefe de zona", "Listo"], icon: <img src={siesaIcon} className="sb-icon" />, children: [
           {id: "cajpos", label: "Cajeros POS", icon: <img src={cajerosIcon} className="sb-icon" />, to: (rctx: RenderCtx) => rctx.services ? <CajerosPOSForm services={{ Tickets: rctx.services.Tickets, Logs: rctx.services.Logs }} /> : <div>Cargando servicios…</div>, roles: ["Administrador", "Tecnico", "Jefe de zona", "Listo"],},
-        ],
-      },
-      {id: "cesar", label: "Cesar", roles: ["Administrador"], children: [
-          { id: "compras", label: "Compras", to: <ComprasPage />, roles: ["Administrador", "Tecnico"] },
-          { id: "facturas", label: "Facturas", to: <RegistroFactura />, roles: ["Administrador", "Tecnico"] },
-          { id: "paz", label: "Paz y Salvos", to: <PazySalvosMode />, roles: ["Administrador"] },
         ],
       },
     ],
@@ -310,7 +297,8 @@ function Shell() {
 
 function LoggedApp({ user }: { user: User }) {
   const { role, changeUser } = useUserRole(user!.mail);
-  const services = useGraphServices() as { Tickets: TicketsService; Usuarios: UsuariosSPService; Logs: LogService, Anuncios: AnunciosService } & Record<string, any>;
+  const services = useGraphServices()
+  const repositories = useRepositories()
   const { theme, toggle } = useTheme();
 
   const navCtx = React.useMemo<NavContext>(() => {
@@ -320,8 +308,8 @@ function LoggedApp({ user }: { user: User }) {
       flags: new Set<string>([]),
       hasService: (k) => {
         if (k === "Usuarios") return Boolean(services?.Usuarios);
-        if (k === "Tickets") return Boolean(services?.Tickets);
-        if (k === "Logs") return Boolean(services?.Logs);
+        if (k === "Tickets") return Boolean(repositories?.tickets);
+        if (k === "Logs") return Boolean(repositories?.logs);
         return false;
       },
     };
@@ -340,7 +328,7 @@ function LoggedApp({ user }: { user: User }) {
   const element = React.useMemo(() => {
     if (!item) return null;
     if (typeof item.to === "function") {
-      return (item.to as (ctx: RenderCtx) => React.ReactNode)({ services });
+      return (item.to as (ctx: RenderCtx) => React.ReactNode)({ services: {Logs: repositories.logs!, Tickets: repositories.tickets!, Usuarios: services.Usuarios} });
     }
     return item.to ?? null;
   }, [item, services]);
@@ -384,69 +372,6 @@ function LoggedApp({ user }: { user: User }) {
     [navs]
   );
 
-  const [adOpen, setAdOpen] = React.useState(false);
-  const [adItem, setAdItem] = React.useState<any>(null);
-
-  // key por día para no repetir el modal en la sesión actual
-  const getTodayKey = () => {
-    const t = new Date();
-    const y = t.getFullYear();
-    const m = String(t.getMonth() + 1).padStart(2, "0");
-    const d = String(t.getDate()).padStart(2, "0");
-    return `ad-shown-${y}-${m}-${d}`;
-  };
-
-  // pickers de campos comunes
-  const pickHtml = (row: any): string => {
-    const f = row?.fields ?? row ?? {};
-    return f.Cuerpo ?? f.ContenidoHtml ?? f.Contenido ?? f.Descripcion ?? f.Description ?? "";
-  };
-  const pickTitle = (row: any): string => {
-    const f = row?.fields ?? row ?? {};
-    return f.TituloAnuncio ?? f.Titulo ?? f.Heading ?? "Anuncio";
-  };
-
-  React.useEffect(() => {
-    let cancel = false;
-    (async () => {
-      try {
-        if (!services.Anuncios) return;
-
-        const key = getTodayKey();
-        if (sessionStorage.getItem(key) === "1") return;
-
-        // Ventana del día de hoy en UTC (cubre columnas date-only y DateTime)
-        const t = new Date();
-        const y = t.getUTCFullYear();
-        const m = String(t.getUTCMonth() + 1).padStart(2, "0");
-        const d = String(t.getUTCDate()).padStart(2, "0");
-        const startIso = `${y}-${m}-${d}T00:00:00Z`;
-        const endIso = `${y}-${m}-${d}T23:59:59Z`;
-
-        // Hoy ∈ [fechaInicio, fechaFinal]
-        const filter = `(fields/Fechadeinicio le '${endIso}') and (fields/Fechafinal ge '${startIso}')`;
-
-        // Pide el MÁS ANTIGUO (fechaInicio asc)
-        const res = await services.Anuncios.getAll({filter, orderby: "fields/Fechadeinicio asc", top: 1,});
-
-        const items: any[] = Array.isArray(res) ? res : res?.items ?? [];
-        if (!items.length) return;
-
-        const winner = items[0];
-        if (!cancel && winner) {
-          setAdItem(winner);
-          setAdOpen(true);
-          sessionStorage.setItem(key, "1");
-        }
-      } catch {
-        alert("Error al obtener el anuncio")
-      }
-    })();
-    return () => {
-      cancel = true;
-    };
-  }, [services.Anuncios]);
-
   return (
     <div className={`page layout layout--withSidebar ${collapsed ? "is-collapsed" : ""}`}>
       <Sidebar navs={navs} selected={selected} onSelect={handleSelect} user={user} role={role} collapsed={collapsed} onToggle={toggleCollapsed} />
@@ -485,10 +410,6 @@ function LoggedApp({ user }: { user: User }) {
         )}
       </main>
 
-      {/* Modal de anuncio del día */}
-      {adOpen && adItem && (
-        <EdmNewsModal open={adOpen} title={pickTitle(adItem)} html={pickHtml(adItem)} inset={{ top: 120, right: 16, bottom: 72, left: 16 }} width={360} confirmText="Entendido" onConfirm={() => setAdOpen(false)} onCancel={() => setAdOpen(false)}/>
-      )}
     </div>
   );
 }

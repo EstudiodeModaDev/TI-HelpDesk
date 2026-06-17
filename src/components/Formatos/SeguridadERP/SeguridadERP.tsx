@@ -1,11 +1,10 @@
-import { usePermisosERP } from "../../../Funcionalidades/Formatos";
-import { useGraphServices } from "../../../graph/GrapServicesContext";
-import type { TicketsService } from "../../../Services/Tickets.service";
+import { usePermisosERP } from "../../../Funcionalidades/forms/Formatos";
+import { useRepositories } from "../../../repositories/repositoriesContext";
 import "./SeguridadERP.css";
 
 export default function SolicitudERP() {
-  const { Tickets: TicketsSvc} = (useGraphServices() as ReturnType<typeof useGraphServices> & {Tickets: TicketsService;})
-  const {filas, sending, error, addFila, removeFila, setCampo, submit,} = usePermisosERP(TicketsSvc)
+  const {tickets} = useRepositories()
+  const {filas, sending, error, addFila, removeFila, setCampo, submit,} = usePermisosERP(tickets!)
 
   return (
     <section className="erp-scope">

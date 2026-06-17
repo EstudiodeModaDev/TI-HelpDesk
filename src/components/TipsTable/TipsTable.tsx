@@ -1,7 +1,7 @@
 import * as React from "react";
 import "./TipsTable.css";
 import { useGraphServices } from "../../graph/GrapServicesContext";
-import { useTips } from "../../Funcionalidades/Anuncementes";
+import { useTips } from "../../Funcionalidades/content/Anuncementes";
 import AnnouncementModal from "./ModalAgregar/ModalAgregar";
 
 export default function AnnouncementsTable() {

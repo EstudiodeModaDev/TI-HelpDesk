@@ -4,10 +4,12 @@ import { CaseDetail } from "../DetallesTickets/DetallesTickets";
 import "./Tickets.css";
 import { useAuth } from "../../auth/authContext";
 import { useGraphServices } from "../../graph/GrapServicesContext";
-import { calcularColorEstado, useTickets } from "../../Funcionalidades/Tickets";
 import type { SortDir, SortField, Ticket } from "../../Models/Tickets";
 import { toISODateTimeFlex } from "../../utils/Date";
-import { useUserRole } from "../../Funcionalidades/Usuarios";
+import { useUserRole } from "../../Funcionalidades/auth/Usuarios";
+import { useRepositories } from "../../repositories/repositoriesContext";
+import { useTickets } from "../../Funcionalidades/Tickets/hooks/useTickets";
+import { calcularColorEstado } from "../../Funcionalidades/Tickets/utils/ticketsColors";
 
 function renderSortIndicator(field: SortField, sorts: Array<{field: SortField; dir: SortDir}>) {
   const idx = sorts.findIndex(s => s.field === field);
@@ -21,8 +23,9 @@ export default function TablaTickets() {
   const userMail = account?.username ?? "";
   const userRole = useUserRole(userMail)
   const isPrivileged = userRole.role === "Administrador" || userRole.role === "Tecnico" || userRole.role === "Técnico";
-  const { Tickets, graph } = useGraphServices();
-  const { loadAll, search, setSearch, me, setMe, ticketsAbiertos, ticketsFueraTiempo, rows, loading, error, filterMode, range, pageSize, pageIndex, hasNext, sorts, setFilterMode, setRange, setPageSize, updateSelectedTicket, nextPage,  toggleSort} = useTickets(graph, Tickets, userMail, userRole.role);
+  const { graph } = useGraphServices();
+  const {tickets} = useRepositories()
+  const { inProgressTickets, loadAll, search, setSearch, me, setMe, rows, loading, error, filterMode, range, pageSize, pageIndex, hasNext, sorts, setFilterMode, setRange, setPageSize, updateSelectedTicket, nextPage, prevPage, toggleSort, outOfTimeTickets} = useTickets({graph, TicketsSvc: tickets!, userMail, role: userRole.role});
 
   // Búsqueda local SOLO sobre la página visible (si quieres global, hay que mover a OData)
 
@@ -40,7 +43,7 @@ export default function TablaTickets() {
       // Si no está en la página, consultar el backend
       const updatedRemote = await updateSelectedTicket(ticketSeleccionado.ID ?? "");
       if (updatedRemote) {
-        setTicketSeleccionado(updatedRemote);
+        setTicketSeleccionado(updatedRemote.data);
       }
     };
 
@@ -115,9 +118,9 @@ export default function TablaTickets() {
                   <td>{ticket.ID}</td>
                   <td><span title={ticket.Nombreresolutor}>{ticket.Nombreresolutor}</span></td>
                   <td><span title={ticket.Solicitante}>{ticket.Solicitante}</span></td>
-                  <td><span title={ticket.Title}>{ticket.Title}</span></td>
+                  <td><span title={ticket.AsuntoTicket}>{ticket.AsuntoTicket}</span></td>
                   <td>{toISODateTimeFlex(ticket.FechaApertura) || "–"}</td>
-                  <td>{toISODateTimeFlex(ticket.TiempoSolucion) || "N/A"}</td>
+                  <td>{toISODateTimeFlex(ticket.FechaMaxima) || "N/A"}</td>
                   <td>
                     <span className="estado-circulo" style={{ backgroundColor: calcularColorEstado(ticket) }} title={ticket.Estadodesolicitud || "Sin estado"} />
                   </td>
@@ -126,10 +129,10 @@ export default function TablaTickets() {
             </tbody>
           </table>
 
-          {/* Paginación servidor: Anterior = volver a primera página (loadFirstPage), Siguiente = nextLink */}
+          {/* Paginación servidor */}
           {rows.length > 0 && (
             <div className="paginacion">
-              <button onClick={loadAll} disabled={loading || pageIndex <= 1}>
+              <button onClick={prevPage} disabled={loading || pageIndex <= 1}>
                 Anterior
               </button>
               <span>Página {pageIndex}</span>
@@ -150,7 +153,7 @@ export default function TablaTickets() {
                     ))}
                   </select>
                   <label htmlFor="page-size" style={{ marginLeft: 12, marginRight: 8 }}>
-                    Tickets abiertos: {ticketsAbiertos} Tickets vencidos: {ticketsFueraTiempo}
+                    Tickets abiertos: {inProgressTickets} Tickets vencidos: {outOfTimeTickets}
                   </label>
                 </>
               )}

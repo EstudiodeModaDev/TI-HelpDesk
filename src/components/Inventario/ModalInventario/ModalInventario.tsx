@@ -2,7 +2,7 @@ import * as React from "react";
 import "./ModalInventario.css"
 import { useGraphServices } from "../../../graph/GrapServicesContext";
 import type { InventarioService } from "../../../Services/Inventario.service";
-import { useInventario } from "../../../Funcionalidades/Inventario";
+import { useInventario } from "../../../Funcionalidades/operations/Inventario";
 
 type Props = {
   open: boolean;

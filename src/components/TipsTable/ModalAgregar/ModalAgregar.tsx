@@ -1,7 +1,7 @@
 import * as React from "react";
 import "./ModalAgregar.css";
 import { useGraphServices } from "../../../graph/GrapServicesContext";
-import { useTips } from "../../../Funcionalidades/Anuncementes";
+import { useTips } from "../../../Funcionalidades/content/Anuncementes";
 
 export type AnnouncementForm = {
   titulo: string;

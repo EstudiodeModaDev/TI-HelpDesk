@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import "./Ausencia.css";
 import { useGraphServices } from "../../graph/GrapServicesContext";
 import type { AusenciaService } from "../../Services/Ausencia.service";
-import { useAusencias } from "../../Funcionalidades/Ausencias";
+import { useAusencias } from "../../Funcionalidades/tasks/Ausencias";
 import { toIsoFromDateTime } from "../../utils/Date";
 
 export interface EventFormValues {

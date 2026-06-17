@@ -8,9 +8,9 @@ import Select, {
 
 import { useGraphServices } from "../../../graph/GrapServicesContext";
 import type { TareasService } from "../../../Services/Tareas.service";
-import { useTareas } from "../../../Funcionalidades/Tareas";
-import { useWorkers } from "../../../Funcionalidades/Workers";
-import { useFranquicias } from "../../../Funcionalidades/Franquicias";
+import { useTareas } from "../../../Funcionalidades/tasks/Tareas";
+import { useWorkers } from "../../../Funcionalidades/access/Workers";
+import { useFranquicias } from "../../../Funcionalidades/access/Franquicias";
 import type { UserOptionEx } from "../../NuevoTicket/NuevoTicketForm";
 import { norm } from "../../../utils/Commons";
 

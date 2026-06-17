@@ -6,7 +6,7 @@ import { Kpi } from "./Kpi";
 import { toISODateTimeFlex } from "../../utils/Date";
 import Select, { components, type OptionProps, } from "react-select";
 import type { UserOptionEx } from "../NuevoTicket/NuevoTicketForm";
-import { useWorkers } from "../../Funcionalidades/Workers";
+import { useWorkers } from "../../Funcionalidades/access/Workers";
 import type { desplegablesOptions } from "../../Models/Commons";
 import { ReturnModal } from "./ReturnSection";
 

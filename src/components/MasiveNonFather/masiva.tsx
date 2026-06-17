@@ -1,21 +1,29 @@
 import * as React from "react";
+import { useTickets } from "../../Funcionalidades/Tickets/hooks/useTickets";
 import { useGraphServices } from "../../graph/GrapServicesContext";
-import { useTickets } from "../../Funcionalidades/Tickets";
+import { useRepositories } from "../../repositories/repositoriesContext";
 
-type Props = { currentId: number | string;
+type Props = {
+  currentId: number | string;
   onCancel: () => void;
   userMail: string;
   role: string;
 };
 
-export default function RelacionadorMasiva({onCancel, userMail, role}: Props) {
-  const { Tickets, graph } = useGraphServices();
-  const {state, setField, sendFileToFlow} = useTickets(graph, Tickets, userMail, role);
+export default function RelacionadorMasiva({ onCancel, userMail, role }: Props) {
+  const { graph } = useGraphServices();
+  const { tickets } = useRepositories();
+  const { state, setField, uploadMasiva } = useTickets({
+    graph,
+    role,
+    TicketsSvc: tickets!,
+    userMail,
+  });
 
   const handleDownload = () => {
     const link = document.createElement("a");
-    link.href = "/Plantilla Masiva.xlsx"; // ruta dentro de public
-    link.download = "PlantillaApertura.xlsx";          // nombre con el que se guarda
+    link.href = "/Plantilla Masiva.xlsx";
+    link.download = "PlantillaApertura.xlsx";
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -26,62 +34,90 @@ export default function RelacionadorMasiva({onCancel, userMail, role}: Props) {
   return (
     <div className="relc">
       <div className="relc-row">
-
-        {/* Combobox de tickets */}
         <div className="relc-field relc-field--grow" ref={wrapRef}>
-            <div className="relc-combobox" role="combobox" aria-haspopup="listbox" aria-owns="relc-listbox">
-                <div className="relc-field">
-                    <label htmlFor="archivo" className="relc-label">Cargar Excel de tickets</label>
-                    <input id="archivo" type="file" className="relc-native" accept=".xlsx,.xls" onChange={(e) => {
-                        const f = e.target.files?.[0] ?? null;
-                        if (!f) { setField("archivo", null); return; }
-                        const MAX_MB = 10;
-                        if (f.size > MAX_MB * 1024 * 1024) {
-                            alert(`Archivo demasiado grande (> ${MAX_MB}MB).`);
-                            e.currentTarget.value = ""; // limpia el input
-                            return;
-                        }
-                        setField("archivo", f);
-                    }}/>
-
-                {/* Botón para limpiar selección (opcional) */}
-                {state.archivo && (
-                    <button type="button" className="relc-link" onClick={() => {
+          <div className="relc-combobox" role="combobox" aria-haspopup="listbox" aria-owns="relc-listbox">
+            <div className="relc-field">
+              <label htmlFor="archivo" className="relc-label">
+                Cargar Excel de tickets
+              </label>
+              <input
+                id="archivo"
+                type="file"
+                className="relc-native"
+                accept=".xlsx,.xls"
+                onChange={(e) => {
+                  const file = e.target.files?.[0] ?? null;
+                  if (!file) {
                     setField("archivo", null);
-                    (document.getElementById("archivo") as HTMLInputElement | null)!.value = "";
-                    }}>
-                    Quitar archivo
-                    </button>
-                )}
-                </div>
+                    return;
+                  }
+
+                  const maxMb = 10;
+                  if (file.size > maxMb * 1024 * 1024) {
+                    alert(`Archivo demasiado grande (> ${maxMb}MB).`);
+                    e.currentTarget.value = "";
+                    return;
+                  }
+
+                  setField("archivo", file);
+                }}
+              />
+
+              {state.archivo && (
+                <button
+                  type="button"
+                  className="relc-link"
+                  onClick={() => {
+                    setField("archivo", null);
+                    const input = document.getElementById("archivo") as HTMLInputElement | null;
+                    if (input) input.value = "";
+                  }}
+                >
+                  Quitar archivo
+                </button>
+              )}
             </div>
+          </div>
         </div>
       </div>
 
-      {/* Acciones */}
       <div className="relc-actions">
-        <button type="button" className="btn btn-circle btn-secondary" onClick={onCancel} title="Cancelar" aria-label="Cancelar">
-          ×
+        <button
+          type="button"
+          className="btn btn-circle btn-secondary"
+          onClick={onCancel}
+          title="Cancelar"
+          aria-label="Cancelar"
+        >
+          x
         </button>
-        <button type="button" className="btn btn-circle btn-primary" 
+        <button
+          type="button"
+          className="btn btn-circle btn-primary"
           onClick={async (e) => {
-            e.preventDefault();           
+            e.preventDefault();
+
             try {
-                if (!state.archivo) {
-                  alert("Selecciona un archivo .xlsx antes de enviar.");
-                  return;
-                }
-                await sendFileToFlow(state.archivo);
-                alert("Archivo enviado al flujo correctamente."); 
-                onCancel()   
-          } catch (err: any) {
-            console.error(err);
-            alert(err?.message ?? "Ocurrió un error en la acción.");
-          }
-        }} title="Confirmar" aria-label="Confirmar">
-                ✓
+              if (!state.archivo) {
+                alert("Selecciona un archivo .xlsx antes de continuar.");
+                return;
+              }
+
+              await uploadMasiva(state.archivo);
+              onCancel();
+            } catch (error: any) {
+              console.error(error);
+              alert(error?.message ?? "Ocurrio un error en la accion.");
+            }
+          }}
+          title="Confirmar"
+          aria-label="Confirmar"
+        >
+          ✓
         </button>
-        <button type="button" className="btn btn-terciary btnxs" onClick={() => handleDownload()}> Descargar plantilla</button>
+        <button type="button" className="btn btn-terciary btnxs" onClick={handleDownload}>
+          Descargar plantilla
+        </button>
       </div>
     </div>
   );

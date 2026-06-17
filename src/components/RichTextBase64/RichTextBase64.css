@@ -123,6 +123,20 @@
   max-width: 100%; height: auto; border-radius: 8px;
 }
 
+.rte-upload-placeholder{
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  margin: 6px 0;
+  border: 1px dashed var(--rte-border-hover);
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--field-bg, #f8fafc) 92%, transparent);
+  color: var(--rte-text-muted);
+  font-size: .85rem;
+  white-space: nowrap;
+}
+
 /* Código inline */
 .rte-editor code{
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;

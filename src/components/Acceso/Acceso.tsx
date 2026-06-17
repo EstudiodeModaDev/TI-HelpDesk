@@ -1,8 +1,8 @@
 // src/Components/Colaboradores/UsuariosApp.tsx
 import * as React from 'react';
 import styles from './colaboradores.module.css';
-import { /*addMemberByUserId,*/ useGroupMembers } from '../../Funcionalidades/GroupMembers';
-import { useWorkers } from '../../Funcionalidades/Workers'
+import { /*addMemberByUserId,*/ useGroupMembers } from '../../Funcionalidades/access/GroupMembers';
+import { useWorkers } from '../../Funcionalidades/access/Workers'
 import { getAccessToken } from '../../auth/msal';
 //import ModalOtorgarPermiso from '../AddGraphUsers/ModalAgregarPermiso';
 

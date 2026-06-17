@@ -1,6 +1,35 @@
+export type GraphRecipient = {
+  emailAddress: {
+    address: string;
+  };
+};
+
+type graphAttachments = {
+  "@odata.type": "#microsoft.graph.fileAttachment";
+  name: string;
+  contentType?: string;
+  contentBytes?: string;
+}
+
+export type GraphSendMailPayload = {
+  message: {
+    subject: string;
+    body: {
+      contentType: "Text" | "HTML";
+      content: string;
+    };
+    toRecipients: GraphRecipient[];
+    ccRecipients?: GraphRecipient[];
+    attachments?: graphAttachments[];
+  };
+  saveToSentItems?: boolean;
+};
+
 export class GraphRest {
   private getToken: () => Promise<string>;
   private base = 'https://graph.microsoft.com/v1.0';
+
+  
 
   constructor(getToken: () => Promise<string>, baseUrl?: string) {
     this.getToken = getToken;

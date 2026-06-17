@@ -1,9 +1,8 @@
 import React from "react";
-import { useDetallado } from "../../../Funcionalidades/DashboardDetallado";
-import { useGraphServices } from "../../../graph/GrapServicesContext";
-import type { TicketsService } from "../../../Services/Tickets.service";
+import { useDetallado } from "../../../Funcionalidades/dashboard/DashboardDetallado";
 import "../DashboardGeneral/DashboardResumen.css";
 import type { Fuente, TopCategoria } from "../../../Models/Dashboard";
+import { useRepositories } from "../../../repositories/repositoriesContext";
 
 // ===== util: formatea "2,1 mil" / "0,2 mil" =====
 function formatShort(n: number) {
@@ -27,11 +26,9 @@ const COLORS: Record<string, string> = {
 };
 
 export default function DashboardDetallado() {
-  const { Tickets } = useGraphServices() as ReturnType<typeof useGraphServices> & {
-    TicketService: TicketsService;
-  };
+  const { tickets } = useRepositories()
 
-  const {totalCasos, totalEnCurso, totalFinalizados, totalFueraTiempo, porcentajeCumplimiento, topCategorias, range, resolutores, Fuentes, loading, conteoPorMes, topSolicitante, obtenerTotal, setRange, obtenerFuentes,} = useDetallado(Tickets);
+  const {totalCasos, totalEnCurso, totalFinalizados, totalFueraTiempo, porcentajeCumplimiento, topCategorias, range, resolutores, Fuentes, loading, conteoPorMes, topSolicitante, obtenerTotal, setRange, obtenerFuentes,} = useDetallado(tickets!);
 
   React.useEffect(() => {
     if (!range.from || !range.to) return;
@@ -92,13 +89,13 @@ export default function DashboardDetallado() {
               className="date"
               type="date"
               value={range?.from ?? ""}
-              onChange={(e) => setRange((prev) => ({ ...prev, from: e.target.value }))}
+              onChange={(e) => setRange((prev: typeof range) => ({ ...prev, from: e.target.value }))}
             />
             <input
               className="date"
               type="date"
               value={range?.to ?? ""}
-              onChange={(e) => setRange((prev) => ({ ...prev, to: e.target.value }))}
+              onChange={(e) => setRange((prev: typeof range) => ({ ...prev, to: e.target.value }))}
             />
           </div>
         </header>
