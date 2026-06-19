@@ -12,6 +12,7 @@ import { first } from "./NuevoTicket";
 import type { TicketsRepository } from "../../repositories/TicketsRepository/TicketRepository";
 import toast from "react-hot-toast";
 import { notifySolicitanteCategoryChange } from "./utils/notifications";
+import type { SupabaseTickets } from "../../Models/DTO/Tickets";
 
 type Svc = {
   Categorias: { getAll: (opts?: any) => Promise<any[]> };
@@ -136,12 +137,12 @@ export function useRecategorizarTicket(services: Svc, ticket: Ticket) {
       const solucionDate = solucionTZ ? new Date(solucionTZ as unknown as string) : null;
       setFechaSolucion(solucionDate);
       const tiempoSolISO = solucionDate ? toGraphDateTime(solucionDate) : null;
-      const payloadUpdate: Partial<Ticket> = {
-        Categoria: state.categoria,
-        SubCategoria: state.subcategoria,
-        Articulo: state.articulo,
-        ANS: ans,
-        ...(tiempoSolISO ? { TiempoSolucion: tiempoSolISO } : {}), // solo si existe
+      const payloadUpdate: Partial<SupabaseTickets> = {
+        ticket_solvi_categoria: state.categoria,
+        ticket_solvi_subcategoria: state.subcategoria,
+        ticket_solvi_articulo: state.articulo,
+        ticket_solvi_ans: ans,
+        ...(tiempoSolISO ? { ticket_solvi_fechamaxima: tiempoSolISO } : {}), // solo si existe
       };
 
       if (!Tickets?.updateTicket) {

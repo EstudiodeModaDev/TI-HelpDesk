@@ -60,8 +60,8 @@ export interface IncomingEmailPayload {
   body?: string;
   bodyType?: "html" | "text";
   bodyPreview?: string;
-  from?: IncomingEmailAddress | null;
-  sender?: IncomingEmailAddress | null;
+  from?: IncomingEmailAddress | string | null;
+  sender?: IncomingEmailAddress | string | null;
   receivedDateTime?: string;
   attachments?: IncomingEmailAttachment[];
   source?: string;

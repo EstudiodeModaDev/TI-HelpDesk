@@ -139,8 +139,24 @@ function normalizeEmailAddress(
     return undefined;
   }
 
+  if (typeof value === "string") {
+    const trimmedValue = value.trim();
+    if (!trimmedValue) {
+      return undefined;
+    }
+
+    return {
+      address: trimmedValue,
+    };
+  }
+
   const address = value.address?.trim() || value.email?.trim() || undefined;
-  const name = value.name?.trim() || undefined;
+  const rawName = value.name?.trim() || undefined;
+  const name = rawName &&
+      address &&
+      rawName.localeCompare(address, undefined, { sensitivity: "accent" }) === 0
+    ? undefined
+    : rawName;
 
   if (!address && !name) {
     return undefined;
@@ -162,6 +178,7 @@ function buildMessageFromPayload(payload: IncomingEmailPayload): GraphMessage {
     },
     bodyPreview: payload.bodyPreview ?? undefined,
     from: from ? { emailAddress: from } : undefined,
+    sender: sender ? { emailAddress: sender } : undefined,
     internetMessageId: payload.internetMessageId?.trim() || undefined,
     conversationId: payload.conversationId?.trim() || undefined,
     receivedDateTime: payload.receivedDateTime?.trim() || undefined,
@@ -235,8 +252,10 @@ function extractPayloadListFromBody(body: unknown): IncomingEmailPayload[] {
 function validateIncomingPayload(payload: IncomingEmailPayload): void {
   const hasSubject = !!payload.subject?.trim();
   const hasBody = !!payload.body?.trim();
-  const hasFrom = !!payload.from?.address?.trim() || !!payload.from?.email?.trim() ||
-    !!payload.sender?.address?.trim() || !!payload.sender?.email?.trim();
+  const fromAddress = normalizeEmailAddress(payload.from);
+  const senderAddress = normalizeEmailAddress(payload.sender);
+  const hasFrom = !!fromAddress?.address || !!fromAddress?.name ||
+    !!senderAddress?.address || !!senderAddress?.name;
 
   if (!hasSubject && !hasBody && !hasFrom && !hasAttachments) {
     throw new Error(

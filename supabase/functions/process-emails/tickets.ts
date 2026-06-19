@@ -17,18 +17,20 @@ function buildTicketPayload(
   resolver: ResolverAssignment | null,
   source = "outlook_graph",
 ): TicketInsertPayload {
-  const requester = message.from?.emailAddress ?? message.sender?.emailAddress ?? {};
+  const requester = message.from?.emailAddress 
   const titulo = (message.subject?.trim() || "Sin asunto").slice(0, 500);
   const hasResolver = !!resolver;
   const fechaActual = new Date();
   const fechaMaxima = new Date(fechaActual);
   fechaMaxima.setHours(fechaMaxima.getHours() + 2);
 
+  console.log(requester)
+
   return {
     ticket_solvi_titulo: titulo,
     ticket_solvi_descripcion: descripcion,
-    ticket_solvi_correo_solicitante: requester.address ?? null,
-    ticket_solvi_solicitante: requester.name ?? null,
+    ticket_solvi_correo_solicitante: requester?.address?.trim() ?? null,
+    ticket_solvi_solicitante: requester?.name?.trim() ?? null,
     ticket_solvi_fuente: source,
     ticket_solvi_estado: hasResolver ? "En Atención" : "pendiente_asignacion",
     ticket_solvi_mail_conversation_id: message.id,
