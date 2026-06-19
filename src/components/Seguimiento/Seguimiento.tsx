@@ -90,7 +90,7 @@ export default function TicketHistorial({
       <div className={className ?? ""} style={{ padding: 16 }}>
         <div style={{ display: "flex", alignItems: "center", marginBottom: 12 }}>
           <button type="button" className="btn btn-xs btn-terciary" onClick={() => setMode("detalle")}>
-            <span className="th-back-icon" aria-hidden>â†</span> Volver al detalle
+            <span className="th-back-icon" aria-hidden>←</span> Volver al detalle
           </button>
         </div>
 
@@ -124,7 +124,7 @@ export default function TicketHistorial({
               onClick={() => { setTab("solucion"); setMode("documentar"); onAdd(); }}
               className={`th-tab ${tab === "solucion" ? "th-tab--active" : ""}`}
             >
-              SoluciÃ³n
+              Solución
             </button>
           </div>
         )}
@@ -226,7 +226,7 @@ function formatDateTime(iso: string) {
 
 function tipoToClass(tipo?: string) {
   const t = (tipo ?? "").toLowerCase();
-  if (t.includes("soluciÃ³n") || t.includes("solucion")) return "solucion";
+  if (t.includes("solución") || t.includes("solucion")) return "solucion";
   if (t.includes("seguimiento")) return "seguimiento";
   if (t.includes("creacion")) return "creacion";
   if (t.includes("cierre") || t.includes("cerrado")) return "cierre";
