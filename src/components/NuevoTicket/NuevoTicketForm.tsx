@@ -158,6 +158,26 @@ export default function NuevoTicketForm() {
 
         <form onSubmit={(e) => {e.preventDefault(); handleSubmit(e)}} noValidate className="tf-grid">
             {/* Solicitante */}
+            {/* Fuente */}
+            <div className="tf-field">
+              <label className="tf-label" htmlFor="fuente">Fuente Solicitante</label>
+              
+              <Select inputId="fuente" options={opcionesFuentes} classNamePrefix="rs" placeholder="Selecciona fuente de solicitud..."
+                value={opcionesFuentes.find(o => o.value === state.fuente) ?? null}
+                onChange={(opt) => {setField("fuente", opt?.label ?? ""); }}
+                isClearable
+              />
+              {errors.fuente && <small className="error">{errors.fuente}</small>}
+            </div>
+
+            {/* Motivo */}
+            <div className="tf-field">
+              <label className="tf-label" htmlFor="motivo">Asunto</label>
+              <input id="motivo" type="text" placeholder="Ingrese el motivo" value={state.motivo} onChange={(e) => setField("motivo", e.target.value)} disabled={submitting} className="tf-input" maxLength={300}/>
+              {errors.motivo && <small className="error">{errors.motivo}</small>}
+            </div>
+
+
             <div className="tf-field">
               <label className="tf-label">Solicitante</label>
               <Select<UserOptionEx, false>
@@ -185,7 +205,7 @@ export default function NuevoTicketForm() {
                 onChange={async (opt) => {
                   console.table(opt)
                   if(opt?.jobTitle === "Tecnico"){
-                    const respuesta = (await balanceCharge(opt?.id ?? ""))
+                    const respuesta = (await balanceCharge({targetId: opt?.id ?? "", fuente: state.fuente}))
                       if(respuesta?.ok || account?.username === "mamartinez@estudiodemoda.com.co"){
                         setField("resolutor", opt ?? null)
                       } else {
@@ -229,25 +249,6 @@ export default function NuevoTicketForm() {
                 <input type="checkbox" checked={state.cerrar} onChange={(ev) => setField("cerrar", ev.target.checked)} disabled={submitting} className="tf-checkbox"/>
                 <span>Ticket cerrado</span>           
               </label>
-            </div>
-
-            {/* Fuente */}
-            <div className="tf-field">
-              <label className="tf-label" htmlFor="fuente">Fuente Solicitante</label>
-              
-              <Select inputId="fuente" options={opcionesFuentes} classNamePrefix="rs" placeholder="Selecciona fuente de solicitud..."
-                value={opcionesFuentes.find(o => o.value === state.fuente) ?? null}
-                onChange={(opt) => {setField("fuente", opt?.label ?? ""); }}
-                isClearable
-              />
-              {errors.fuente && <small className="error">{errors.fuente}</small>}
-            </div>
-
-            {/* Motivo */}
-            <div className="tf-field">
-              <label className="tf-label" htmlFor="motivo">Asunto</label>
-              <input id="motivo" type="text" placeholder="Ingrese el motivo" value={state.motivo} onChange={(e) => setField("motivo", e.target.value)} disabled={submitting} className="tf-input" maxLength={300}/>
-              {errors.motivo && <small className="error">{errors.motivo}</small>}
             </div>
 
             {/* Descripción */}

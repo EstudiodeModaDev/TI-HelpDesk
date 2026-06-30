@@ -295,7 +295,16 @@ export function useNuevoTicketForm(services: Svc) {
     }
     
 
-  const balanceCharge = async (targetId: string, maxDiff= 3) => {
+  const balanceCharge = async ({
+    targetId,
+    maxDiff = 3,
+    fuente
+  }: {
+    targetId: string;
+    maxDiff?: number;
+    fuente: string;
+  }) =>{
+    if(fuente === "Disponibilidad") return {ok: true}
     const resolutores: UsuariosSP[] = await Usuarios.getAll({filter: "fields/Rol eq 'Tecnico' and fields/Disponible eq 'Disponible'"})
     
     if(resolutores.length  > 0){
