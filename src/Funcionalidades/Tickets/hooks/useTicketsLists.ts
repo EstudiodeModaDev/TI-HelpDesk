@@ -49,6 +49,7 @@ function buildTicketsFilter(params: {
   me: boolean;
   userMail: string;
   role: string;
+  fuente: string
 }): filterTickets | undefined {
   let filter: filterTickets = {};
 
@@ -65,6 +66,11 @@ function buildTicketsFilter(params: {
   if (params.me || params.role !== "Administrador") {
     filter.currentUser = params.userMail;
   }
+
+  if(params.fuente){
+    filter.fuente = params.fuente
+  }
+
   return filter;
 }
 
@@ -74,6 +80,7 @@ export function useTicketsLists({ graph, TicketsSvc, userMail, role }: UseTicket
   const [error, setError] = React.useState<string | null>(null);
   const [me, setMe] = React.useState(false);
   const [filterMode, setFilterMode] = React.useState<TicketFilterMode>("En curso");
+  const [fuenteFilter, setFuenteFilter] = React.useState<string>("");
   const [range, setRange] = React.useState(getXMonthsBackRange({MonthQuantity:2}));
   const [pageSize, setPageSize] = React.useState(10);
   const [pageIndex, setPageIndex] = React.useState(1);
@@ -144,6 +151,7 @@ export function useTicketsLists({ graph, TicketsSvc, userMail, role }: UseTicket
         me,
         userMail,
         role,
+        fuente: fuenteFilter
       });
 
       const result = await TicketsSvc.loadTickets({
@@ -179,7 +187,7 @@ export function useTicketsLists({ graph, TicketsSvc, userMail, role }: UseTicket
     } finally {
       setLoading(false);
     }
-  }, [TicketsSvc, debouncedSearch, filterMode, me, pageIndex, pageSize, primarySort.dir, primarySort.field, range, role, userMail]);
+  }, [TicketsSvc, debouncedSearch, filterMode, me, pageIndex, pageSize, primarySort.dir, primarySort.field, range, role, userMail, fuenteFilter]);
 
   React.useEffect(() => {
     const criteriaChanged = previousCriteriaRef.current !== criteriaKey;
@@ -258,6 +266,8 @@ export function useTicketsLists({ graph, TicketsSvc, userMail, role }: UseTicket
     zoneEmails,
     loadAll,
     inProgressTickets,
-    outOfTimeTickets
+    outOfTimeTickets,
+    fuenteFilter,
+    setFuenteFilter
   };
 }

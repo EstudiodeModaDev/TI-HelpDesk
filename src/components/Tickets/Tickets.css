@@ -43,7 +43,7 @@
 /* --------- Filtros superiores --------- */
 .tickets-filtros{
   display: grid;
-  grid-template-columns: 1.2fr max-content repeat(2, max-content) 1fr;
+  grid-template-columns: 1.2fr max-content repeat(3, max-content) 1fr;
   align-items: center;
   gap: var(--gap);
   background: color-mix(in oklab, var(--card) 96%, transparent);
