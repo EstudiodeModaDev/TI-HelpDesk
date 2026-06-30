@@ -7,7 +7,6 @@ import type { Articulo, Categoria, Subcategoria } from "../../Models/Categorias"
 import type {  GetAllOpts, } from "../../Models/Commons";
 import type { TZDate } from "@date-fns/tz";
 import { toGraphDateTime } from "../../utils/Date";
-import type { Holiday } from "festivos-colombianos";
 import { UsuariosSPService } from "../../Services/Usuarios.Service";
 import { useAuth } from "../../auth/authContext";
 import { pickTecnicoConMenosCasos } from "../../utils/Commons";
@@ -19,6 +18,7 @@ import toast from "react-hot-toast";
 import { uploadImageToSupabase } from "../shared/UploadFileToSupabase";
 import { useRepositories } from "../../repositories/repositoriesContext";
 import type { LogRepository } from "../../repositories/LogRepository/LogRespository";
+import type { Holiday } from "../../Models/Holiday";
 
 
 type Svc = {

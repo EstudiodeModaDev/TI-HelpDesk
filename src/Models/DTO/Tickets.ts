@@ -20,4 +20,9 @@ export type SupabaseTickets = {
     ticket_solvi_attachemnt_path?: string,
     ticket_solvi_observador: string,
     ticket_solvi_correo_observador: string,
+    ticket_solvi_fechacierreal?: string | null,
+    ticket_solvi_minutosnocturnos?: number | null,
+    ticket_solvi_minutosdominicales?: number | null,
+    ticket_solvi_minutosfestivos?: number | null,
+    ticket_solvi_minutostotales?: number | null,
 }

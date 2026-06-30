@@ -194,6 +194,17 @@ export interface ProcessDetail {
   reason?: string;
   ticketId?: string;
   resolver?: string | null;
+  requesterEmail?: string | null;
+  autoReplyStatus?: "sent" | "not_sent";
+  autoReplyReason?: string | null;
+}
+
+export interface AutoReplyResultItem {
+  messageId: string;
+  subject?: string;
+  requesterEmail?: string | null;
+  ticketId?: string;
+  reason?: string | null;
 }
 
 export interface ProcessResult {
@@ -202,4 +213,8 @@ export interface ProcessResult {
   skipped: number;
   failed: number;
   details: ProcessDetail[];
+  autoReplySummary: {
+    sent: AutoReplyResultItem[];
+    notSent: AutoReplyResultItem[];
+  };
 }

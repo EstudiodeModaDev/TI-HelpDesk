@@ -6,13 +6,13 @@ import type { FormErrors } from "../../Models/nuevoTicket";
 import type { Articulo, Categoria, Subcategoria } from "../../Models/Categorias";
 import type { TZDate } from "@date-fns/tz";
 import { toGraphDateTime /* o toUtcIso */ } from "../../utils/Date";
-import type { Holiday } from "festivos-colombianos";
 import type { FormRecategorizarState, Ticket } from "../../Models/Tickets";
 import { first } from "./NuevoTicket";
 import type { TicketsRepository } from "../../repositories/TicketsRepository/TicketRepository";
 import toast from "react-hot-toast";
 import { notifySolicitanteCategoryChange } from "./utils/notifications";
 import type { SupabaseTickets } from "../../Models/DTO/Tickets";
+import type { Holiday } from "../../Models/Holiday";
 
 type Svc = {
   Categorias: { getAll: (opts?: any) => Promise<any[]> };

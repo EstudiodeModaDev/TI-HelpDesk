@@ -84,6 +84,7 @@ export class TicketsService implements TicketsRepository {
       // Fechas (tu UI usa "dd/mm/yyyy hh:mm")
       FechaApertura: f.FechaApertura ?? '',
       FechaMaxima: f.TiempoSolucion ?? '',
+      FechaCierreReal: f.FechaCierreReal ?? null,
 
       // Estado / categorización
       Fuente: f.Fuente ?? '',
@@ -105,6 +106,10 @@ export class TicketsService implements TicketsRepository {
       // Observador
       Observador: f.Observador ?? '',
       CorreoObservador: f.CorreoObservador ?? '',
+      MinutosNocturnos: f.MinutosNocturnos ?? 0,
+      MinutosDominicales: f.MinutosDominicales ?? 0,
+      MinutosFestivos: f.MinutosFestivos ?? 0,
+      MinutosTotales: f.MinutosTotales ?? 0,
     };
   }
 

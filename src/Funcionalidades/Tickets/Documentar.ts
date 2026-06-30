@@ -10,6 +10,7 @@ import { useRepositories } from "../../repositories/repositoriesContext";
 import { notifyClosedSolicitante } from "./utils/notifications";
 import type { LogDTO } from "../../Models/DTO/Log";
 import type { LogRepository } from "../../repositories/LogRepository/LogRespository";
+import { calcularMinutos } from "./utils/CalcularMinutos";
 
 type Svc = { Tickets?: TicketsRepository; Logs: LogRepository; ComprasSvc: ComprasService };
 
@@ -106,7 +107,16 @@ export function useDocumentarTicket(services: Svc) {
 
         const nuevoEstado = ticket.Estadodesolicitud === "En Atención" ? "Cerrado" : "Cerrado fuera de tiempo";
         toast.success("Caso cerrado. Enviando notificación al solicitante")
-        await Tickets.updateTicket(ticket.ID!, { ticket_solvi_estado: nuevoEstado });
+        const minutos = await calcularMinutos(new Date(ticket.FechaApertura!))
+        const updated = await Tickets.updateTicket(ticket.ID!, { 
+          ticket_solvi_estado: nuevoEstado, 
+          FechaCierreReal: new Date(), 
+          MinutosNocturnos: minutos.nocturnos,
+          MinutosFestivos: minutos.festivos,
+          MinutosDominicales: minutos.dominicales,
+          MinutosTotales: minutos.total
+         });
+         console.log(updated)
         const casodecompra = await ComprasSvc.getAll({filter:  `fields/IdCreado eq '${ticket.ID}'`})
         const casodeentrega = await ComprasSvc.getAll({filter:  `fields/IdEntrega eq '${ticket.ID}'`})
         await Promise.allSettled( casodecompra.items.map((it) => { const id = String(it.Id);    return ComprasSvc.update(id, { Estado: "Pendiente por registro de factura" });}));

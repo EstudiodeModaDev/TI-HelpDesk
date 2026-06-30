@@ -45,7 +45,7 @@ export function loadConfig(): MonitorConfig {
     supabaseUrl: getRequiredEnv("SUPABASE_URL"),
     supabaseServiceRoleKey: getRequiredEnv("SUPABASE_SERVICE_ROLE_KEY"),
     msTenantId: getRequiredEnv("AZURE_TENANT_ID"),
-    msClientId: getFirstAvailableEnv(["AZURE_CLIENT_ID", "SOLVI_CLIENT_ID"]),
+    msClientId: getRequiredEnv("SOLVI_CLIENT_ID"),
     msClientSecret: getRequiredEnv("SOLVI_CLIENT_SECRET"),
     graphScope: GRAPH_SCOPE,
     mailboxUser: getRequiredEnv("SOLVI_MAILBOX_USER"),

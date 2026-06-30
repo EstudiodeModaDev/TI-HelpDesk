@@ -43,6 +43,10 @@ export class SupabaseTicketRepository implements TicketsRepository {
         query = query.in("ticket_solvi_estado", statuses);
       }
 
+      if(filter?.fuente){
+        query = query.eq("ticket_solvi_fuente", filter.fuente)
+      }
+
       if (filter?.range) {
         query = query.gt("ticket_solvi_fechaapertura", filter.range.from)
         query = query.lte("ticket_solvi_fechaapertura", filter.range.to)
@@ -257,7 +261,7 @@ export class SupabaseTicketRepository implements TicketsRepository {
   }
 
   toModel(bdModel: any): Ticket{
-    const toRetun = {
+      const toRetun = {
       ANS: bdModel.ticket_solvi_ans,
       Articulo: bdModel.ticket_solvi_articulo,
       Categoria: bdModel.ticket_solvi_categoria,
@@ -275,8 +279,14 @@ export class SupabaseTicketRepository implements TicketsRepository {
       Solicitante: bdModel.ticket_solvi_solicitante,
       SubCategoria: bdModel.ticket_solvi_subcategoria,
       FechaMaxima: bdModel.ticket_solvi_fechamaxima,
+      FechaCierreReal: bdModel.FechaCierreReal,
+      MinutosNocturnos: bdModel.MinutosNocturnos,
+      MinutosDominicales: bdModel.MinutosDominicales,
+      MinutosFestivos: bdModel.MinutosFestivos,
+      MinutosTotales: bdModel.MinutosTotales,
       AsuntoTicket: bdModel.ticket_solvi_titulo,
-      Title: bdModel.ticket_solvi_titulo
+      Title: bdModel.ticket_solvi_titulo,
+
     }
 
     return toRetun

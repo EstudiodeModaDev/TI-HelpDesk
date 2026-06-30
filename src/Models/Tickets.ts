@@ -7,6 +7,7 @@ export type Ticket = {
   AsuntoTicket?: string; //Asunto
   FechaApertura?: string; // "dd/mm/yyyy hh:mm"
   FechaMaxima?: string;   // "dd/mm/yyyy hh:mm"
+  FechaCierreReal?: Date | null
   Estadodesolicitud?: string;
   Observador?: string;
   Descripcion?: string;
@@ -19,6 +20,11 @@ export type Ticket = {
   IdCasoPadre?: string;
   ANS?: string;
   CorreoObservador?: string;
+  MinutosNocturnos?: number;
+  MinutosDominicales?: number;
+  MinutosFestivos?: number
+  MinutosTotales?: number
+
 };
 
 export type FormRecategorizarState = {

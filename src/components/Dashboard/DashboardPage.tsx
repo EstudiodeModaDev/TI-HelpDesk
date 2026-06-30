@@ -4,16 +4,19 @@ import DashBoardIcon from "../../assets/dashboard.svg";
 import Detalle from "../../assets/Detalle.svg"
 import DashboardDetallado from "./DashboardDetallado/DashboardDetallado"
 import "./Dashboard.css"
+import DashboardDisponibilidad from "./DashboardDisponibilidad/DashboardDisponibilidad";
 
-type Mode = "resumen" | "dashboard"; // ajusta
+type Mode = "resumen" | "dashboard" | "disponibilidad";
 type Item = { id: Mode; label: string; icon?: React.ReactNode; active?: boolean };
 
 export default function DashBoardPage() {
 
-  const [mode, setMode] = React.useState<string>("resumen");
+  const [mode, setMode] = React.useState<Mode>("resumen");
   const Items: Item[] = [
     {id: "resumen", label: "Dashboard", active: true, icon: <img src={DashBoardIcon} alt="" className="sb-icon" />}, 
-    {id: "dashboard", label: "Detallado", active: true, icon: <img src={Detalle} alt="" className="sb-icon" />}]
+    {id: "dashboard", label: "Detallado", active: true, icon: <img src={Detalle} alt="" className="sb-icon" />},
+    {id: "disponibilidad", label: "Disponibilidad", active: true, icon: <img src={DashBoardIcon} alt="" className="sb-icon" />},
+  ]
 
   return (
     <section className="msb-layout">
@@ -33,7 +36,12 @@ export default function DashBoardPage() {
           <div className="msb-spacer" aria-hidden="true" />
         </div>
 
-        {mode === "resumen" ? <DashboardResumen /> : <DashboardDetallado />}
+        {mode === "resumen" ? 
+          <DashboardResumen /> : 
+          mode === "dashboard" ? 
+          <DashboardDetallado /> : 
+          <DashboardDisponibilidad />
+        }
     </section>
   );
 }

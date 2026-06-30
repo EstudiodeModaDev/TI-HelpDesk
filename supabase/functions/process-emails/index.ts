@@ -30,6 +30,7 @@ import {
   saveTicketFiles,
 } from "./tickets.ts";
 import type {
+  AutoReplyResultItem,
   GraphAttachment,
   GraphEmailAddress,
   GraphMessage,
@@ -112,6 +113,35 @@ function textToHtml(text: string): string {
     .filter((line) => line.trim().length > 0)
     .map((line) => `<p>${escapeHtml(line)}</p>`)
     .join("");
+}
+
+function getRequesterEmail(message: GraphMessage): string | null {
+  return message.from?.emailAddress?.address?.trim() ??
+    message.sender?.emailAddress?.address?.trim() ??
+    null;
+}
+
+function buildAutoReplySummary(details: ProcessDetail[]): ProcessResult["autoReplySummary"] {
+  const sent: AutoReplyResultItem[] = [];
+  const notSent: AutoReplyResultItem[] = [];
+
+  for (const detail of details) {
+    const item: AutoReplyResultItem = {
+      messageId: detail.messageId,
+      subject: detail.subject,
+      requesterEmail: detail.requesterEmail ?? null,
+      ticketId: detail.ticketId,
+      reason: detail.autoReplyReason ?? detail.reason ?? null,
+    };
+
+    if (detail.autoReplyStatus === "sent") {
+      sent.push(item);
+    } else {
+      notSent.push(item);
+    }
+  }
+
+  return { sent, notSent };
 }
 
 function buildStorageFolder(message: GraphMessage): string {
@@ -256,6 +286,8 @@ function validateIncomingPayload(payload: IncomingEmailPayload): void {
   const senderAddress = normalizeEmailAddress(payload.sender);
   const hasFrom = !!fromAddress?.address || !!fromAddress?.name ||
     !!senderAddress?.address || !!senderAddress?.name;
+  const hasAttachments = Array.isArray(payload.attachments) &&
+    payload.attachments.length > 0;
 
   if (!hasSubject && !hasBody && !hasFrom && !hasAttachments) {
     throw new Error(
@@ -370,6 +402,8 @@ async function processMessage(
   source = "outlook_graph",
   syncMailboxState = true,
 ): Promise<ProcessDetail> {
+  const requesterEmail = getRequesterEmail(message);
+
   const existingTicketId = await findExistingTicketId(supabase, message);
   if (existingTicketId) {
     return {
@@ -378,6 +412,9 @@ async function processMessage(
       status: "skipped",
       reason: `Message already processed for ticket ${existingTicketId}`,
       ticketId: existingTicketId,
+      requesterEmail,
+      autoReplyStatus: "not_sent",
+      autoReplyReason: "Message already processed.",
     };
   }
 
@@ -433,17 +470,37 @@ async function processMessage(
         resolverName: resolver.nombre_resolutor,
         ticketId: ticket.id,
         ticketSubject: message.subject,
-        requesterEmail: message.from?.emailAddress?.address ??
-          message.sender?.emailAddress?.address ??
-          null,
+        requesterEmail,
       });
     });
   }
 
-  if (syncMailboxState && config.sendAutoReply) {
-    await runNonCriticalStep("sendAutoReply", message, async () => {
-      await sendAutoReply(accessToken, config, message.id, ticket.id);
-    });
+  let autoReplyStatus: ProcessDetail["autoReplyStatus"] = "not_sent";
+  let autoReplyReason: string | null = null;
+
+  if (config.sendAutoReply) {
+    try {
+      await sendAutoReply(accessToken, config, {
+        messageId: message.id,
+        ticketId: ticket.id,
+        requesterName: message.from?.emailAddress?.name ??
+          message.sender?.emailAddress?.name ??
+          null,
+        requesterEmail,
+        resolverName: resolver?.nombre_resolutor ?? null,
+        ticketSubject: message.subject,
+      });
+      autoReplyStatus = "sent";
+    } catch (error) {
+      autoReplyReason = error instanceof Error ? error.message : String(error);
+      console.warn("process-emails sendAutoReply warning", {
+        messageId: message.id,
+        subject: message.subject,
+        error: autoReplyReason,
+      });
+    }
+  } else if (!config.sendAutoReply) {
+    autoReplyReason = "SEND_AUTO_REPLY is disabled.";
   }
 
   if (syncMailboxState) {
@@ -460,6 +517,9 @@ async function processMessage(
     status: "processed",
     ticketId: ticket.id,
     resolver: resolver?.nombre_resolutor ?? null,
+    requesterEmail,
+    autoReplyStatus,
+    autoReplyReason,
   };
 }
 
@@ -474,6 +534,10 @@ async function run(): Promise<ProcessResult> {
     skipped: 0,
     failed: 0,
     details: [],
+    autoReplySummary: {
+      sent: [],
+      notSent: [],
+    },
   };
 
   for (const message of messages) {
@@ -502,9 +566,14 @@ async function run(): Promise<ProcessResult> {
         subject: message.subject,
         status: "failed",
         reason,
+        requesterEmail: getRequesterEmail(message),
+        autoReplyStatus: "not_sent",
+        autoReplyReason: reason,
       });
     }
   }
+
+  result.autoReplySummary = buildAutoReplySummary(result.details);
 
   return result;
 }
@@ -551,6 +620,10 @@ Deno.serve(async (request) => {
       skipped: 0,
       failed: 0,
       details: [],
+      autoReplySummary: {
+        sent: [],
+        notSent: [],
+      },
     };
 
     for (const payload of payloads) {
@@ -587,9 +660,16 @@ Deno.serve(async (request) => {
           subject: payload.subject,
           status: "failed",
           reason,
+          requesterEmail: normalizeEmailAddress(payload.from)?.address ??
+            normalizeEmailAddress(payload.sender)?.address ??
+            null,
+          autoReplyStatus: "not_sent",
+          autoReplyReason: reason,
         });
       }
     }
+
+    result.autoReplySummary = buildAutoReplySummary(result.details);
 
     return Response.json(result, {
       status: result.ok ? 200 : 207,
@@ -606,6 +686,10 @@ Deno.serve(async (request) => {
         skipped: 0,
         failed: 0,
         details: [],
+        autoReplySummary: {
+          sent: [],
+          notSent: [],
+        },
         error: reason,
       },
       { status: 500 },

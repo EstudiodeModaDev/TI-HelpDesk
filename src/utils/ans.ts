@@ -1,7 +1,7 @@
 // src/utils/ans.ts
 import { addMinutes, isSaturday, isSunday } from "date-fns";
 import { TZDate } from "@date-fns/tz";
-import type { Holiday } from "festivos-colombianos";
+import type { Holiday } from "../Models/Holiday";
 export type ANSLevel = 'ANS 1' | 'ANS 2' | 'ANS 3' | 'ANS 4' | 'ANS 5' | '';
 
 const TIMEZONE = "America/Bogota";
@@ -25,7 +25,7 @@ const sliceYMD = (s?: string) => (s ? s.slice(0, 10) : "");
 export const isHoliday = (date: Date, holidays: Holiday[]) => {
   const ymd = toYMD(date);
   return holidays.some(h =>
-    sliceYMD(h.holiday) === ymd || sliceYMD(h.celebrationDay) === ymd
+    sliceYMD(h.date) === ymd
   );
 };
 

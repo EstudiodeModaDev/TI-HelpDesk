@@ -4,10 +4,10 @@ import type {FilaPermisoNav, FilaSolicitudERP, FilaSolicitudRed, SolicitudUsuari
 import { useAuth } from "../../auth/authContext";
 import { FlowClient } from "../shared/FlowClient";
 import { calcularFechaSolucion } from "../../utils/ans";
-import type { Holiday } from "festivos-colombianos";
 import { fetchHolidays } from "../../Services/Festivos";
 import { toGraphDateTime } from "../../utils/Date";
 import type { TicketsRepository } from "../../repositories/TicketsRepository/TicketRepository";
+import type { Holiday } from "../../Models/Holiday";
 
 /* ───────────────────────────── Utilidades base ───────────────────────────── */
 

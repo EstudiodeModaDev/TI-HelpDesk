@@ -7,6 +7,7 @@ export type filterTickets = {
   ticketStatus?: string[]
   range?: DateRange
   currentUser?: string
+  fuente?: string
   pageSize?: number;
   pageIndex?: number
   paginated?: boolean

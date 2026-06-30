@@ -32,14 +32,17 @@ function escapeHtml(value: unknown): string {
 
 function buildCaseNotificationHtml(params: {
   greetingName: string;
+  title?: string;
   intro: string;
   ticketId?: string | number | null;
   requesterEmail?: string | null;
   resolverName?: string | null;
   ticketSubject?: string;
   closing: string;
+  footer?: string;
 }): string {
   const safeTicketId = toSafeText(params.ticketId, "Sin ID");
+  const safeTitle = params.title?.trim() || "Solicitud registrada";
   const requesterLine = params.requesterEmail?.trim()
     ? `<p><strong>Solicitante:</strong> ${escapeHtml(params.requesterEmail.trim())}</p>`
     : "";
@@ -53,7 +56,7 @@ function buildCaseNotificationHtml(params: {
   return `
     <div style="max-width: 620px; margin: 0 auto; font-family: Arial, sans-serif; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden;">
       <div style="background: #84CC16; color: #ffffff; padding: 18px 24px;">
-        <h2 style="margin: 0; font-size: 20px;">Solicitud registrada</h2>
+        <h2 style="margin: 0; font-size: 20px;">${escapeHtml(safeTitle)}</h2>
       </div>
       <div style="padding: 24px; color: #374151;">
         <p style="margin-top: 0;">Hola ${escapeHtml(params.greetingName)},</p>
@@ -65,6 +68,11 @@ function buildCaseNotificationHtml(params: {
           ${resolverLine}
         </div>
         <p style="margin-top: 20px; margin-bottom: 0;">${escapeHtml(params.closing)}</p>
+        ${
+    params.footer?.trim()
+      ? `<p style="margin-top: 20px; font-size: 12px; color: #6B7280;">${escapeHtml(params.footer.trim())}</p>`
+      : ""
+  }
       </div>
     </div>
   `;
@@ -227,19 +235,62 @@ export async function moveMessage(
 export async function sendAutoReply(
   accessToken: string,
   config: ProcessEmailsConfig,
-  messageId: string,
-  ticketId: string,
+  params: {
+    messageId: string;
+    ticketId: string;
+    requesterName?: string | null;
+    requesterEmail?: string | null;
+    resolverName?: string | null;
+    ticketSubject?: string;
+  },
 ): Promise<void> {
-  await graphFetch<void>(
+  const draft = await graphFetch<{ id: string }>(
     accessToken,
-    `/users/listo@estudiodemoda.com.co/messages/${
-      encodeURIComponent(messageId)
-    }/reply`,
+    `/users/${encodeURIComponent(config.mailboxUser)}/messages/${
+      encodeURIComponent(params.messageId)
+    }/createReply`,
     {
       method: "POST",
+    },
+  );
+
+  const html = buildCaseNotificationHtml({
+    greetingName: params.requesterName?.trim() || params.requesterEmail?.trim() ||
+      "equipo",
+    title: "Solicitud registrada",
+    intro:
+      "Tu solicitud ha sido registrada exitosamente y ha sido asignada a un tecnico para su gestion. Estos son los detalles del caso:",
+    ticketId: params.ticketId,
+    resolverName: params.resolverName ?? null,
+    ticketSubject: params.ticketSubject,
+    closing:
+      "El resolutor asignado se pondra en contacto contigo en el menor tiempo posible para darte solucion a tu requerimiento.",
+    footer: "Este es un mensaje automatico, por favor no respondas.",
+  });
+
+  await graphFetch<void>(
+    accessToken,
+    `/users/${encodeURIComponent(config.mailboxUser)}/messages/${
+      encodeURIComponent(draft.id)
+    }`,
+    {
+      method: "PATCH",
       body: JSON.stringify({
-        comment: `Tu solicitud fue registrada con el ticket ${ticketId}.`,
+        body: {
+          contentType: "HTML",
+          content: html,
+        },
       }),
+    },
+  );
+
+  await graphFetch<void>(
+    accessToken,
+    `/users/${encodeURIComponent(config.mailboxUser)}/messages/${
+      encodeURIComponent(draft.id)
+    }/send`,
+    {
+      method: "POST",
     },
   );
 }
@@ -258,7 +309,7 @@ export async function sendCaseCreationReply(
 ): Promise<void> {
   const draft = await graphFetch<{ id: string }>(
     accessToken,
-    `/users/listo@estudiodemoda.com.co/messages/${
+    `/users/${encodeURIComponent(config.mailboxUser)}/messages/${
       encodeURIComponent(params.messageId)
     }/createReply`,
     {
@@ -278,7 +329,7 @@ export async function sendCaseCreationReply(
 
   await graphFetch<void>(
     accessToken,
-    `/users/listo@estudiodemoda.com.co/messages/${
+    `/users/${encodeURIComponent(config.mailboxUser)}/messages/${
       encodeURIComponent(draft.id)
     }`,
     {
@@ -294,7 +345,7 @@ export async function sendCaseCreationReply(
 
   await graphFetch<void>(
     accessToken,
-    `/users/listo@estudiodemoda.com.co/messages/${
+    `/users/${encodeURIComponent(config.mailboxUser)}/messages/${
       encodeURIComponent(draft.id)
     }/send`,
     {
@@ -332,7 +383,7 @@ export async function sendResolverNotification(
 
   await graphFetch<void>(
     accessToken,
-    `/users/listo@estudiodemoda.com.co/sendMail`,
+    `/users/${encodeURIComponent(config.mailboxUser)}/sendMail`,
     {
       method: "POST",
       body: JSON.stringify({

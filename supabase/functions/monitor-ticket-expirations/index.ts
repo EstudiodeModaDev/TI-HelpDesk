@@ -125,16 +125,6 @@ async function processWarningTicket(
     nowIso: string;
   },
 ): Promise<void> {
-  const alreadyWarned = await hasTrackingEvent(
-    context.supabase,
-    ticket.ticket_solvi_id,
-    WARNING_TRACKING_TYPE,
-  );
-
-  if (alreadyWarned) {
-    summary.skipped += 1;
-    return;
-  }
 
   await sendWarningEmail(
     context.accessToken,
@@ -146,15 +136,6 @@ async function processWarningTicket(
   console.log("[EMAIL_SENT]", {
     ticketId: ticket.ticket_solvi_id,
     type: "warning",
-  });
-
-  await createTracking(
-    context.supabase,
-    buildWarningTracking(ticket, context.nowIso, hoursRemaining),
-  );
-  console.log("[TRACKING_CREATED]", {
-    ticketId: ticket.ticket_solvi_id,
-    type: WARNING_TRACKING_TYPE,
   });
 
   console.log("[TICKET_WARNING]", {
