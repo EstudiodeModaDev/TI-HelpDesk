@@ -13,6 +13,7 @@ export type FormState = {
   categoria: string;
   subcategoria: string;
   articulo: string;
+  articuloId: string;
   archivo: File[];
   ANS?: "";
   cerrar?: boolean

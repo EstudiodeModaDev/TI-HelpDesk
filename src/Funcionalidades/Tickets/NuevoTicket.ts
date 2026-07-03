@@ -36,7 +36,7 @@ const TICKETS_ATTACHMENTS_BUCKET = "ticket-attachments"
 
 export function useNuevoTicketForm(services: Svc) {
   const { Categorias, SubCategorias, Articulos, Tickets, Usuarios, Logs} = services;
-  const {attachments} = useRepositories()
+  const {attachments, ans} = useRepositories()
   const [state, setState] = useState<FormState>({
     solicitante: null,
     resolutor: null,
@@ -48,6 +48,7 @@ export function useNuevoTicketForm(services: Svc) {
     categoria: "",    // Título
     subcategoria: "", // Título
     articulo: "",     // Título
+    articuloId: "",
     ANS: "",
     archivo: [],
   });
@@ -181,7 +182,7 @@ export function useNuevoTicketForm(services: Svc) {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent, ansProps: {catId: number | null, subId: number | null, art: number | null}) => {
     e.preventDefault();
     if (!validate()) return;
 
@@ -197,7 +198,7 @@ export function useNuevoTicketForm(services: Svc) {
       };
       let solucion: TZDate | null = null;
 
-      const ANS = calculoANS(state.categoria, state.subcategoria, state.articulo);
+      const ANS = await calculoANS(ansProps, ans);
       const horasAns = horasPorANS[ANS] ?? 0;
 
       if (horasAns > 0) {
@@ -290,7 +291,7 @@ export function useNuevoTicketForm(services: Svc) {
 
      
       //Limpiar formularior
-      setState({solicitante: null, resolutor: null, usarFechaApertura: false, fechaApertura: null, fuente: "", motivo: "", descripcion: "", categoria: "", subcategoria: "", articulo: "",  ANS: "", archivo: [],})
+      setState({solicitante: null, resolutor: null, usarFechaApertura: false, fechaApertura: null, fuente: "", motivo: "", descripcion: "", categoria: "", subcategoria: "", articulo: "", articuloId: "",  ANS: "", archivo: [],})
       setErrors({})
     }
     

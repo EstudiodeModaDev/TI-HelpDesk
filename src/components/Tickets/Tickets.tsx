@@ -25,7 +25,7 @@ export default function TablaTickets() {
   const isPrivileged = userRole.role === "Administrador" || userRole.role === "Tecnico" || userRole.role === "Técnico";
   const { graph } = useGraphServices();
   const {tickets} = useRepositories()
-  const { inProgressTickets, loadAll, search, setSearch, me, setMe, rows, loading, error, filterMode, range, pageSize, pageIndex, hasNext, sorts, setFilterMode, setRange, setPageSize, updateSelectedTicket, nextPage, prevPage, toggleSort, outOfTimeTickets} = useTickets({graph, TicketsSvc: tickets!, userMail, role: userRole.role});
+  const {fuenteFilter, setFuenteFilter, inProgressTickets, loadAll, search, setSearch, me, setMe, rows, loading, error, filterMode, range, pageSize, pageIndex, hasNext, sorts, setFilterMode, setRange, setPageSize, updateSelectedTicket, nextPage, prevPage, toggleSort, outOfTimeTickets} = useTickets({graph, TicketsSvc: tickets!, userMail, role: userRole.role});
 
   // Búsqueda local SOLO sobre la página visible (si quieres global, hay que mover a OData)
 
@@ -67,7 +67,7 @@ export default function TablaTickets() {
             <option value="Todos">Todos</option>
           </select>
 
-          <select value={filterMode} onChange={(e) => setFilterMode(e.target.value as any)} title="Estado">
+          <select value={fuenteFilter} onChange={(e) => setFuenteFilter(e.target.value as any)} title="Estado">
             <option value="">Todos</option>
             <option value="Disponibilidad">Disponibilidad</option>
           </select>

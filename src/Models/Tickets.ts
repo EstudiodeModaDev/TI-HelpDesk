@@ -31,6 +31,7 @@ export type FormRecategorizarState = {
   categoria: string;
   subcategoria: string;
   articulo: string;
+  articuloId: string;
 };
 
 export type FormReasignarState = {
@@ -61,3 +62,11 @@ export type SortDir = 'asc' | 'desc';
 export type SortField = 'id' | 'FechaApertura' | 'TiempoSolucion' | 'Title' | 'resolutor';
 
 export type TicketsError = Partial<Record<keyof Ticket, string>>;
+
+export type ANS = {
+  Id?: string
+  Title: string //ANS
+  id_categoria: number;
+  id_subcategoria: number;
+  id_articulo: number
+}

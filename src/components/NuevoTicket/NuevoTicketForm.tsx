@@ -22,6 +22,7 @@ export type TreeOption = {
   meta: {
     catId: string | number;
     subId: string | number;
+    artId: string | number;
     catTitle: string;
     subTitle: string;
     artTitle: string;
@@ -30,7 +31,7 @@ export type TreeOption = {
 
 export default function NuevoTicketForm() {
   const {Categorias, SubCategorias, Articulos, Franquicias: FranquiciasSvc, Usuarios: UsuariosSPServiceSvc,} = useGraphServices()
-  const {tickets, logs} = useRepositories()
+  const {tickets, logs,} = useRepositories()
 
   const {account} = useAuth()
   const userRole = useUserRole(account?.username)
@@ -48,6 +49,7 @@ export default function NuevoTicketForm() {
     { value: "WhatsApp", label: "WhatsApp" },
   ];
   const [masiva, setMasiva] = React.useState<boolean>(false)
+  const [categoriasProps, setCategoriasProps] = React.useState<{catId: number | null, subId: number | null, artId: number | null}>({artId: null, catId: null, subId: null})
 
   // ====== Combinar usuarios con franquicias
   const combinedOptions: UserOptionEx[] = React.useMemo(() => {
@@ -78,6 +80,7 @@ export default function NuevoTicketForm() {
         meta: {
           catId: sub?.Id_categoria ?? "",
           subId: a.Id_subCategoria ?? "",
+          artId: a.ID ?? "",
           catTitle,
           subTitle,
           artTitle,
@@ -87,20 +90,25 @@ export default function NuevoTicketForm() {
   }, [categorias, subcategoriasAll, articulosAll]);
 
   const treeValue: TreeOption | null = React.useMemo(() => {
-    if (!state.articulo) return null;
+    if (!state.articulo && !state.articuloId) return null;
 
     const normArt = norm(state.articulo || "");
     const normCat = norm(state.categoria || "");
     const normSub = norm(state.subcategoria || "");
 
+    const artId = String(state.articuloId ?? "");
+
     return (
       treeOptions.find(o =>
-        norm(o.meta.artTitle) === normArt &&
-        norm(o.meta.catTitle) === normCat &&
-        norm(o.meta.subTitle) === normSub
+        (artId && String(o.meta.artId) === artId) ||
+        (
+          norm(o.meta.artTitle) === normArt &&
+          norm(o.meta.catTitle) === normCat &&
+          norm(o.meta.subTitle) === normSub
+        )
       ) ?? null
     );
-  }, [state.articulo, state.categoria, state.subcategoria, treeOptions]);
+  }, [state.articulo, state.articuloId, state.categoria, state.subcategoria, treeOptions]);
 
   const userFilter = (option: any, raw: string) => {
     const q = norm(raw);
@@ -128,20 +136,23 @@ export default function NuevoTicketForm() {
   };
 
   // ====== Handlers (guardan SOLO título en state y manejan IDs locales)
-  const onTreeChange = (opt: SingleValue<TreeOption>) => {
+  const onTreeChange = async (opt: SingleValue<TreeOption>) => {
     if (!opt) {
       setField("categoria", "");
       setField("subcategoria", "");
       setField("articulo", "");
+      setField("articuloId", "");
+      setCategoriasProps({artId: null, catId: null, subId: null})
       return;
     }
 
-    const { catTitle, subTitle, artTitle } = opt.meta;
+    const { catTitle, subTitle, artTitle, } = opt.meta;
 
     // Títulos en tu estado global
     setField("categoria", catTitle);
     setField("subcategoria", subTitle);
     setField("articulo", artTitle);
+    setCategoriasProps({artId: Number(opt.meta.artId), catId: Number(opt.meta.catId), subId: Number(opt.meta.subId)})
   };
 
   const disabledCats = submitting || loadingCatalogos;
@@ -156,8 +167,7 @@ export default function NuevoTicketForm() {
           <button className="btn btn-primary-final btn-xs" onClick={() => setMasiva(true)}>Masivo</button>
         </div> 
 
-        <form onSubmit={(e) => {e.preventDefault(); handleSubmit(e)}} noValidate className="tf-grid">
-            {/* Solicitante */}
+        <form onSubmit={(e) => {e.preventDefault(); handleSubmit(e, {art: categoriasProps.artId, catId: categoriasProps.catId, subId: categoriasProps.subId})}} noValidate className="tf-grid">
             {/* Fuente */}
             <div className="tf-field">
               <label className="tf-label" htmlFor="fuente">Fuente Solicitante</label>

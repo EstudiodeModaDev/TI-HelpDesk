@@ -13,21 +13,24 @@ import toast from "react-hot-toast";
 import { notifySolicitanteCategoryChange } from "./utils/notifications";
 import type { SupabaseTickets } from "../../Models/DTO/Tickets";
 import type { Holiday } from "../../Models/Holiday";
+import type { ANSRepository } from "../../repositories/AnsRepository/AnsRepository";
 
 type Svc = {
   Categorias: { getAll: (opts?: any) => Promise<any[]> };
   SubCategorias: { getAll: (opts?: any) => Promise<any[]> };
   Articulos: { getAll: (opts?: any) => Promise<any[]> };
   Tickets?: TicketsRepository;
+  Ans: ANSRepository
 };
 
 export function useRecategorizarTicket(services: Svc, ticket: Ticket) {
-  const { Categorias, SubCategorias, Articulos, Tickets } = services;
+  const { Categorias, SubCategorias, Articulos, Tickets, Ans } = services;
 
   const [state, setState] = useState<FormRecategorizarState>({
     categoria: "",
     subcategoria: "",
     articulo: "",
+    articuloId: "",
   });
 
   const [errors, setErrors] = useState<FormErrors>({});
@@ -109,7 +112,7 @@ export function useRecategorizarTicket(services: Svc, ticket: Ticket) {
     return Object.keys(e).length === 0;
   };
 
-  const handleRecategorizar = async (e: React.FormEvent): Promise<boolean> => {
+  const handleRecategorizar = async (e: React.FormEvent, ANSprops: {catId: number | null, subId: number | null, artId: number | null}): Promise<boolean> => {
     e.preventDefault();
     if (!validate()) return false;
 
@@ -125,7 +128,7 @@ export function useRecategorizarTicket(services: Svc, ticket: Ticket) {
         "ANS 5": 240,
       };
 
-      const ans = calculoANS(state.categoria, state.subcategoria, state.articulo);
+      const ans = await calculoANS({art: ANSprops.artId, catId: ANSprops.catId, subId: ANSprops.subId}, Ans);
       const horasAns = horasPorANS[ans] ?? 0;
 
       let solucionTZ: TZDate | null = null;
@@ -160,7 +163,7 @@ export function useRecategorizarTicket(services: Svc, ticket: Ticket) {
       }
 
       // Limpiar formulario
-      setState({ categoria: "", subcategoria: "", articulo: "" });
+      setState({ categoria: "", subcategoria: "", articulo: "", articuloId: "" });
       setErrors({});
       return true
   

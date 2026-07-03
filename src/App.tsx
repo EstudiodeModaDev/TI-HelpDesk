@@ -40,7 +40,6 @@ import ReportsPage from "./components/Reports/ReportsPage";
 import { useRepositories } from "./repositories/repositoriesContext";
 import type { TicketsRepository } from "./repositories/TicketsRepository/TicketRepository";
 import type { LogRepository } from "./repositories/LogRepository/LogRespository";
-
 /* ============================================================
    Tipos de navegación y contexto de visibilidad
    ============================================================ */
@@ -287,7 +286,6 @@ function Shell() {
     );
   }
 
-  // estado logueado
   return <LoggedApp user={user as User} />;
 }
 

@@ -10,10 +10,11 @@ import { useAuth } from "../../../auth/authContext";
 import { useRepositories } from "../../../repositories/repositoriesContext";
 
 export default function Recategorizar({ ticket, onDone}: { ticket: Ticket, onDone: () => void }) {
-  const {tickets, logs} = useRepositories()
+  const {tickets, logs, ans} = useRepositories()
   const {Categorias, SubCategorias, Articulos, } = useGraphServices() as ReturnType<typeof useGraphServices>;
-  const {state, errors, submitting, categorias, subcategoriasAll, articulosAll, loadingCatalogos, setField, handleRecategorizar,} = useRecategorizarTicket({ Categorias, SubCategorias, Articulos, Tickets: tickets! }, ticket);
+  const {state, errors, submitting, categorias, subcategoriasAll, articulosAll, loadingCatalogos, setField, handleRecategorizar,} = useRecategorizarTicket({ Categorias, SubCategorias, Articulos, Tickets: tickets!, Ans: ans }, ticket);
   const {account} = useAuth()
+  const [categoriasProps, setCategoriasProps] = React.useState<{catId: number | null, subId: number | null, artId: number | null}>({artId: null, catId: null, subId: null})
   const treeOptions: TreeOption[] = React.useMemo(() => {
     if (!categorias.length || !subcategoriasAll.length || !articulosAll.length) return [];
     const subById = new Map(subcategoriasAll.map(s => [String(s.ID), s]));
@@ -33,6 +34,7 @@ export default function Recategorizar({ ticket, onDone}: { ticket: Ticket, onDon
         meta: {
           catId: sub?.Id_categoria ?? "",
           subId: a.Id_subCategoria ?? "",
+          artId: a.ID ?? "",
           catTitle,
           subTitle,
           artTitle,
@@ -42,39 +44,47 @@ export default function Recategorizar({ ticket, onDone}: { ticket: Ticket, onDon
   }, [categorias, subcategoriasAll, articulosAll]);
 
   const treeValue: TreeOption | null = React.useMemo(() => {
-    if (!state.articulo) return null;
+    if (!state.articulo && !state.articuloId) return null;
 
     const normArt = norm(state.articulo || "");
     const normCat = norm(state.categoria || "");
     const normSub = norm(state.subcategoria || "");
 
+    const artId = String(state.articuloId ?? "");
+
     return (
       treeOptions.find(o =>
-        norm(o.meta.artTitle) === normArt &&
-        norm(o.meta.catTitle) === normCat &&
-        norm(o.meta.subTitle) === normSub
+        (artId && String(o.meta.artId) === artId) ||
+        (
+          norm(o.meta.artTitle) === normArt &&
+          norm(o.meta.catTitle) === normCat &&
+          norm(o.meta.subTitle) === normSub
+        )
       ) ?? null
     );
-  }, [state.articulo, state.categoria, state.subcategoria, treeOptions]);
+  }, [state.articulo, state.articuloId, state.categoria, state.subcategoria, treeOptions]);
 
   const onTreeChange = (opt: SingleValue<TreeOption>) => {
     if (!opt) {
       setField("categoria", "");
       setField("subcategoria", "");
       setField("articulo", "");
+      setField("articuloId", "");
       return;
     }
 
-    const { catTitle, subTitle, artTitle } = opt.meta;
+    const { catTitle, subTitle, artTitle, artId } = opt.meta;
 
     // Títulos en tu estado global
     setField("categoria", catTitle);
     setField("subcategoria", subTitle);
     setField("articulo", artTitle);
+    setField("articuloId", String(artId));
+    setCategoriasProps({artId: Number(opt.meta.artId), catId: Number(opt.meta.catId), subId: Number(opt.meta.subId)})
   };
 
   const handleConfirm = async (e: React.FormEvent) => {
-    const canContinue = await handleRecategorizar(e);
+    const canContinue = await handleRecategorizar(e, {artId: categoriasProps.artId, catId: categoriasProps.catId, subId: categoriasProps.subId});
 
     if (!canContinue) return;
 

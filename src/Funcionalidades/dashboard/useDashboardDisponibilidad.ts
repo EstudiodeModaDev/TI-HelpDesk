@@ -188,13 +188,14 @@ function aggregateResolutores(tickets: Ticket[]): ResolutorDisponibilidadAgg[] {
     .sort((a, b) => b.totalTickets - a.totalTickets || a.nombre.localeCompare(b.nombre, "es", { sensitivity: "base" }));
 }
 
-function buildRangeFilter(range: DateRange): filterTickets {
+function buildRangeFilter(range: DateRange, resolutor: string): filterTickets {
   return {
     range: {
       from: toGraphDateTime(range.from) ?? range.from,
       to: toGraphDateTime(range.to) ?? range.to,
     },
-    fuente: "Disponibilidad"
+    fuente: "Disponibilidad",
+    resolutor
   };
 }
 
@@ -224,7 +225,8 @@ export function useDashboardDisponibilidad(TicketsSvc: TicketsRepository) {
     setError(null);
 
     try {
-      const response = await TicketsSvc.loadTickets(buildRangeFilter(range));
+      console.log(selectedResolutor)
+      const response = await TicketsSvc.loadTickets(buildRangeFilter(range, selectedResolutor));
       const tickets = Array.isArray(response?.data) ? response.data : [];
 
       setTicketsDisponibilidad(tickets);
@@ -236,7 +238,7 @@ export function useDashboardDisponibilidad(TicketsSvc: TicketsRepository) {
     } finally {
       setLoading(false);
     }
-  }, [TicketsSvc, range]);
+  }, [TicketsSvc, range, selectedResolutor]);
 
   React.useEffect(() => {
     void loadDashboardDisponibilidad();

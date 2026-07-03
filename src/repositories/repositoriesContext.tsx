@@ -9,6 +9,8 @@ import type { AttachmentRepository } from "./AttachmentsRepostory/AttachmentRepo
 import { AttachmentFromSupabase } from "./AttachmentsRepostory/AttachmentFromSupabase";
 import type { LogRepository } from "./LogRepository/LogRespository";
 import { LogFromSupabase } from "./LogRepository/LogFromSupabase";
+import type { ANSRepository } from "./AnsRepository/AnsRepository";
+import { SharepointANS } from "./AnsRepository/SharepointANS";
 
 type RepositorySource = "supabase" | "sharepoint";
 
@@ -17,6 +19,7 @@ export type AppRepositories = {
   usuarios: UsuariosSPRepository | null;
   attachments: AttachmentRepository | null
   logs: LogRepository | null
+  ans: ANSRepository
 };
 
 type RepositoriesProviderProps = {
@@ -49,7 +52,8 @@ export const RepositoriesProvider: React.FC<RepositoriesProviderProps> = ({
       tickets: ticketsSource === "supabase" ? new SupabaseTicketRepository() : null,
       usuarios: usuariosSource === "sharepoint" ? new UsuariosSPFromSharepoint(graph) : null,
       attachments: attachmentsSource === "supabase" ? new AttachmentFromSupabase() : null,
-      logs: logsSource === "supabase" ? new LogFromSupabase() : null
+      logs: logsSource === "supabase" ? new LogFromSupabase() : null,
+      ans: new SharepointANS(graph) 
     };
   }, [graph, sources?.tickets, sources?.usuarios]);
 

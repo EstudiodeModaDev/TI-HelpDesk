@@ -56,6 +56,10 @@ export class SupabaseTicketRepository implements TicketsRepository {
         query = query.eq("ticket_solvi_id_casopadre", filter.padreId)
       }
 
+      if(filter?.resolutor && filter.resolutor !== "all"){
+        query = query.eq("ticket_solvi_correo_resolutor", filter.resolutor)
+      }
+
       const currentUserFilters = filter?.currentUser
         ? [
             `ticket_solvi_correo_resolutor.eq.${filter.currentUser}`,

@@ -2,6 +2,7 @@
 import { addMinutes, isSaturday, isSunday } from "date-fns";
 import { TZDate } from "@date-fns/tz";
 import type { Holiday } from "../Models/Holiday";
+import type { ANSRepository } from "../repositories/AnsRepository/AnsRepository";
 export type ANSLevel = 'ANS 1' | 'ANS 2' | 'ANS 3' | 'ANS 4' | 'ANS 5' | '';
 
 const TIMEZONE = "America/Bogota";
@@ -116,38 +117,26 @@ export function calcularFechaSolucion(
   return actual;
 }
 
-const KEYWORDS: Record<Exclude<ANSLevel, ''>, string[]> = {
-  'ANS 1': ['monitor principal', 'bloqueo general', 'sesiones bloqueadas'],
-  'ANS 2': ['internet'],
-  'ANS 4': [
-    'acompanamiento, embalaje y envio de equipo',
-    'cambio',
-    'entrega de equipo',
-    'repotenciacion',
-    'entrega',
-  ],
-  'ANS 5': ['alquiler', 'cotizacion/compras', 'cotizacion', 'compras'],
-  'ANS 3': []
-};
-
-const EXCLUDE = ['actividad masiva', 'cierre de tienda', 'apertura de tiendas'];
-
 /** Normaliza: quita tildes/diacríticos, lowercase y trim. */
 export const norm = (s: string) =>
   s.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase().trim();
 
 /** Determina el ANS por palabras clave/exclusiones. */
-export function calculoANS(categoria: string, subcategoria: string, articulo?: string): ANSLevel {
-  const combinacion = norm(`${categoria} ${subcategoria} ${articulo ?? ''}`);
 
-  if (EXCLUDE.some(k => combinacion.includes(norm(k)))) return '';
+export async function calculoANS(ansProps: {catId: number | null, subId: number | null, art: number | null}, ansService: ANSRepository): Promise<string> {
+  const {catId, subId, art} = ansProps
 
-  if (KEYWORDS['ANS 1'].some(k => combinacion.includes(norm(k)))) return 'ANS 1';
-  if (KEYWORDS['ANS 2'].some(k => combinacion.includes(norm(k)))) return 'ANS 2';
-  if (KEYWORDS['ANS 4'].some(k => combinacion.includes(norm(k)))) return 'ANS 4';
-  if (KEYWORDS['ANS 5'].some(k => combinacion.includes(norm(k)))) return 'ANS 5';
+  if(!catId || !subId || !art){
+    return "ANS 3"
+  }
 
-  return 'ANS 3';
+  const response = await ansService.loadANS({id_categoria: catId, id_sub_categoria: subId, id_articulo: art})
+  
+  if(!response.status){
+    return "ANS 3"
+  }
+
+  return response.data.Title
 }
 
 /** (Opcional) Mapa de horas por ANS para reuso. */

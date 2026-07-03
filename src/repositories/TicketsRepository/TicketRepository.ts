@@ -15,6 +15,7 @@ export type filterTickets = {
   sortField?: SortField
   sortDir?: SortDir
   padreId?: number
+  resolutor: string
 }
 
 export type TicketsLoadResult = {
