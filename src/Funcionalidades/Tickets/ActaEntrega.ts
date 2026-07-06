@@ -10,10 +10,9 @@ import type {
   FormStateActa,
   TipoUsuario,
 } from "../../Models/ActasEntrega";
-import type { ActasdeentregaService } from "../../Services/Actasdeentrega.service";
 import { FlowClient } from "../shared/FlowClient";
 import { toGraphDateOnly } from "../../utils/Date";
-import type { LogRepository } from "../../repositories/LogRepository/LogRespository";
+import { useRepositories } from "../../repositories/repositoriesContext";
 
 /* ===== Config ===== */
 const ENTREGAS_BY_TIPO: Record<TipoUsuario, string[]> = {
@@ -99,10 +98,8 @@ function buildCampos(state: FormStateActa, selectedKeys: string[], nombreEntrega
 /* ===== Hook ===== */
 export function useActaEntrega(ticketId: string) {
   const { account } = useAuth();
-  const { Logs: LogSvc, ActasEntrega: EntregaSvc} = useGraphServices() as ReturnType<typeof useGraphServices> & {
-    Logs: LogRepository;
-    ActasEntrega: ActasdeentregaService;
-  };
+  const { ActasEntrega: EntregaSvc} = useGraphServices()
+  const {logs} = useRepositories()
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const [errors, setErrors] = React.useState<FormActaStateErrors>({});
@@ -228,7 +225,7 @@ export function useActaEntrega(ticketId: string) {
       setError(null);
 
       // Log (opcional)
-      await LogSvc.createLog({
+      await logs?.createLog({
         seguimientos_solvi_actor: account?.name ?? "",
         seguimientos_solvi_correo_actor: account?.username ?? "",
         seguimientos_solvi_tipo_de_accion: "seguimiento",
