@@ -48,8 +48,10 @@ export class SupabaseTicketRepository implements TicketsRepository {
       }
 
       if (filter?.range) {
-        query = query.gt("ticket_solvi_fechaapertura", filter.range.from)
-        query = query.lte("ticket_solvi_fechaapertura", filter.range.to)
+        const nextDay = new Date(filter.range.to);
+        nextDay.setDate(nextDay.getDate() + 1); 
+        query = query.gte("ticket_solvi_fechaapertura", filter.range.from)
+        query = query.lte("ticket_solvi_fechaapertura", nextDay.toISOString())
       }
 
       if(filter?.padreId){
