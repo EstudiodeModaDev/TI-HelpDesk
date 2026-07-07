@@ -75,7 +75,7 @@ function buildCampos(state: FormStateActa, selectedKeys: string[], nombreEntrega
     NombreEntrega: nombreEntrega,
     CorreoEntrega: correoEntrega,
     SedeOrigen: "TI",
-    ID: state.numeroTicket,
+    ID: String(state.numeroTicket),
     Enviar: state.enviarEquipos,
     Portatil: esPortatil(state, selectedKeys),
     Franquicia: sociedadFromEmail(state.correo),
@@ -268,7 +268,7 @@ export function useActaEntrega(ticketId: string) {
       Cedula: state.cedula,
       Correo_x0028_QuienRecibe_x0029_: state.correo,
       Estado: "Enviado",
-      Id_caso: state.numeroTicket,
+      Id_caso: String(state.numeroTicket),
       Tecnico_x0028_Queentrega_x0029_: account?.username ?? "",
       Title: account?.name ?? "",
       Fecha: toGraphDateOnly(new Date()),
@@ -289,8 +289,20 @@ export function useActaEntrega(ticketId: string) {
 
     };
 
-    const resp = await notifyFlow.invoke<typeof body, any>(body);
-    return resp;
+    try{
+      const resp = await notifyFlow.invoke<typeof body, any>(body);
+      console.log(resp) 
+      return resp;
+    } catch (e) {
+      if (e instanceof Response) {
+        const errorBody = await e.json();
+        console.log(errorBody);
+        throw new Error(errorBody.message ?? "Error en la petición");
+      }
+
+      throw e;
+    }
+
   };
 
   
