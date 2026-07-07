@@ -240,22 +240,6 @@ export default function NuevoTicketForm() {
             {/* Fecha de apertura (opcional) */}
             <div className="tf-field tf-col-2 tf-inline">
               <label className="tf-checkbox">
-                <input type="checkbox" checked={state.usarFechaApertura} onChange={(ev) => setField("usarFechaApertura", ev.target.checked)} disabled={submitting} className="tf-checkbox"/>
-                <span>Escoger fecha de apertura</span>           
-              </label>
-            </div>
-
-            {state.usarFechaApertura && (
-              <div className="tf-field">
-                <label className="tf-label" htmlFor="fechaApertura">Fecha de apertura</label>
-                <input id="fechaApertura" type="date" value={state.fechaApertura ?? ""} onChange={(e) => setField("fechaApertura", e.target.value || null)} disabled={submitting} className="tf-input"/>
-                {errors.fechaApertura && <small className="error">{errors.fechaApertura}</small>}
-              </div>
-            )}
-
-            {/* Fecha de apertura (opcional) */}
-            <div className="tf-field tf-col-2 tf-inline">
-              <label className="tf-checkbox">
                 <input type="checkbox" checked={state.cerrar} onChange={(ev) => setField("cerrar", ev.target.checked)} disabled={submitting} className="tf-checkbox"/>
                 <span>Ticket cerrado</span>           
               </label>
