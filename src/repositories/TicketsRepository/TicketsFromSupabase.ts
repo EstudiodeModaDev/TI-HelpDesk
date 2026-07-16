@@ -6,6 +6,7 @@ import type { filterTickets, TicketsLoadResult, TicketsRepository } from "./Tick
 
 export class SupabaseTicketRepository implements TicketsRepository {
   private readonly tableName = "TBL_Ticket_Solvi";
+  private readonly batchSize = 1000;
 
   private normalizeTicketStatuses(ticketStatus?: string[]): string[] {
     return (ticketStatus ?? [])
@@ -33,101 +34,146 @@ export class SupabaseTicketRepository implements TicketsRepository {
     }
   }
 
+  private buildTicketsQuery(filter?: filterTickets, includeCount = false) {
+    let query = supabase
+      .from(this.tableName)
+      .select("*", includeCount ? { count: "exact" } : undefined);
+
+    const statuses = this.normalizeTicketStatuses(filter?.ticketStatus);
+    if (statuses.length) {
+      query = query.in("ticket_solvi_estado", statuses);
+    }
+
+    if (filter?.fuente) {
+      query = query.eq("ticket_solvi_fuente", filter.fuente);
+    }
+
+    if (filter?.range) {
+      const nextDay = new Date(filter.range.to);
+      nextDay.setDate(nextDay.getDate() + 1);
+      query = query.gte("ticket_solvi_fechaapertura", filter.range.from);
+      query = query.lte("ticket_solvi_fechaapertura", nextDay.toISOString());
+    }
+
+    if (filter?.padreId) {
+      query = query.eq("ticket_solvi_id_casopadre", filter.padreId);
+    }
+
+    if (filter?.resolutor && filter.resolutor !== "all") {
+      query = query.eq("ticket_solvi_correo_resolutor", filter.resolutor);
+    }
+
+    const currentUserFilters = filter?.currentUser
+      ? [
+          `ticket_solvi_correo_resolutor.eq.${filter.currentUser}`,
+          `ticket_solvi_correo_solicitante.eq.${filter.currentUser}`,
+          `ticket_solvi_correo_observador.eq.${filter.currentUser}`,
+        ].join(",")
+      : "";
+    const trimmedSearch = String(filter?.search ?? "").trim();
+    let searchFilters = "";
+    if (trimmedSearch) {
+      const searchValue = this.sanitizeSearchValue(trimmedSearch);
+      if (searchValue) {
+        const searchPattern = `%${searchValue}%`;
+        searchFilters = [
+          `ticket_solvi_titulo.ilike.${searchPattern}`,
+          `ticket_solvi_solicitante.ilike.${searchPattern}`,
+          `ticket_solvi_resolutor.ilike.${searchPattern}`,
+        ].join(",");
+      }
+    }
+
+    if (currentUserFilters && searchFilters) {
+      query = query.or(`and(or(${currentUserFilters}),or(${searchFilters}))`);
+    } else if (currentUserFilters) {
+      query = query.or(currentUserFilters);
+    } else if (searchFilters) {
+      query = query.or(searchFilters);
+    }
+
+    const resolvedSortField = this.resolveSortField(filter?.sortField);
+    const ascending = filter?.sortDir === "asc";
+    query = query.order(resolvedSortField, { ascending });
+
+    if (resolvedSortField !== "ticket_solvi_id") {
+      query = query.order("ticket_solvi_id", { ascending: false });
+    }
+
+    return query;
+  }
+
   async loadTickets(filter?: filterTickets): Promise<TicketsLoadResult> {
     try {
-      
-      let query = supabase.from(this.tableName).select("*", {count: "exact"});
-
-      const statuses = this.normalizeTicketStatuses(filter?.ticketStatus);
-      if (statuses.length) {
-        query = query.in("ticket_solvi_estado", statuses);
-      }
-
-      if(filter?.fuente){
-        query = query.eq("ticket_solvi_fuente", filter.fuente)
-      }
-
-      if (filter?.range) {
-        const nextDay = new Date(filter.range.to);
-        nextDay.setDate(nextDay.getDate() + 1); 
-        query = query.gte("ticket_solvi_fechaapertura", filter.range.from)
-        query = query.lte("ticket_solvi_fechaapertura", nextDay.toISOString())
-      }
-
-      if(filter?.padreId){
-        query = query.eq("ticket_solvi_id_casopadre", filter.padreId)
-      }
-
-      if(filter?.resolutor && filter.resolutor !== "all"){
-        query = query.eq("ticket_solvi_correo_resolutor", filter.resolutor)
-      }
-
-      const currentUserFilters = filter?.currentUser
-        ? [
-            `ticket_solvi_correo_resolutor.eq.${filter.currentUser}`,
-            `ticket_solvi_correo_solicitante.eq.${filter.currentUser}`,
-            `ticket_solvi_correo_observador.eq.${filter.currentUser}`,
-          ].join(",")
-        : "";
-      const trimmedSearch = String(filter?.search ?? "").trim();
-      let searchFilters = "";
-      if (trimmedSearch) {
-        const searchValue = this.sanitizeSearchValue(trimmedSearch);
-        if (searchValue) {
-          const searchPattern = `%${searchValue}%`;
-          searchFilters = [
-            `ticket_solvi_titulo.ilike.${searchPattern}`,
-            `ticket_solvi_solicitante.ilike.${searchPattern}`,
-            `ticket_solvi_resolutor.ilike.${searchPattern}`,
-          ].join(",");
-        }
-      }
-
-      if (currentUserFilters && searchFilters) {
-        query = query.or(`and(or(${currentUserFilters}),or(${searchFilters}))`);
-      } else if (currentUserFilters) {
-        query = query.or(currentUserFilters);
-      } else if (searchFilters) {
-        query = query.or(searchFilters);
-      }
-
-      const resolvedSortField = this.resolveSortField(filter?.sortField);
-      const ascending = filter?.sortDir === "asc";
-      query = query.order(resolvedSortField, { ascending });
-
-      if (resolvedSortField !== "ticket_solvi_id") {
-        query = query.order("ticket_solvi_id", { ascending: false });
-      }
-
       const pageSize = Math.max(1, Number(filter?.pageSize ?? 10));
       const pageIndex = Math.max(1, Number(filter?.pageIndex ?? 1));
-      const from = (pageIndex - 1) * pageSize;
-      const to = from + pageSize - 1;
 
       if (filter?.paginated) {
-        query = query.range(from, to);
-      }
+        const from = (pageIndex - 1) * pageSize;
+        const to = from + pageSize - 1;
+        const { data, error, count } = await this.buildTicketsQuery(filter, true).range(from, to);
 
-      console.log(query)
+        if (error) {
+          return {
+            data: [],
+            message: error.message,
+            status: false,
+          };
+        }
 
-      const { data, error, count } = await query;
-
-      if (error) {
         return {
-          data: [],
-          message: error.message,
-          status: false,
+          data: data.map((d) => this.toModel(d)) ?? [],
+          hasNext: from + (data?.length ?? 0) < (count ?? 0),
+          message: null,
+          pageIndex,
+          pageSize,
+          status: true,
+          total: count ?? data?.length ?? 0,
         };
       }
 
+      const allRows: any[] = [];
+      let from = 0;
+      let total = 0;
+
+      while (true) {
+        const to = from + this.batchSize - 1;
+        const { data, error, count } = await this.buildTicketsQuery(filter, from === 0).range(from, to);
+
+        if (error) {
+          return {
+            data: [],
+            message: error.message,
+            status: false,
+          };
+        }
+
+        const rows = data ?? [];
+        if (from === 0) {
+          total = count ?? rows.length;
+        }
+
+        allRows.push(...rows);
+
+        if (!rows.length || rows.length < this.batchSize) {
+          break;
+        }
+
+        if (total > 0 && allRows.length >= total) {
+          break;
+        }
+
+        from += this.batchSize;
+      }
+
       return {
-        data: data.map((d) => {return this.toModel(d)}) ?? [],
-        hasNext: filter?.paginated ? from + (data?.length ?? 0) < (count ?? 0) : false,
+        data: allRows.map((d) => this.toModel(d)),
+        hasNext: false,
         message: null,
         pageIndex,
         pageSize,
         status: true,
-        total: count ?? data?.length ?? 0,
+        total: total || allRows.length,
       };
     } catch (error: any) {
       return {
@@ -253,7 +299,8 @@ export class SupabaseTicketRepository implements TicketsRepository {
     }
   }
 
-  async countTickets(resolutorMail: string, status: "En atención" | "Fuera de tiempo"): Promise<number> {
+  async countTickets(resolutorMail: string, status: "En Atención" | "Fuera de tiempo"): Promise<number> {
+    console.log(resolutorMail)
     let query = supabase
       .from(this.tableName)
       .select("*", { count: "exact", head: true })

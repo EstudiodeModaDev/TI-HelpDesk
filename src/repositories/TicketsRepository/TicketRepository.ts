@@ -33,5 +33,5 @@ export interface TicketsRepository {
   createTicket(payload: Ticket): Promise<{data: Ticket | null, status: boolean, message: string | null}>;
   updateTicket(id: string, payload: any): Promise<{data: Ticket | null, status: boolean, message: string | null}>;
   getTicketById(id: string): Promise<{data: Ticket | null, status: boolean, message: null | string}>
-  countTickets(resolutorMail: string, status: "En atención" | "Fuera de tiempo"): Promise<number>;
+  countTickets(resolutorMail: string, status: "En Atención" | "Fuera de tiempo"): Promise<number>;
 }

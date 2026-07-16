@@ -165,7 +165,7 @@ export function useTicketsLists({ graph, TicketsSvc, userMail, role }: UseTicket
       });
 
     const [inProgressCount, outOfTimeCount] = await Promise.all([
-      TicketsSvc.countTickets(userMail, "En atención"),
+      TicketsSvc.countTickets(userMail, "En Atención"),
       TicketsSvc.countTickets(userMail, "Fuera de tiempo"),
     ]);
 
