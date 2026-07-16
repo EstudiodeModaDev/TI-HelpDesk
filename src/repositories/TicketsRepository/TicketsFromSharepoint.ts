@@ -23,7 +23,7 @@ export class TicketsService implements TicketsRepository {
     this.sitePath = sitePath.startsWith('/') ? sitePath : `/${sitePath}`;
     this.listName = listName;
   }
-  countTickets(resolutorMail: string, status: "En atención" | "Fuera de tiempo"): Promise<number> {
+  countTickets(resolutorMail: string, status: "En Atención" | "Fuera de tiempo"): Promise<number> {
     console.log(resolutorMail, " ", status)
     throw new Error("Method not implemented.");
   }
