@@ -20,6 +20,8 @@ export class LogFromSupabase implements LogRepository {
         query = query.eq("seguimientos_solvi_descripcion", filter.seguimientos_solvi_id_ticket);
       }
 
+      query = query.order("seguimientos_solvi_action_date", { ascending: true });
+
       const { data, error, } = await query;
 
       if (error) {

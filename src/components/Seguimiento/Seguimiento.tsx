@@ -4,7 +4,6 @@ import HtmlContent from "../Renderizador/Renderizador";
 import type { Log } from "../../Models/Log";
 import type { Ticket } from "../../Models/Tickets";
 import Documentar from "../Documentar/Documentar";
-import { toISODateFlex } from "../../utils/Date";
 import { useRepositories } from "../../repositories/repositoriesContext";
 import { supabase } from "../../Services/Supabase.service";
 
@@ -207,7 +206,7 @@ function mapItemsToMensajes(items: any[]): Log[] {
   return (Array.isArray(items) ? items : []).map((it: any) => ({
     Id: String(it.Id),
     Actor: it.Actor ?? "Sistema",
-    Created: toISODateFlex(it.Created),
+    Created: it.Created ?? null,
     Id_caso: it.Id_caso ?? undefined,
     Descripcion: it.Descripcion ?? "",
     Tipo_de_accion: it.Tipo_de_accion,
@@ -218,10 +217,31 @@ function mapItemsToMensajes(items: any[]): Log[] {
 function formatDateTime(iso: string) {
   const d = new Date(iso);
   if (isNaN(d.getTime())) return iso;
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(
-    d.getMinutes()
-  )}`;
+
+  // Registros históricos migrados sin hora real quedaron en medianoche UTC exacta.
+  // Mostrarlos con hora inventaría precisión que nunca existió: solo se muestra la fecha.
+  const isMidnightUtc =
+    d.getUTCHours() === 0 && d.getUTCMinutes() === 0 && d.getUTCSeconds() === 0 && d.getUTCMilliseconds() === 0;
+
+  const parts = new Intl.DateTimeFormat("es-CO", {
+    timeZone: "America/Bogota",
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).formatToParts(d);
+  const get = (type: string) => parts.find((p) => p.type === type)?.value ?? "";
+
+  if (isMidnightUtc) {
+    // Usar la fecha calendario tal cual fue guardada (UTC), sin desplazarla a Bogotá.
+    const dd = String(d.getUTCDate()).padStart(2, "0");
+    const mm = String(d.getUTCMonth() + 1).padStart(2, "0");
+    return `${dd}/${mm}/${d.getUTCFullYear()}`;
+  }
+
+  return `${get("day")}/${get("month")}/${get("year")} ${get("hour")}:${get("minute")}`;
 }
 
 function tipoToClass(tipo?: string) {

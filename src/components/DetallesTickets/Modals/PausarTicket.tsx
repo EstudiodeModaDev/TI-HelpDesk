@@ -71,7 +71,7 @@ export default function PausarTicket({ ticket, onCancel, onDone }: PausarTicketP
         return;
       }
 
-      await logs?.createLog({
+      const logCreated = await logs?.createLog({
         seguimientos_solvi_actor: account?.name ?? "",
         seguimientos_solvi_correo_actor: account?.username ?? "",
         seguimientos_solvi_descripcion: motivo,
@@ -79,6 +79,13 @@ export default function PausarTicket({ ticket, onCancel, onDone }: PausarTicketP
         seguimientos_solvi_id_ticket: Number(ticket.ID ?? ""),
         seguimientos_solvi_action_date: new Date(),
       });
+
+      if (!logCreated) {
+        toast.error("No se pudo crear el registro de auditoría.");
+        return;
+      }
+
+      console.log("Log de auditoría creado:", logCreated);
 
       toast.success("Ticket pausado.");
       onDone();
