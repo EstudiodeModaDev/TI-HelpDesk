@@ -1,9 +1,16 @@
-import type { ActivoTI } from "../../Models/ActivoTI";
+import type {
+  ActivoTI,
+  CategoriaActivo,
+  EstadoActivo,
+  Ubicacion_Tipo,
+  CrearActivoDTO,
+  ActualizarActivoDTO,
+} from "../../Models/ActivoTI";
 
 export type FilterActivosTI = {
-  categoria?: string;
-  estado?: string;
-  ubicacion_tipo?: string;
+  categoria?: CategoriaActivo;
+  estado?: EstadoActivo;
+  ubicacion_tipo?: Ubicacion_Tipo;
   search?: string;
   usuario_asignado_id?: string;
   pageSize?: number;
@@ -21,14 +28,14 @@ export type ActivosTILoadResult = {
 };
 export interface ActivosTIRepository {
   loadActivos(filter?: FilterActivosTI): Promise<ActivosTILoadResult>;
-  createActivo(payload: Partial<ActivoTI>): Promise<{
+  createActivo(payload: CrearActivoDTO): Promise<{
     data: ActivoTI | null;
     status: boolean;
     message: string | null;
   }>;
   updateActivo(
     id: string,
-    payload: any,
+    payload: ActualizarActivoDTO,
   ): Promise<{
     data: ActivoTI | null;
     status: boolean;

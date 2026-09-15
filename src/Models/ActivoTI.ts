@@ -1,7 +1,7 @@
 export type CategoriaActivo =
-  | "Equipo_computo"
+  | "equipo_computo"
   | "periferico"
-  | "red infraestructura";
+  | "red_infraestructura";
 
 export type EstadoActivo =
   | "disponible"
@@ -32,7 +32,7 @@ export interface ActivoTI {
   created_at: string;
   updated_at: string;
   created_by: string;
-  updated_by: string;
+  updated_by?: string;
 }
 
 export type CrearActivoDTO = Omit<

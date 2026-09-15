@@ -1,4 +1,8 @@
-import type { ActivoTI } from "../../Models/ActivoTI";
+import type {
+  ActivoTI,
+  ActualizarActivoDTO,
+  CrearActivoDTO,
+} from "../../Models/ActivoTI";
 import { supabase } from "../../Services/Supabase.service";
 import type {
   FilterActivosTI,
@@ -22,7 +26,7 @@ export class SupabaseActivosTIRepository implements ActivosTIRepository {
       query = query.eq("categoria", filter.categoria);
     }
     if (filter?.estado) {
-      query = query.eq("estado", filter.categoria);
+      query = query.eq("estado", filter.estado);
     }
     if (filter?.ubicacion_tipo) {
       query = query.eq("ubicacion_tipo", filter.ubicacion_tipo);
@@ -31,7 +35,7 @@ export class SupabaseActivosTIRepository implements ActivosTIRepository {
       query = query.eq("usuario_asignado_id", filter.usuario_asignado_id);
     }
     const trimmedSearch = String(filter?.search ?? "").trim();
-    let searchFilters = " ";
+    let searchFilters = "";
     if (trimmedSearch) {
       const searchValue = this.sanitizeSearchValue(trimmedSearch);
       if (searchValue) {
@@ -49,7 +53,7 @@ export class SupabaseActivosTIRepository implements ActivosTIRepository {
     if (searchFilters) {
       query = query.or(searchFilters);
     }
-    query = query.order("create_at", { ascending: false });
+    query = query.order("created_at", { ascending: false });
 
     return query;
   }
@@ -131,11 +135,11 @@ export class SupabaseActivosTIRepository implements ActivosTIRepository {
       return {
         data: [],
         status: false,
-        message: error?.message ?? "Error cargando los tickets registrados",
+        message: error?.message ?? "Error cargando los activos registrados",
       };
     }
   }
-  async createActivo(payload: Partial<ActivoTI>): Promise<{
+  async createActivo(payload: CrearActivoDTO): Promise<{
     data: ActivoTI | null;
     status: boolean;
     message: string | null;
@@ -188,7 +192,7 @@ export class SupabaseActivosTIRepository implements ActivosTIRepository {
   }
   async updateActivo(
     id: string,
-    payload: any,
+    payload: ActualizarActivoDTO,
   ): Promise<{
     data: ActivoTI | null;
     status: boolean;
