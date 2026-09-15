@@ -13,16 +13,18 @@ import type { ANSRepository } from "./AnsRepository/AnsRepository";
 import { SharepointANS } from "./AnsRepository/SharepointANS";
 import type { MessagesRepository } from "./ParticipantsRepository/MessagesRepository";
 import { SupabaseMessageRepository } from "./ParticipantsRepository/SupabaseMessageRepository";
-
+import type { ActivosTIRepository } from "./ActivosTIRepository/ActivosTIRepository";
+import { SupabaseActivosTIRepository } from "./ActivosTIRepository/ActivosTIFromSupabase";
 type RepositorySource = "supabase" | "sharepoint";
 
 export type AppRepositories = {
   tickets: TicketsRepository | null;
   usuarios: UsuariosSPRepository | null;
-  attachments: AttachmentRepository | null
-  logs: LogRepository | null
-  ans: ANSRepository
-  messages: MessagesRepository
+  attachments: AttachmentRepository | null;
+  logs: LogRepository | null;
+  ans: ANSRepository;
+  messages: MessagesRepository;
+  activosTI: ActivosTIRepository | null;
 };
 
 type RepositoriesProviderProps = {
@@ -30,8 +32,8 @@ type RepositoriesProviderProps = {
   sources?: Partial<{
     tickets: RepositorySource;
     usuarios: RepositorySource;
-    attachments: RepositorySource
-    logs: RepositorySource
+    attachments: RepositorySource;
+    logs: RepositorySource;
   }>;
 };
 
@@ -46,18 +48,24 @@ export const RepositoriesProvider: React.FC<RepositoriesProviderProps> = ({
   const graph = React.useMemo(() => new GraphRest(getToken), [getToken]);
 
   const repositories = React.useMemo<AppRepositories>(() => {
-    const attachmentsSource = sources?.attachments ?? "supabase"
+    const attachmentsSource = sources?.attachments ?? "supabase";
     const ticketsSource = sources?.tickets ?? "supabase";
     const usuariosSource = sources?.usuarios ?? "sharepoint";
-    const logsSource = sources?.logs ?? "supabase"
+    const logsSource = sources?.logs ?? "supabase";
 
     return {
-      tickets: ticketsSource === "supabase" ? new SupabaseTicketRepository() : null,
-      usuarios: usuariosSource === "sharepoint" ? new UsuariosSPFromSharepoint(graph) : null,
-      attachments: attachmentsSource === "supabase" ? new AttachmentFromSupabase() : null,
+      tickets:
+        ticketsSource === "supabase" ? new SupabaseTicketRepository() : null,
+      usuarios:
+        usuariosSource === "sharepoint"
+          ? new UsuariosSPFromSharepoint(graph)
+          : null,
+      attachments:
+        attachmentsSource === "supabase" ? new AttachmentFromSupabase() : null,
       logs: logsSource === "supabase" ? new LogFromSupabase() : null,
       ans: new SharepointANS(graph),
-      messages: new SupabaseMessageRepository()
+      messages: new SupabaseMessageRepository(),
+      activosTI: new SupabaseActivosTIRepository(),
     };
   }, [graph, sources?.tickets, sources?.usuarios]);
 
@@ -72,7 +80,9 @@ export function useRepositories(): AppRepositories {
   const ctx = React.useContext(RepositoriesContext);
 
   if (!ctx) {
-    throw new Error("useRepositories must be used within <RepositoriesProvider>");
+    throw new Error(
+      "useRepositories must be used within <RepositoriesProvider>",
+    );
   }
 
   return ctx;
