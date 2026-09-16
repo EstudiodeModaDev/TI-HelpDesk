@@ -65,11 +65,14 @@ export const validarActivoTI = (
   const errors: ActivoTIErrors = {};
 
   if (!data.codigo_inventario?.trim()) {
-    errors.codigo_inventario = "El código de invetario es obligatorio";
+    errors.codigo_inventario = "El código de inventario es obligatorio";
   }
 
   if (!data.numero_serie?.trim()) {
-    errors.numero_serie = "El numero de serie es obligatorio";
+    errors.numero_serie = "El número de serie es obligatorio";
+  }
+  if (!data.ubicacion_tipo?.trim()) {
+    errors.ubicacion_tipo = "Debe seleccionar una ubicación";
   }
   if (!data.categoria) {
     errors.categoria = "Debe seleccionar una categoria valida";
