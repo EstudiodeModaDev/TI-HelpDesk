@@ -1,238 +1,260 @@
-import React, { useState } from "react";
+import React from "react";
 import "./ModalAltaActivos.css";
-
-export interface ActivoTI {
-  id?: string;
-  codigo_inventario: string;
-  numero_serie: string;
-  categoria: string;
-  tipo: string;
-  marca: string;
-  modelo: string;
-  estado: string;
-  tienda_id?: string | number;
-  usuario_asignado_nombre?: string;
-  usuario_asignado_correo?: string;
-}
+import type {
+  ActivoTI,
+  CategoriaActivo,
+  EstadoActivo,
+  Ubicacion_Tipo,
+} from "../../Models/ActivoTI";
+import {
+  CATEGORIAS_ACTIVO,
+  ESTADOS_ACTIVO,
+  UBICACIONES_ACTIVO,
+} from "../../Models/ActivoTI";
+import { useRepositories } from "../../repositories/repositoriesContext";
+import { useActivosTI } from "../../Funcionalidades/inventario/useActivosTI";
 
 interface ModalAltaActivosProps {
-  onSave?: (activo: ActivoTI) => void;
-  onCancel?: () => void;
-  isOpen?: boolean;
-  onClose?: () => void;
   activoToEdit?: ActivoTI | null;
+  onSaved?: () => void;
+  onClose?: () => void;
 }
 
 export const ModalAltaActivos: React.FC<ModalAltaActivosProps> = ({
-  onSave,
-  onCancel,
-  onClose,
   activoToEdit,
+  onSaved,
+  onClose,
 }) => {
-  const initialFormState: ActivoTI = {
-    codigo_inventario: "",
-    numero_serie: "",
-    categoria: "Cómputo",
-    tipo: "Portátil",
-    marca: "",
-    modelo: "",
-    estado: "disponible",
-    tienda_id: "",
-    usuario_asignado_nombre: "",
-    usuario_asignado_correo: "",
-  };
+  const { activosTI } = useRepositories();
+  const { form, formErrors, setField, saveActivo, selectActivo, resetForm } =
+    useActivosTI({ ActivosSvc: activosTI! });
 
-  const [formData, setFormData] = useState<ActivoTI>(
-    activoToEdit || initialFormState,
-  );
+  React.useEffect(() => {
+    if (activoToEdit) selectActivo(activoToEdit);
+    else resetForm();
+  }, [activoToEdit]);
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (onSave) onSave(formData);
-  };
-
-  const handleClose = () => {
-    if (onCancel) onCancel();
-    if (onClose) onClose();
+    const ok = await saveActivo();
+    if (ok) {
+      onSaved?.();
+      onClose?.();
+    }
   };
 
   return (
-    <div className="activo-form-page">
-      <div className="activo-form-header">
-        <h2>{activoToEdit ? "Editar Activo TI" : "Nuevo Activo TI"}</h2>
-        <p>Ingresa la información detallada del activo en el sistema</p>
+    <div className="modal-overlay">
+      <div className="activo-form-page">
+        <div className="activo-form-header">
+          <h2>{activoToEdit ? "Editar Activo TI" : "Nuevo Activo TI"}</h2>
+          <p>Ingresa la información detallada del activo en el sistema</p>
+        </div>
+
+        <form onSubmit={handleSubmit} className="activo-form-container">
+          <div className="form-section">
+            <div className="section-title">
+              <h3>Información General</h3>
+              <span>Datos principales de identificación y clasificación</span>
+            </div>
+
+            <div className="form-grid">
+              <div className="form-group">
+                <label htmlFor="codigo_inventario">
+                  Código Inventario <span>*</span>
+                </label>
+                <input
+                  id="codigo_inventario"
+                  type="text"
+                  required
+                  value={form.codigo_inventario ?? ""}
+                  onChange={(e) =>
+                    setField("codigo_inventario", e.target.value)
+                  }
+                />
+                {formErrors.codigo_inventario && (
+                  <small style={{ color: "#dc2626" }}>
+                    {formErrors.codigo_inventario}
+                  </small>
+                )}
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="numero_serie">
+                  Número de Serie <span>*</span>
+                </label>
+                <input
+                  id="numero_serie"
+                  type="text"
+                  required
+                  value={form.numero_serie ?? ""}
+                  onChange={(e) => setField("numero_serie", e.target.value)}
+                />
+                {formErrors.numero_serie && (
+                  <small style={{ color: "#dc2626" }}>
+                    {formErrors.numero_serie}
+                  </small>
+                )}
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="categoria">
+                  Categoría <span>*</span>
+                </label>
+                <select
+                  id="categoria"
+                  value={form.categoria ?? ""}
+                  onChange={(e) =>
+                    setField("categoria", e.target.value as CategoriaActivo)
+                  }
+                >
+                  <option value="">Selecciona...</option>
+                  {Object.entries(CATEGORIAS_ACTIVO).map(([value, label]) => (
+                    <option key={value} value={value}>
+                      {label}
+                    </option>
+                  ))}
+                </select>
+                {formErrors.categoria && (
+                  <small style={{ color: "#dc2626" }}>
+                    {formErrors.categoria}
+                  </small>
+                )}
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="tipo">
+                  Tipo <span>*</span>
+                </label>
+                <input
+                  id="tipo"
+                  type="text"
+                  required
+                  placeholder="Ej: Portátil, Monitor"
+                  value={form.tipo ?? ""}
+                  onChange={(e) => setField("tipo", e.target.value)}
+                />
+                {formErrors.tipo && (
+                  <small style={{ color: "#dc2626" }}>{formErrors.tipo}</small>
+                )}
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="marca">Marca</label>
+                <input
+                  id="marca"
+                  type="text"
+                  value={form.marca ?? ""}
+                  onChange={(e) => setField("marca", e.target.value)}
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="modelo">Modelo</label>
+                <input
+                  id="modelo"
+                  type="text"
+                  value={form.modelo ?? ""}
+                  onChange={(e) => setField("modelo", e.target.value)}
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="fecha_ingreso">
+                  Fecha de ingreso <span>*</span>
+                </label>
+                <input
+                  id="fecha_ingreso"
+                  type="date"
+                  value={form.fecha_ingreso?.slice(0, 10) ?? ""}
+                  onChange={(e) => setField("fecha_ingreso", e.target.value)}
+                />
+                {formErrors.fecha_ingreso && (
+                  <small style={{ color: "#dc2626" }}>
+                    {formErrors.fecha_ingreso}
+                  </small>
+                )}
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="estado">
+                  Estado <span>*</span>
+                </label>
+                <select
+                  id="estado"
+                  value={form.estado ?? ""}
+                  onChange={(e) =>
+                    setField("estado", e.target.value as EstadoActivo)
+                  }
+                >
+                  <option value="">Selecciona...</option>
+                  {Object.entries(ESTADOS_ACTIVO).map(([value, label]) => (
+                    <option key={value} value={value}>
+                      {label}
+                    </option>
+                  ))}
+                </select>
+                {formErrors.estado && (
+                  <small style={{ color: "#dc2626" }}>
+                    {formErrors.estado}
+                  </small>
+                )}
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="ubicacion_tipo">
+                  Ubicación <span>*</span>
+                </label>
+                <select
+                  id="ubicacion_tipo"
+                  value={form.ubicacion_tipo ?? ""}
+                  onChange={(e) =>
+                    setField("ubicacion_tipo", e.target.value as Ubicacion_Tipo)
+                  }
+                >
+                  <option value="">Selecciona...</option>
+                  {Object.entries(UBICACIONES_ACTIVO).map(([value, label]) => (
+                    <option key={value} value={value}>
+                      {label}
+                    </option>
+                  ))}
+                </select>
+                {formErrors.ubicacion_tipo && (
+                  <small style={{ color: "#dc2626" }}>
+                    {formErrors.ubicacion_tipo}
+                  </small>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className="form-section">
+            <div className="section-title">
+              <h3>Asignación y notas</h3>
+              <span>Responsable y observaciones adicionales</span>
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="notas">Notas</label>
+              <input
+                id="notas"
+                type="text"
+                value={form.notas ?? ""}
+                onChange={(e) => setField("notas", e.target.value)}
+              />
+            </div>
+          </div>
+
+          <div className="activo-form-footer">
+            <button type="button" onClick={onClose} className="btn-cancelar">
+              Cancelar
+            </button>
+            <button type="submit" className="btn-guardar">
+              {activoToEdit ? "Guardar Cambios" : "Crear Activo"}
+            </button>
+          </div>
+        </form>
       </div>
-
-      <form onSubmit={handleSubmit} className="activo-form-container">
-        <div className="form-section">
-          <div className="section-title">
-            <h3>Información General</h3>
-            <span>Datos principales de identificación y clasificación</span>
-          </div>
-
-          <div className="form-grid">
-            <div className="form-group">
-              <label htmlFor="codigo_inventario">
-                Código Inventario <span>*</span>
-              </label>
-              <input
-                id="codigo_inventario"
-                type="text"
-                name="codigo_inventario"
-                required
-                value={formData.codigo_inventario}
-                onChange={handleChange}
-              />
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="numero_serie">
-                Número de Serie <span>*</span>
-              </label>
-              <input
-                id="numero_serie"
-                type="text"
-                name="numero_serie"
-                required
-                value={formData.numero_serie}
-                onChange={handleChange}
-              />
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="categoria">
-                Categoría <span>*</span>
-              </label>
-              <select
-                id="categoria"
-                name="categoria"
-                value={formData.categoria}
-                onChange={handleChange}
-              >
-                <option value="Cómputo">Cómputo</option>
-                <option value="Redes">Redes</option>
-                <option value="Periféricos">Periféricos</option>
-                <option value="Impresoras">Impresoras</option>
-              </select>
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="tipo">
-                Tipo <span>*</span>
-              </label>
-              <input
-                id="tipo"
-                type="text"
-                name="tipo"
-                required
-                placeholder="Ej: Portátil, Monitor"
-                value={formData.tipo}
-                onChange={handleChange}
-              />
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="marca">Marca</label>
-              <input
-                id="marca"
-                type="text"
-                name="marca"
-                value={formData.marca}
-                onChange={handleChange}
-              />
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="modelo">Modelo</label>
-              <input
-                id="modelo"
-                type="text"
-                name="modelo"
-                value={formData.modelo}
-                onChange={handleChange}
-              />
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="estado">
-                Estado <span>*</span>
-              </label>
-              <select
-                id="estado"
-                name="estado"
-                value={formData.estado}
-                onChange={handleChange}
-              >
-                <option value="disponible">Disponible</option>
-                <option value="asignado">Asignado</option>
-                <option value="en_mantenimiento">En Mantenimiento</option>
-                <option value="de_baja">De Baja</option>
-              </select>
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="tienda_id">Tienda / Ubicación</label>
-              <select
-                id="tienda_id"
-                name="tienda_id"
-                value={formData.tienda_id || ""}
-                onChange={handleChange}
-              >
-                <option value="">Selecciona una ubicación...</option>
-                <option value="Sede Principal">Tienda</option>
-                <option value="Bodega Central">Bodega Central</option>
-              </select>
-            </div>
-          </div>
-        </div>
-
-        <div className="form-section">
-          <div className="section-title">
-            <h3>Asignación de Usuario</h3>
-            <span>Información del responsable asignado</span>
-          </div>
-
-          <div className="form-grid">
-            <div className="form-group">
-              <label htmlFor="usuario_asignado_nombre">Nombre Usuario</label>
-              <input
-                id="usuario_asignado_nombre"
-                type="text"
-                name="usuario_asignado_nombre"
-                value={formData.usuario_asignado_nombre || ""}
-                onChange={handleChange}
-              />
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="usuario_asignado_correo">Correo Usuario</label>
-              <input
-                id="usuario_asignado_correo"
-                type="email"
-                name="usuario_asignado_correo"
-                value={formData.usuario_asignado_correo || ""}
-                onChange={handleChange}
-              />
-            </div>
-          </div>
-        </div>
-
-        <div className="activo-form-footer">
-          <button type="button" onClick={handleClose} className="btn-cancelar">
-            Cancelar
-          </button>
-          <button type="submit" className="btn-guardar">
-            {activoToEdit ? "Guardar Cambios" : "Crear Activo"}
-          </button>
-        </div>
-      </form>
     </div>
   );
 };

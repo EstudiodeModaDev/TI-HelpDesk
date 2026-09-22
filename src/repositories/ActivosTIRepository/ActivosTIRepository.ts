@@ -12,7 +12,6 @@ export type FilterActivosTI = {
   estado?: EstadoActivo;
   ubicacion_tipo?: Ubicacion_Tipo;
   search?: string;
-  usuario_asignado_id?: string;
   pageSize?: number;
   pageIndex?: number;
   paginated?: boolean;

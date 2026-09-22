@@ -2,12 +2,28 @@ import * as React from "react";
 import type {
   ActivoTI,
   ActualizarActivoDTO,
+  CategoriaActivo,
   CrearActivoDTO,
+  EstadoActivo,
+  Ubicacion_Tipo,
   ActivoTIErrors,
 } from "../../Models/ActivoTI";
 import { validarActivoTI } from "../../Models/ActivoTI";
 import type { ActivosTIRepository } from "../../repositories/ActivosTIRepository/ActivosTIRepository";
 import type { FilterActivosTI } from "../../repositories/ActivosTIRepository/ActivosTIRepository";
+
+const DEFAULT_PAGE_SIZE = 10;
+
+function useDebouncedValue<T>(value: T, delay = 300) {
+  const [debouncedValue, setDebouncedValue] = React.useState(value);
+
+  React.useEffect(() => {
+    const timeout = setTimeout(() => setDebouncedValue(value), delay);
+    return () => clearTimeout(timeout);
+  }, [value, delay]);
+
+  return debouncedValue;
+}
 
 type UseActivosTIParams = {
   ActivosSvc: ActivosTIRepository;
@@ -21,6 +37,21 @@ export function useActivosTI({ ActivosSvc }: UseActivosTIParams) {
   const [selectedActivo, setSelectedActivo] = React.useState<ActivoTI | null>(
     null,
   );
+
+  const [search, setSearch] = React.useState("");
+  const [categoriaFiltro, setCategoriaFiltro] = React.useState<
+    CategoriaActivo | ""
+  >("");
+  const [estadoFiltro, setEstadoFiltro] = React.useState<EstadoActivo | "">("");
+  const [ubicacionFiltro, setUbicacionFiltro] = React.useState<
+    Ubicacion_Tipo | ""
+  >("");
+  const [pageIndex, setPageIndex] = React.useState(1);
+  const [pageSize, setPageSize] = React.useState(DEFAULT_PAGE_SIZE);
+  const [total, setTotal] = React.useState(0);
+  const [hasNext, setHasNext] = React.useState(false);
+
+  const debouncedSearch = useDebouncedValue(search);
 
   const setField = React.useCallback(
     <K extends keyof CrearActivoDTO>(key: K, value: CrearActivoDTO[K]) => {
@@ -58,9 +89,14 @@ export function useActivosTI({ ActivosSvc }: UseActivosTIParams) {
           return false;
         }
         setActivos(result.data ?? []);
+        setTotal(result.total ?? result.data?.length ?? 0);
+        setHasNext(result.hasNext ?? false);
         return true;
       } catch (loadError: any) {
         setError(loadError?.message ?? "Error cargando los activos");
+        setActivos([]);
+        setTotal(0);
+        setHasNext(false);
         return false;
       } finally {
         setLoading(false);
@@ -68,6 +104,27 @@ export function useActivosTI({ ActivosSvc }: UseActivosTIParams) {
     },
     [ActivosSvc],
   );
+
+  const buildFilter = React.useCallback(
+    (): FilterActivosTI => ({
+      categoria: categoriaFiltro || undefined,
+      estado: estadoFiltro || undefined,
+      ubicacion_tipo: ubicacionFiltro || undefined,
+      search: debouncedSearch.trim() || undefined,
+      pageIndex,
+      pageSize,
+      paginated: true,
+    }),
+    [
+      categoriaFiltro,
+      estadoFiltro,
+      ubicacionFiltro,
+      debouncedSearch,
+      pageIndex,
+      pageSize,
+    ],
+  );
+
   const saveActivo = React.useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -86,7 +143,7 @@ export function useActivosTI({ ActivosSvc }: UseActivosTIParams) {
         setError(result.message ?? "Error guardando el activo");
         return false;
       }
-      await loadActivos();
+      await loadActivos(buildFilter());
       resetForm();
       return true;
     } catch (saveError: any) {
@@ -95,7 +152,54 @@ export function useActivosTI({ ActivosSvc }: UseActivosTIParams) {
     } finally {
       setLoading(false);
     }
-  }, [ActivosSvc, form, selectedActivo, validateForm, loadActivos, resetForm]);
+  }, [
+    ActivosSvc,
+    form,
+    selectedActivo,
+    validateForm,
+    loadActivos,
+    buildFilter,
+    resetForm,
+  ]);
+
+  const loadAll = React.useCallback(
+    () => loadActivos(buildFilter()),
+    [loadActivos, buildFilter],
+  );
+
+  const criteriaKey = React.useMemo(
+    () =>
+      JSON.stringify({
+        categoriaFiltro,
+        estadoFiltro,
+        ubicacionFiltro,
+        pageSize,
+        search: debouncedSearch.trim(),
+      }),
+    [categoriaFiltro, estadoFiltro, ubicacionFiltro, pageSize, debouncedSearch],
+  );
+  const previousCriteriaRef = React.useRef(criteriaKey);
+
+  React.useEffect(() => {
+    const criteriaChanged = previousCriteriaRef.current !== criteriaKey;
+    previousCriteriaRef.current = criteriaKey;
+
+    if (criteriaChanged && pageIndex !== 1) {
+      setPageIndex(1);
+      return;
+    }
+
+    loadAll();
+  }, [criteriaKey, pageIndex, loadAll]);
+
+  const nextPage = React.useCallback(() => {
+    if (!hasNext) return;
+    setPageIndex((currentPage) => currentPage + 1);
+  }, [hasNext]);
+
+  const prevPage = React.useCallback(() => {
+    setPageIndex((currentPage) => Math.max(1, currentPage - 1));
+  }, []);
   const selectActivo = React.useCallback((activo: ActivoTI) => {
     setSelectedActivo(activo);
     setForm({
@@ -110,9 +214,8 @@ export function useActivosTI({ ActivosSvc }: UseActivosTIParams) {
       proveedor: activo.proveedor,
       estado: activo.estado,
       ubicacion_tipo: activo.ubicacion_tipo,
-      tienda_id: activo.tienda_id,
-      usuario_asignado_id: activo.usuario_asignado_id,
-      fecha_fin_garantia: activo.fecha_fin_garantia,
+      nombre_usuario: activo.nombre_usuario,
+      correo_usuario: activo.correo_usuario,
       notas: activo.notas,
     });
     setFormErrors({});
@@ -133,5 +236,22 @@ export function useActivosTI({ ActivosSvc }: UseActivosTIParams) {
     loadActivos,
     saveActivo,
     selectActivo,
+
+    search,
+    setSearch,
+    categoriaFiltro,
+    setCategoriaFiltro,
+    estadoFiltro,
+    setEstadoFiltro,
+    ubicacionFiltro,
+    setUbicacionFiltro,
+    pageIndex,
+    pageSize,
+    setPageSize,
+    total,
+    hasNext,
+    nextPage,
+    prevPage,
+    loadAll,
   };
 }

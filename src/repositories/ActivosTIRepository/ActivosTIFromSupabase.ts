@@ -11,7 +11,7 @@ import type {
 } from "./ActivosTIRepository";
 
 export class SupabaseActivosTIRepository implements ActivosTIRepository {
-  private readonly tableName = "activos_ti";
+  private readonly tableName = "TBL_Solvi_activos_ti";
   private readonly batchSize = 100;
 
   private sanitizeSearchValue(value: string): string {
@@ -31,9 +31,6 @@ export class SupabaseActivosTIRepository implements ActivosTIRepository {
     if (filter?.ubicacion_tipo) {
       query = query.eq("ubicacion_tipo", filter.ubicacion_tipo);
     }
-    if (filter?.usuario_asignado_id) {
-      query = query.eq("usuario_asignado_id", filter.usuario_asignado_id);
-    }
     const trimmedSearch = String(filter?.search ?? "").trim();
     let searchFilters = "";
     if (trimmedSearch) {
@@ -46,6 +43,8 @@ export class SupabaseActivosTIRepository implements ActivosTIRepository {
           `tipo.ilike.${searchPattern}`,
           `marca.ilike.${searchPattern}`,
           `modelo.ilike.${searchPattern}`,
+          `nombre_usuario.ilike.${searchPattern}`,
+          `correo_usuario.ilike.${searchPattern}`,
         ].join(",");
       }
     }
@@ -157,9 +156,8 @@ export class SupabaseActivosTIRepository implements ActivosTIRepository {
         proveedor: payload.proveedor ?? null,
         estado: payload.estado ?? "disponible",
         ubicacion_tipo: payload.ubicacion_tipo ?? "bodega_central",
-        tienda_id: payload.tienda_id ?? null,
-        usuario_asignado_id: payload.usuario_asignado_id ?? null,
-        fecha_fin_garantia: payload.fecha_fin_garantia ?? null,
+        nombre_usuario: payload.nombre_usuario ?? null,
+        correo_usuario: payload.correo_usuario ?? null,
         notas: payload.notas ?? null,
       };
 
@@ -276,9 +274,8 @@ export class SupabaseActivosTIRepository implements ActivosTIRepository {
       proveedor: bdModel.proveedor,
       estado: bdModel.estado,
       ubicacion_tipo: bdModel.ubicacion_tipo,
-      tienda_id: bdModel.tienda_id,
-      usuario_asignado_id: bdModel.usuario_asignado_id,
-      fecha_fin_garantia: bdModel.fecha_fin_garantia,
+      nombre_usuario: bdModel.nombre_usuario,
+      correo_usuario: bdModel.correo_usuario,
       notas: bdModel.notas,
       prestamo_activo_id: bdModel.prestamo_activo_id,
       created_at: bdModel.created_at,

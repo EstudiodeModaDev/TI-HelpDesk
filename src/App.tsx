@@ -10,7 +10,8 @@ import CrearPlantilla from "./components/NuevaPlantilla/NuevaPlantilla";
 import UsuariosPanel from "./components/Usuarios/Usuarios";
 import AnsAdmin from "./components/Admin/AnsAdmin/AnsAdmin";
 import CajerosPOSForm from "./components/CajerosPOS/CajerosPOS";
-import { ModalAltaActivos } from "./components/Inventario/ModalAltaActivo";
+
+import CatalogosActivos from "./components/Inventario/CatalogosActivos";
 import type { User } from "./Models/User";
 import { useAuth } from "./auth/authContext";
 import { useUserRole } from "./Funcionalidades/auth/Usuarios";
@@ -127,17 +128,19 @@ const NAV: MenuItem[] = [
     autocollapse: true,
   },
   {
-    id: "altaActivos",
-    label: "Nuevo Activo",
-    icon: <img src={addIcon} alt="" className="sb-icon" />,
-    to: () => (
-      <ModalAltaActivos
-        onSave={(activo) => {
-          console.log("Activo creado:", activo);
-        }}
-      />
-    ),
+    id: "act",
+    label: "Activos",
+    icon: <img src={settingsIcon} className="sb-icon" />,
     roles: ["Administrador", "Tecnico", "Listo"],
+    children: [
+      {
+        id: "catalogoA",
+        label: "Catalogo de activos",
+        icon: <img src={usersIcon} className="sb-icon" />,
+        to: () => <CatalogosActivos />,
+        roles: ["Administrador", "Tecnico", "Listo"],
+      },
+    ],
   },
   {
     id: "formatos",
