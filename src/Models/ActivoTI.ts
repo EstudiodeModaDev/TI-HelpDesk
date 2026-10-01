@@ -1,30 +1,26 @@
-export const CATEGORIAS_ACTIVO = {
-  equipo_computo: "Equipo de cómputo",
-  periferico: "Periférico",
-  red_infraestructura: "Red / Infraestructura",
-} as const;
+import type { EstadoActivo } from "./ActivosTIMovimientos";
 
-export const ESTADOS_ACTIVO = {
-  disponible: "Disponible",
-  asignado: "Asignado",
-  en_prestamo: "En préstamo",
-  en_mantenimiento: "En mantenimiento",
-  dado_de_baja: "Dado de baja",
-} as const;
+// export const CATEGORIAS_ACTIVO = {
+//   equipo_computo: "Equipo de cómputo",
+//   periferico: "Periférico",
+//   red_infraestructura: "Red / Infraestructura",
+// } as const;
 
 export const UBICACIONES_ACTIVO = {
-  bodega_central: "Bodega central",
-  tienda: "Tienda",
+  bodega_central: "Bodega",
+  usuario: "Usuario",
+  sala_reuniones: "Sala de reuniones",
 } as const;
 
-export type CategoriaActivo = keyof typeof CATEGORIAS_ACTIVO;
-export type EstadoActivo = keyof typeof ESTADOS_ACTIVO;
+// export type CategoriaActivo = keyof typeof CATEGORIAS_ACTIVO;
+
 export type Ubicacion_Tipo = keyof typeof UBICACIONES_ACTIVO;
 
 export interface ActivoTI {
+  estado: EstadoActivo;
   id: string;
   codigo_inventario: string;
-  categoria: CategoriaActivo;
+  // categoria: CategoriaActivo;
   tipo: string;
   subtipo?: string | null;
   marca?: string | null;
@@ -32,7 +28,6 @@ export interface ActivoTI {
   numero_serie: string;
   fecha_ingreso: string;
   proveedor?: string | null;
-  estado: EstadoActivo;
   ubicacion_tipo: Ubicacion_Tipo;
   nombre_usuario: string;
   correo_usuario: string;
@@ -54,7 +49,9 @@ export type CrearActivoDTO = Omit<
   | "prestamo_activo_id"
 >;
 
-export type ActualizarActivoDTO = Partial<CrearActivoDTO>;
+export type ActualizarActivoDTO = Partial<CrearActivoDTO> & {
+  prestamo_activo_id?: string | null;
+};
 
 export interface ActivoTIErrors {
   codigo_inventario?: string;
@@ -83,17 +80,11 @@ export const validarActivoTI = (
   if (!data.ubicacion_tipo?.trim()) {
     errors.ubicacion_tipo = "Debe seleccionar una ubicación";
   }
-  if (!data.categoria?.trim()) {
-    errors.categoria = "Debe seleccionar una categoria valida";
-  }
+  // if (!data.categoria?.trim()) {
+  //   errors.categoria = "Debe seleccionar una categoria valida";
+  // }
   if (!data.tipo?.trim()) {
     errors.tipo = "El tipo de activo es obligatorio";
-  }
-  if (!data.nombre_usuario?.trim()) {
-    errors.nombre_usuario = "El nombre del usuario es obligatorio";
-  }
-  if (!data.correo_usuario?.trim()) {
-    errors.correo_usuario = "El correo del usuario es obligatorio";
   }
 
   return errors;

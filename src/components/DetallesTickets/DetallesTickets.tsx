@@ -16,6 +16,8 @@ import CaseAttachments from "./CaseAttachments";
 import ModalShell from "./ModalShell";
 import CambiarFuente from "./Modals/ChangeFuente";
 import PausarTicket from "./Modals/PausarTicket";
+import { useRepositories } from "../../repositories/repositoriesContext";
+import { useActivoTicket } from "../../Funcionalidades/inventario/useActivoTickets";
 
 type Props = {
   ticket: Ticket;
@@ -28,6 +30,13 @@ type ActiveModal = "recategorizar" | "reasignar" | "observador" | "fuente" | "pa
 
 export function CaseDetail({ ticket, onVolver, role, onDocumentar }: Props) {
   const { loadAttachments, rows } = useTicketsAttachments();
+  const { activotickets } = useRepositories();
+  const {
+    activoticket: activosRelacionados,
+    loading: loadingActivos,
+    error: errorActivos,
+    loadActivoTicket,
+  } = useActivoTicket({ ActivosTicketSvc: activotickets! });
 
   const [selected, setSelected] = React.useState<Ticket>(ticket);
   const [selectedAttachment, setSelectedAttachment] = React.useState<TicketAttachment | null>(null);
@@ -58,6 +67,12 @@ export function CaseDetail({ ticket, onVolver, role, onDocumentar }: Props) {
       id_ticket: Number(ticket.ID),
     });
   }, [ticket?.ID, loadAttachments]);
+
+  // Usa selected (no ticket) para recargar también al saltar a un ticket relacionado.
+  React.useEffect(() => {
+    if (!selected?.ID) return;
+    loadActivoTicket({ ticket_id: Number(selected.ID) });
+  }, [selected?.ID, loadActivoTicket]);
 
   // Mantiene la selección de adjunto vigente, o elige el primero previsualizable.
   React.useEffect(() => {
@@ -143,6 +158,26 @@ export function CaseDetail({ ticket, onVolver, role, onDocumentar }: Props) {
       {/* ===== Tickets relacionados ===== */}
       <div className="seccion">
         <TicketsAsociados key={String(selected.ID)} ticket={selected} onSelect={handleSelectRelacionado} />
+      </div>
+
+      {/* ===== Activos relacionados ===== */}
+      <div className="seccion">
+        <h3 className="cd-subtitle">Activos relacionados ({activosRelacionados.length})</h3>
+        {loadingActivos && <p>Cargando activos…</p>}
+        {errorActivos && <p style={{ color: "#b91c1c" }}>{errorActivos}</p>}
+        {!loadingActivos && !errorActivos && activosRelacionados.length === 0 && (
+          <p>Este ticket no tiene activos vinculados.</p>
+        )}
+        {activosRelacionados.length > 0 && (
+          <ul className="cd-files">
+            {activosRelacionados.map((v) => (
+              <li key={v.id}>
+                <strong>{v.activo?.codigo_inventario ?? v.activo_id}</strong>
+                {v.activo?.tipo && ` — ${v.activo.tipo}`}
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
 
       {/* ===== Botón de Seguimiento ===== */}

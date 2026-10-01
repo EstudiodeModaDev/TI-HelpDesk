@@ -11,7 +11,8 @@ import UsuariosPanel from "./components/Usuarios/Usuarios";
 import AnsAdmin from "./components/Admin/AnsAdmin/AnsAdmin";
 import CajerosPOSForm from "./components/CajerosPOS/CajerosPOS";
 
-import CatalogosActivos from "./components/Inventario/CatalogosActivos";
+import CatalogosActivos from "./components/Inventario/Catalogo/CatalogosActivos";
+
 import type { User } from "./Models/User";
 import { useAuth } from "./auth/authContext";
 import { useUserRole } from "./Funcionalidades/auth/Usuarios";
@@ -40,13 +41,17 @@ import AnnouncementsTable from "./components/TipsTable/TipsTable";
 import { useTheme } from "./Funcionalidades/auth/Theme";
 import TeamsEventForm from "./components/Ausencia/Ausencia";
 import { StoragePage } from "./components/Storage/StoragePage";
-import { PrestamosPage } from "./components/Loans/PretamosPage";
+// import { PrestamosPage } from "./components/Loans/PretamosPage";
+
 import loanImage from "./assets/device.svg";
 import ReportsPage from "./components/Reports/ReportsPage";
 import { useRepositories } from "./repositories/repositoriesContext";
 import type { TicketsRepository } from "./repositories/TicketsRepository/TicketRepository";
 import type { LogRepository } from "./repositories/LogRepository/LogRespository";
 import { useContador } from "./Funcionalidades/timeCounter/hooks/useCounter";
+import FichaActivo from "./components/Inventario/FichaActivo";
+import { ModalAltaActivos } from "./components/Inventario/ModalAltaActivo";
+import { ModalAsignarActivo } from "./components/Inventario/ModalAsignarActivo";
 
 /* ============================================================
   Tipos de navegación y contexto de visibilidad
@@ -130,15 +135,36 @@ const NAV: MenuItem[] = [
   {
     id: "act",
     label: "Activos",
-    icon: <img src={settingsIcon} className="sb-icon" />,
+    icon: <img src={loanImage} className="sb-icon" />,
     roles: ["Administrador", "Tecnico", "Listo"],
     children: [
       {
         id: "catalogoA",
         label: "Catalogo de activos",
-        icon: <img src={usersIcon} className="sb-icon" />,
+        icon: <img src={templateIcon} className="sb-icon" />,
         to: () => <CatalogosActivos />,
         roles: ["Administrador", "Tecnico", "Listo"],
+      },
+      {
+        id: "Activos",
+        label: " Nuevo Activo",
+        icon: <img src={addIcon} alt="" className="sb-icon" />,
+        to: () => <ModalAltaActivos />,
+        roles: ["Administrador", "Técnico", "Listo"],
+      },
+      {
+        id: "Asignacion",
+        label: "Asignación",
+        icon: <img src={usersIcon} className="sb-icon" />,
+        to: () => <ModalAsignarActivo />,
+        roles: ["Administrador", "Técnico", "Listo"],
+      },
+      {
+        id: "FichaA",
+        label: "Ficha de seguimiento",
+        icon: <img src={filesIcon} className="sb-icon" />,
+        to: () => <FichaActivo />,
+        roles: ["Administrador", "Técnico", "Listo"],
       },
     ],
   },
@@ -164,13 +190,13 @@ const NAV: MenuItem[] = [
     roles: ["Administrador", "Listo"],
   },
 
-  {
-    id: "loan",
-    label: "Prestamos",
-    icon: <img src={loanImage} alt="" className="sb-icon" />,
-    to: <PrestamosPage />,
-    roles: ["Administrador", "Listo", "Tecnico"],
-  },
+  // {
+  //   id: "loan",
+  //   label: "Prestamos",
+  //   icon: <img src={loanImage} alt="" className="sb-icon" />,
+  //   to: <PrestamosPage />,
+  //   roles: ["Administrador", "Listo", "Tecnico"],
+  // },
   {
     id: "admin",
     label: "Administración",

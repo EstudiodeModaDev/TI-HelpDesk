@@ -16,6 +16,8 @@ import { SupabaseMessageRepository } from "./ParticipantsRepository/SupabaseMess
 import type { ActivosTIRepository } from "./ActivosTIRepository/ActivosTIRepository";
 import { SupabaseActivosTIRepository } from "./ActivosTIRepository/ActivosTIFromSupabase";
 import type { MovimientosTIRepository } from "./MovimientoTIRepository/MovimientosTIRepository";
+import type { ActivoTicketRepository } from "./ActivoTicket/ActivoTicketRepository";
+import { SupabaseActivoTicketRepository } from "./ActivoTicket/ActivoTicketFromSupabase";
 import { SupabaseMovimientosTIRepository } from "./MovimientoTIRepository/MovimientoTIFromSupabase";
 type RepositorySource = "supabase" | "sharepoint";
 
@@ -28,6 +30,7 @@ export type AppRepositories = {
   messages: MessagesRepository;
   activosTI: ActivosTIRepository | null;
   movimientosTI: MovimientosTIRepository | null;
+  activotickets: ActivoTicketRepository | null;
 };
 
 type RepositoriesProviderProps = {
@@ -70,6 +73,7 @@ export const RepositoriesProvider: React.FC<RepositoriesProviderProps> = ({
       messages: new SupabaseMessageRepository(),
       activosTI: new SupabaseActivosTIRepository(),
       movimientosTI: new SupabaseMovimientosTIRepository(),
+      activotickets: new SupabaseActivoTicketRepository(),
     };
   }, [graph, sources?.tickets, sources?.usuarios]);
 

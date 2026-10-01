@@ -4,12 +4,13 @@ import { Card } from "./Card";
 import { DataTable } from "./DateTable";
 import { Kpi } from "./Kpi";
 import { toISODateTimeFlex } from "../../utils/Date";
-import Select, { components, type OptionProps, } from "react-select";
+import Select, { components, type OptionProps } from "react-select";
 import type { UserOptionEx } from "../NuevoTicket/NuevoTicketForm";
 import { useWorkers } from "../../Funcionalidades/access/Workers";
 import type { desplegablesOptions } from "../../Models/Commons";
 import { ReturnModal } from "./ReturnSection";
-
+import AsyncSelect from "react-select/async";
+import { useRepositories } from "../../repositories/repositoriesContext";
 export type LoanHistorySectionProps = {
   rows: prestamos[];
   query: string;
@@ -18,9 +19,9 @@ export type LoanHistorySectionProps = {
   onStatusFilterChange: (value: string) => void;
   dispositivos: dispositivos[];
 
-  onCreateLoan: (dispositivoId: string) => Promise<prestamos | null>; 
+  onCreateLoan: (dispositivoId: string) => Promise<prestamos | null>;
   onFinalizeLoan: (loan: prestamos, continuar: boolean) => void;
-  state: prestamos
+  state: prestamos;
   creating?: boolean;
   createError?: string | null;
   setField: <K extends keyof prestamos>(k: K, v: prestamos[K]) => void;
@@ -42,21 +43,44 @@ const Option = (props: OptionProps<UserOptionEx, false>) => {
 
 export function countLoansByStatus(loans: prestamos[], status: string): number {
   return loans.reduce(
-    (count, loan) => (loan.Estado.toLocaleLowerCase() === status.toLocaleLowerCase() ? count + 1 : count),
-    0
+    (count, loan) =>
+      loan.Estado.toLocaleLowerCase() === status.toLocaleLowerCase()
+        ? count + 1
+        : count,
+    0,
   );
 }
 
-export function LoanHistorySection({onFinalizeLoan, setField, state, rows, query, statusFilter = "Todos", onQueryChange, onStatusFilterChange, dispositivos, onCreateLoan, creating = false, createError = null,}: LoanHistorySectionProps) {
+export function LoanHistorySection({
+  onFinalizeLoan,
+  setField,
+  state,
+  rows,
+  query,
+  statusFilter = "Todos",
+  onQueryChange,
+  onStatusFilterChange,
+  dispositivos,
+  onCreateLoan,
+  creating = false,
+  createError = null,
+}: LoanHistorySectionProps) {
   const [openCreate, setOpenCreate] = React.useState(false);
   const [openDevolver, setOpenDevolver] = React.useState(false);
-  const [selectedLoan, setSelectedLoan] = React.useState<prestamos | null>(null);
+  const [selectedLoan, setSelectedLoan] = React.useState<prestamos | null>(
+    null,
+  );
   const [created, setCreated] = React.useState<prestamos | null>(null);
-  const [step, setStep] = React.useState<1 | 2>(1)
-  const { workersOptions, loadingWorkers, error: usersError } = useWorkers({onlyEnabled: true, });
+  const [step, setStep] = React.useState<1 | 2>(1);
+  const {
+    workersOptions,
+    loadingWorkers,
+    error: usersError,
+  } = useWorkers({ onlyEnabled: true });
 
   const closeCreate = () => {
     setOpenCreate(false);
+    setActivoSeleccionado(null);
   };
 
   const canSubmit = state.nombreSolicitante.trim().length > 0 && !creating;
@@ -64,8 +88,8 @@ export function LoanHistorySection({onFinalizeLoan, setField, state, rows, query
   const submit = async () => {
     if (!canSubmit) return;
     const created = await onCreateLoan(state.Id_dispositivo);
-    setCreated(created)
-    setStep(2)
+    setCreated(created);
+    setStep(2);
   };
 
   const submitFinalize = (continuar: boolean) => {
@@ -81,18 +105,33 @@ export function LoanHistorySection({onFinalizeLoan, setField, state, rows, query
     return () => window.removeEventListener("keydown", onKey);
   }, [openCreate]);
 
-  const availableDevices: dispositivos[] = React.useMemo(() => dispositivos.filter((d) => d.Estado === "Disponible"), [dispositivos]);
+  const { activosTI } = useRepositories();
+  const [activoSeleccionado, setActivoSeleccionado] =
+    React.useState<desplegablesOptions | null>(null);
 
-  const deviceOptions: desplegablesOptions[] = React.useMemo(() =>
-    availableDevices.map((d) => ({
-      value: String(d.Id),
-      label: `${d.Referencia} ${d.Title} · ${d.Serial}`,
-    })),
-  [availableDevices]);
-
-  const selectedSolicitante = workersOptions.find((o) => o.label.toLocaleLowerCase() === state.nombreSolicitante.toLocaleLowerCase()) ?? null;
-  const selectedDevice = deviceOptions.find((o) => o.value === state.Id_dispositivo) ?? null;
-
+  // Solo se prestan activos disponibles
+  const buscarActivos = React.useCallback(
+    async (texto: string): Promise<desplegablesOptions[]> => {
+      const res = await activosTI!.loadActivos({
+        search: texto,
+        estado: "Disponible",
+        paginated: true,
+        pageSize: 10,
+      });
+      if (!res.status) return [];
+      return res.data.map((a) => ({
+        value: a.id,
+        label: `${a.codigo_inventario} - ${a.tipo}${a.numero_serie ? `. ${a.numero_serie}` : ""}`,
+      }));
+    },
+    [activosTI],
+  );
+  const selectedSolicitante =
+    workersOptions.find(
+      (o) =>
+        o.label.toLocaleLowerCase() ===
+        state.nombreSolicitante.toLocaleLowerCase(),
+    ) ?? null;
   return (
     <>
       <div>
@@ -101,42 +140,76 @@ export function LoanHistorySection({onFinalizeLoan, setField, state, rows, query
           <div className="pl-headTop">
             <div className="pl-kpisRow">
               <Kpi label="Activos" value={countLoansByStatus(rows, "Activo")} />
-              <Kpi label="Cerrados" value={countLoansByStatus(rows, "Cerrado")} />
+              <Kpi
+                label="Cerrados"
+                value={countLoansByStatus(rows, "Cerrado")}
+              />
             </div>
           </div>
 
           {/* 2) Filtros abajo (una sola fila y full width) */}
           <div className="pl-filtersBar">
-            <input className="pl-input pl-grow" type="text" value={query ?? ""} placeholder="Buscar persona" onChange={(e) => onQueryChange(e.target.value)}/>
+            <input
+              className="pl-input pl-grow"
+              type="text"
+              value={query ?? ""}
+              placeholder="Buscar persona"
+              onChange={(e) => onQueryChange(e.target.value)}
+            />
 
-            <select className="pl-input pl-select" value={statusFilter} onChange={(e) => onStatusFilterChange(e.target.value)}>
+            <select
+              className="pl-input pl-select"
+              value={statusFilter}
+              onChange={(e) => onStatusFilterChange(e.target.value)}
+            >
               <option value="all">Todos</option>
               <option value="Activo">Activo</option>
               <option value="Cerrado">Cerrado</option>
             </select>
 
-            <button className="pl-btn primary" onClick={() => setOpenCreate(true)}>
+            <button
+              className="pl-btn primary"
+              onClick={() => setOpenCreate(true)}
+            >
               Nuevo préstamo
             </button>
           </div>
 
           {/* 3) Tabla */}
           <DataTable
-            columns={["ID", "Solicitante", "Equipo", "Fecha de prestamo", "Estado", "Devuelto"]}
+            columns={[
+              "ID",
+              "Solicitante",
+              "Equipo",
+              "Fecha de prestamo",
+              "Estado",
+              "Devuelto",
+            ]}
             rows={
               <>
                 {rows.map((l) => {
-                  const device = dispositivos.find((d) => d.Id === l.Id_dispositivo);
-                  const isClosed = l.Estado === "Cerrado" || !!l.FechaDevolucion;
+                  const device = dispositivos.find(
+                    (d) => d.Id === l.Id_dispositivo,
+                  );
+                  const isClosed =
+                    l.Estado === "Cerrado" || !!l.FechaDevolucion;
 
                   return (
-                    <tr key={l.Id} className={isClosed ? "pl-rowDisabled" : "pl-rowClickable"} 
+                    <tr
+                      key={l.Id}
+                      className={
+                        isClosed ? "pl-rowDisabled" : "pl-rowClickable"
+                      }
                       onClick={() => {
                         if (isClosed) return;
                         setSelectedLoan(l);
                         setOpenDevolver(true);
                       }}
-                      title={isClosed ? "Este préstamo ya está cerrado" : "Click para inventariar devolución"}
+                      title={
+                        isClosed
+                          ? "Este préstamo ya está cerrado"
+                          : "Click para inventariar devolución"
+                      }
                     >
                       <td className="pl-mono">{l.Id}</td>
 
@@ -145,22 +218,29 @@ export function LoanHistorySection({onFinalizeLoan, setField, state, rows, query
                       </td>
 
                       <td>
-                        <div className="pl-cellMain">{device?.Title} {device?.Referencia}</div>
-                        <div className="pl-cellSub pl-mono">{device?.Serial ?? "—"}</div>
+                        <div className="pl-cellMain">
+                          {device?.Title} {device?.Referencia}
+                        </div>
+                        <div className="pl-cellSub pl-mono">
+                          {device?.Serial ?? "—"}
+                        </div>
                       </td>
 
-                      <td className="pl-mono">{toISODateTimeFlex(l.FechaPrestamo)}</td>
+                      <td className="pl-mono">
+                        {toISODateTimeFlex(l.FechaPrestamo)}
+                      </td>
 
                       <td>{l.Estado}</td>
 
                       <td className="pl-mono">
-                        {l.FechaDevolucion ? toISODateTimeFlex(l.FechaDevolucion) ?? "—" : "Pendiente"}
+                        {l.FechaDevolucion
+                          ? (toISODateTimeFlex(l.FechaDevolucion) ?? "—")
+                          : "Pendiente"}
                       </td>
                     </tr>
                   );
                 })}
               </>
-
             }
           />
         </Card>
@@ -169,10 +249,15 @@ export function LoanHistorySection({onFinalizeLoan, setField, state, rows, query
       {/* MODAL */}
       {openCreate && (
         <div className="pl-modalOverlay" onMouseDown={closeCreate}>
-          <div className="pl-modal pl-modalWide" onMouseDown={(e) => e.stopPropagation()}>
+          <div
+            className="pl-modal pl-modalWide"
+            onMouseDown={(e) => e.stopPropagation()}
+          >
             <div className="pl-modalHead">
               <div>
-                <div className="pl-cardTitle">{step === 1 ? "Crear préstamo" : "Estado de entrega"}</div>
+                <div className="pl-cardTitle">
+                  {step === 1 ? "Crear préstamo" : "Estado de entrega"}
+                </div>
                 <div className="pl-cardSub">
                   {step === 1
                     ? "Selecciona un dispositivo disponible y un solicitante solicitante"
@@ -180,7 +265,11 @@ export function LoanHistorySection({onFinalizeLoan, setField, state, rows, query
                 </div>
               </div>
 
-              <button className="pl-btn ghost" onClick={closeCreate} aria-label="Cerrar">
+              <button
+                className="pl-btn ghost"
+                onClick={closeCreate}
+                aria-label="Cerrar"
+              >
                 ✕
               </button>
             </div>
@@ -192,7 +281,11 @@ export function LoanHistorySection({onFinalizeLoan, setField, state, rows, query
                     <span className="pl-label">Solicitante</span>
                     <Select<UserOptionEx, false>
                       options={workersOptions}
-                      placeholder={loadingWorkers ? "Cargando opciones…" : "Buscar solicitante…"}
+                      placeholder={
+                        loadingWorkers
+                          ? "Cargando opciones…"
+                          : "Buscar solicitante…"
+                      }
                       value={selectedSolicitante}
                       onChange={(opt) => {
                         setField("nombreSolicitante", opt?.label ?? "");
@@ -202,45 +295,63 @@ export function LoanHistorySection({onFinalizeLoan, setField, state, rows, query
                       isDisabled={loadingWorkers}
                       isLoading={loadingWorkers}
                       components={{ Option }}
-                      noOptionsMessage={() => (usersError ? "Error cargando opciones" : "Sin coincidencias")}
+                      noOptionsMessage={() =>
+                        usersError
+                          ? "Error cargando opciones"
+                          : "Sin coincidencias"
+                      }
                       isClearable
                       menuPortalTarget={document.body}
                       menuPosition="fixed"
-                      styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
+                      styles={{
+                        menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                      }}
                     />
 
-                    <span className="pl-label">Dispositivo</span>
-                    <Select<desplegablesOptions, false>
-                      options={deviceOptions}
-                      placeholder={"Buscar dispositivo"}
-                      value={selectedDevice}
+                    <span className="pl-label">Activo</span>
+                    <AsyncSelect<desplegablesOptions, false>
+                      cacheOptions
+                      defaultOptions
+                      loadOptions={buscarActivos}
+                      value={activoSeleccionado}
                       onChange={(opt) => {
+                        setActivoSeleccionado(opt ?? null);
                         setField("Id_dispositivo", opt?.value ?? "");
                       }}
+                      placeholder="Buscar por código, serial o tipo..."
                       classNamePrefix="rs"
-                      isDisabled={loadingWorkers}
-                      isLoading={loadingWorkers}
-                      components={{ Option }}
-                      noOptionsMessage={() => (usersError ? "Error cargando opciones" : "Sin coincidencias")}
                       isClearable
+                      noOptionsMessage={({ inputValue }) =>
+                        inputValue
+                          ? "No hay activos disponibles con ese dato"
+                          : "No hay activos disponibles"
+                      }
+                      loadingMessage={() => "Buscando..."}
                       menuPortalTarget={document.body}
                       menuPosition="fixed"
-                      styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
+                      styles={{
+                        menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                      }}
                     />
                   </div>
 
-                  {createError ? <div className="pl-note">{createError}</div> : null}
+                  {createError ? (
+                    <div className="pl-note">{createError}</div>
+                  ) : null}
                 </>
               ) : (
                 <>
-                  <ReturnModal 
-                    open={step === 2} 
-                    onClose={() => setOpenCreate(false)} 
-                    loan={created} 
-                    dispositivos={dispositivos} 
-                    onFinalize={() => {return}} 
-                    mode={"edit"} 
-                    fase={"Entrega"} />
+                  <ReturnModal
+                    open={step === 2}
+                    onClose={() => setOpenCreate(false)}
+                    loan={created}
+                    dispositivos={dispositivos}
+                    onFinalize={() => {
+                      return;
+                    }}
+                    mode={"edit"}
+                    fase={"Entrega"}
+                  />
                 </>
               )}
             </div>
@@ -248,7 +359,11 @@ export function LoanHistorySection({onFinalizeLoan, setField, state, rows, query
             <div className="pl-modalActions">
               {step === 1 ? (
                 <>
-                  <button className="pl-btn" onClick={closeCreate} disabled={creating || step !== 1}>
+                  <button
+                    className="pl-btn"
+                    onClick={closeCreate}
+                    disabled={creating || step !== 1}
+                  >
                     Cancelar
                   </button>
 
@@ -263,15 +378,21 @@ export function LoanHistorySection({onFinalizeLoan, setField, state, rows, query
                     {creating ? "Cargando..." : "Siguiente"}
                   </button>
                 </>
-              ) : (
-                null
-              )}
+              ) : null}
             </div>
           </div>
         </div>
       )}
 
-      <ReturnModal open={openDevolver} onClose={() => setOpenDevolver(false)} loan={selectedLoan!} dispositivos={dispositivos} onFinalize={submitFinalize} mode={"edit"} fase={"Devolucion"} />
+      <ReturnModal
+        open={openDevolver}
+        onClose={() => setOpenDevolver(false)}
+        loan={selectedLoan!}
+        dispositivos={dispositivos}
+        onFinalize={submitFinalize}
+        mode={"edit"}
+        fase={"Devolucion"}
+      />
     </>
   );
 }

@@ -1,17 +1,13 @@
 .activos-page {
   padding: 16px;
-  --card: var(--surface, #fff);
-  --ink: var(--ink, #0f172a);
-  --muted: var(--muted, #64748b);
+  max-width: 1100px;
+  margin: 0 auto;
+  --card: var(--surface, #f4f0f0);
+
   --bd: var(--border, #e5e7eb);
-  --bd-strong: var(--bd-strong, color-mix(in oklab, var(--bd) 75%, black));
-  --shadow: var(--shadow, 0 10px 30px rgba(0, 0, 0, 0.08));
+
   --radius: 15px;
-  --primary: var(--primary, #3b82f6);
-  --ring: var(
-    --ring,
-    color-mix(in oklab, var(--primary, #3b82f6) 25%, transparent)
-  );
+
   --pad: clamp(10px, 2vw, 16px);
   --gap: clamp(10px, 1.8vw, 14px);
   color: var(--ink);
@@ -29,36 +25,13 @@
   font-size: 1.6rem;
 }
 
-.btn-nuevo-activo {
-  height: 40px;
-  padding: 0 16px;
-  border-radius: 10px;
-  border: none;
-  background: var(--primary);
-  color: #130b0b;
-  font-weight: 600;
-  cursor: pointer;
-  transition:
-    filter 0.15s ease,
-    transform 0.06s ease;
-}
-.btn-nuevo-activo:hover {
-  filter: brightness(1.08);
-}
-.btn-nuevo-activo:active {
-  transform: translateY(1px);
-}
-
 /* --------- Filtros --------- */
 .activos-filtros {
   display: grid;
-  grid-template-columns: 1.4fr repeat(3, 1fr);
-  align-items: center;
+  grid-template-columns: minmax(0, 1fr) 240px;
+  align-items: stretch;
   gap: var(--gap);
-  background: color-mix(in oklab, var(--card) 96%, transparent);
-  border: 1px solid var(--bd);
-  border-radius: var(--radius);
-  padding: var(--pad);
+
   margin-bottom: var(--gap);
 }
 .activos-filtros input[type="text"],
@@ -68,9 +41,11 @@
   color: var(--ink);
   border: 1px solid var(--bd);
   border-radius: calc(var(--radius) - 6px);
-  padding: 10px 12px;
+  box-sizing: border-box;
+  padding: 0 12px;
   min-width: 0;
-  height: 40px;
+  height: 44px;
+  margin: 0;
 }
 .activos-filtros input::placeholder {
   color: color-mix(in oklab, var(--muted) 85%, transparent);
@@ -98,39 +73,62 @@
   border-collapse: separate;
   border-spacing: 0;
   table-layout: fixed;
-  min-width: 960px;
+  min-width: 640px;
 }
+
+/* Anchos por columna (Modelo se queda con el espacio sobrante) */
+.activos-table .col-codigo {
+  width: 18%;
+}
+.activos-table .col-tipo {
+  width: 15%;
+}
+.activos-table .col-marca {
+  width: 15%;
+}
+.activos-table .col-estado {
+  width: 15%;
+}
+
 .activos-table thead th {
   position: sticky;
   top: 0;
   z-index: 1;
   background: color-mix(in oklab, var(--card) 98%, transparent);
-  color: var(--ink);
+  color: var(--muted);
   text-align: left;
-  font-weight: 700;
-  letter-spacing: 0.01em;
+  font-weight: 500;
+  letter-spacing: 0.06em;
   border-bottom: 1px solid var(--bd);
-  padding: 12px;
+  text-transform: uppercase;
+  font-size: 0.78rem;
+
+  padding: 16px 14px;
   white-space: nowrap;
 }
 .activos-table tbody td {
   border-bottom: 1px solid var(--bd);
-  padding: 12px;
+  padding: 16px 14px;
   color: var(--ink);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.activos-table tbody tr:nth-child(odd) {
-  background: color-mix(in oklab, var(--card) 98%, transparent);
-}
+
 .activos-table tbody tr:hover {
-  background: color-mix(in oklab, gray 15%, transparent);
+  background: color-mix(in oklab, rgb(34, 197, 94) 10%, transparent);
 }
 .activos-table th:last-child,
 .activos-table td:last-child {
-  width: 6ch;
+  width: 120px; /* enlace "Ver detalle" */
   text-align: center;
+}
+/* La paginación ya trae su línea superior: evita la doble línea */
+.activos-table tbody tr:last-child td {
+  border-bottom: none;
+}
+.activos-table td.col-acciones .icon-btn + .icon-btn {
+  margin-left: 6px;
 }
 
 .icon-btn {
@@ -138,7 +136,7 @@
   height: 32px;
   border-radius: 8px;
   border: 1px solid var(--bd);
-  background: #fff;
+  background: #e2d2d2;
   color: var(--ink);
   display: inline-grid;
   place-items: center;
@@ -180,7 +178,7 @@
   cursor: pointer;
 }
 .paginacion button:hover:enabled {
-  background: color-mix(in oklab, var(--card) 88%, transparent);
+  background: color-mix(in oklab, var(--ink) 5%, transparent);
 }
 .paginacion button:disabled {
   opacity: 0.5;
@@ -204,11 +202,6 @@
   color: var(--muted);
 }
 
-@media (max-width: 980px) {
-  .activos-filtros {
-    grid-template-columns: 1fr 1fr;
-  }
-}
 @media (max-width: 640px) {
   .activos-header {
     grid-template-columns: 1fr;
@@ -221,4 +214,36 @@
     margin-left: 0;
     width: 100%;
   }
+}
+.link-detalle {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--ink);
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* --------- Celdas --------- */
+.celda-codigo {
+  font-family: ui-monospace, monospace;
+  font-weight: 700;
+  color: var(--ink);
+}
+.celda-muted {
+  color: var(--muted);
+}
+
+/* El color llega por style={{ colorEstadoActivo(...) }} */
+.estado-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-family: ui-monospace, monospace;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--c);
+  background: color-mix(in oklab, var(--c) 15%, transparent);
+  border: 1px solid color-mix(in oklab, var(--c) 40%, transparent);
 }

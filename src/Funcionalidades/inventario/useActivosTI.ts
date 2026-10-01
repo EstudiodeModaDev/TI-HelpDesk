@@ -1,10 +1,10 @@
+import type { EstadoActivo } from "../../Models/ActivosTIMovimientos";
 import * as React from "react";
 import type {
   ActivoTI,
   ActualizarActivoDTO,
-  CategoriaActivo,
+  // CategoriaActivo,
   CrearActivoDTO,
-  EstadoActivo,
   Ubicacion_Tipo,
   ActivoTIErrors,
 } from "../../Models/ActivoTI";
@@ -39,9 +39,9 @@ export function useActivosTI({ ActivosSvc }: UseActivosTIParams) {
   );
 
   const [search, setSearch] = React.useState("");
-  const [categoriaFiltro, setCategoriaFiltro] = React.useState<
-    CategoriaActivo | ""
-  >("");
+  // const [categoriaFiltro, setCategoriaFiltro] = React.useState<
+  //   CategoriaActivo | ""
+  // >("");
   const [estadoFiltro, setEstadoFiltro] = React.useState<EstadoActivo | "">("");
   const [ubicacionFiltro, setUbicacionFiltro] = React.useState<
     Ubicacion_Tipo | ""
@@ -92,8 +92,12 @@ export function useActivosTI({ ActivosSvc }: UseActivosTIParams) {
         setTotal(result.total ?? result.data?.length ?? 0);
         setHasNext(result.hasNext ?? false);
         return true;
-      } catch (loadError: any) {
-        setError(loadError?.message ?? "Error cargando los activos");
+      } catch (loadError) {
+        setError(
+          loadError instanceof Error
+            ? loadError.message
+            : "Error cargando los activos",
+        );
         setActivos([]);
         setTotal(0);
         setHasNext(false);
@@ -107,7 +111,7 @@ export function useActivosTI({ ActivosSvc }: UseActivosTIParams) {
 
   const buildFilter = React.useCallback(
     (): FilterActivosTI => ({
-      categoria: categoriaFiltro || undefined,
+      // categoria: categoriaFiltro || undefined,
       estado: estadoFiltro || undefined,
       ubicacion_tipo: ubicacionFiltro || undefined,
       search: debouncedSearch.trim() || undefined,
@@ -116,7 +120,7 @@ export function useActivosTI({ ActivosSvc }: UseActivosTIParams) {
       paginated: true,
     }),
     [
-      categoriaFiltro,
+      // categoriaFiltro,
       estadoFiltro,
       ubicacionFiltro,
       debouncedSearch,
@@ -133,12 +137,29 @@ export function useActivosTI({ ActivosSvc }: UseActivosTIParams) {
       if (!isValid) {
         return false;
       }
+      // No se permiten dos activos con el mismo serial
+      const serial = form.numero_serie?.trim() ?? "";
+      const existente = await ActivosSvc.getActivoBySerial(serial);
+      if (!existente.status) {
+        setError(existente.message ?? "No se pudo validar el serial");
+        return false;
+      }
+      if (existente.data && existente.data.id !== selectedActivo?.id) {
+        setFormErrors((prev) => ({
+          ...prev,
+          numero_serie: `Ya existe un activo con este serial (código ${existente.data!.codigo_inventario})`,
+        }));
+        return false;
+      }
       const result = selectedActivo
         ? await ActivosSvc.updateActivo(
             selectedActivo.id,
             form as ActualizarActivoDTO,
           )
-        : await ActivosSvc.createActivo(form as CrearActivoDTO);
+        : await ActivosSvc.createActivo({
+            ...form,
+            estado: "Disponible",
+          } as CrearActivoDTO);
       if (!result.status) {
         setError(result.message ?? "Error guardando el activo");
         return false;
@@ -146,8 +167,12 @@ export function useActivosTI({ ActivosSvc }: UseActivosTIParams) {
       await loadActivos(buildFilter());
       resetForm();
       return true;
-    } catch (saveError: any) {
-      setError(saveError?.message ?? "Error guardando el activo");
+    } catch (saveError) {
+      setError(
+        saveError instanceof Error
+          ? saveError.message
+          : "Error guardando el activo",
+      );
       return false;
     } finally {
       setLoading(false);
@@ -170,13 +195,13 @@ export function useActivosTI({ ActivosSvc }: UseActivosTIParams) {
   const criteriaKey = React.useMemo(
     () =>
       JSON.stringify({
-        categoriaFiltro,
+        // categoriaFiltro,
         estadoFiltro,
         ubicacionFiltro,
         pageSize,
         search: debouncedSearch.trim(),
       }),
-    [categoriaFiltro, estadoFiltro, ubicacionFiltro, pageSize, debouncedSearch],
+    [estadoFiltro, ubicacionFiltro, pageSize, debouncedSearch],
   );
   const previousCriteriaRef = React.useRef(criteriaKey);
 
@@ -204,7 +229,7 @@ export function useActivosTI({ ActivosSvc }: UseActivosTIParams) {
     setSelectedActivo(activo);
     setForm({
       codigo_inventario: activo.codigo_inventario,
-      categoria: activo.categoria,
+      // categoria: activo.categoria,
       tipo: activo.tipo,
       subtipo: activo.subtipo,
       marca: activo.marca,
@@ -239,8 +264,8 @@ export function useActivosTI({ ActivosSvc }: UseActivosTIParams) {
 
     search,
     setSearch,
-    categoriaFiltro,
-    setCategoriaFiltro,
+    // categoriaFiltro,
+    // setCategoriaFiltro,
     estadoFiltro,
     setEstadoFiltro,
     ubicacionFiltro,

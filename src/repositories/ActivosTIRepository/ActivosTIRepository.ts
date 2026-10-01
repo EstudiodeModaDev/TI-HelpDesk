@@ -1,14 +1,14 @@
+import type { EstadoActivo } from "../../Models/ActivosTIMovimientos";
 import type {
   ActivoTI,
-  CategoriaActivo,
-  EstadoActivo,
+  // CategoriaActivo,
   Ubicacion_Tipo,
   CrearActivoDTO,
   ActualizarActivoDTO,
 } from "../../Models/ActivoTI";
 
 export type FilterActivosTI = {
-  categoria?: CategoriaActivo;
+  // categoria?: CategoriaActivo;
   estado?: EstadoActivo;
   ubicacion_tipo?: Ubicacion_Tipo;
   search?: string;
@@ -41,6 +41,11 @@ export interface ActivosTIRepository {
     message: string | null;
   }>;
   getActivoById(id: string): Promise<{
+    data: ActivoTI | null;
+    status: boolean;
+    message: string | null;
+  }>;
+  getActivoBySerial(serial: string): Promise<{
     data: ActivoTI | null;
     status: boolean;
     message: string | null;

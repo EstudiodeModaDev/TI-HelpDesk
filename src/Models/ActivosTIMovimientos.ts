@@ -1,36 +1,48 @@
-export const TIPO_EVENTO = {
-  alta: "Alta",
-  traslado: "Traslado",
-  asignacion: "Asignacion",
-  cambio_estado: "Cambio de Estado",
-  baja: "Baja",
-  vinculo_prestamo: "Vinculo Prestamo",
+export const ESTADOS_ACTIVO = {
+  Disponible: "Disponible",
+  Asignado: "Asignado",
+  en_prestamo: "En Prestamo",
 } as const;
 
-export type TipoEvento = keyof typeof TIPO_EVENTO;
+export type EstadoActivo = keyof typeof ESTADOS_ACTIVO;
+
+export interface ActivoMovimientoResumenActivo {
+  codigo_inventario: string;
+  tipo: string;
+  marca?: string | null;
+  modelo?: string | null;
+  numero_serie: string;
+}
 
 export interface ActivoMovimiento {
   id: string;
   activo_id: string;
-  tipo_evento: TipoEvento;
+  activo?: ActivoMovimientoResumenActivo | null;
   ubicacion_origen?: string;
-  ubicacion_destino?: string;
-  usuario_origen_id?: string;
-  usuario_destino_id?: string;
+  ubicacion_destino: string;
+  usuario_origen_nombre?: string;
+  usuario_origen_correo?: string;
+  usuario_destino_correo?: string;
+  usuario_destino_nombre?: string;
   estado_anterior?: string;
-  estado_nuevo?: string;
-  responsable_id: string;
+  estado_nuevo?: EstadoActivo;
+  responsable_correo: string;
+  responsable_nombre: string;
   ticket_id?: string;
   fecha_evento: string;
   comentario?: string;
 }
 export type CrearActivoMovimientoDTO = Omit<
   ActivoMovimiento,
-  "id" | "fecha_evento"
+  "id" | "fecha_evento" | "activo"
 >;
 
 export interface MovimientoErrors {
-  tipo_evento?: string;
+  estado_nuevo?: string;
+  responsable_correo?: string;
+  responsable_nombre?: string;
+  usuario_destino_nombre?: string;
+  usuario_destino_correo?: string;
 }
 
 export const ValidarMovimiento = (
@@ -38,8 +50,15 @@ export const ValidarMovimiento = (
 ): MovimientoErrors => {
   const errors: MovimientoErrors = {};
 
-  if (!data.tipo_evento?.trim()) {
-    errors.tipo_evento = "Debe seleccionar un tipo de evento";
+  if (!data.estado_nuevo?.trim()) {
+    errors.estado_nuevo = "Debe seleccionar un estado";
   }
+  if (!data.responsable_correo?.trim()) {
+    errors.responsable_correo = "Debe seleccionar un correo del responsable";
+  }
+  if (!data.responsable_nombre?.trim()) {
+    errors.responsable_nombre = "Debe seleccionar el nombre del responsable";
+  }
+
   return errors;
 };

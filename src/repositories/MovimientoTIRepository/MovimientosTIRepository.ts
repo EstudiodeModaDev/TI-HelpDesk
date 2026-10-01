@@ -1,14 +1,14 @@
 import type {
   ActivoMovimiento,
-  TipoEvento,
+  EstadoActivo,
   CrearActivoMovimientoDTO,
 } from "../../Models/ActivosTIMovimientos";
 import type { DateRange } from "../../Models/Filtros";
 
 export type FilterActivosMovimiento = {
   activo_id?: string;
-  tipo_evento?: TipoEvento;
-  responsable_id?: string;
+  estado_nuevo?: EstadoActivo;
+  responsable_nombre?: string;
   range?: DateRange;
   search?: string;
   pageSize?: number;

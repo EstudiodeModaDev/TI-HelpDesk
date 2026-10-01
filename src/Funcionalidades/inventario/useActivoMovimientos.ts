@@ -2,7 +2,7 @@ import * as React from "react";
 import type {
   ActivoMovimiento,
   CrearActivoMovimientoDTO,
-  TipoEvento,
+  EstadoActivo,
   MovimientoErrors,
 } from "../../Models/ActivosTIMovimientos";
 import { ValidarMovimiento } from "../../Models/ActivosTIMovimientos";
@@ -12,6 +12,20 @@ import type {
 } from "../../repositories/MovimientoTIRepository/MovimientosTIRepository";
 
 const DEFAULT_PAGE_SIZE = 10;
+
+export type MovimientoSortField =
+  | "fecha_evento"
+  | "estado_nuevo"
+  | "responsable_nombre";
+export type MovimientoSortDir = "asc" | "desc";
+export type MovimientoSort = {
+  field: MovimientoSortField;
+  dir: MovimientoSortDir;
+};
+
+const DEFAULT_SORTS: MovimientoSort[] = [
+  { field: "fecha_evento", dir: "desc" },
+];
 
 function useDebouncedValue<T>(value: T, delay = 300) {
   const [debouncedValue, setDebouncedValue] = React.useState(value);
@@ -45,15 +59,17 @@ export function useActivoMovimientos({
 
   const [search, setSearch] = React.useState("");
   const [tipoEventoFiltro, setTipoEventoFiltro] = React.useState<
-    TipoEvento | ""
+    EstadoActivo | ""
   >("");
 
   const [pageIndex, setPageIndex] = React.useState(1);
   const [pageSize, setPageSize] = React.useState(DEFAULT_PAGE_SIZE);
   const [total, setTotal] = React.useState(0);
   const [hasNext, setHasNext] = React.useState(false);
+  const [sorts, setSorts] = React.useState<MovimientoSort[]>(DEFAULT_SORTS);
 
   const debouncedSearch = useDebouncedValue(search);
+  const primarySort = sorts[0] ?? DEFAULT_SORTS[0];
 
   const setField = React.useCallback(
     <K extends keyof CrearActivoMovimientoDTO>(
@@ -96,8 +112,12 @@ export function useActivoMovimientos({
         setTotal(result.total ?? result.data?.length ?? 0);
         setHasNext(result.hasNext ?? false);
         return true;
-      } catch (loadError: any) {
-        setError(loadError?.message ?? "Error cargando la bitácora");
+      } catch (loadError) {
+        setError(
+          loadError instanceof Error
+            ? loadError.message
+            : "Error cargando la bitácora",
+        );
         setMovimientos([]);
         setTotal(0);
         setHasNext(false);
@@ -112,15 +132,51 @@ export function useActivoMovimientos({
   const buildFilter = React.useCallback(
     (): FilterActivosMovimiento => ({
       activo_id: activoId,
-      tipo_evento: tipoEventoFiltro || undefined,
+      estado_nuevo: tipoEventoFiltro || undefined,
       search: debouncedSearch.trim() || undefined,
       pageIndex,
       pageSize,
       paginated: true,
-      sortField: "fecha_evento",
-      sortDir: "desc",
+      sortField: primarySort.field,
+      sortDir: primarySort.dir,
     }),
-    [activoId, tipoEventoFiltro, debouncedSearch, pageIndex, pageSize],
+    [
+      activoId,
+      tipoEventoFiltro,
+      debouncedSearch,
+      pageIndex,
+      pageSize,
+      primarySort.field,
+      primarySort.dir,
+    ],
+  );
+
+  const toggleSort = React.useCallback(
+    (field: MovimientoSortField, additive = false) => {
+      setSorts((previousSorts) => {
+        const index = previousSorts.findIndex((sort) => sort.field === field);
+
+        if (!additive) {
+          if (index >= 0) {
+            const dir = previousSorts[index].dir === "desc" ? "asc" : "desc";
+            return [{ field, dir }];
+          }
+          return [{ field, dir: "asc" }];
+        }
+
+        if (index >= 0) {
+          const nextSorts = [...previousSorts];
+          nextSorts[index] = {
+            field,
+            dir: nextSorts[index].dir === "desc" ? "asc" : "desc",
+          };
+          return nextSorts;
+        }
+
+        return [...previousSorts, { field, dir: "asc" }];
+      });
+    },
+    [],
   );
 
   const loadAll = React.useCallback(
@@ -151,8 +207,12 @@ export function useActivoMovimientos({
       await loadAll();
       resetForm();
       return true;
-    } catch (saveError: any) {
-      setError(saveError?.message ?? "Error registrando el movimiento");
+    } catch (saveError) {
+      setError(
+        saveError instanceof Error
+          ? saveError.message
+          : "Error registrando el movimiento",
+      );
       return false;
     } finally {
       setLoading(false);
@@ -166,8 +226,17 @@ export function useActivoMovimientos({
         tipoEventoFiltro,
         pageSize,
         search: debouncedSearch.trim(),
+        sortField: primarySort.field,
+        sortDir: primarySort.dir,
       }),
-    [activoId, tipoEventoFiltro, pageSize, debouncedSearch],
+    [
+      activoId,
+      tipoEventoFiltro,
+      pageSize,
+      debouncedSearch,
+      primarySort.field,
+      primarySort.dir,
+    ],
   );
 
   const previousCriteriaRef = React.useRef(criteriaKey);
@@ -218,5 +287,7 @@ export function useActivoMovimientos({
     nextPage,
     prevPage,
     loadAll,
+    sorts,
+    toggleSort,
   };
 }

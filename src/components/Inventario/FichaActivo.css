@@ -1,0 +1,511 @@
+.ficha-activo {
+  --card: var(--surface, #fff);
+  --ink: var(--ink, #0f172a);
+  --muted: var(--muted, #64748b);
+  --bd: var(--border, #e5e7eb);
+  --bd-strong: var(--bd-strong, color-mix(in oklab, var(--bd) 75%, black));
+  --shadow: var(--shadow, 0 10px 30px rgba(0, 0, 0, 0.08));
+  --radius: var(--radius, 14px);
+  --pad: clamp(10px, 2vw, 16px);
+  --gap: clamp(10px, 1.8vw, 14px);
+  --ring: var(
+    --ring,
+    color-mix(in oklab, var(--primary, #3b82f6) 25%, transparent) padding: 8px
+      24px 24px;
+  );
+  --radius: 15px;
+
+  color: var(--ink);
+}
+
+.ficha-activo[data-force-light] {
+  --card: var(--surface, #fff);
+  --ink: var(--ink, #0f172a);
+  --muted: var(--muted, #64748b);
+  --bd: var(--border, #e5e7eb);
+}
+
+/* --------- Wrapper tabla (scroll horizontal cómodo) --------- */
+.ficha-activo .table-wrap {
+  background: var(--card);
+  border: 1px solid var(--bd);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: var(--pad);
+  overflow-x: auto; /* 🔑 no se “rompe” en pantallas estrechas */
+  scrollbar-gutter: stable both-edges;
+}
+
+/* --------- Filtros superiores --------- */
+.ficha-activo-filtros {
+  display: grid;
+  grid-template-columns: 1.2fr max-content repeat(3, max-content) 1fr;
+  align-items: center;
+  gap: var(--gap);
+  padding-bottom: var(--pad);
+  margin-bottom: var(--pad);
+  border-bottom: 1px solid var(--bd);
+}
+
+.ficha-activo-filtros input[type="text"],
+.ficha-activo-filtros input[type="date"],
+.ficha-activo-filtros select {
+  appearance: none;
+  background: color-mix(in oklab, var(--card) 98%, transparent);
+  color: var(--ink);
+  border: 1px solid var(--bd);
+  border-radius: calc(var(--radius) - 6px);
+  padding: 10px 12px;
+  min-width: 0;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.02) inset;
+}
+.ficha-activo-filtros input::placeholder {
+  color: color-mix(in oklab, var(--muted) 85%, transparent);
+}
+.ficha-activo-filtros span {
+  color: var(--muted);
+  user-select: none;
+}
+
+/* enfoque accesible */
+.ficha-activo-filtros input:focus,
+.ficha-activo-filtros select:focus {
+  outline: none;
+  border-color: var(--bd-strong);
+  box-shadow: 0 0 0 4px var(--ring);
+}
+
+/* --------- Tabla --------- */
+.ficha-activo table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  table-layout: fixed; /* celdas estables */
+  min-width: 1900px; /* 10 columnas; el wrap hace scroll horizontal */
+}
+
+/* Cabezera sticky para tablas largas */
+.ficha-activo thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: color-mix(in oklab, var(--card) 98%, transparent);
+  color: var(--ink);
+  text-align: left;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  border-bottom: 1px solid var(--bd);
+  padding: 12px;
+  white-space: nowrap;
+}
+
+/* Indicador de “clickable” para columnas ordenables (role="button") */
+.ficha-activo thead th[role="button"] {
+  cursor: pointer;
+}
+.ficha-activo thead th[role="button"]:hover {
+  background: color-mix(in oklab, var(--card) 92%, transparent);
+}
+
+/* Filas */
+.ficha-activo tbody td {
+  border-bottom: 1px solid var(--bd);
+  padding: 12px;
+  color: var(--ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Zebra + hover */
+.ficha-activo tbody tr:nth-child(odd) {
+  background: color-mix(in oklab, var(--card) 98%, transparent);
+}
+.ficha-activo tbody tr:hover {
+  background: color-mix(in oklab, gray 15%, transparent);
+}
+
+.ficha-activo th:nth-child(1) {
+  width: 150px; /* Fecha */
+}
+.ficha-activo th:nth-child(2) {
+  width: 130px; /* Estado Anterior*/
+}
+.ficha-activo th:nth-child(3) {
+  width: 130px; /* Estado nuevo*/
+}
+.ficha-activo th:nth-child(4) {
+  width: 130px; /* Ubicación origen */
+}
+.ficha-activo th:nth-child(5) {
+  width: 130px; /* Ubicacion destino*/
+}
+.ficha-activo th:nth-child(6) {
+  width: 250x; /* Usuario origen */
+}
+.ficha-activo th:nth-child(7) {
+  width: 250px; /* Usuario destino */
+}
+.ficha-activo th:nth-child(8) {
+  width: 110px; /* Ticket */
+}
+.ficha-activo th:nth-child(9) {
+  width: 150px; /* Responsable */
+}
+.ficha-activo th:last-child {
+  width: 280px; /* Comentario, necesita más espacio */
+}
+
+.ficha-activo tbody td:last-child {
+  white-space: normal; /* el comentario puede envolver en vez de cortarse */
+}
+
+/* Clickable rows (accesible) */
+.ficha-activo tbody tr {
+  transition: background 0.15s ease;
+}
+.ficha-activo tbody tr:focus-within {
+  outline: none;
+  background: color-mix(in oklab, var(--card) 88%, transparent);
+  box-shadow: 0 0 0 4px var(--ring) inset;
+}
+
+/* --------- Paginación --------- */
+.paginacion {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+  align-items: center;
+  gap: 10px;
+  margin-top: var(--gap);
+  padding-top: var(--gap);
+  border-top: 1px solid var(--bd);
+  color: var(--muted);
+}
+.paginacion > span {
+  font-weight: 700;
+  color: var(--ink);
+}
+.paginacion button {
+  background: color-mix(in oklab, var(--card) 94%, transparent);
+  color: var(--ink);
+  border: 1px solid var(--bd);
+  border-radius: calc(var(--radius) - 8px);
+  padding: 8px 12px;
+  font-weight: 600;
+}
+.paginacion button:hover:enabled {
+  background: color-mix(in oklab, var(--card) 88%, transparent);
+}
+.paginacion button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.paginacion select {
+  background: color-mix(in oklab, var(--card) 96%, transparent);
+  color: var(--ink);
+  border: 1px solid var(--bd);
+  border-radius: calc(var(--radius) - 8px);
+  padding: 6px 10px;
+}
+
+/* --------- Estados de la vista (loading / error / vacío) --------- */
+.ficha-activo p {
+  margin: 8px 0;
+  color: var(--muted);
+}
+.ficha-activo p strong {
+  color: var(--ink);
+}
+
+/* =========================================================
+   RESPONSIVE / ADAPTATIVO
+   ========================================================= */
+
+/* 1) Filtros se reacomodan en pantallas medianas */
+@container (max-width: 1100px) {
+  .ficha-activo-filtros {
+    grid-template-columns: 1fr 1fr;
+    grid-auto-rows: minmax(40px, auto);
+  }
+  .ficha-activo-filtros span {
+    display: none;
+  } /* ocultamos el “→” si no hay espacio */
+}
+
+/* 2) Filtros en una sola columna en pantallas estrechas */
+@container (max-width: 640px) {
+  .ficha-activo-filtros {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+}
+
+/* 3) Tabla: reduce padding en celdas cuando el viewport es angosto
+   (el overflow-x del .table-wrap asegura el scroll horizontal) */
+@media (max-width: 720px) {
+  .ficha-activo thead th,
+  .ficha-activo td {
+    padding: 10px 8px;
+  }
+}
+
+/* 4) Mejoras de accesibilidad / motion */
+@media (prefers-reduced-motion: reduce) {
+  .ficha-activo tbody tr {
+    transition: none;
+  }
+}
+
+/* --------- Cuadro con la información del activo --------- */
+.ficha-activo-header {
+  background: var(--card);
+  border: 1px solid var(--bd);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: var(--pad);
+  margin-bottom: var(--gap);
+  max-width: 1500px;
+}
+
+/* --------- Selector (entrar a la ficha desde el menú) --------- */
+.ficha-activo-selector {
+  width: 100%;
+  max-width: 1000px;
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+.ficha-activo-selector__header {
+  margin-bottom: 24px;
+}
+.ficha-activo-selector__header h2 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.ficha-activo-selector__header p {
+  margin: 6px 0 0;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.ficha-activo-selector__tarjeta {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  padding: 22px;
+  border: 1px solid var(--bd);
+  border-radius: var(--radius);
+  background: var(--card);
+}
+
+.ficha-activo-selector__label {
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* --------- Título con estado + botón Devolver --------- */
+
+.ficha-activo-titulo__acciones {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Badge de estado: el color llega por --c (colorEstadoActivo) */
+.ficha-activo-estado {
+  display: inline-block;
+  padding: 3px 10px;
+  border: 1px solid color-mix(in oklab, var(--c) 40%, transparent);
+  border-radius: 6px;
+  background: color-mix(in oklab, var(--c) 15%, transparent);
+  color: var(--c);
+  font-family: ui-monospace, monospace;
+  font-size: 0.82rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.ficha-activo-btn-devolver,
+.ficha-activo-btn-secundario {
+  height: 34px;
+  padding: 0 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+}
+.ficha-activo-btn-devolver {
+  border: 1px solid var(--primary);
+  background: var(--primary);
+  color: var(--primary-ink);
+}
+.ficha-activo-btn-devolver:hover {
+  filter: brightness(1.08);
+}
+.ficha-activo-btn-secundario {
+  border: 1px solid var(--bd);
+  background: transparent;
+  color: var(--ink);
+}
+.ficha-activo-btn-devolver:disabled,
+.ficha-activo-btn-secundario:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  filter: none;
+}
+
+/* --------- Panel de devolución --------- */
+.ficha-activo-devolucion {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 14px;
+  padding: 14px;
+  border: 1px solid var(--bd);
+  border-radius: 10px;
+  background: color-mix(in oklab, var(--ink) 3%, var(--card));
+}
+.ficha-activo-devolucion__label {
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.ficha-activo-devolucion__opciones {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.ficha-activo-devolucion__opcion {
+  height: 40px;
+  border: 1px solid var(--bd);
+  border-radius: 8px;
+  background: var(--field-bg);
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+}
+.ficha-activo-devolucion__opcion.is-activo {
+  border-color: var(--primary);
+  background: color-mix(in oklab, var(--primary) 16%, var(--field-bg));
+  color: var(--ink);
+}
+.ficha-activo-devolucion textarea {
+  padding: 10px 12px;
+  border: 1px solid var(--bd);
+  border-radius: 8px;
+  background: var(--field-bg);
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 14px;
+  resize: vertical;
+}
+.ficha-activo-devolucion textarea:focus,
+.ficha-activo-devolucion__opcion:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--ring);
+}
+.ficha-activo-devolucion__error {
+  color: var(--danger, #dc2626);
+}
+.ficha-activo-devolucion__acciones {
+  display: flex;
+  gap: 10px;
+}
+/* --------- Título de la página --------- */
+.ficha-activo-pagina {
+  margin-bottom: 18px;
+}
+.ficha-activo-pagina h2 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.ficha-activo-pagina p {
+  margin: 6px 0 0;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+/* --------- Tarjeta del activo --------- */
+.ficha-activo-tarjeta__top {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding-bottom: 16px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid var(--bd);
+}
+
+.ficha-activo-tarjeta__icono {
+  align-self: center;
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border: 1px solid color-mix(in oklab, var(--primary) 35%, transparent);
+  border-radius: 10px;
+  background: color-mix(in oklab, var(--primary) 12%, transparent);
+  color: var(--primary);
+}
+
+.ficha-activo-tarjeta__info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.ficha-activo-tarjeta__codigo {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 20px;
+  color: var(--primary);
+  font-weight: 700;
+}
+.ficha-activo-tarjeta__nombre {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.ficha-activo-tarjeta__sub {
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.ficha-activo-tarjeta__datos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 48px;
+  margin: 0;
+}
+.ficha-activo-tarjeta__datos dt {
+  font-size: 14px;
+  color: var(--muted);
+}
+.ficha-activo-tarjeta__datos dd {
+  margin: 4px 0 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 18px;
+  color: var(--ink);
+}
+
+@media (max-width: 640px) {
+  .ficha-activo-tarjeta__top {
+    flex-wrap: wrap;
+  }
+  .ficha-activo-titulo__acciones {
+    width: 100%;
+  }
+}

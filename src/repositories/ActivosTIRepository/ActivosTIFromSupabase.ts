@@ -22,9 +22,9 @@ export class SupabaseActivosTIRepository implements ActivosTIRepository {
       .from(this.tableName)
       .select("*", includeCount ? { count: "exact" } : undefined);
 
-    if (filter?.categoria) {
-      query = query.eq("categoria", filter.categoria);
-    }
+    // if (filter?.categoria) {
+    //   query = query.eq("categoria", filter.categoria);
+    // }
     if (filter?.estado) {
       query = query.eq("estado", filter.estado);
     }
@@ -43,8 +43,6 @@ export class SupabaseActivosTIRepository implements ActivosTIRepository {
           `tipo.ilike.${searchPattern}`,
           `marca.ilike.${searchPattern}`,
           `modelo.ilike.${searchPattern}`,
-          `nombre_usuario.ilike.${searchPattern}`,
-          `correo_usuario.ilike.${searchPattern}`,
         ].join(",");
       }
     }
@@ -146,7 +144,7 @@ export class SupabaseActivosTIRepository implements ActivosTIRepository {
     try {
       const supabaseActivo = {
         codigo_inventario: payload.codigo_inventario ?? "",
-        categoria: payload.categoria,
+        // categoria: payload.categoria,
         tipo: payload.tipo ?? "",
         subtipo: payload.subtipo ?? null,
         marca: payload.marca ?? null,
@@ -154,10 +152,10 @@ export class SupabaseActivosTIRepository implements ActivosTIRepository {
         numero_serie: payload.numero_serie ?? "",
         fecha_ingreso: payload.fecha_ingreso ?? new Date().toISOString(),
         proveedor: payload.proveedor ?? null,
-        estado: payload.estado ?? "disponible",
+        estado: payload.estado ?? "Disponible",
         ubicacion_tipo: payload.ubicacion_tipo ?? "bodega_central",
-        nombre_usuario: payload.nombre_usuario ?? null,
-        correo_usuario: payload.correo_usuario ?? null,
+        nombre_usuario_asignado: payload.nombre_usuario || null,
+        correo_usuario_asignado: payload.correo_usuario || null,
         notas: payload.notas ?? null,
       };
 
@@ -197,9 +195,17 @@ export class SupabaseActivosTIRepository implements ActivosTIRepository {
     message: string | null;
   }> {
     try {
+      // En BD el usuario actual se guarda en columnas *_asignado
+      const { nombre_usuario, correo_usuario, ...rest } = payload;
+      const supabasePayload: Record<string, unknown> = { ...rest };
+      if (nombre_usuario !== undefined)
+        supabasePayload.nombre_usuario_asignado = nombre_usuario;
+      if (correo_usuario !== undefined)
+        supabasePayload.correo_usuario_asignado = correo_usuario;
+
       const { data, error } = await supabase
         .from(this.tableName)
-        .update(payload)
+        .update(supabasePayload)
         .eq("id", id)
         .select()
         .single();
@@ -260,11 +266,47 @@ export class SupabaseActivosTIRepository implements ActivosTIRepository {
       };
     }
   }
+  async getActivoBySerial(serial: string): Promise<{
+    data: ActivoTI | null;
+    status: boolean;
+    message: string | null;
+  }> {
+    try {
+      const limpio = serial.trim().replace(/[\\%_]/g, "\\$%");
+      if (!limpio) {
+        return { data: null, status: true, message: null };
+      }
+
+      const { data, error } = await supabase
+        .from(this.tableName)
+        .select("*")
+        .ilike("numero_serie", limpio)
+        .limit(1)
+        .maybeSingle();
+
+      if (error) {
+        return { data: null, status: false, message: error.message };
+      }
+
+      return {
+        data: data ? this.toModel(data) : null,
+        status: true,
+        message: null,
+      };
+    } catch (e: any) {
+      return {
+        data: null,
+        status: false,
+        message: e?.message ?? "Error buscando el activo por serial",
+      };
+    }
+  }
+
   toModel(bdModel: any): ActivoTI {
     return {
       id: bdModel.id,
       codigo_inventario: bdModel.codigo_inventario,
-      categoria: bdModel.categoria,
+      // categoria: bdModel.categoria,
       tipo: bdModel.tipo,
       subtipo: bdModel.subtipo,
       marca: bdModel.marca,
@@ -274,8 +316,8 @@ export class SupabaseActivosTIRepository implements ActivosTIRepository {
       proveedor: bdModel.proveedor,
       estado: bdModel.estado,
       ubicacion_tipo: bdModel.ubicacion_tipo,
-      nombre_usuario: bdModel.nombre_usuario,
-      correo_usuario: bdModel.correo_usuario,
+      nombre_usuario: bdModel.nombre_usuario_asignado,
+      correo_usuario: bdModel.correo_usuario_asignado,
       notas: bdModel.notas,
       prestamo_activo_id: bdModel.prestamo_activo_id,
       created_at: bdModel.created_at,
