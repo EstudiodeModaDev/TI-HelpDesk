@@ -143,7 +143,9 @@ export function useActivosTI({ ActivosSvc }: UseActivosTIParams) {
       const serial = form.numero_serie?.trim() ?? "";
       const existente = await ActivosSvc.getActivoBySerial(serial);
       if (!existente.status) {
-        setError(existente.message ?? "No se pudo validar el serial");
+        const message = existente.message ?? "No se pudo validar el serial";
+        setError(message);
+        toast.error(message);
         return false;
       }
       if (existente.data && existente.data.id !== selectedActivo?.id) {
@@ -151,6 +153,7 @@ export function useActivosTI({ ActivosSvc }: UseActivosTIParams) {
           ...prev,
           numero_serie: `Ya existe un activo con este serial (código ${existente.data!.codigo_inventario})`,
         }));
+        toast.error("Ya existe un activo con este serial");
         return false;
       }
       const result = selectedActivo
@@ -165,7 +168,9 @@ export function useActivosTI({ ActivosSvc }: UseActivosTIParams) {
             estado: "Disponible",
           } as CrearActivoDTO);
       if (!result.status) {
-        setError(result.message ?? "Error guardando el activo");
+        const message = result.message ?? "Error guardando el activo";
+        setError(message);
+        toast.error(message);
         return false;
       }
       await loadActivos(buildFilter());
@@ -173,11 +178,12 @@ export function useActivosTI({ ActivosSvc }: UseActivosTIParams) {
       resetForm();
       return true;
     } catch (saveError) {
-      setError(
+      const message =
         saveError instanceof Error
           ? saveError.message
-          : "Error guardando el activo",
-      );
+          : "Error guardando el activo";
+      setError(message);
+      toast.error(message);
       return false;
     } finally {
       setLoading(false);

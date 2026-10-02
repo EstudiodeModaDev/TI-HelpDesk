@@ -199,9 +199,10 @@ export function useActivoMovimientos({
       );
 
       if (!result.status) {
-        setError(
-          result.message ?? "Error registrando el movimiento en la bitácora",
-        );
+        const message =
+          result.message ?? "Error registrando el movimiento en la bitácora";
+        setError(message);
+        toast.error(message);
         return false;
       }
 
@@ -210,11 +211,12 @@ export function useActivoMovimientos({
       resetForm();
       return true;
     } catch (saveError) {
-      setError(
+      const message =
         saveError instanceof Error
           ? saveError.message
-          : "Error registrando el movimiento",
-      );
+          : "Error registrando el movimiento";
+      setError(message);
+      toast.error(message);
       return false;
     } finally {
       setLoading(false);

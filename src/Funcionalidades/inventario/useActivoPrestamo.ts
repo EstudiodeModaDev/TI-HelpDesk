@@ -9,6 +9,7 @@ import { FlowClient } from "../shared/FlowClient";
 import { PRESTAMOS_FLOW_URL } from "../loans/prestamos";
 import { toISODateTimeFlex } from "../../utils/Date";
 import { escapeHTML } from "../../utils/Text";
+import toast from "react-hot-toast";
 
 export function useActivoPrestamo() {
   const { activosTI, movimientosTI, activotickets, tickets, logs } =
@@ -36,6 +37,7 @@ export function useActivoPrestamo() {
       } = await activosTI.getActivoById(prestamo.Id_dispositivo);
       if (!status || !activo) {
         console.error("No se encontró el activo del préstamo:", message);
+        toast.error("No se encontró el activo del préstamo");
         return false;
       }
 
@@ -60,6 +62,7 @@ export function useActivoPrestamo() {
           "No se pudo registrar el préstamo en la bitácora:",
           mov.message,
         );
+        toast.error("No se pudo registrar el préstamo en la bitácora");
         return false;
       }
 
@@ -72,6 +75,7 @@ export function useActivoPrestamo() {
       });
       if (!upd.status) {
         console.error("No se pudo marcar el activo en préstamo:", upd.message);
+        toast.error("No se pudo marcar el activo en préstamo");
         return false;
       }
       if (prestamo.IdTicket && activotickets) {
@@ -85,9 +89,11 @@ export function useActivoPrestamo() {
             "No se pudo vincular el ticket al activo:",
             link.message,
           );
+          toast.error("No se pudo vincular el ticket al activo");
         }
       }
 
+      toast.success("Activo marcado en préstamo");
       return true;
     },
     [activosTI, movimientosTI, activotickets, account?.name, account?.username],
@@ -106,6 +112,7 @@ export function useActivoPrestamo() {
       } = await activosTI.getActivoById(prestamo.Id_dispositivo);
       if (!status || !activo) {
         console.error("No se encontró el activo del préstamo:", message);
+        toast.error("No se encontró el activo del préstamo");
         return false;
       }
       if (activo.estado !== "en_prestamo") return false;
@@ -144,6 +151,7 @@ export function useActivoPrestamo() {
           "No se pudo registrar la devolución en la bitácora:",
           mov.message,
         );
+        toast.error("No se pudo registrar la devolución en la bitácora");
         return false;
       }
 
@@ -159,8 +167,10 @@ export function useActivoPrestamo() {
           "No se pudo actualizar el activo al devolverlo:",
           upd.message,
         );
+        toast.error("No se pudo actualizar el activo al devolverlo");
         return false;
       }
+      toast.success("Activo devuelto a su estado anterior");
       return true;
     },
     [activosTI, movimientosTI, account?.name, account?.username],
@@ -209,6 +219,7 @@ export function useActivoPrestamo() {
         }
       } catch (err) {
         console.error("Error cerrando el préstamo:", err);
+        toast.error("No se pudo cerrar el préstamo");
         return false;
       }
 
@@ -235,7 +246,10 @@ export function useActivoPrestamo() {
             </p>`.trim(),
           mail: true,
         })
-        .catch((err) => console.error("Error notificando la devolución:", err));
+        .catch((err) => {
+          console.error("Error notificando la devolución:", err);
+          toast.error("No se pudo enviar el correo de devolución al usuario");
+        });
 
       return true;
     },
