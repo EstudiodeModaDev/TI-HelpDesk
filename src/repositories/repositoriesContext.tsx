@@ -16,8 +16,8 @@ import { SupabaseMessageRepository } from "./ParticipantsRepository/SupabaseMess
 import type { ActivosTIRepository } from "./ActivosTIRepository/ActivosTIRepository";
 import { SupabaseActivosTIRepository } from "./ActivosTIRepository/ActivosTIFromSupabase";
 import type { MovimientosTIRepository } from "./MovimientoTIRepository/MovimientosTIRepository";
-import type { ActivoTicketRepository } from "./ActivoTicket/ActivoTicketRepository";
-import { SupabaseActivoTicketRepository } from "./ActivoTicket/ActivoTicketFromSupabase";
+import type { ActivoTicketRepository } from "./ActivoTicketRepository/ActivoTicketRepository";
+import { SupabaseActivoTicketRepository } from "./ActivoTicketRepository/ActivoTicketFromSupabase";
 import { SupabaseMovimientosTIRepository } from "./MovimientoTIRepository/MovimientoTIFromSupabase";
 type RepositorySource = "supabase" | "sharepoint";
 

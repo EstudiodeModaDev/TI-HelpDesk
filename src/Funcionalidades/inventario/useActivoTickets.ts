@@ -3,8 +3,8 @@ import type {
   ActivoTicket,
   CrearActivoTicketDTO,
 } from "../../Models/ActivoTicket";
-import type { ActivoTicketRepository } from "../../repositories/ActivoTicket/ActivoTicketRepository";
-import type { FilterActivoTicket } from "../../repositories/ActivoTicket/ActivoTicketRepository";
+import type { ActivoTicketRepository } from "../../repositories/ActivoTicketRepository/ActivoTicketRepository";
+import type { FilterActivoTicket } from "../../repositories/ActivoTicketRepository/ActivoTicketRepository";
 
 type UseActivoTicketParams = {
   ActivosTicketSvc: ActivoTicketRepository;
