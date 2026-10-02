@@ -11,6 +11,8 @@ import type {
 import { validarActivoTI } from "../../Models/ActivoTI";
 import type { ActivosTIRepository } from "../../repositories/ActivosTIRepository/ActivosTIRepository";
 import type { FilterActivosTI } from "../../repositories/ActivosTIRepository/ActivosTIRepository";
+import { capitalCase } from 'change-case';
+import toast from "react-hot-toast";
 
 const DEFAULT_PAGE_SIZE = 10;
 
@@ -154,10 +156,12 @@ export function useActivosTI({ ActivosSvc }: UseActivosTIParams) {
       const result = selectedActivo
         ? await ActivosSvc.updateActivo(
             selectedActivo.id,
-            form as ActualizarActivoDTO,
+            {...form, tipo: capitalCase(form.tipo ?? ""), marca: capitalCase(form.marca ?? "")} as ActualizarActivoDTO,
           )
         : await ActivosSvc.createActivo({
             ...form,
+            tipo: capitalCase(form.tipo ?? ""),
+            marca: capitalCase(form.marca ?? ""),
             estado: "Disponible",
           } as CrearActivoDTO);
       if (!result.status) {
@@ -165,6 +169,7 @@ export function useActivosTI({ ActivosSvc }: UseActivosTIParams) {
         return false;
       }
       await loadActivos(buildFilter());
+      toast.success(`Activo ${selectedActivo ? "actualizado" : "creado"} correctamente`);
       resetForm();
       return true;
     } catch (saveError) {
@@ -231,17 +236,14 @@ export function useActivosTI({ ActivosSvc }: UseActivosTIParams) {
       codigo_inventario: activo.codigo_inventario,
       // categoria: activo.categoria,
       tipo: activo.tipo,
-      subtipo: activo.subtipo,
       marca: activo.marca,
       modelo: activo.modelo,
       numero_serie: activo.numero_serie,
       fecha_ingreso: activo.fecha_ingreso,
-      proveedor: activo.proveedor,
       estado: activo.estado,
       ubicacion_tipo: activo.ubicacion_tipo,
       nombre_usuario: activo.nombre_usuario,
       correo_usuario: activo.correo_usuario,
-      notas: activo.notas,
     });
     setFormErrors({});
     setError(null);

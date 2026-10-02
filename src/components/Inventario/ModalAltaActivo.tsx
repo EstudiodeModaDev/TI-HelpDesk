@@ -4,7 +4,7 @@ import type {
   // CategoriaActivo,
   Ubicacion_Tipo,
 } from "../../Models/ActivoTI";
-import { UBICACIONES_ACTIVO } from "../../Models/ActivoTI";
+import { TIPOS_ACTIVO, UBICACIONES_ACTIVO } from "../../Models/ActivoTI";
 import { useRepositories } from "../../repositories/repositoriesContext";
 import { useActivosTI } from "../../Funcionalidades/inventario/useActivosTI";
 
@@ -44,7 +44,7 @@ export const ModalAltaActivos: React.FC = () => {
                   placeholder="Ingrese código del activo"
                   value={form.codigo_inventario ?? ""}
                   onChange={(e) =>
-                    setField("codigo_inventario", e.target.value)
+                    setField("codigo_inventario", e.target.value.toUpperCase())
                   }
                 />
                 {formErrors.codigo_inventario && (
@@ -64,7 +64,7 @@ export const ModalAltaActivos: React.FC = () => {
                   required
                   placeholder="Ingrese número de serie"
                   value={form.numero_serie ?? ""}
-                  onChange={(e) => setField("numero_serie", e.target.value)}
+                  onChange={(e) => setField("numero_serie", e.target.value.toUpperCase())}
                 />
                 {formErrors.numero_serie && (
                   <small style={{ color: "#dc2626" }}>
@@ -83,14 +83,22 @@ export const ModalAltaActivos: React.FC = () => {
                 <label htmlFor="tipo">
                   TIPO <span>*</span>
                 </label>
-                <input
+                <select
                   id="tipo"
-                  type="text"
-                  required
-                  placeholder="Ej: Portátil, Monitor"
                   value={form.tipo ?? ""}
-                  onChange={(e) => setField("tipo", e.target.value)}
-                />
+                  onChange={(e) =>
+                    setField("tipo", e.target.value)
+                  }
+                >
+                  <option value="">Selecciona...</option>
+                  {Object.entries(TIPOS_ACTIVO)
+                  .sort(([, labelA], [, labelB]) => labelA.localeCompare(labelB, "es"))
+                  .map(([value, label]) => (
+                    <option key={value} value={value}>
+                      {label}
+                    </option>
+                  ))}
+                </select>
                 {formErrors.tipo && (
                   <small style={{ color: "#dc2626" }}>{formErrors.tipo}</small>
                 )}
@@ -103,7 +111,7 @@ export const ModalAltaActivos: React.FC = () => {
                   type="text"
                   placeholder="Ingrese Marca"
                   value={form.marca ?? ""}
-                  onChange={(e) => setField("marca", e.target.value)}
+                  onChange={(e) => setField("marca", (e.target.value))}
                 />
               </div>
 
@@ -155,7 +163,7 @@ export const ModalAltaActivos: React.FC = () => {
                   type="text"
                   placeholder="Ingrese modelo"
                   value={form.modelo ?? ""}
-                  onChange={(e) => setField("modelo", e.target.value)}
+                  onChange={(e) => setField("modelo", (e.target.value))}
                 />
               </div>
             </div>

@@ -10,6 +10,7 @@ import type {
   FilterActivosMovimiento,
   MovimientosTIRepository,
 } from "../../repositories/MovimientoTIRepository/MovimientosTIRepository";
+import toast from "react-hot-toast";
 
 const DEFAULT_PAGE_SIZE = 10;
 
@@ -204,6 +205,7 @@ export function useActivoMovimientos({
         return false;
       }
 
+      toast.success("Movimiento registrado correctamente");
       await loadAll();
       resetForm();
       return true;
