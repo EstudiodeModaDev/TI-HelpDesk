@@ -1,29 +1,29 @@
 export type SupabaseTickets = {
-    ticket_solvi_id?: string,
-    ticket_solvi_titulo: string,
-    ticket_solvi_fuente: string,
-    ticket_solvi_estado: string,
-    ticket_solvi_resolutor: string,
-    ticket_solvi_correo_resolutor: string,
-    ticket_solvi_fechaapertura: string,
-    ticket_solvi_fechamaxima: string,
-    ticket_solvi_descripcion: string,
-    ticket_solvi_categoria: string,
-    ticket_solvi_subcategoria: string,
-    ticket_solvi_articulo: string,
-    ticket_solvi_solicitante: string,
-    ticket_solvi_correo_solicitante: string,
-    ticket_solvi_id_casopadre: number | null,
-    ticket_solvi_ans: string,
-    ticket_solvi_mail_conversation_id?: string,
-    ticket_solvi_attachment_name?: string,
-    ticket_solvi_attachemnt_path?: string,
-    ticket_solvi_observador: string,
-    ticket_solvi_correo_observador: string,
-    ticket_solvi_fechacierreal?: string | null,
-    ticket_solvi_minutosnocturnos?: number | null,
-    ticket_solvi_minutosdominicales?: number | null,
-    ticket_solvi_minutosfestivos?: number | null,
-    ticket_solvi_minutostotales?: number | null,
-    ticket_solvi_fecha_pausa?: string | null,
-}
+  ticket_solvi_id?: string;
+  ticket_solvi_titulo: string;
+  ticket_solvi_fuente: string;
+  ticket_solvi_estado: string;
+  ticket_solvi_resolutor: string;
+  ticket_solvi_correo_resolutor: string;
+  ticket_solvi_fechaapertura: string;
+  ticket_solvi_fechamaxima: string | null;
+  ticket_solvi_descripcion: string;
+  ticket_solvi_categoria: string;
+  ticket_solvi_subcategoria: string;
+  ticket_solvi_articulo: string;
+  ticket_solvi_solicitante: string;
+  ticket_solvi_correo_solicitante: string;
+  ticket_solvi_id_casopadre: number | null;
+  ticket_solvi_ans: string;
+  ticket_solvi_mail_conversation_id?: string;
+  ticket_solvi_attachment_name?: string;
+  ticket_solvi_attachemnt_path?: string;
+  ticket_solvi_observador: string;
+  ticket_solvi_correo_observador: string;
+  ticket_solvi_fechacierreal?: string | null;
+  ticket_solvi_minutosnocturnos?: number | null;
+  ticket_solvi_minutosdominicales?: number | null;
+  ticket_solvi_minutosfestivos?: number | null;
+  ticket_solvi_minutostotales?: number | null;
+  ticket_solvi_fecha_pausa?: string | null;
+};

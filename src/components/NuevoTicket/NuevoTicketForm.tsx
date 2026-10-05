@@ -1,7 +1,12 @@
 import * as React from "react";
-import Select, { components, type OptionProps, type SingleValue } from "react-select";
+import { BuscadorActivo } from "../Inventario/BuscadorActivo";
+import Select, {
+  components,
+  type OptionProps,
+  type SingleValue,
+} from "react-select";
 import "./NuevoTicketForm.css";
-import "../../App.css"
+import "../../App.css";
 import { useFranquicias } from "../../Funcionalidades/access/Franquicias";
 import type { UserOption } from "../../Models/Commons";
 import { useGraphServices } from "../../graph/GrapServicesContext";
@@ -12,12 +17,14 @@ import RichTextBase64 from "../RichTextBase64/RichTextBase64";
 import { norm } from "../../utils/Commons";
 import RelacionadorMasiva from "../MasiveNonFather/masiva";
 import { useAuth } from "../../auth/authContext";
+
 import { useRepositories } from "../../repositories/repositoriesContext";
+import type { ActivoTI } from "../../Models/ActivoTI";
 
 export type UserOptionEx = UserOption & { source?: "Empleado" | "Franquicia" };
 export type TreeOption = {
-  value: string;              
-  label: string;              
+  value: string;
+  label: string;
   meta: {
     catId: string | number;
     subId: string | number;
@@ -29,26 +36,68 @@ export type TreeOption = {
 };
 
 export default function NuevoTicketForm() {
-  const {Categorias, SubCategorias, Articulos, Franquicias: FranquiciasSvc, Usuarios: UsuariosSPServiceSvc,} = useGraphServices()
-  const {tickets, logs,} = useRepositories()
+  const {
+    Categorias,
+    SubCategorias,
+    Articulos,
+    Franquicias: FranquiciasSvc,
+    Usuarios: UsuariosSPServiceSvc,
+  } = useGraphServices();
+  const { tickets, logs } = useRepositories();
 
-  const {account} = useAuth()
-  const userRole = useUserRole(account?.username)
-  const {state, errors, submitting, categorias, subcategoriasAll, articulosAll, loadingCatalogos, setField, handleSubmit,} = useNuevoTicketForm({ Categorias, SubCategorias, Articulos, Tickets: tickets!, Usuarios: UsuariosSPServiceSvc, Logs: logs!});
-  const { franqOptions, loading: loadingFranq, error: franqError } = useFranquicias(FranquiciasSvc!);
-  const { workersOptions, loadingWorkers, error: usersError } = useWorkers({
+  const [activosSeleccionados, setActivosSeleccionados] = React.useState<
+    ActivoTI[]
+  >([]);
+
+  const { account } = useAuth();
+
+  const userRole = useUserRole(account?.username);
+  const {
+    state,
+    errors,
+    submitting,
+    categorias,
+    subcategoriasAll,
+    articulosAll,
+    loadingCatalogos,
+    setField,
+    handleSubmit,
+  } = useNuevoTicketForm({
+    Categorias,
+    SubCategorias,
+    Articulos,
+    Tickets: tickets!,
+    Usuarios: UsuariosSPServiceSvc,
+    Logs: logs!,
+  });
+  const {
+    franqOptions,
+    loading: loadingFranq,
+    error: franqError,
+  } = useFranquicias(FranquiciasSvc!);
+  const {
+    workersOptions,
+    loadingWorkers,
+    error: usersError,
+  } = useWorkers({
     onlyEnabled: true,
   });
-  const { UseruserOptions, loading, error } = useUsuarios(UsuariosSPServiceSvc!);
+  const { UseruserOptions, loading, error } = useUsuarios(
+    UsuariosSPServiceSvc!,
+  );
   const opcionesFuentes = [
-    { value: "Correo", label: "Correo" }, 
+    { value: "Correo", label: "Correo" },
     { value: "Disponibilidad", label: "Disponibilidad" },
     { value: "Teams", label: "Teams" },
     { value: "Presencial", label: "Presencial" },
     { value: "WhatsApp", label: "WhatsApp" },
   ];
-  const [masiva, setMasiva] = React.useState<boolean>(false)
-  const [categoriasProps, setCategoriasProps] = React.useState<{catId: number | null, subId: number | null, artId: number | null}>({artId: null, catId: null, subId: null})
+  const [masiva, setMasiva] = React.useState<boolean>(false);
+  const [categoriasProps, setCategoriasProps] = React.useState<{
+    catId: number | null;
+    subId: number | null;
+    artId: number | null;
+  }>({ artId: null, catId: null, subId: null });
 
   // ====== Combinar usuarios con franquicias
   const combinedOptions: UserOptionEx[] = React.useMemo(() => {
@@ -57,15 +106,17 @@ export default function NuevoTicketForm() {
       const key = (o.value || "").toLowerCase();
       if (!map.has(key)) map.set(key, o);
     }
-    return Array.from(map.values()).sort((a, b) => a.label.localeCompare(b.label));
+    return Array.from(map.values()).sort((a, b) =>
+      a.label.localeCompare(b.label),
+    );
   }, [workersOptions, franqOptions]);
 
   const treeOptions: TreeOption[] = React.useMemo(() => {
     if (!categorias.length || !subcategoriasAll.length) return [];
-    const subById = new Map(subcategoriasAll.map(s => [String(s.ID), s]));
-    const catById = new Map(categorias.map(c => [String(c.ID), c]));
+    const subById = new Map(subcategoriasAll.map((s) => [String(s.ID), s]));
+    const catById = new Map(categorias.map((c) => [String(c.ID), c]));
 
-    const desdeArticulos = articulosAll.map(a => {
+    const desdeArticulos = articulosAll.map((a) => {
       const sub = subById.get(String(a.Id_subCategoria));
       const cat = sub ? catById.get(String(sub.Id_categoria)) : undefined;
 
@@ -90,10 +141,12 @@ export default function NuevoTicketForm() {
     // No todo el catálogo tiene artículo: las subcategorías sin ninguno se
     // ofrecen igual como hoja seleccionable, para poder calcular el ANS con
     // categoría + subcategoría solamente.
-    const subIdsConArticulo = new Set(articulosAll.map(a => String(a.Id_subCategoria)));
+    const subIdsConArticulo = new Set(
+      articulosAll.map((a) => String(a.Id_subCategoria)),
+    );
     const desdeSubcategoriasSinArticulo = subcategoriasAll
-      .filter(s => !subIdsConArticulo.has(String(s.ID)))
-      .map(s => {
+      .filter((s) => !subIdsConArticulo.has(String(s.ID)))
+      .map((s) => {
         const cat = catById.get(String(s.Id_categoria));
         const catTitle = cat?.Title ?? "(Sin categoría)";
         const subTitle = s.Title ?? "(Sin subcategoría)";
@@ -112,7 +165,9 @@ export default function NuevoTicketForm() {
         } as TreeOption;
       });
 
-    return [...desdeArticulos, ...desdeSubcategoriasSinArticulo].sort((x, y) => x.label.localeCompare(y.label));
+    return [...desdeArticulos, ...desdeSubcategoriasSinArticulo].sort((x, y) =>
+      x.label.localeCompare(y.label),
+    );
   }, [categorias, subcategoriasAll, articulosAll]);
 
   const treeValue: TreeOption | null = React.useMemo(() => {
@@ -125,16 +180,21 @@ export default function NuevoTicketForm() {
     const artId = String(state.articuloId ?? "");
 
     return (
-      treeOptions.find(o =>
-        (artId && String(o.meta.artId) === artId) ||
-        (
-          norm(o.meta.artTitle) === normArt &&
-          norm(o.meta.catTitle) === normCat &&
-          norm(o.meta.subTitle) === normSub
-        )
+      treeOptions.find(
+        (o) =>
+          (artId && String(o.meta.artId) === artId) ||
+          (norm(o.meta.artTitle) === normArt &&
+            norm(o.meta.catTitle) === normCat &&
+            norm(o.meta.subTitle) === normSub),
       ) ?? null
     );
-  }, [state.articulo, state.articuloId, state.categoria, state.subcategoria, treeOptions]);
+  }, [
+    state.articulo,
+    state.articuloId,
+    state.categoria,
+    state.subcategoria,
+    treeOptions,
+  ]);
 
   const userFilter = (option: any, raw: string) => {
     const q = norm(raw);
@@ -168,11 +228,11 @@ export default function NuevoTicketForm() {
       setField("subcategoria", "");
       setField("articulo", "");
       setField("articuloId", "");
-      setCategoriasProps({artId: null, catId: null, subId: null})
+      setCategoriasProps({ artId: null, catId: null, subId: null });
       return;
     }
 
-    const { catTitle, subTitle, artTitle, } = opt.meta;
+    const { catTitle, subTitle, artTitle } = opt.meta;
 
     // Títulos en tu estado global
     setField("categoria", catTitle);
@@ -182,57 +242,118 @@ export default function NuevoTicketForm() {
       artId: opt.meta.artId ? Number(opt.meta.artId) : null,
       catId: Number(opt.meta.catId),
       subId: Number(opt.meta.subId),
-    })
+    });
   };
 
   const disabledCats = submitting || loadingCatalogos;
 
   return (
-  <div className="ticket-form">
+    <div className="ticket-form">
+      {masiva ? (
+        <RelacionadorMasiva
+          onCancel={() => setMasiva(false)}
+          userMail={account?.username ?? ""}
+          role={userRole.role}
+          currentId={""}
+        />
+      ) : (
+        <>
+          <div className="form-header">
+            <h2 className="tf-title">Nuevo Ticket</h2>
+            <button
+              className="btn btn-primary-final btn-xs"
+              onClick={() => setMasiva(true)}
+            >
+              Masivo
+            </button>
+          </div>
 
-    {masiva ? <RelacionadorMasiva onCancel={() => setMasiva(false)} userMail={account?.username ?? ""} role={userRole.role} currentId={""}/> : (
-      <>
-        <div className="form-header">
-          <h2 className="tf-title">Nuevo Ticket</h2>
-          <button className="btn btn-primary-final btn-xs" onClick={() => setMasiva(true)}>Masivo</button>
-        </div> 
-
-        <form onSubmit={(e) => {e.preventDefault(); handleSubmit(e, {art: categoriasProps.artId, catId: categoriasProps.catId, subId: categoriasProps.subId})}} noValidate className="tf-grid">
+          <form
+            onSubmit={async (e) => {
+              e.preventDefault();
+              const ok = await handleSubmit(
+                e,
+                {
+                  art: categoriasProps.artId,
+                  catId: categoriasProps.catId,
+                  subId: categoriasProps.subId,
+                },
+                activosSeleccionados.map((a) => a.id),
+              );
+              if (ok) setActivosSeleccionados([]);
+            }}
+            noValidate
+            className="tf-grid"
+          >
             {/* Fuente */}
             <div className="tf-field">
-              <label className="tf-label" htmlFor="fuente">Fuente Solicitante</label>
-              
-              <Select inputId="fuente" options={opcionesFuentes} classNamePrefix="rs" placeholder="Selecciona fuente de solicitud..."
-                value={opcionesFuentes.find(o => o.value === state.fuente) ?? null}
-                onChange={(opt) => {setField("fuente", opt?.label ?? ""); }}
+              <label className="tf-label" htmlFor="fuente">
+                Fuente Solicitante
+              </label>
+
+              <Select
+                inputId="fuente"
+                options={opcionesFuentes}
+                classNamePrefix="rs"
+                placeholder="Selecciona fuente de solicitud..."
+                value={
+                  opcionesFuentes.find((o) => o.value === state.fuente) ?? null
+                }
+                onChange={(opt) => {
+                  setField("fuente", opt?.label ?? "");
+                }}
                 isClearable
               />
-              {errors.fuente && <small className="error">{errors.fuente}</small>}
+              {errors.fuente && (
+                <small className="error">{errors.fuente}</small>
+              )}
             </div>
 
             {/* Motivo */}
             <div className="tf-field">
-              <label className="tf-label" htmlFor="motivo">Asunto</label>
-              <input id="motivo" type="text" placeholder="Ingrese el motivo" value={state.motivo} onChange={(e) => setField("motivo", e.target.value)} disabled={submitting} className="tf-input" maxLength={300}/>
-              {errors.motivo && <small className="error">{errors.motivo}</small>}
+              <label className="tf-label" htmlFor="motivo">
+                Asunto
+              </label>
+              <input
+                id="motivo"
+                type="text"
+                placeholder="Ingrese el motivo"
+                value={state.motivo}
+                onChange={(e) => setField("motivo", e.target.value)}
+                disabled={submitting}
+                className="tf-input"
+                maxLength={300}
+              />
+              {errors.motivo && (
+                <small className="error">{errors.motivo}</small>
+              )}
             </div>
-
 
             <div className="tf-field">
               <label className="tf-label">Solicitante</label>
               <Select<UserOptionEx, false>
                 options={combinedOptions}
-                placeholder={loadingWorkers || loadingFranq ? "Cargando opciones…" : "Buscar solicitante…"}
+                placeholder={
+                  loadingWorkers || loadingFranq
+                    ? "Cargando opciones…"
+                    : "Buscar solicitante…"
+                }
                 value={state.solicitante as UserOptionEx | null}
                 onChange={(opt) => setField("solicitante", opt ?? null)}
                 classNamePrefix="rs"
                 isDisabled={submitting || loadingWorkers || loadingFranq}
                 isLoading={loadingWorkers || loadingFranq}
                 components={{ Option }}
-                noOptionsMessage={() => (usersError || franqError ? "Error cargando opciones" : "Sin coincidencias")}
+                noOptionsMessage={() =>
+                  usersError || franqError
+                    ? "Error cargando opciones"
+                    : "Sin coincidencias"
+                }
                 isClearable
               />
-              {errors.solicitante && <small className="error">{errors.solicitante}</small>}
+              {errors.solicitante && (
+                <small className="error">{errors.solicitante}</small>
+              )}
             </div>
 
             {/* Resolutor */}
@@ -240,62 +361,100 @@ export default function NuevoTicketForm() {
               <label className="tf-label">Resolutor</label>
               <Select<UserOption, false>
                 options={UseruserOptions}
-                placeholder={loading ? "Cargando usuarios…" : "Buscar resolutor…"}
+                placeholder={
+                  loading ? "Cargando usuarios…" : "Buscar resolutor…"
+                }
                 value={state.resolutor}
                 onChange={async (opt) => {
-                    setField("resolutor", opt ?? null)
-                  }
-                }
+                  setField("resolutor", opt ?? null);
+                }}
                 classNamePrefix="rs"
                 isDisabled={submitting || loading}
                 isLoading={loading}
                 filterOption={userFilter as any}
                 components={{ Option: Option as any }}
-                noOptionsMessage={() => (error ? "Error cargando usuarios" : "Sin coincidencias")}
+                noOptionsMessage={() =>
+                  error ? "Error cargando usuarios" : "Sin coincidencias"
+                }
                 isClearable
               />
-              {errors.resolutor && <small className="error">{errors.resolutor}</small>}
+              {errors.resolutor && (
+                <small className="error">{errors.resolutor}</small>
+              )}
+            </div>
+
+            <div className="tf-field">
+              <label className="tf-label">Activos</label>
+              <BuscadorActivo
+                isMulti
+                inputId="nuevo_ticket_activos"
+                value={activosSeleccionados}
+                onChange={setActivosSeleccionados}
+                isDisabled={submitting}
+              />
             </div>
 
             {/* Fecha de apertura (opcional) */}
             <div className="tf-field tf-col-2 tf-inline">
               <label className="tf-checkbox">
-                <input type="checkbox" checked={state.cerrar} onChange={(ev) => setField("cerrar", ev.target.checked)} disabled={submitting} className="tf-checkbox"/>
-                <span>Ticket cerrado</span>           
+                <input
+                  type="checkbox"
+                  checked={state.cerrar}
+                  onChange={(ev) => setField("cerrar", ev.target.checked)}
+                  disabled={submitting}
+                  className="tf-checkbox"
+                />
+                <span>Ticket cerrado</span>
               </label>
             </div>
 
             {/* Descripción */}
-            <div className={`tf-field tf-col-2 ${errors.descripcion ? "has-error" : ""}`}>
+            <div
+              className={`tf-field tf-col-2 ${errors.descripcion ? "has-error" : ""}`}
+            >
               <label className="tf-label">Descripción</label>
 
               <div className="rtb-box">
-                <RichTextBase64 value={state.descripcion} onChange={(html) => setField("descripcion", html)} placeholder="Describe el problema y pega capturas (Ctrl+V)..."/>
+                <RichTextBase64
+                  value={state.descripcion}
+                  onChange={(html) => setField("descripcion", html)}
+                  placeholder="Describe el problema y pega capturas (Ctrl+V)..."
+                />
               </div>
 
-              {errors.descripcion && <small className="error">{errors.descripcion}</small>}
+              {errors.descripcion && (
+                <small className="error">{errors.descripcion}</small>
+              )}
             </div>
 
             {/* Categoría / Subcategoría / Artículo */}
-            <div className="tf-row tf-row--cats tf-col-2"> 
+            <div className="tf-row tf-row--cats tf-col-2">
               <div className="tf-field">
                 <label className="tf-label">Categoría</label>
                 <Select<TreeOption, false>
                   classNamePrefix="rs"
-                  placeholder={loadingCatalogos ? "Cargando catálogo..." : "Buscar categoría/sub/artículo…"}
+                  placeholder={
+                    loadingCatalogos
+                      ? "Cargando catálogo..."
+                      : "Buscar categoría/sub/artículo…"
+                  }
                   options={treeOptions}
                   value={treeValue}
                   onChange={onTreeChange}
                   isDisabled={disabledCats}
                   isClearable
                 />
-                {errors.categoria && <small className="error">{errors.categoria}</small>}
+                {errors.categoria && (
+                  <small className="error">{errors.categoria}</small>
+                )}
               </div>
             </div>
 
             {/* Archivo */}
             <div className="tf-field tf-col-2">
-              <label className="tf-label" htmlFor="archivo">Adjuntar archivo</label>
+              <label className="tf-label" htmlFor="archivo">
+                Adjuntar archivo
+              </label>
               <input
                 id="archivo"
                 type="file"
@@ -310,16 +469,17 @@ export default function NuevoTicketForm() {
 
             {/* Submit */}
             <div className="tf-actions tf-col-2">
-              <button type="submit" disabled={submitting || loadingCatalogos} className="btn btn-primary-final">
+              <button
+                type="submit"
+                disabled={submitting || loadingCatalogos}
+                className="btn btn-primary-final"
+              >
                 {submitting ? "Enviando..." : "Enviar Ticket"}
               </button>
             </div>
-        </form>
-      </>
-    )}
-      
+          </form>
+        </>
+      )}
     </div>
   );
 }
-
-

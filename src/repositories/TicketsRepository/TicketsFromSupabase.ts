@@ -1,8 +1,11 @@
 import type { SupabaseTickets } from "../../Models/DTO/Tickets";
 import type { Ticket } from "../../Models/Tickets";
 import { supabase } from "../../Services/Supabase.service";
-import type { filterTickets, TicketsLoadResult, TicketsRepository } from "./TicketRepository";
-
+import type {
+  filterTickets,
+  TicketsLoadResult,
+  TicketsRepository,
+} from "./TicketRepository";
 
 export class SupabaseTicketRepository implements TicketsRepository {
   private readonly tableName = "TBL_Ticket_Solvi";
@@ -111,7 +114,10 @@ export class SupabaseTicketRepository implements TicketsRepository {
       if (filter?.paginated) {
         const from = (pageIndex - 1) * pageSize;
         const to = from + pageSize - 1;
-        const { data, error, count } = await this.buildTicketsQuery(filter, true).range(from, to);
+        const { data, error, count } = await this.buildTicketsQuery(
+          filter,
+          true,
+        ).range(from, to);
 
         if (error) {
           return {
@@ -138,7 +144,10 @@ export class SupabaseTicketRepository implements TicketsRepository {
 
       while (true) {
         const to = from + this.batchSize - 1;
-        const { data, error, count } = await this.buildTicketsQuery(filter, from === 0).range(from, to);
+        const { data, error, count } = await this.buildTicketsQuery(
+          filter,
+          from === 0,
+        ).range(from, to);
 
         if (error) {
           return {
@@ -184,10 +193,11 @@ export class SupabaseTicketRepository implements TicketsRepository {
     }
   }
 
-  async createTicket(payload: Partial<Ticket>): Promise<{data: Ticket | null, status: boolean, message: string | null}> {
+  async createTicket(
+    payload: Partial<Ticket>,
+  ): Promise<{ data: Ticket | null; status: boolean; message: string | null }> {
     try {
-
-      const supabaseTicket: SupabaseTickets ={
+      const supabaseTicket: SupabaseTickets = {
         ticket_solvi_ans: payload.ANS ?? "",
         ticket_solvi_articulo: payload.Articulo ?? "",
         ticket_solvi_categoria: payload.Categoria ?? "",
@@ -196,10 +206,14 @@ export class SupabaseTicketRepository implements TicketsRepository {
         ticket_solvi_correo_solicitante: payload.CorreoSolicitante ?? "",
         ticket_solvi_descripcion: payload.Descripcion ?? "",
         ticket_solvi_estado: payload.Estadodesolicitud ?? "",
-        ticket_solvi_fechaapertura: payload.FechaApertura ?? "",
-        ticket_solvi_fechamaxima: payload.FechaMaxima ?? "",
+        ticket_solvi_fechaapertura:
+          payload.FechaApertura || new Date().toISOString(),
+        ticket_solvi_fechamaxima: payload.FechaMaxima || null,
+
         ticket_solvi_fuente: payload.Fuente ?? "",
-        ticket_solvi_id_casopadre: payload.IdCasoPadre ? Number(payload.IdCasoPadre) : null,
+        ticket_solvi_id_casopadre: payload.IdCasoPadre
+          ? Number(payload.IdCasoPadre)
+          : null,
         ticket_solvi_observador: payload.Observador ?? "",
         ticket_solvi_resolutor: payload.Nombreresolutor ?? "",
         ticket_solvi_solicitante: payload.Solicitante ?? "",
@@ -207,7 +221,7 @@ export class SupabaseTicketRepository implements TicketsRepository {
         ticket_solvi_titulo: payload.AsuntoTicket ?? "",
         ticket_solvi_attachemnt_path: "",
         ticket_solvi_attachment_name: "",
-      }
+      };
 
       const { data, error } = await supabase
         .from(this.tableName)
@@ -237,7 +251,10 @@ export class SupabaseTicketRepository implements TicketsRepository {
     }
   }
 
-  async updateTicket(id: string, payload: any): Promise<{data: Ticket | null, status: boolean, message: string | null}> {
+  async updateTicket(
+    id: string,
+    payload: any,
+  ): Promise<{ data: Ticket | null; status: boolean; message: string | null }> {
     try {
       const { data, error } = await supabase
         .from(this.tableName)
@@ -268,10 +285,15 @@ export class SupabaseTicketRepository implements TicketsRepository {
     }
   }
 
-  async getTicketById(id: string): Promise<{data: Ticket | null, status: boolean, message: string | null}> {
+  async getTicketById(
+    id: string,
+  ): Promise<{ data: Ticket | null; status: boolean; message: string | null }> {
     try {
-      const query = supabase.from(this.tableName).select("*").eq("ticket_solvi_id", id).single()
-
+      const query = supabase
+        .from(this.tableName)
+        .select("*")
+        .eq("ticket_solvi_id", id)
+        .single();
 
       const { data, error } = await query;
 
@@ -297,21 +319,23 @@ export class SupabaseTicketRepository implements TicketsRepository {
     }
   }
 
-  async countTickets(resolutorMail: string, status: "En Atención" | "Fuera de tiempo"): Promise<number> {
+  async countTickets(
+    resolutorMail: string,
+    status: "En Atención" | "Fuera de tiempo",
+  ): Promise<number> {
     let query = supabase
       .from(this.tableName)
       .select("*", { count: "exact", head: true })
       .eq("ticket_solvi_correo_resolutor", resolutorMail)
       .eq("ticket_solvi_estado", status);
 
-
     const { count, error } = await query;
     if (error) throw error;
     return count ?? 0;
   }
 
-  toModel(bdModel: any): Ticket{
-      const toRetun = {
+  toModel(bdModel: any): Ticket {
+    const toRetun = {
       ANS: bdModel.ticket_solvi_ans,
       Articulo: bdModel.ticket_solvi_articulo,
       Categoria: bdModel.ticket_solvi_categoria,
@@ -337,10 +361,8 @@ export class SupabaseTicketRepository implements TicketsRepository {
       MinutosTotales: bdModel.MinutosTotales,
       AsuntoTicket: bdModel.ticket_solvi_titulo,
       Title: bdModel.ticket_solvi_titulo,
+    };
 
-    }
-
-    return toRetun
-
+    return toRetun;
   }
 }

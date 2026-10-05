@@ -1,7 +1,15 @@
 import * as React from "react";
 import type { GetAllOpts, PageResult } from "../../Models/Commons";
 import { useGraphServices } from "../../graph/GrapServicesContext";
-import type { dispositivos, dispositivosErrors, prestamos, prestamosErrors, pruebasDefinidas, pruebasDispositos, pruebasPrestamo } from "../../Models/prestamos";
+import type {
+  dispositivos,
+  dispositivosErrors,
+  prestamos,
+  prestamosErrors,
+  pruebasDefinidas,
+  pruebasDispositos,
+  pruebasPrestamo,
+} from "../../Models/prestamos";
 import { toISODateTimeFlex } from "../../utils/Date";
 import { useAuth } from "../../auth/authContext";
 import { FlowClient } from "../shared/FlowClient";
@@ -9,12 +17,15 @@ import type { FlowToUser } from "../../Models/FlujosPA";
 import { escapeHTML } from "../../utils/Text";
 import { useRepositories } from "../../repositories/repositoriesContext";
 
+// Flujo de Power Automate que envía los correos de préstamo/devolución
+export const PRESTAMOS_FLOW_URL =
+  "https://defaultcd48ecd97e154f4b97d9ec813ee42b.2c.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/a21d66d127ff43d7a940369623f0b27d/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=0ptZLGTXbYtVNKdmIvLdYPhw1Wcqb869N3AOZUf2OH4";
+
 export function usePrestamos() {
-  const {prestamos,} = useGraphServices()
-  const {logs} = useRepositories()
-  const {tickets} = useRepositories()
-  const {dispositivosById} = useDispositivos()
-  const {loadPruebasPrestamo} = usePruebas()
+  const { prestamos } = useGraphServices();
+  const { logs } = useRepositories();
+  const { tickets } = useRepositories();
+  const { loadPruebasPrestamo } = usePruebas();
 
   const [rows, setRows] = React.useState<prestamos[]>([]);
   const [loading, setLoading] = React.useState(false);
@@ -22,44 +33,59 @@ export function usePrestamos() {
   const [error, setError] = React.useState<string | null>(null);
   const [estado, setEstado] = React.useState<string>("Activo");
   const [search, setSearch] = React.useState<string>("");
-  const [state, setState] = React.useState<prestamos>({Estado: "Activo", FechaDevolucion: null, FechaPrestamo: toISODateTimeFlex(new Date()), Id_dispositivo: "", UsuarioRecibe: "", Title: "", IdTicket: "", nombreSolicitante: ""});
-  const setField = <K extends keyof prestamos>(k: K, v: prestamos[K]) => setState((s) => ({ ...s, [k]: v })); 
+  const [state, setState] = React.useState<prestamos>({
+    Estado: "Activo",
+    FechaDevolucion: null,
+    FechaPrestamo: toISODateTimeFlex(new Date()),
+    Id_dispositivo: "",
+    UsuarioRecibe: "",
+    Title: "",
+    IdTicket: "",
+    nombreSolicitante: "",
+  });
+  const setField = <K extends keyof prestamos>(k: K, v: prestamos[K]) =>
+    setState((s) => ({ ...s, [k]: v }));
   const [errors, setErrors] = React.useState<prestamosErrors>({});
-  const {account} = useAuth()
-  const notifyFlow = new FlowClient("https://defaultcd48ecd97e154f4b97d9ec813ee42b.2c.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/a21d66d127ff43d7a940369623f0b27d/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=0ptZLGTXbYtVNKdmIvLdYPhw1Wcqb869N3AOZUf2OH4")
-  
+  const { account } = useAuth();
+  const notifyFlow = new FlowClient(PRESTAMOS_FLOW_URL);
+
   const buildFilter = React.useCallback((): GetAllOpts => {
     const filters: string[] = [];
 
-    if(estado && estado !== "all") filters.push(`fields/Estado eq '${estado}'`);
+    if (estado && estado !== "all")
+      filters.push(`fields/Estado eq '${estado}'`);
 
     return {
       filter: filters.join(" and "),
-      orderby: "fields/Created asc", 
+      orderby: "fields/Created asc",
     };
-  }, [estado,]);
+  }, [estado]);
 
   const validate = () => {
     const e: prestamosErrors = {};
-    if (!state.Id_dispositivo) e.Id_dispositivo = "Ingrese la referencia del dispositivo";
+    if (!state.Id_dispositivo)
+      e.Id_dispositivo = "Ingrese la referencia del dispositivo";
     if (!state.Title) e.Title = "Seleccione el solicitante del préstamo";
     setErrors(e);
     return Object.keys(e).length === 0;
   };
 
-  const handleSubmit = async (): Promise<{continue: boolean, created: prestamos | null}> => {
+  const handleSubmit = async (): Promise<{
+    continue: boolean;
+    created: prestamos | null;
+  }> => {
     if (!validate()) {
-      alert("Por favor rellene todos los campos")
-      return {continue: false, created: null};
-    };
+      alert("Por favor rellene todos los campos");
+      return { continue: false, created: null };
+    }
 
     setSubmitting(true);
     try {
-      const ticket =await tickets?.createTicket({
-        AsuntoTicket: "Prestamo de equipo a " + state.nombreSolicitante, 
-        ANS: "N/A", 
-        Categoria: "Otros", 
-        Descripcion: `Préstamo del dispositivo con ID ${state.Id_dispositivo} a ${state.Title} el día ${state.FechaPrestamo}.`, 
+      const ticket = await tickets?.createTicket({
+        AsuntoTicket: "Prestamo de equipo a " + state.nombreSolicitante,
+        ANS: "N/A",
+        Categoria: "Otros",
+        Descripcion: `Préstamo del dispositivo con ID ${state.Id_dispositivo} a ${state.Title} el día ${state.FechaPrestamo}.`,
         CorreoSolicitante: state.Title,
         Correoresolutor: account?.username ?? "",
         Estadodesolicitud: "En Atención",
@@ -75,38 +101,51 @@ export function usePrestamos() {
         Observador: "",
       });
       await logs?.createLog({
-        seguimientos_solvi_actor: "Sistema", 
-        seguimientos_solvi_descripcion: `Se ha creado el ticket ${ticket?.data?.ID} para el préstamo de equipo.`, 
-        seguimientos_solvi_tipo_de_accion: "Creacion",  
-        seguimientos_solvi_id_ticket: Number(ticket?.data?.ID), 
+        seguimientos_solvi_actor: "Sistema",
+        seguimientos_solvi_descripcion: `Se ha creado el ticket ${ticket?.data?.ID} para el préstamo de equipo.`,
+        seguimientos_solvi_tipo_de_accion: "Creacion",
+        seguimientos_solvi_id_ticket: Number(ticket?.data?.ID),
         seguimientos_solvi_correo_actor: "",
-        seguimientos_solvi_action_date: new Date()
-      })
+        seguimientos_solvi_action_date: new Date(),
+      });
       const payload: prestamos = {
         Title: state.Title!,
         Id_dispositivo: state.Id_dispositivo!,
         Estado: "Activo",
-        FechaPrestamo: state.FechaPrestamo!,
-        IdTicket: ticket?.data?.ID ?? "",
+        FechaPrestamo: new Date().toISOString(),
+        IdTicket: ticket?.data?.ID?.toString() ?? "",
         FechaDevolucion: null,
         UsuarioRecibe: "",
         nombreSolicitante: state.nombreSolicitante!,
-
-      }
+      };
       const prestamo = await prestamos.create(payload);
 
       alert("Prestamo creado exitosamente");
-      setState({Estado: "Activo", FechaDevolucion: null, FechaPrestamo: toISODateTimeFlex(new Date()), Id_dispositivo: "", IdTicket: "", UsuarioRecibe: "", Title: "", nombreSolicitante: ""});
+      setState({
+        Estado: "Activo",
+        FechaDevolucion: null,
+        FechaPrestamo: toISODateTimeFlex(new Date()),
+        Id_dispositivo: "",
+        IdTicket: "",
+        UsuarioRecibe: "",
+        Title: "",
+        nombreSolicitante: "",
+      });
       load();
-      return {continue: true, created: prestamo};
+      return { continue: true, created: prestamo };
     } catch (err) {
       console.error("Error en handleSubmit:", err);
-      return {continue: false, created: null}
-    }  
+      return { continue: false, created: null };
+    }
   };
 
-  const notify = async (prestamo: prestamos, dispositivos: dispositivos[]): Promise<void> => {
-    const dispositivo = dispositivos.find(d => d.Id === prestamo.Id_dispositivo);
+  const notify = async (
+    prestamo: prestamos,
+    dispositivos: dispositivos[],
+  ): Promise<void> => {
+    const dispositivo = dispositivos.find(
+      (d) => d.Id === prestamo.Id_dispositivo,
+    );
     const message = `
       <p>
         ¡Hola ${prestamo.nombreSolicitante ?? ""}!<br><br>
@@ -119,11 +158,22 @@ export function usePrestamos() {
 
         Este es un mensaje automático, por favor no respondas.
       </p>`.trim();
-    await notifyFlow.invoke<FlowToUser, any>({recipient: prestamo.Title, title: "Notificación de prestamo", message, mail: true})
-  }
+    await notifyFlow.invoke<FlowToUser, any>({
+      recipient: prestamo.Title,
+      title: "Notificación de prestamo",
+      message,
+      mail: true,
+    });
+  };
 
-  const notifyEstado = async (prestamo: prestamos, dispositivos: dispositivos[], estado: string): Promise<void> => {
-    const dispositivo = dispositivos.find(d => d.Id === prestamo.Id_dispositivo);
+  const notifyEstado = async (
+    prestamo: prestamos,
+    dispositivos: dispositivos[],
+    estado: string,
+  ): Promise<void> => {
+    const dispositivo = dispositivos.find(
+      (d) => d.Id === prestamo.Id_dispositivo,
+    );
     const message = `
       <p>
         ¡Hola ${prestamo.nombreSolicitante ?? ""}!<br><br>
@@ -133,14 +183,21 @@ export function usePrestamos() {
         <strong>Dispositivo prestado:</strong>  ${dispositivo?.Referencia ?? ""}<br><br>
         <strong>Estado de devolucion:</strong> ${estado}<br><br>
 
-        ${estado.toLocaleLowerCase() === "mal estado" ? 
-          "Lamentablemente el dispositivo no fue devuelto en buen estado. Nos pondremos en contacto contigo para informarte sobre los próximos pasos a seguir." : 
-          "Gracias por devolver el dispositivo en buen estado. Si necesitas realizar otro préstamo, no dudes en contactarnos."}<br><br>
+        ${
+          estado.toLocaleLowerCase() === "mal estado"
+            ? "Lamentablemente el dispositivo no fue devuelto en buen estado. Nos pondremos en contacto contigo para informarte sobre los próximos pasos a seguir."
+            : "Gracias por devolver el dispositivo en buen estado. Si necesitas realizar otro préstamo, no dudes en contactarnos."
+        }<br><br>
 
         Este es un mensaje automático, por favor no respondas.
       </p>`.trim();
-    await notifyFlow.invoke<FlowToUser, any>({recipient: prestamo.Title, title: "Notificación de prestamo", message, mail: true})
-  }
+    await notifyFlow.invoke<FlowToUser, any>({
+      recipient: prestamo.Title,
+      title: "Notificación de prestamo",
+      message,
+      mail: true,
+    });
+  };
 
   const load = React.useCallback(async () => {
     setLoading(true);
@@ -151,7 +208,9 @@ export function usePrestamos() {
       let nextLink: string | undefined = undefined;
 
       do {
-        const res: PageResult<prestamos> = nextLink ? await prestamos.getByNextLink(nextLink)         : await prestamos.getAll(buildFilter());     
+        const res: PageResult<prestamos> = nextLink
+          ? await prestamos.getByNextLink(nextLink)
+          : await prestamos.getAll(buildFilter());
 
         all.push(...(res.items ?? []));
         nextLink = res.nextLink ? res.nextLink : "";
@@ -166,29 +225,36 @@ export function usePrestamos() {
     }
   }, [buildFilter, prestamos]);
 
-  const loadDeviceLoans = React.useCallback(async (idDevice: string): Promise<prestamos[]> => {
-    setLoading(true);
-    setError(null);
+  const loadDeviceLoans = React.useCallback(
+    async (idDevice: string): Promise<prestamos[]> => {
+      setLoading(true);
+      setError(null);
 
-    try {
-      const all: prestamos[] = [];
-      let nextLink: string | undefined = undefined;
+      try {
+        const all: prestamos[] = [];
+        let nextLink: string | undefined = undefined;
 
-      do {
-        const res: PageResult<prestamos> = nextLink ? await prestamos.getByNextLink(nextLink) : await prestamos.getAll({filter: `fields/Id_dispositivo eq '${idDevice}'`});     
+        do {
+          const res: PageResult<prestamos> = nextLink
+            ? await prestamos.getByNextLink(nextLink)
+            : await prestamos.getAll({
+                filter: `fields/Id_dispositivo eq '${idDevice}'`,
+              });
 
-        all.push(...(res.items ?? []));
-        nextLink = res.nextLink ? res.nextLink : "";
-      } while (nextLink);
+          all.push(...(res.items ?? []));
+          nextLink = res.nextLink ? res.nextLink : "";
+        } while (nextLink);
 
-      return all
-    } catch (e: any) {
-      setError(e?.message ?? "Error cargando logs");
-      return []
-    } finally {
-      setLoading(false);
-    }
-  }, [buildFilter, prestamos]);
+        return all;
+      } catch (e: any) {
+        setError(e?.message ?? "Error cargando logs");
+        return [];
+      } finally {
+        setLoading(false);
+      }
+    },
+    [buildFilter, prestamos],
+  );
 
   const reload = React.useCallback(() => {
     load();
@@ -196,19 +262,30 @@ export function usePrestamos() {
 
   const finalizeLoan = async (loan: prestamos, continuar: boolean) => {
     try {
-      await prestamos.update(loan.Id!, {Estado: "Cerrado", FechaDevolucion: toISODateTimeFlex(new Date()), UsuarioRecibe: account?.name ?? "",});
+      await prestamos.update(loan.Id!, {
+        Estado: "Cerrado",
+        FechaDevolucion: toISODateTimeFlex(new Date()),
+        UsuarioRecibe: account?.name ?? "",
+      });
 
-      await tickets?.updateTicket(loan.IdTicket, {Estadodesolicitud: "Cerrado", FechaMaxima: toISODateTimeFlex(new Date()),});
+      await tickets?.updateTicket(loan.IdTicket, {
+        Estadodesolicitud: "Cerrado",
+        FechaMaxima: toISODateTimeFlex(new Date()),
+      });
 
-      const entregaPrestamo = (await loadPruebasPrestamo(loan.Id!, "Entrega")) ?? [];
-      const devolucionPrestamo = (await loadPruebasPrestamo(loan.Id!, "Devolucion")) ?? [];
+      const entregaPrestamo =
+        (await loadPruebasPrestamo(loan.Id!, "Entrega")) ?? [];
+      const devolucionPrestamo =
+        (await loadPruebasPrestamo(loan.Id!, "Devolucion")) ?? [];
 
       const buildTable = (rows: any[]) => {
-        const filas = rows.map((e) => {
+        const filas = rows
+          .map((e) => {
             const nombre = escapeHTML(e.Title ?? "");
             const resultado = escapeHTML(e.Aprobado);
             return `<tr><td>${nombre}</td><td>${resultado}</td></tr>`;
-          }).join("");
+          })
+          .join("");
 
         return `
           <table class="tbl-entrega" cellpadding="0" cellspacing="0">
@@ -222,7 +299,7 @@ export function usePrestamos() {
               ${filas || `<tr><td colspan="2">Sin pruebas registradas</td></tr>`}
             </tbody>
           </table>`.trim();
-        };
+      };
 
       const tablaEntregaHtml = buildTable(entregaPrestamo);
       const tablaDevolucionHtml = buildTable(devolucionPrestamo);
@@ -246,7 +323,7 @@ export function usePrestamos() {
         seguimientos_solvi_tipo_de_accion: "Cierre",
         seguimientos_solvi_id_ticket: Number(loan.IdTicket),
         seguimientos_solvi_correo_actor: "",
-        seguimientos_solvi_action_date: new Date()
+        seguimientos_solvi_action_date: new Date(),
       });
     } catch (err) {
       console.error("Error finalizando préstamo:", err);
@@ -257,30 +334,42 @@ export function usePrestamos() {
     const q = search.trim().toLowerCase();
     if (!q || q.length < 3) return rows;
 
-    return rows.filter(p => {
-      const d = dispositivosById.get(p.Id_dispositivo);
-
-      return (
+    return rows.filter(
+      (p) =>
         p.Title?.toLowerCase().includes(q) ||
-        p.nombreSolicitante?.toLowerCase().includes(q) ||
-        (d?.Referencia ?? "").toLowerCase().includes(q) ||
-        (d?.Serial ?? "").toLowerCase().includes(q) ||
-        (d?.Title)?.toLowerCase().includes(q)
-      );
-    });
-  }, [rows, search, dispositivosById]);
-  
+        p.nombreSolicitante?.toLowerCase().includes(q),
+    );
+  }, [rows, search]);
 
-  React.useEffect(() => { load(); }, [load]);
-
+  React.useEffect(() => {
+    load();
+  }, [load]);
 
   return {
-    loadDeviceLoans, visibleRows, rows, loading, error, load, reload, estado, setEstado, search, setSearch, handleSubmit, errors, submitting, setField, state, notify, finalizeLoan, notifyEstado
+    loadDeviceLoans,
+    visibleRows,
+    rows,
+    loading,
+    error,
+    load,
+    reload,
+    estado,
+    setEstado,
+    search,
+    setSearch,
+    handleSubmit,
+    errors,
+    submitting,
+    setField,
+    state,
+    notify,
+    finalizeLoan,
+    notifyEstado,
   };
 }
 
 export function useDispositivos() {
-  const {dispositivos} = useGraphServices()
+  const { dispositivos } = useGraphServices();
   const [rows, setRows] = React.useState<dispositivos[]>([]);
   const [loading, setLoading] = React.useState(false);
   const [submitting, setSubmitting] = React.useState(false);
@@ -288,19 +377,27 @@ export function useDispositivos() {
   const [estado, setEstado] = React.useState<string>("all");
   const [search, setSearch] = React.useState<string>("");
   const [errors, setErrors] = React.useState<dispositivosErrors>({});
-  const [state, setState] = React.useState<dispositivos>({Title: "", Referencia: "", Serial: "", Estado: "Disponible"});
-  const setField = <K extends keyof dispositivos>(k: K, v: dispositivos[K]) => setState((s) => ({ ...s, [k]: v }));
+  const [state, setState] = React.useState<dispositivos>({
+    Title: "",
+    Referencia: "",
+    Serial: "",
+    Estado: "Disponible",
+  });
+  const setField = <K extends keyof dispositivos>(k: K, v: dispositivos[K]) =>
+    setState((s) => ({ ...s, [k]: v }));
 
   const buildFilter = React.useCallback((): GetAllOpts => {
     const filters: string[] = [];
 
     //if(estado && estado !== "all") filters.push(`fields/Estado eq '${estado}'`);
-    if(search) filters.push(`startswith(fields/Title, '${search}') or startswith(fields/Referencia, '${search}') or startswith(fields/Serial, '${search}')`);
-
+    if (search)
+      filters.push(
+        `startswith(fields/Title, '${search}') or startswith(fields/Referencia, '${search}') or startswith(fields/Serial, '${search}')`,
+      );
 
     return {
       filter: filters.join(" and "),
-      orderby: "fields/Created asc", 
+      orderby: "fields/Created asc",
     };
   }, [estado, search]);
 
@@ -313,7 +410,9 @@ export function useDispositivos() {
       let nextLink: string | undefined = undefined;
 
       do {
-        const res: PageResult<dispositivos> = nextLink ? await dispositivos.getByNextLink(nextLink) : await dispositivos.getAll(buildFilter());     
+        const res: PageResult<dispositivos> = nextLink
+          ? await dispositivos.getByNextLink(nextLink)
+          : await dispositivos.getAll(buildFilter());
 
         all.push(...(res.items ?? []));
         nextLink = res.nextLink ? res.nextLink : "";
@@ -330,7 +429,8 @@ export function useDispositivos() {
 
   const validate = () => {
     const e: dispositivosErrors = {};
-    if (!state.Referencia) e.Referencia = "Ingrese la referencia del dispositivo";
+    if (!state.Referencia)
+      e.Referencia = "Ingrese la referencia del dispositivo";
     if (!state.Serial) e.Serial = "Ingrese el número de serie del dispositivo";
     if (!state.Title) e.Title = "Ingrese la marca del dispositivo";
     setErrors(e);
@@ -339,9 +439,9 @@ export function useDispositivos() {
 
   const handleSubmit = async () => {
     if (!validate()) {
-      alert("Por favor rellene todos los campos")
+      alert("Por favor rellene todos los campos");
       return;
-    };
+    }
 
     setSubmitting(true);
     try {
@@ -351,50 +451,58 @@ export function useDispositivos() {
         Serial: state.Serial!,
         Estado: state.Estado || "Disponible",
       };
-
+      console.log(payload);
       await dispositivos.create(payload);
 
       alert("Dispositivo agregado exitosamente");
-      setState({Title: "", Referencia: "", Serial: "", Estado: "Disponible"});
+      setState({ Title: "", Referencia: "", Serial: "", Estado: "Disponible" });
       load();
     } catch (err) {
       console.error("Error en handleSubmit:", err);
-    } 
+    }
   };
 
-  const borrowDevice = React.useCallback(async (deviceId: string) => {
-    setLoading(true);
-    setError(null);
+  const borrowDevice = React.useCallback(
+    async (deviceId: string) => {
+      setLoading(true);
+      setError(null);
 
-    try {
-      await dispositivos.update(deviceId, {Estado: "Prestado"});
-    } catch (e: any) {
-      setError(e?.message ?? "Error cargando logs");
-      setRows([]);
-    } finally {
-      setLoading(false);
-    }
-  }, [buildFilter]);
+      try {
+        await dispositivos.update(deviceId, { Estado: "Prestado" });
+      } catch (e: any) {
+        setError(e?.message ?? "Error cargando logs");
+        setRows([]);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [buildFilter],
+  );
 
-  const deviceReturn = React.useCallback(async (deviceId: string, estado: boolean) => {
-    setLoading(true);
-    setError(null);
+  const deviceReturn = React.useCallback(
+    async (deviceId: string, estado: boolean) => {
+      setLoading(true);
+      setError(null);
 
-    try {
-      await dispositivos.update(deviceId, {Estado: estado ? "Disponible" : "Malo"});
-    } catch (e: any) {
-      setError(e?.message ?? "Error cambiando el estado del dispositivo");
-      setRows([]);
-    } finally {
-      setLoading(false);
-    }
-  }, [buildFilter]);
+      try {
+        await dispositivos.update(deviceId, {
+          Estado: estado ? "Disponible" : "Malo",
+        });
+      } catch (e: any) {
+        setError(e?.message ?? "Error cambiando el estado del dispositivo");
+        setRows([]);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [buildFilter],
+  );
 
   const editDevice = async () => {
     if (!validate()) {
-      alert("Por favor rellene todos los campos")
+      alert("Por favor rellene todos los campos");
       return;
-    };
+    }
 
     setSubmitting(true);
     try {
@@ -408,19 +516,20 @@ export function useDispositivos() {
       await dispositivos.update(state.Id!, payload);
 
       alert("Dispositivo editado exitosamente");
-      setState({Title: "", Referencia: "", Serial: "", Estado: "Disponible"});
+      setState({ Title: "", Referencia: "", Serial: "", Estado: "Disponible" });
       load();
     } catch (err) {
       console.error("Error en handleSubmit:", err);
-    } 
+    }
   };
 
   const reload = React.useCallback(() => {
     load();
   }, [load]);
 
-  React.useEffect(() => { load(); }, [load]);
-
+  React.useEffect(() => {
+    load();
+  }, [load]);
 
   const dispositivosById = React.useMemo(() => {
     const m = new Map<string, dispositivos>();
@@ -429,24 +538,48 @@ export function useDispositivos() {
   }, [rows]);
 
   return {
-    dispositivosById, rows, loading, error, load, reload, estado, setEstado, search, setSearch, handleSubmit, errors, state, setState, submitting, setField, borrowDevice, deviceReturn, editDevice
+    dispositivosById,
+    rows,
+    loading,
+    error,
+    load,
+    reload,
+    estado,
+    setEstado,
+    search,
+    setSearch,
+    handleSubmit,
+    errors,
+    state,
+    setState,
+    submitting,
+    setField,
+    borrowDevice,
+    deviceReturn,
+    editDevice,
   };
 }
 
 export function usePruebas() {
-  const {pruebas, pruebasPrestamo} = useGraphServices()
-  const {loadDeviceTests} = usePruebasDispositivos()
-  const [pruebasPrestamoRows, setPruebasPrestamoRows] = React.useState<pruebasPrestamo[]>([]);
+  const { pruebas, pruebasPrestamo } = useGraphServices();
+  const { loadDeviceTests } = usePruebasDispositivos();
+  const [pruebasPrestamoRows, setPruebasPrestamoRows] = React.useState<
+    pruebasPrestamo[]
+  >([]);
   const [pruebasRows, setPruebasRows] = React.useState<pruebasDefinidas[]>([]);
   const [loading, setLoading] = React.useState(false);
   const [submitting, setSubmitting] = React.useState(false);
   const [draft, setDraft] = React.useState<Record<string, string>>({});
-  const [state, setState] = React.useState<pruebasDefinidas>({Title: "", Estado: "Activo"});
-  const setField = <K extends keyof dispositivos>(k: K, v: dispositivos[K]) => setState((s) => ({ ...s, [k]: v }));
+  const [state, setState] = React.useState<pruebasDefinidas>({
+    Title: "",
+    Estado: "Activo",
+  });
+  const setField = <K extends keyof dispositivos>(k: K, v: dispositivos[K]) =>
+    setState((s) => ({ ...s, [k]: v }));
 
   const onDraftChange = React.useCallback((testId: string, next: string) => {
     if (!testId) return;
-    setDraft(prev => ({ ...prev, [testId]: next }));
+    setDraft((prev) => ({ ...prev, [testId]: next }));
   }, []);
 
   const createAllPruebas = async (prestamoId: string, deviceid: string) => {
@@ -456,7 +589,7 @@ export function usePruebas() {
       if (!pruebasLoaded?.length) return;
 
       for (const p of pruebasLoaded) {
-        console.table(p)
+        console.table(p);
         const title = (await pruebas.get(p.IdPrueba!)).Title;
 
         const payload = {
@@ -484,7 +617,9 @@ export function usePruebas() {
       let nextLink: string | undefined = undefined;
 
       do {
-        const res: PageResult<pruebasDefinidas> = nextLink ? await pruebas.getByNextLink(nextLink) : await pruebas.getAll();     
+        const res: PageResult<pruebasDefinidas> = nextLink
+          ? await pruebas.getByNextLink(nextLink)
+          : await pruebas.getAll();
 
         all.push(...(res.items ?? []));
         nextLink = res.nextLink ? res.nextLink : "";
@@ -500,57 +635,71 @@ export function usePruebas() {
     }
   }, [pruebas]);
 
-  const loadPruebasPrestamo = React.useCallback(async (Id: string, fase: "Entrega" | "Devolucion" | "Ambas"): Promise<pruebasPrestamo[]> => {
-    setLoading(true);
+  const loadPruebasPrestamo = React.useCallback(
+    async (
+      Id: string,
+      fase: "Entrega" | "Devolucion" | "Ambas",
+    ): Promise<pruebasPrestamo[]> => {
+      setLoading(true);
 
-    const fetchByFase = async (faseSingle: "Entrega" | "Devolucion") => {
-      const all: pruebasPrestamo[] = [];
-      let nextLink: string | undefined = undefined;
+      const fetchByFase = async (faseSingle: "Entrega" | "Devolucion") => {
+        const all: pruebasPrestamo[] = [];
+        let nextLink: string | undefined = undefined;
 
-      do {
-        const res: PageResult<pruebasPrestamo> = nextLink ? await pruebasPrestamo.getByNextLink(nextLink) : await pruebasPrestamo.getAll({filter: `fields/IdPrestamo eq '${Id}' and fields/Fase eq '${faseSingle}'`, });
+        do {
+          const res: PageResult<pruebasPrestamo> = nextLink
+            ? await pruebasPrestamo.getByNextLink(nextLink)
+            : await pruebasPrestamo.getAll({
+                filter: `fields/IdPrestamo eq '${Id}' and fields/Fase eq '${faseSingle}'`,
+              });
 
-        all.push(...(res.items ?? []));
-        nextLink = res.nextLink ? res.nextLink : "";
-      } while (nextLink);
+          all.push(...(res.items ?? []));
+          nextLink = res.nextLink ? res.nextLink : "";
+        } while (nextLink);
 
-      return all;
-    };
+        return all;
+      };
 
-    try {
-      let rows: pruebasPrestamo[] = [];
+      try {
+        let rows: pruebasPrestamo[] = [];
 
-      if (fase === "Ambas") {
-        const [entrega, devolucion] = await Promise.all([
-          fetchByFase("Entrega"),
-          fetchByFase("Devolucion"),
-        ]);
+        if (fase === "Ambas") {
+          const [entrega, devolucion] = await Promise.all([
+            fetchByFase("Entrega"),
+            fetchByFase("Devolucion"),
+          ]);
 
-        // ✅ merge sin duplicados por Id
-        const map = new Map<string, pruebasPrestamo>();
-        [...entrega, ...devolucion].forEach((t) => {
-          const key = String(t.Id ?? "");
-          if (key) map.set(key, t);
-        });
+          // ✅ merge sin duplicados por Id
+          const map = new Map<string, pruebasPrestamo>();
+          [...entrega, ...devolucion].forEach((t) => {
+            const key = String(t.Id ?? "");
+            if (key) map.set(key, t);
+          });
 
-        rows = Array.from(map.values());
-      } else {
-        rows = await fetchByFase(fase);
+          rows = Array.from(map.values());
+        } else {
+          rows = await fetchByFase(fase);
+        }
+
+        setPruebasPrestamoRows(rows);
+        return rows;
+      } catch (e: any) {
+        setPruebasPrestamoRows([]);
+        return [];
+      } finally {
+        setLoading(false);
       }
-
-      setPruebasPrestamoRows(rows);
-      return rows;
-    } catch (e: any) {
-      setPruebasPrestamoRows([]);
-      return [];
-    } finally {
-      setLoading(false);
-    }
-  },[pruebasPrestamo]);
+    },
+    [pruebasPrestamo],
+  );
 
   const pendingChanges = React.useMemo(() => {
-    const currentById = new Map(pruebasPrestamoRows.map(t => [t.Id ?? "", t.Aprobado]));
-    return Object.entries(draft).filter(([id, next]) => currentById.get(id) !== next);
+    const currentById = new Map(
+      pruebasPrestamoRows.map((t) => [t.Id ?? "", t.Aprobado]),
+    );
+    return Object.entries(draft).filter(
+      ([id, next]) => currentById.get(id) !== next,
+    );
   }, [draft, pruebasPrestamoRows]);
 
   const handleFinalize = async (loan: prestamos): Promise<boolean> => {
@@ -558,26 +707,25 @@ export function usePruebas() {
 
     await Promise.all(
       pendingChanges.map(([id, next]) =>
-        pruebasPrestamo.update(id, { Aprobado: next })
-      )
+        pruebasPrestamo.update(id, { Aprobado: next }),
+      ),
     );
 
     await loadPruebasPrestamo(String(loan.Id), "Devolucion");
     setDraft({});
 
-    const hasNoExitosa = pendingChanges.some(([, next]) =>
-      next.trim().toLowerCase() === "rechazado"
+    const hasNoExitosa = pendingChanges.some(
+      ([, next]) => next.trim().toLowerCase() === "rechazado",
     );
 
-    return !hasNoExitosa; 
+    return !hasNoExitosa;
   };
-
 
   const handleSubmit = async () => {
     if (!state.Title) {
-      alert("Por favor rellene todos los campos")
+      alert("Por favor rellene todos los campos");
       return;
-    };
+    }
 
     setSubmitting(true);
     try {
@@ -589,18 +737,18 @@ export function usePruebas() {
       await pruebas.create(payload);
 
       alert("Prueba agregada exitosamente");
-      setState({Title: "",  Estado: "Activo"});
-      loadAllPruebas()
+      setState({ Title: "", Estado: "Activo" });
+      loadAllPruebas();
     } catch (err) {
       console.error("Error en handleSubmit:", err);
-    } 
+    }
   };
 
   const editTest = async () => {
     if (!state.Title) {
-      alert("Por favor rellene todos los campos")
+      alert("Por favor rellene todos los campos");
       return;
-    };
+    }
 
     setSubmitting(true);
     try {
@@ -612,38 +760,57 @@ export function usePruebas() {
       await pruebas.update(state.Id!, payload);
 
       alert("Prueba editada exitosamente");
-      setState({Title: "",  Estado: "Activo"});
+      setState({ Title: "", Estado: "Activo" });
       loadAllPruebas();
     } catch (err) {
       console.error("Error en handleSubmit:", err);
-    } 
+    }
   };
 
-
   return {
-    handleSubmit, editTest, state, setState, setField, loading, submitting, createAllPruebas, pruebasRows, pruebasPrestamoRows, loadPruebasPrestamo, draft, onDraftChange, handleFinalize, pendingChanges, setDraft, loadAllPruebas
+    handleSubmit,
+    editTest,
+    state,
+    setState,
+    setField,
+    loading,
+    submitting,
+    createAllPruebas,
+    pruebasRows,
+    pruebasPrestamoRows,
+    loadPruebasPrestamo,
+    draft,
+    onDraftChange,
+    handleFinalize,
+    pendingChanges,
+    setDraft,
+    loadAllPruebas,
   };
 }
 
 export function usePruebasDispositivos() {
-  const {pruebasDispositivo,} = useGraphServices()
+  const { pruebasDispositivo } = useGraphServices();
   const [testsOpen, setTestsOpen] = React.useState(false);
-  const [testsAssigned, setTestsAssigned] = React.useState<pruebasDispositos[]>([]);
+  const [testsAssigned, setTestsAssigned] = React.useState<pruebasDispositos[]>(
+    [],
+  );
   const [testsLoading, setTestsLoading] = React.useState(false);
 
-
   const listByDevice = async (deviceId: string) => {
-    const catalog = await pruebasDispositivo.getAll({filter: `fields/Title eq '${deviceId}'`}); // tabla Pruebas
-    return catalog
+    const catalog = await pruebasDispositivo.getAll({
+      filter: `fields/Title eq '${deviceId}'`,
+    }); // tabla Pruebas
+    return catalog;
   };
 
-  const loadDeviceTests = async (deviceId: string): Promise<pruebasDispositos[]> => {
+  const loadDeviceTests = async (
+    deviceId: string,
+  ): Promise<pruebasDispositos[]> => {
     setTestsLoading(true);
     try {
       const assigned = await listByDevice(deviceId); // tabla puente
       setTestsAssigned(assigned.items);
-      return assigned.items
-    
+      return assigned.items;
     } finally {
       setTestsLoading(false);
     }
@@ -654,15 +821,22 @@ export function usePruebasDispositivos() {
     await loadDeviceTests(deviceId);
   };
 
-  const unassignTest = async (bridgeId: string, selectedDevice: dispositivos) => {
+  const unassignTest = async (
+    bridgeId: string,
+    selectedDevice: dispositivos,
+  ) => {
     await pruebasDispositivo.delete(bridgeId);
     if (selectedDevice?.Id) await loadDeviceTests(selectedDevice.Id);
   };
 
-
   return {
-    loadDeviceTests, unassignTest, assignTest, testsOpen, testsAssigned, setTestsAssigned, setTestsOpen, testsLoading
+    loadDeviceTests,
+    unassignTest,
+    assignTest,
+    testsOpen,
+    testsAssigned,
+    setTestsAssigned,
+    setTestsOpen,
+    testsLoading,
   };
 }
-
-

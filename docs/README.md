@@ -18,6 +18,7 @@ Este índice organiza la documentación técnica del proyecto por capa arquitect
 - [forms.md](forms.md) — Formatos/formularios de TI.
 - [dashboard-funcionalidades.md](dashboard-funcionalidades.md) — Lógica de indicadores y disponibilidad de agentes (incl. integración con Teams).
 - [loans-funcionalidades.md](loans-funcionalidades.md) — Lógica de préstamos de equipos.
+- [activos.md](activos.md) — Activos TI: catálogo, bitácora de movimientos,asignacion de usuarios, préstamo/devolución de activos y vínculo con tickets.
 - [operations.md](operations.md) — Cajeros POS, información de tienda, inventario y proveedores de internet.
 - [shared-funcionalidades.md](shared-funcionalidades.md) — Cliente de Power Automate (Flow) y subida de archivos a Supabase.
 - [tasks-funcionalidades.md](tasks-funcionalidades.md) — Tareas y ausencias del equipo.
@@ -39,6 +40,7 @@ Este índice organiza la documentación técnica del proyecto por capa arquitect
 - [components-documentar.md](components-documentar.md) — Documentación de casos, actas de entrega y escalamiento a proveedor.
 - [components-formatos.md](components-formatos.md) — Formularios de seguridad de red, ERP, permisos de navegación y servicios de TI.
 - [components-loans.md](components-loans.md) — Préstamo de equipos, pruebas de dispositivo, historial y devoluciones.
+- [components-activos.md](components-activos.md) — Catálogo, detalle, ficha de seguimiento, alta y asignación de activos.
 - [components-tareas.md](components-tareas.md) — Tareas, ausencias, seguimiento y contador de tiempo.
 - [components-usuarios-acceso.md](components-usuarios-acceso.md) — Gestión de usuarios, acceso/franquicias y login.
 - [components-operativos.md](components-operativos.md) — Cajeros POS, información de tienda/proveedores, inventario y tips.

@@ -1,0 +1,152 @@
+.detalle-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  z-index: 1000;
+}
+
+.detalle-card {
+  width: 100%;
+  max-width: 620px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+/* ---------- Header ---------- */
+.detalle-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid var(--border);
+}
+.detalle-codigo {
+  display: block;
+  font-family: ui-monospace, monospace;
+  font-size: 1rem;
+  color: var(--muted);
+}
+.detalle-header h2 {
+  margin: 4px 0 10px;
+  font-size: 1.35rem;
+}
+.detalle-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  /* El color llega por style={{ "--c": colorEstadoActivo(...) }} */
+  color: var(--c);
+  background: color-mix(in oklab, var(--c) 15%, transparent);
+  border: 1px solid color-mix(in oklab, var(--c) 40%, transparent);
+}
+.detalle-cerrar {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 8px;
+}
+.detalle-cerrar:hover {
+  color: var(--ink);
+  background: color-mix(in oklab, var(--ink) 8%, transparent);
+}
+
+/* ---------- Campos ---------- */
+.detalle-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px 24px;
+  padding: 20px 20px 0;
+}
+.detalle-campo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+/* Usuario y descripción van fuera del grid: mismo padding lateral */
+.detalle-card > .detalle-campo {
+  padding: 16px 20px 0;
+}
+.detalle-label {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+.detalle-valor {
+  font-family: ui-monospace, monospace;
+  font-weight: 600;
+}
+
+/* ---------- Usuario ---------- */
+.detalle-usuario {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.detalle-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  color: var(--primary);
+  background: color-mix(in oklab, var(--primary) 18%, transparent);
+  border: 1px solid color-mix(in oklab, var(--primary) 45%, transparent);
+}
+
+/* ---------- Botones ---------- */
+.detalle-acciones {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  padding: 20px;
+}
+.detalle-acciones button {
+  padding: 11px 16px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    filter 0.15s ease,
+    background 0.15s ease;
+}
+.btn-primario {
+  background: var(--c);
+  color: #fff;
+  border: 1px solid var(--c);
+}
+.btn-primario:hover {
+  filter: brightness(1.08);
+}
+.btn-secundario {
+  background: var(--field-bg);
+  color: var(--ink);
+  border: 1px solid var(--border);
+}
+.btn-secundario:hover {
+  background: color-mix(in oklab, var(--ink) 8%, var(--field-bg));
+}
+.detalle-acciones button:focus-visible,
+.detalle-cerrar:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 4px var(--ring);
+}
+
+@media (max-width: 520px) {
+  .detalle-grid,
+  .detalle-acciones {
+    grid-template-columns: 1fr;
+  }
+}

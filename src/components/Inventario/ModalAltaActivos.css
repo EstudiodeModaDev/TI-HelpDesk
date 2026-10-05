@@ -1,0 +1,162 @@
+/* Todo va bajo .alta-activo: ModalAsignarActivo.css usa los mismos nombres de clase */
+.activo-form-page.alta-activo {
+  width: 100%;
+  max-width: 1000px;
+  margin: 0;
+  padding: 0px 24px 24px;
+  box-sizing: border-box;
+}
+
+.alta-activo .activo-form-header {
+  margin-bottom: 24px;
+}
+.alta-activo .activo-form-header h2 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.alta-activo .activo-form-header p {
+  margin: 6px 0 0;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.alta-activo .activo-form-container {
+  /* Cuadro exterior: agrupa las secciones (tarjetas) y los botones */
+  padding: 24px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: color-mix(in oklab, var(--ink) 4%, var(--surface));
+  box-shadow: var(--shadow);
+  display: grid;
+  gap: 18px;
+}
+
+.alta-activo .form-section,
+.alta-activo .form-section:first-child,
+.alta-activo .form-section:last-child {
+  padding: 22px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface);
+}
+
+.alta-activo .section-title {
+  margin: 0 0 18px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.alta-activo .form-group label {
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* GRID */
+
+.alta-activo .form-grid {
+  display: grid;
+  /* Siempre 2 columnas; en pantallas angostas pasa a 1 (ver @media al final) */
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  /* Anula overflow/padding del .form-grid global de ModalInventario.css */
+  overflow: visible;
+  padding-block: 0;
+}
+
+.alta-activo .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+/* Ocupa toda la fila del grid (p. ej. Modelo al final de Especificaciones) */
+.alta-activo .form-group--completo {
+  grid-column: 1 / -1;
+}
+
+.alta-activo .form-group label span {
+  color: #dc2626;
+}
+
+/* INPUTS */
+
+.alta-activo .form-group input,
+.alta-activo .form-group select {
+  width: 100%;
+  height: 42px;
+  padding: 0 12px;
+  box-sizing: border-box;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--field-bg);
+  color: var(--ink);
+  font-size: 14px;
+  outline: none;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+}
+
+.alta-activo .form-group input:focus,
+.alta-activo .form-group select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--ring);
+}
+
+/* FOOTER */
+
+.alta-activo .activo-form-footer {
+  display: flex;
+  justify-content: flex-start;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.alta-activo .btn-cancelar,
+.alta-activo .btn-guardar {
+  height: 42px;
+  padding: 0 24px;
+  border-radius: 9px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    filter 0.2s,
+    background 0.2s;
+}
+
+.alta-activo .btn-cancelar {
+  border: 1px solid var(--border);
+  background: var(--field-bg);
+  color: var(--ink);
+}
+.alta-activo .btn-cancelar:hover {
+  background: color-mix(in oklab, var(--ink) 8%, var(--field-bg));
+}
+
+.alta-activo .btn-guardar {
+  border: 1px solid var(--primary);
+  background: var(--primary);
+  color: var(--primary-ink);
+}
+.alta-activo .btn-guardar:hover {
+  filter: brightness(1.08);
+}
+.alta-activo .btn-guardar:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@media (max-width: 640px) {
+  .alta-activo .form-grid {
+    grid-template-columns: 1fr;
+  }
+}
