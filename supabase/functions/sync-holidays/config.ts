@@ -32,3 +32,4 @@ export function loadConfig(): SyncHolidaysConfig {
     tableName: getOptionalEnv("HOLIDAYS_TABLE", DEFAULT_TABLE_NAME),
   };
 }
+ 
