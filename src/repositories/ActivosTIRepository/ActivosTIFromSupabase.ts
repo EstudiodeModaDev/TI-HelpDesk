@@ -269,7 +269,7 @@ export class SupabaseActivosTIRepository implements ActivosTIRepository {
     message: string | null;
   }> {
     try {
-      const limpio = serial.trim().replace(/[\\%_]/g, "\\$%");
+      const limpio = serial.trim().replace(/[\\%_]/g, "\\$&");
       if (!limpio) {
         return { data: null, status: true, message: null };
       }
