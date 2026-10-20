@@ -1,106 +1,125 @@
-import Select, {
-  components,
-  type OptionProps,
-  type FilterOptionOption
-} from "react-select";
+import Select, { components, type FilterOptionOption, type OptionProps } from "react-select";
 import "./ModalsStyles.css";
-import type { UserOption } from "../../../Models/Commons";
-import { useGraphServices } from "../../../graph/GrapServicesContext";
-import { useUsuarios } from "../../../Funcionalidades/auth/Usuarios";
-import { useReasignarTicket } from "../../../Funcionalidades/Tickets/Reasignar";
+import "./Reasignar.css";
 import type { Ticket } from "../../../Models/Tickets";
 import { norm } from "../../../utils/Commons";
 import { useRepositories } from "../../../repositories/repositoriesContext";
+import { useReasignarTicket, type ResolutorOption } from "../../../Funcionalidades/Tickets/Reasignar";
 
-type UserOptionEx = UserOption & {
-  source?: "Empleado" | "Franquicia";
-  email?: string;
-  jobTitle?: string;
+type ReasignarProps = {
+  ticket: Ticket;
+  onCancel: () => void;
+  onDone: () => void;
 };
 
-export default function Reasignar({ ticket }: { ticket: Ticket }) {
-  const { Usuarios: UsuariosSPServiceSvc,  } = useGraphServices() 
-  const {logs: LogSvc} = useRepositories()
+const isDisponible = (o?: ResolutorOption | null) =>
+  String(o?.disponible ?? "").trim().toLowerCase() === "disponible";
 
-  const { state, errors, submitting, setField, handleReasignar } =
-    useReasignarTicket({ Usuarios: UsuariosSPServiceSvc, Logs: LogSvc! }, ticket);
-    
+// filtro insensible a acentos
+const resolutorFilter = (option: FilterOptionOption<ResolutorOption>, raw: string) => {
+  const q = norm(raw);
+  if (!q) return true;
+  const d = option.data;
+  return norm(`${d.label} ${d.email ?? ""} ${d.jobTitle ?? ""}`).includes(q);
+};
 
-  const { UseruserOptions, loading, error } = useUsuarios(UsuariosSPServiceSvc!);
-
-  // filtro insensible a acentos
-  const userFilter = (option: FilterOptionOption<UserOptionEx>, raw: string) => {
-    const q = norm(raw);
-    if (!q) return true;
-    const label = option?.label ?? "";
-    const data = option?.data as UserOptionEx | undefined;
-    const email = data?.email ?? "";
-    const job = data?.jobTitle ?? "";
-    const haystack = norm(`${label} ${email} ${job}`);
-    return haystack.includes(q);
-  };
-
-  const Option = (props: OptionProps<UserOptionEx, false>) => {
-    const { data, label } = props;
-    return (
-      <components.Option {...props}>
-        <div className="rs-opt">
-          <div className="rs-opt__text">
-            <span className="rs-opt__title">{label}</span>
-            {data.email && <span className="rs-opt__meta">{data.email}</span>}
-            {data.jobTitle && <span className="rs-opt__meta">{data.jobTitle}</span>}
-          </div>
-          {data.source && <span className="rs-opt__tag">{data.source}</span>}
+const Option = (props: OptionProps<ResolutorOption, false>) => {
+  const { data, label } = props;
+  return (
+    <components.Option {...props}>
+      <div className="ra-opt">
+        <div className="ra-opt__text">
+          <span className="ra-opt__title">{label}</span>
+          {data.email && <span className="ra-opt__meta">{data.email}</span>}
+          <span className="ra-opt__meta">
+            {data.jobTitle ? `${data.jobTitle} · ` : ""}{data.casos ?? 0} casos asignados
+          </span>
         </div>
-      </components.Option>
-    );
-  };
+        {data.disponible && (
+          <span className={`ra-badge ${isDisponible(data) ? "ra-badge--ok" : "ra-badge--off"}`}>{data.disponible}</span>
+        )}
+      </div>
+    </components.Option>
+  );
+};
 
-  const selectId = "select-resolutor";
-  const noteId = "reasignacion-nota";
-  const nota = state.Nota ?? "";
-  const maxLen = 500;
+export default function Reasignar({ ticket, onCancel, onDone }: ReasignarProps) {
+  const { tickets, usuarios, logs } = useRepositories();
+
+  const {
+    state, setField, errors, submitting, isCerrado,
+    resolutores, loadingResolutores, errorResolutores, handleReasignar,
+  } = useReasignarTicket({ Tickets: tickets!, Usuarios: usuarios!, Logs: logs }, ticket, onDone);
+
+  const nuevo = state.resolutor as ResolutorOption | null;
+  const disabled = submitting || isCerrado;
 
   return (
-    <div className="dta-form">
-      <h2 className="dta-title">Reasignar Ticket</h2>
+    <div className="ra-card">
+      <div className="ra-head">
+        <span className="ra-icon" aria-hidden="true">⇄</span>
+        <div>
+          <h2 className="ra-title">Reasignar ticket #{ticket.ID}</h2>
+          <p className="ra-subtitle">
+            El cambio se aplica de inmediato y se notifica por correo al nuevo resolutor y al solicitante.
+          </p>
+        </div>
+      </div>
 
-      <form onSubmit={handleReasignar} noValidate className="tf-grid">
-        {/* Resolutor */}
-        <div className="dta-field">
-          <label className="dta-label" htmlFor={selectId}>Nuevo Resolutor</label>
-          <Select<UserOptionEx, false>
-            inputId={selectId}
-            options={UseruserOptions as UserOptionEx[]}
-            placeholder={loading ? "Cargando usuarios…" : "Buscar resolutor…"}
-            value={state.resolutor as UserOptionEx | null}
+      {isCerrado && <div className="ra-alert">Este ticket está cerrado y no puede reasignarse.</div>}
+
+      {/* Resumen del cambio */}
+      <div className="ra-swap">
+        <div className="ra-person">
+          <span className="ra-person__label">Resolutor actual</span>
+          <span className="ra-person__name">{ticket.Nombreresolutor || "Sin asignar"}</span>
+          {ticket.Correoresolutor && <span className="ra-person__mail">{ticket.Correoresolutor}</span>}
+        </div>
+        <span className="ra-arrow" aria-hidden="true">→</span>
+        <div className={`ra-person ${nuevo ? "ra-person--new" : "ra-person--empty"}`}>
+          <span className="ra-person__label">Nuevo resolutor</span>
+          <span className="ra-person__name">{nuevo?.label ?? "Por seleccionar"}</span>
+          {nuevo?.email && <span className="ra-person__mail">{nuevo.email}</span>}
+        </div>
+      </div>
+
+      <form className="ra-form" onSubmit={handleReasignar} noValidate>
+        <div className="ra-field">
+          <label className="ra-label" htmlFor="ra-resolutor">Nuevo resolutor</label>
+          <Select<ResolutorOption, false>
+            inputId="ra-resolutor"
+            options={resolutores.filter((r) => r.disponible === "Disponible" && r.jobTitle !== "developer")}
+            placeholder={loadingResolutores ? "Cargando resolutores…" : "Buscar por nombre o correo…"}
+            value={nuevo}
             onChange={(opt) => setField("resolutor", opt ?? null)}
             classNamePrefix="rs"
-            isDisabled={submitting || loading}
-            isLoading={loading}
+            isDisabled={disabled || loadingResolutores}
+            isLoading={loadingResolutores}
             loadingMessage={() => "Cargando…"}
-            filterOption={userFilter}
+            filterOption={resolutorFilter}
             components={{ Option }}
-            noOptionsMessage={() => (error ? "Error cargando usuarios" : "Sin coincidencias")}
+            menuPortalTarget={document.body}
+            menuPosition="fixed"
+            menuPlacement="auto"
+            styles={{ menuPortal: (base) => ({ ...base, zIndex: 10000 }) }}
+            noOptionsMessage={() => (errorResolutores ? "Error cargando resolutores" : "Sin coincidencias")}
             isClearable
             aria-invalid={Boolean(errors.resolutor) || undefined}
           />
-          {errors.resolutor && <small className="error">{errors.resolutor}</small>}
+          {nuevo && !isDisponible(nuevo) && nuevo.disponible && (
+            <span className="ra-hint">Este resolutor figura como "{nuevo.disponible}". La reasignación se hará de todas formas.</span>
+          )}
+          <span className="ra-error">{errors.resolutor}</span>
         </div>
 
-        {/* Nota (razón de la reasignación) */}
-        <div className="dta-field">
-          <label className="rf-label" htmlFor={noteId}>Nota (razón de la reasignación)</label>
-          <textarea id={noteId} className="dta-textarea" placeholder="Explica brevemente por qué reasignas este ticket…" value={nota} maxLength={maxLen} onChange={(e) => setField("Nota", e.target.value)} rows={4} disabled={submitting}/>
-          <div className="dta-help" id={`${noteId}-help`}>Esta nota se enviará junto con la reasignación.</div>
-          <div className="dta-counter" id={`${noteId}-counter`}> {nota.length}/{maxLen} </div>
-          {errors.Nota && <small className="error">{errors.Nota}</small>}
-        </div>
+        {errors.general && <div className="ra-alert">{errors.general}</div>}
 
-        {/* Submit */}
-        <div className="dta-actions rf-col-2">
-          <button type="submit" disabled={submitting || loading} className="btn-primary">
-            {submitting ? "Enviando..." : "Enviar solicitud"}
+        <div className="ra-actions">
+          <button type="button" className="btn btn-secondary-final" onClick={onCancel} disabled={submitting}>
+            Cancelar
+          </button>
+          <button type="submit" className="btn btn-primary-final" disabled={disabled || loadingResolutores}>
+            {submitting ? "Reasignando…" : "Reasignar ticket"}
           </button>
         </div>
       </form>

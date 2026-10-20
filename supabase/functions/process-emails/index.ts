@@ -15,9 +15,9 @@ import {
 import { replaceCidSources, sanitizeHtml } from "./html.ts";
 import {
   buildResolverAssignment,
+  FIXED_RESOLVER_ID,
+  getFixedTechnician,
   incrementTechnicianCaseCount,
-  listAvailableTechnicians,
-  selectTechnicianWithLowestCases,
 } from "./resolvers.ts";
 import {
   createAdminClient,
@@ -367,12 +367,11 @@ async function resolveTechnician(
   message: GraphMessage,
 ): Promise<SharePointTechnician> {
   try {
-    const technicians = await listAvailableTechnicians(accessToken, config);
-    const technician = selectTechnicianWithLowestCases(technicians);
+    const technician = await getFixedTechnician(accessToken, config);
 
     if (!technician) {
       const reason =
-        "No valid technician found in SharePoint. Expected at least one user with Rol = 'Tecnico' and Disponibilidad = 'Disponible'.";
+        `Fixed resolver with SharePoint id ${FIXED_RESOLVER_ID} not found in the Usuarios list.`;
       console.warn("process-emails no technician available", {
         messageId: message.id,
         subject: message.subject,

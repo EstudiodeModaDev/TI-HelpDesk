@@ -1,117 +1,197 @@
 import * as React from "react";
-import { useState } from "react";
-import type { FormErrors, FormReasignarErrors } from "../../Models/nuevoTicket";
+import toast from "react-hot-toast";
+import type { FormReasignarErrors } from "../../Models/nuevoTicket";
 import type { FormReasignarState, Ticket } from "../../Models/Tickets";
-import type { UsuariosSPService } from "../../Services/Usuarios.Service";
-import type { GetAllOpts, Reasignar } from "../../Models/Commons";
-import { FlowClient } from "../shared/FlowClient";
-import type { FlowToReasign } from "../../Models/FlujosPA";
+import type { UserOption } from "../../Models/Commons";
+import type { UsuariosSP } from "../../Models/Usuarios";
+import type { SupabaseTickets } from "../../Models/DTO/Tickets";
 import type { TicketsRepository } from "../../repositories/TicketsRepository/TicketRepository";
-import type { LogDTO } from "../../Models/DTO/Log";
+import type { UsuariosSPRepository } from "../../repositories/UsuariosRepository/UsuariosSPRepository";
 import type { LogRepository } from "../../repositories/LogRepository/LogRespository";
+import { useAuth } from "../../auth/authContext";
+import { increaseResolverCaseCount } from "./utils/ticketAssignment";
+import { notifyTicketReassignedResolutor, notifyTicketReassignedSolicitante } from "./utils/notifications";
 
 type Svc = {
-  Tickets?: TicketsRepository;
-  Usuarios: UsuariosSPService;
-  Logs: LogRepository;
+  Tickets: TicketsRepository;
+  Usuarios: UsuariosSPRepository;
+  Logs: LogRepository | null;
 };
 
-const escapeOData = (s: string) => String(s ?? "").replace(/'/g, "''");
+export type ResolutorOption = UserOption & {
+  disponible?: string;
+  casos?: number;
+};
 
-export function useReasignarTicket(services: Svc, ticket: Ticket) {
-  const { Usuarios, Logs } = services;
+type FormReasignarFullErrors = FormReasignarErrors & { general?: string };
 
-  const [state, setState] = useState<FormReasignarState>({ resolutor: null, Nota: "" });
-  const [errors, setErrors] = useState<FormReasignarErrors>({});
-  const [submitting, setSubmitting] = useState(false);
+const NOTA_MAX = 500;
 
-  const setField = <K extends keyof FormReasignarState>(k: K, v: FormReasignarState[K]) =>
+const normEmail = (s?: string | null) => String(s ?? "").trim().toLowerCase();
+
+function toResolutorOption(u: UsuariosSP): ResolutorOption {
+  const correo = String(u.Correo ?? "").trim();
+  return {
+    value: correo,
+    label: String(u.Title ?? correo).trim() || correo,
+    id: String(u.Id ?? ""),
+    email: correo,
+    jobTitle: u.Rol || undefined,
+    disponible: u.Disponible || undefined,
+    casos: Number(u.Numerodecasos ?? 0) || 0,
+  };
+}
+
+export function useReasignarTicket(services: Svc, ticket: Ticket, onDone?: () => void) {
+  const { Tickets, Usuarios, Logs } = services;
+  const { account } = useAuth();
+
+  const [state, setState] = React.useState<FormReasignarState>({ resolutor: null, Nota: "" });
+  const [errors, setErrors] = React.useState<FormReasignarFullErrors>({});
+  const [submitting, setSubmitting] = React.useState(false);
+
+  const [resolutores, setResolutores] = React.useState<ResolutorOption[]>([]);
+  const [loadingResolutores, setLoadingResolutores] = React.useState(false);
+  const [errorResolutores, setErrorResolutores] = React.useState<string | null>(null);
+
+  const correoActual = normEmail(ticket.Correoresolutor);
+  const estadoLower = String(ticket.Estadodesolicitud ?? "").toLowerCase();
+  const isCerrado = estadoLower.includes("cerrado");
+
+  // Carga los posibles resolutores (lista Usuarios de SharePoint), excluyendo al actual.
+  React.useEffect(() => {
+    let cancel = false;
+    (async () => {
+      setLoadingResolutores(true);
+      setErrorResolutores(null);
+      const res = await Usuarios.loadUsuarios();
+      if (cancel) return;
+
+      if (!res.status) {
+        setErrorResolutores(res.message ?? "Error cargando resolutores");
+        setResolutores([]);
+        toast.error("No se pudieron cargar los resolutores.");
+      } else {
+        const opts = res.data
+          .filter((u) => normEmail(u.Correo) && normEmail(u.Correo) !== correoActual)
+          .map(toResolutorOption)
+          .sort((a, b) => a.label.localeCompare(b.label));
+        setResolutores(opts);
+      }
+      setLoadingResolutores(false);
+    })();
+    return () => { cancel = true; };
+  }, [Usuarios, correoActual]);
+
+  const setField = <K extends keyof FormReasignarState>(k: K, v: FormReasignarState[K]) => {
     setState((s) => ({ ...s, [k]: v }));
-
-  const validate = () => {
-    const e: FormErrors = {};
-    if (!state.resolutor) e.resolutor = "Seleccione un resolutor para reasignar";
-    setErrors(e);
-    return Object.keys(e).length === 0;
+    setErrors((prev) => ({ ...prev, [k]: undefined, general: undefined }));
   };
 
-  const notifyFlow = new FlowClient("https://defaultcd48ecd97e154f4b97d9ec813ee42b.2c.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/d17c9915a48f4b0d8e8a1fa90f007ba8/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=5uBiLoVQS7tiJ0i5xL13qMlBmzDSoee9kmAqcHTPIh0")
+  const validate = (): boolean => {
+    const e: FormReasignarFullErrors = {};
+    const nuevoCorreo = normEmail(state.resolutor?.email ?? state.resolutor?.value);
+
+    if (isCerrado) e.general = "No se puede reasignar un ticket cerrado.";
+    if (!state.resolutor || !nuevoCorreo) e.resolutor = "Seleccione el nuevo resolutor.";
+    else if (nuevoCorreo === correoActual) e.resolutor = "El ticket ya está asignado a este resolutor.";
+    else if (state.Nota.length > NOTA_MAX) e.Nota = `Máximo ${NOTA_MAX} caracteres.`;
+
+    setErrors(e);
+    const first = e.general ?? e.resolutor ?? e.Nota;
+    if (first) toast.error(first);
+    return !first;
+  };
 
   const handleReasignar = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!validate()) return;
+    if (submitting || !validate()) return;
+
+    const nuevo = {
+      nombre: state.resolutor!.label,
+      correo: String(state.resolutor!.email ?? state.resolutor!.value).trim(),
+    };
+    const anterior = ticket.Nombreresolutor ?? ticket.Correoresolutor ?? null;
+    const actor = account?.name ?? account?.username ?? "Sistema";
+    const toastId = toast.loading(`Reasignando ticket #${ticket.ID}…`);
 
     setSubmitting(true);
     try {
-      const candidatoMail = state.resolutor?.email?.trim();
-      const solicitanteMail = ticket?.Correoresolutor;
-
-      if (!candidatoMail) throw new Error("No se proporcionó correo del candidato (resolutor).");
-      if (!solicitanteMail) throw new Error("No se encontró correo del resolutor previo en el ticket.");
-
-      // Filtros OData
-      const filterCandidato: GetAllOpts = {
-        filter: `fields/Correo eq '${escapeOData(candidatoMail)}'`,
-        top: 1,
+      // 1) Reasignación directa en la BD: si esto falla, no se continúa.
+      const payload: Partial<SupabaseTickets> = {
+        ticket_solvi_resolutor: nuevo.nombre,
+        ticket_solvi_correo_resolutor: nuevo.correo,
       };
-      const filterSolicitante: GetAllOpts = {
-        filter: `fields/Correo eq '${escapeOData(solicitanteMail)}'`,
-        top: 1,
+      const updated = await Tickets.updateTicket(String(ticket.ID), payload);
+      if (!updated.status) {
+        throw new Error(updated.message ?? "No se pudo actualizar el resolutor del ticket.");
+      }
+
+      const ticketActualizado: Ticket = updated.data ?? {
+        ...ticket,
+        Nombreresolutor: nuevo.nombre,
+        Correoresolutor: nuevo.correo,
       };
 
-      const [candidatos, solicitantes] = await Promise.all([
-        Usuarios.getAll(filterCandidato),
-        Usuarios.getAll(filterSolicitante),
+      // 2) Tareas secundarias: no revierten la reasignación si fallan.
+      toast.loading("Ticket reasignado. Enviando notificaciones…", { id: toastId });
+
+      const notifParams = { ticket: ticketActualizado, nuevoResolutor: nuevo, resolutorAnterior: anterior, actor, nota: "Reasignado por el jefe" };
+      const [resResolutor, resSolicitante, resLog, resContador] = await Promise.allSettled([
+        notifyTicketReassignedResolutor(notifParams),
+        notifyTicketReassignedSolicitante(notifParams),
+        Logs?.createLog({
+          seguimientos_solvi_id_ticket: Number(ticket.ID),
+          seguimientos_solvi_actor: actor,
+          seguimientos_solvi_correo_actor: account?.username ?? "",
+          seguimientos_solvi_descripcion: `${actor} reasignó el caso de ${anterior ?? "—"} a ${nuevo.nombre}. Motivo: "Reasignado por el jefe"`,
+          seguimientos_solvi_tipo_de_accion: "Reasignación de caso",
+          seguimientos_solvi_action_date: new Date(),
+        }),
+        increaseResolverCaseCount(Usuarios, nuevo.correo),
       ]);
-      
-      const candidato = candidatos?.[0];
-      const solicitante = solicitantes?.[0];
 
-      if (!candidato?.Id) throw new Error(`No se encontró candidato con correo ${candidatoMail}`);
-      if (!solicitante?.Id) throw new Error(`No se encontró solicitante con correo ${solicitanteMail}`);
+      const fallidos: string[] = [];
+      if (resResolutor.status === "rejected") fallidos.push("resolutor");
+      if (resSolicitante.status === "rejected") fallidos.push("solicitante");
 
-      const payloadFlow: Reasignar = {
-        IDCandidato: Number(candidato.Id),
-        IDSolicitante: Number(solicitante.Id),
-        IDCaso: Number(ticket.ID),
-        Nota: state.Nota ?? "",
-      };
+      if (resLog.status === "rejected") console.error("[Reasignar] Error creando log:", resLog.reason);
+      if (resContador.status === "rejected") console.error("[Reasignar] Error actualizando contador:", resContador.reason);
+      if (fallidos.length) console.error("[Reasignar] Error notificando:", resResolutor, resSolicitante);
 
-      // 1) Enviar la reasignación por Flow
-      const resp =  await notifyFlow.invoke<FlowToReasign, any>({
-                    IDCandidato: payloadFlow.IDCandidato,
-                    IDCaso: payloadFlow.IDCaso,
-                    IDSolicitante: payloadFlow.IDSolicitante,
-                    Nota: payloadFlow.Nota, 
-                  });
-      console.log("[Flow] Reasignación enviada:", resp);
-
-      // 2) Registrar Log (si falla, que no bloquee la UI)
-      const payloadLog: LogDTO = {
-        seguimientos_solvi_id_ticket: Number(ticket.ID),
-        seguimientos_solvi_actor: solicitante.Title,
-        seguimientos_solvi_correo_actor: solicitante.Correo ?? solicitanteMail,
-        seguimientos_solvi_descripcion: `${solicitante.Title} ha reasignado el caso ID ${ticket.ID} a ${candidato.Title}`,
-        seguimientos_solvi_tipo_de_accion: "Reasignación de caso",
-        seguimientos_solvi_action_date: new Date()
-      };
-      try {
-        const created = await Logs.createLog(payloadLog);
-        console.log(created)
-        if (!created) console.warn("[Logs.create] respuesta vacía/inesperada", { payloadLog });
-      } catch (logErr) {
-        console.error("[Logs.create] error:", logErr, { payloadLog });
+      if (!fallidos.length) {
+        toast.success(`Ticket #${ticket.ID} reasignado a ${nuevo.nombre}. Se notificó al resolutor y al solicitante.`, { id: toastId, duration: 5000 });
+      } else {
+        toast.success(`Ticket #${ticket.ID} reasignado a ${nuevo.nombre}.`, { id: toastId });
+        toast(`No se pudo enviar la notificación al ${fallidos.join(" ni al ")}.`, { icon: "⚠️", duration: 7000 });
+      }
+      if (resLog.status === "rejected") {
+        toast("No se pudo registrar la reasignación en el seguimiento.", { icon: "⚠️", duration: 6000 });
       }
 
       setState({ resolutor: null, Nota: "" });
       setErrors({});
+      onDone?.();
     } catch (err) {
-      console.error("Error en reasignación:", err);
-      setErrors((prev) => ({ ...prev, general: (err as Error).message }));
+      const message = (err as Error)?.message ?? "Error inesperado reasignando el ticket.";
+      console.error("[Reasignar] Error:", err);
+      setErrors((prev) => ({ ...prev, general: message }));
+      toast.error(`No se pudo reasignar el ticket: ${message}`, { id: toastId });
     } finally {
       setSubmitting(false);
     }
   };
 
-  return { state, setField, errors, submitting, handleReasignar };
+  return {
+    state,
+    setField,
+    errors,
+    submitting,
+    isCerrado,
+    resolutores,
+    loadingResolutores,
+    errorResolutores,
+    notaMax: NOTA_MAX,
+    handleReasignar,
+  };
 }

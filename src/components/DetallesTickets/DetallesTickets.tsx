@@ -103,6 +103,11 @@ export function CaseDetail({ ticket, onVolver, role, onDocumentar }: Props) {
     onDocumentar();
   }, [onDocumentar]);
 
+  const handleReasignado = React.useCallback(() => {
+    setActiveModal(null);
+    onDocumentar();
+  }, [onDocumentar]);
+
   const handlePausado = React.useCallback(() => {
     setActiveModal(null);
     onDocumentar();
@@ -219,7 +224,7 @@ export function CaseDetail({ ticket, onVolver, role, onDocumentar }: Props) {
 
       {activeModal === "reasignar" && (
         <ModalShell ariaLabel="Reasignar ticket" onClose={closeModal}>
-          <Reasignar ticket={selected} />
+          <Reasignar ticket={selected} onCancel={closeModal} onDone={handleReasignado} />
         </ModalShell>
       )}
 

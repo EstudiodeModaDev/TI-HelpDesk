@@ -79,10 +79,13 @@ export class SupabaseTicketRepository implements TicketsRepository {
       const searchValue = this.sanitizeSearchValue(trimmedSearch);
       if (searchValue) {
         const searchPattern = `%${searchValue}%`;
+        // ticket_solvi_id es integer: ilike no aplica (rompe todo el or), se compara por igualdad.
+        const idMatch = /^#?(\d{1,9})$/.exec(searchValue);
         searchFilters = [
           `ticket_solvi_titulo.ilike.${searchPattern}`,
           `ticket_solvi_solicitante.ilike.${searchPattern}`,
           `ticket_solvi_resolutor.ilike.${searchPattern}`,
+          ...(idMatch ? [`ticket_solvi_id.eq.${idMatch[1]}`] : []),
         ].join(",");
       }
     }

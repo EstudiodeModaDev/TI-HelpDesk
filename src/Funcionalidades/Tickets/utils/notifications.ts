@@ -466,3 +466,85 @@ export async function notifyTicketResumedSolicitante(
     senderMail: "listo@estudiodemoda.com.co",
   });
 }
+
+type ReassignmentNotificationParams = {
+  ticket: Ticket;
+  nuevoResolutor: { nombre: string; correo: string };
+  resolutorAnterior?: string | null;
+  actor: string;
+  nota: string;
+};
+
+export async function notifyTicketReassignedResolutor(params: ReassignmentNotificationParams): Promise<void> {
+  const { ticket, nuevoResolutor, resolutorAnterior, actor, nota } = params;
+  const address = nuevoResolutor.correo.trim();
+
+  if (!address) {
+    throw new Error("notifyTicketReassignedResolutor: correo del resolutor inválido");
+  }
+
+  const subject = `Se te reasignó el caso ${ticket.ID}`;
+  const body = `
+    <div style="font-family:Segoe UI,Arial,sans-serif;color:#111827;line-height:1.5;">
+      <p>Hola ${escapeHtml(nuevoResolutor.nombre)},</p>
+      <p><strong>${escapeHtml(actor)}</strong> te ha reasignado el siguiente caso:</p>
+      <div style="border:1px solid #dbeafe;border-radius:12px;padding:16px;background:#eff6ff;">
+        <p style="margin:0 0 8px 0;"><strong>ID del Caso:</strong> ${escapeHtml(String(ticket.ID ?? "-"))}</p>
+        <p style="margin:0 0 8px 0;"><strong>Asunto:</strong> ${escapeHtml(String(ticket.AsuntoTicket ?? "Sin asunto"))}</p>
+        <p style="margin:0 0 8px 0;"><strong>Solicitante:</strong> ${escapeHtml(ticket.Solicitante ?? "—")}${ticket.CorreoSolicitante ? ` (${escapeHtml(ticket.CorreoSolicitante)})` : ""}</p>
+        <p style="margin:0 0 8px 0;"><strong>Resolutor anterior:</strong> ${escapeHtml(resolutorAnterior || "—")}</p>
+        <p style="margin:0 0 8px 0;"><strong>Fecha máxima de solución:</strong> ${toISODateTimeFlex(ticket.FechaMaxima) || "No aplica"}</p>
+        <p style="margin:0;"><strong>Motivo de la reasignación:</strong><br>${buildCommentSnippet(nota)}</p>
+      </div>
+      ${buildOpenTicketButton(ticket.ID)}
+      <p style="margin-top:16px;">Por favor, contacta al solicitante para continuar con la gestión. Este es un mensaje automático, por favor no respondas.</p>
+    </div>
+  `.trim();
+
+  await sendMail({
+    payload: {
+      message: {
+        subject,
+        body: { contentType: "HTML", content: body },
+        toRecipients: buildRecipients([address]),
+      },
+    },
+    senderMail: "listo@estudiodemoda.com.co",
+  });
+}
+
+export async function notifyTicketReassignedSolicitante(params: ReassignmentNotificationParams): Promise<void> {
+  const { ticket, nuevoResolutor } = params;
+  const address = (ticket.CorreoSolicitante ?? "").trim();
+
+  if (!address) {
+    throw new Error("notifyTicketReassignedSolicitante: correo del solicitante inválido");
+  }
+
+  const subject = `Tu caso ${ticket.ID} tiene un nuevo resolutor`;
+  const body = `
+    <div style="font-family:Segoe UI,Arial,sans-serif;color:#111827;line-height:1.5;">
+      <p>Hola ${escapeHtml(ticket.Solicitante ?? "")},</p>
+      <p>Te informamos que tu caso ha sido <strong>reasignado</strong> a un nuevo resolutor, quien continuará con su gestión.</p>
+      <div style="border:1px solid #e5e7eb;border-radius:12px;padding:16px;background:#f9fafb;">
+        <p style="margin:0 0 8px 0;"><strong>ID del Caso:</strong> ${escapeHtml(String(ticket.ID ?? "-"))}</p>
+        <p style="margin:0 0 8px 0;"><strong>Asunto:</strong> ${escapeHtml(String(ticket.AsuntoTicket ?? "Sin asunto"))}</p>
+        <p style="margin:0 0 8px 0;"><strong>Nuevo resolutor:</strong> ${escapeHtml(nuevoResolutor.nombre)} (${escapeHtml(nuevoResolutor.correo)})</p>
+        <p style="margin:0;"><strong>Fecha máxima de solución:</strong> ${toISODateTimeFlex(ticket.FechaMaxima) || "No aplica"}</p>
+      </div>
+      ${buildOpenTicketButton(ticket.ID)}
+      <p style="margin-top:16px;">El resolutor se pondrá en contacto contigo en el menor tiempo posible. Este es un mensaje automático, por favor no respondas.</p>
+    </div>
+  `.trim();
+
+  await sendMail({
+    payload: {
+      message: {
+        subject,
+        body: { contentType: "HTML", content: body },
+        toRecipients: buildRecipients([address]),
+      },
+    },
+    senderMail: "listo@estudiodemoda.com.co",
+  });
+}

@@ -51,6 +51,42 @@ function getNumberField(
   return 0;
 }
 
+// ID (lista Usuarios de SharePoint) del resolutor al que se asignan todos los tickets por correo.
+export const FIXED_RESOLVER_ID = "121";
+
+function toTechnician(item: { id: string; fields?: GraphListItemFields }): SharePointTechnician {
+  const role = getStringField(item.fields, ["Rol"]);
+  const availability = getStringField(item.fields, ["Disponible"]);
+  const name = getStringField(item.fields, ["Title", "Nombre", "NombreCompleto"]) ??
+    `Tecnico ${item.id}`;
+  const email = getStringField(item.fields, [
+    "Correo",
+    "Email",
+    "EMail",
+    "CorreoElectronico",
+  ]);
+  const caseCount = getNumberField(item.fields, ["Numerodecasos"]);
+
+  return {
+    id: item.id,
+    name,
+    email,
+    role: role ?? "",
+    availability: availability ?? "",
+    caseCount,
+  };
+}
+
+// Devuelve el resolutor fijo sin importar su rol ni disponibilidad.
+export async function getFixedTechnician(
+  accessToken: string,
+  config: ProcessEmailsConfig,
+): Promise<SharePointTechnician | null> {
+  const items = await listSharePointUsers(accessToken, config);
+  const item = items.find((i) => String(i.id) === FIXED_RESOLVER_ID);
+  return item ? toTechnician(item) : null;
+}
+
 export async function listAvailableTechnicians(
   accessToken: string,
   config: ProcessEmailsConfig,
@@ -58,28 +94,7 @@ export async function listAvailableTechnicians(
   const items = await listSharePointUsers(accessToken, config);
 
   return items
-    .map((item) => {
-      const role = getStringField(item.fields, ["Rol"]);
-      const availability = getStringField(item.fields, ["Disponible"]);
-      const name = getStringField(item.fields, ["Title", "Nombre", "NombreCompleto"]) ??
-        `Tecnico ${item.id}`;
-      const email = getStringField(item.fields, [
-        "Correo",
-        "Email",
-        "EMail",
-        "CorreoElectronico",
-      ]);
-      const caseCount = getNumberField(item.fields, ["Numerodecasos"]);
-
-      return {
-        id: item.id,
-        name,
-        email,
-        role: role ?? "",
-        availability: availability ?? "",
-        caseCount,
-      };
-    })
+    .map(toTechnician)
     .filter((technician) =>
       technician.role === "Tecnico" &&
       technician.availability === "Disponible"
@@ -101,6 +116,7 @@ export function selectTechnicianWithLowestCases(
     return left.name.localeCompare(right.name, "es", { sensitivity: "base" });
   })[0];
 }
+
 
 export async function incrementTechnicianCaseCount(
   accessToken: string,

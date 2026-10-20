@@ -48,14 +48,14 @@ export default function TablaTickets() {
     };
 
     load();
-  }, [rows]); 
+  }, [rows, ticketSeleccionado, updateSelectedTicket]); 
   return (
     <div className="tabla-tickets">
 
       {!ticketSeleccionado && (
         <div className="tickets-filtros">
 
-          <input type="text" placeholder="Buscar (resolutor, solicitante, asunto)..." value={search} onChange={(e) => setSearch(e.target.value)}/>
+          <input type="text" placeholder="Buscar (id, resolutor, solicitante, asunto)..." value={search} onChange={(e) => setSearch(e.target.value)}/>
 
           <select value={filterMode} onChange={(e) => setFilterMode(e.target.value as any)} title="Estado">
             <option value="En curso">En curso</option>
