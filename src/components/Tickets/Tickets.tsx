@@ -48,7 +48,7 @@ export default function TablaTickets() {
     };
 
     load();
-  }, [rows, ticketSeleccionado, updateSelectedTicket]); 
+  }, [rows,]); 
   return (
     <div className="tabla-tickets">
 
